@@ -21,7 +21,9 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
+    return SizedBox(
+      width: width ?? double.infinity,
+      child: AbsorbPointer(
       absorbing: isLoading,
       child: ElevatedButton(
         onPressed: onPressed,
@@ -31,14 +33,15 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-        maximumSize: Size(width ?? double.infinity, 60),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        ), child: Text(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          ),
+          child: Text(
           text, 
           style: TextStyle(
             fontSize: 14, 
             fontWeight: FontWeight.w600,
             color: textColor ?? Colors.white,
+            ),
           ),
         ),
       ),
@@ -52,6 +55,7 @@ class CustomOutlinedButton extends StatelessWidget {
   final Color? color;
   final bool isLoading;
   final double? width;
+  final Color? textColor;
 
   const CustomOutlinedButton({
     super.key,
@@ -60,11 +64,14 @@ class CustomOutlinedButton extends StatelessWidget {
     this.color,
     this.isLoading = false,
     this.width,
+    this.textColor,
 });
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
+    return SizedBox(
+      width: width ?? double.infinity,
+      child: AbsorbPointer(
       absorbing: isLoading,
       child: OutlinedButton(
       onPressed: onPressed,
@@ -74,12 +81,18 @@ class CustomOutlinedButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        maximumSize: Size(width ?? double.infinity, 60),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-      ), child: Text(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          ),
+          child: Text(
         text, 
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: textColor ?? color ??  Constants.primaryColor,
+            ),
+          ),
       ),
-    ));
+      ),
+    );
   }
 }

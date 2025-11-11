@@ -53,6 +53,7 @@ class CustomDropdown<T> extends StatelessWidget {
   final void Function(T?) onChanged;
   final String? Function(T?)? validator;
   final bool isRequired;
+  final bool enabled;
 
   const CustomDropdown({
     super.key,
@@ -66,6 +67,7 @@ class CustomDropdown<T> extends StatelessWidget {
     this.validator,
     this.isRequired = true,
     this.value,
+    this.enabled = true,
   }) : assert(
          (items != null && dropdownItems == null) || 
          (items == null && dropdownItems != null),
@@ -75,6 +77,14 @@ class CustomDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseFillColor = isDark ? Colors.grey.shade800 : Colors.white;
+    final dropdownMenuColor = isDark ? Colors.grey.shade800 : Colors.white;
+    final disabledFillColor = isDark
+        ? Colors.grey.shade800.withOpacity(0.6)
+        : Colors.white.withOpacity(0.7);
+    final borderColor = theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3);
+    final focusColor = theme.colorScheme.primary;
     
     // Extract items and labels from dropdownItems if provided
     final actualItems = dropdownItems != null 
@@ -98,9 +108,9 @@ class CustomDropdown<T> extends StatelessWidget {
         const SizedBox(height: 8),
         Theme(
           data: Theme.of(context).copyWith(
-            canvasColor: Colors.white,
-            cardColor: Colors.white,
-            dialogBackgroundColor: Colors.white,
+            canvasColor: dropdownMenuColor,
+            cardColor: dropdownMenuColor,
+            dialogBackgroundColor: dropdownMenuColor,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -110,7 +120,8 @@ class CustomDropdown<T> extends StatelessWidget {
             child: DropdownButtonFormField<T>(
             value: value,
             isExpanded: true,
-            dropdownColor: Colors.white,
+            dropdownColor: dropdownMenuColor,
+            onChanged: enabled ? onChanged : null,
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
@@ -119,31 +130,31 @@ class CustomDropdown<T> extends StatelessWidget {
               ),
               prefixIcon: Icon(
                 icon,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
                 size: Constants.iconsSize,
               ),
               filled: true,
-              fillColor: Constants.veryLightGreyColor,
+              fillColor: enabled ? baseFillColor : disabledFillColor,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Constants.primaryColor.withOpacity(0.2),
+                  color: borderColor,
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Constants.primaryColor.withOpacity(0.2),
+                  color: borderColor,
                   width: 1.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Constants.primaryColor,
-                  width: 2,
+                  color: enabled ? focusColor : borderColor,
+                  width: enabled ? 2 : 1.5,
                 ),
               ),
               errorBorder: OutlineInputBorder(
@@ -160,16 +171,26 @@ class CustomDropdown<T> extends StatelessWidget {
                   width: 2,
                 ),
               ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.15),
+                  width: 1.5,
+                ),
+              ),
             ),
             style: TextStyle(
               fontSize: Constants.textSize,
-              color: theme.colorScheme.onSurface,
+              color: enabled
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onSurface.withOpacity(0.6),
             ),
             selectedItemBuilder: (BuildContext context) {
+              final labels = actualLabels;
               return actualItems.map<Widget>((T item) {
                 final index = actualItems.indexOf(item);
-                final label = actualLabels != null && index < actualLabels!.length
-                    ? actualLabels![index]
+                final label = labels != null && index < labels.length
+                    ? labels[index]
                     : item.toString();
                 return Container(
                   width: double.infinity,
@@ -187,10 +208,11 @@ class CustomDropdown<T> extends StatelessWidget {
               }).toList();
             },
             items: actualItems.asMap().entries.map((entry) {
+              final labels = actualLabels;
               final index = entry.key;
               final item = entry.value;
-              final label = actualLabels != null && index < actualLabels!.length
-                  ? actualLabels![index]
+              final label = labels != null && index < labels.length
+                  ? labels[index]
                   : item.toString();
                 return DropdownMenuItem<T>(
                 value: item,
@@ -211,7 +233,6 @@ class CustomDropdown<T> extends StatelessWidget {
                 ),
               );
             }).toList(),
-            onChanged: onChanged,
             validator: validator,
             ),
           ),

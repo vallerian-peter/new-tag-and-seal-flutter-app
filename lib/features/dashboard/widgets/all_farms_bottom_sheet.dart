@@ -9,8 +9,10 @@ import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart'
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_details_bottom_sheet.dart';
+import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/farm_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/repository/livestock_repository.dart';
 
 class AllFarmsBottomSheet extends StatefulWidget {
   final List<Map<String, dynamic>> farms;
@@ -400,13 +402,21 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
                     ),
                   ),
                   
-                  const SizedBox(width: 12),
-                  
-                  // Arrow
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.layers_outlined),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        onPressed: () => _showBulkActionsSheet(context, farm),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -415,6 +425,15 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
           ),
         );
       },
+    );
+  }
+
+  void _showBulkActionsSheet(BuildContext context, Map<String, dynamic> farm) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FarmBulkActionsSheet(farm: farm),
     );
   }
 
@@ -470,17 +489,23 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
   Future<void> _performDelete(BuildContext context, Map<String, dynamic> farm) async {
     log('🌾🌾 Farms: ${farm}');
     final l10n = AppLocalizations.of(context)!;
-    final farmId = farm['id'];
     
-    if (farmId == null) {
+    // Extract farmId and farmUuid from the nested farmData object
+    final farmData = farm['farmData'] as Farm?;
+    log('🌾🌾 Farm Data: ${farmData}');
+
+    if (farmData == null) {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
-        message: 'Invalid farm ID',
+        message: l10n.farmDataNotFound,
         buttonText: l10n.ok,
       );
       return;
     }
+
+    final farmId = farmData.id;
+    final farmUuid = farmData.uuid;
 
     try {
       // Mark farm as deleted (soft delete with syncAction='deleted')
@@ -488,7 +513,12 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
       final success = await farmProvider.markFarmAsDeleted(farmId);
       
       if (success) {
-        // Remove from filtered list to update UI
+        // Also mark all livestock belonging to this farm as deleted
+        final database = Provider.of<AppDatabase>(context, listen: false);
+        final livestockRepository = LivestockRepository(database);
+        final deletedLivestockCount = await livestockRepository.markLivestockByFarmUuidAsDeleted(farmUuid);
+        
+        log('✅ Farm and $deletedLivestockCount livestock marked for deletion');
         setState(() {
           _filteredFarms.removeWhere((f) => f['id'] == farmId);
         });
@@ -496,14 +526,24 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
-          message: '${farm['name']} marked for deletion',
+          message: deletedLivestockCount > 0 
+              ? '${farm['name']} and $deletedLivestockCount livestock marked for deletion'
+              : '${farm['name']} marked for deletion',
           buttonText: l10n.ok,
         );
+        
+        // Close the bottom sheet
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+        
+        // Trigger refresh to reload the page
+        widget.onRefresh?.call();
       } else {
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
-          message: 'Failed to mark farm for deletion',
+          message: l10n.failedToMarkFarmForDeletion,
           buttonText: l10n.ok,
         );
       }
@@ -511,7 +551,7 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
-        message: 'Error deleting farm: $e',
+        message: '${l10n.errorDeletingFarm}: $e',
         buttonText: l10n.ok,
       );
     }

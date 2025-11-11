@@ -26,28 +26,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // AuthProvider will be accessed via Provider.of<AuthProvider>(context)
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controllers for Step 1: Personal Information
   final _firstNameController = TextEditingController();
   final _middleNameController = TextEditingController();
   final _surnameController = TextEditingController();
   final _dateOfBirthController = TextEditingController();
-  
+
   // Controllers for Step 2: Contact Information
   final _phone1Controller = TextEditingController();
   final _phone2Controller = TextEditingController();
   final _emailController = TextEditingController();
   final _physicalAddressController = TextEditingController();
-  
+
   // Controllers for Step 3: Identity Information
   final _identityNumberController = TextEditingController();
-  
+
   // Controllers for Step 4: Location Information
   // We'll store IDs from dropdowns
-  
+
   // Controllers for Step 5: Additional Information
   final _farmerOrganizationController = TextEditingController();
-  
+
   // Form field values
   String? _selectedGender;
   String? _selectedFarmerType;
@@ -59,9 +59,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int? _selectedWardId;
   int? _selectedVillageId;
   int? _selectedStreetId;
-  
+
   bool _isLoading = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -70,16 +70,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _loadLocationsIfNeeded();
     });
   }
-  
+
   Future<void> _loadLocationsIfNeeded() async {
-    final additionalDataProvider = Provider.of<AdditionalDataProvider>(context, listen: false);
-    
+    final additionalDataProvider = Provider.of<AdditionalDataProvider>(
+      context,
+      listen: false,
+    );
+
     // Only load if not already loaded
-    if (!additionalDataProvider.hasLocationData && !additionalDataProvider.isLoadingLocations) {
+    if (!additionalDataProvider.hasLocationData &&
+        !additionalDataProvider.isLoadingLocations) {
       await additionalDataProvider.fetchLocationsWithDialogs(context);
     }
   }
-  
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -100,10 +104,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Constants.veryLightGreyColor,
@@ -127,58 +135,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: Consumer<AdditionalDataProvider>(
         builder: (context, additionalDataProvider, child) {
- 
-          if(!additionalDataProvider.hasLocationData) {
+          if (!additionalDataProvider.hasLocationData) {
             return const Center(child: LoadingIndicator());
           }
-        
+
           return SafeArea(
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: CustomStepper(
-                  currentStep: _currentStep,
-                  onStepContinue: _onStepContinue,
-                  onStepCancel: _onStepCancel,
-                  isLoading: _isLoading,
-                  steps: [
-                    StepperStep(
-                      title: l10n.personalInfoStep,
-                      subtitle: l10n.personalInfoStepSubtitle,
-                      icon: Icons.person_outline,
-                      content: _buildPersonalInfoStep(),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: CustomStepper(
+                      currentStep: _currentStep,
+                      onStepContinue: _onStepContinue,
+                      onStepCancel: _onStepCancel,
+                      isLoading: _isLoading,
+                      steps: [
+                        StepperStep(
+                          title: l10n.personalInfoStep,
+                          subtitle: l10n.personalInfoStepSubtitle,
+                          icon: Icons.person_outline,
+                          content: _buildPersonalInfoStep(),
+                        ),
+                        StepperStep(
+                          title: l10n.contactInfoStep,
+                          subtitle: l10n.contactInfoStepSubtitle,
+                          icon: Icons.contact_phone_outlined,
+                          content: _buildContactInfoStep(),
+                        ),
+                        StepperStep(
+                          title: l10n.identityInfoStep,
+                          subtitle: l10n.identityInfoStepSubtitle,
+                          icon: Icons.badge_outlined,
+                          content: _buildIdentityInfoStep(),
+                        ),
+                        StepperStep(
+                          title: l10n.locationInfoStep,
+                          subtitle: l10n.locationInfoStepSubtitle,
+                          icon: Icons.location_on_outlined,
+                          content: _buildLocationInfoStep(),
+                        ),
+                        StepperStep(
+                          title: l10n.additionalInfoStep,
+                          subtitle: l10n.additionalInfoStepSubtitle,
+                          icon: Icons.info_outline,
+                          content: _buildAdditionalInfoStep(),
+                        ),
+                      ],
                     ),
-                    StepperStep(
-                      title: l10n.contactInfoStep,
-                      subtitle: l10n.contactInfoStepSubtitle,
-                      icon: Icons.contact_phone_outlined,
-                      content: _buildContactInfoStep(),
-                    ),
-                    StepperStep(
-                      title: l10n.identityInfoStep,
-                      subtitle: l10n.identityInfoStepSubtitle,
-                      icon: Icons.badge_outlined,
-                      content: _buildIdentityInfoStep(),
-                    ),
-                    StepperStep(
-                      title: l10n.locationInfoStep,
-                      subtitle: l10n.locationInfoStepSubtitle,
-                      icon: Icons.location_on_outlined,
-                      content: _buildLocationInfoStep(),
-                    ),
-                    StepperStep(
-                      title: l10n.additionalInfoStep,
-                      subtitle: l10n.additionalInfoStepSubtitle,
-                      icon: Icons.info_outline,
-                      content: _buildAdditionalInfoStep(),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
         },
-      ),    
+      ),
     );
   }
 
@@ -211,11 +222,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //                 subtitle: l10n.additionalInfoStepSubtitle,
   //                 icon: Icons.info_outline,
   // }
-  
+
   // Step 1: Personal Information
   Widget _buildPersonalInfoStep() {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -283,11 +294,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ],
     );
   }
-  
+
   // Step 2: Contact Information
   Widget _buildContactInfoStep() {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -351,27 +362,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ],
     );
   }
-  
+
   // Step 3: Identity Information
   Widget _buildIdentityInfoStep() {
     final l10n = AppLocalizations.of(context)!;
     final additionalDataProvider = Provider.of<AdditionalDataProvider>(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(l10n.identityCardType),
         const SizedBox(height: 20),
-        
+
         // Identity Card Type Dropdown
         CustomDropdown<int>(
           value: _selectedIdentityCardTypeId,
           label: l10n.identityCardType,
           hint: l10n.selectIdType,
           icon: Icons.badge_outlined,
-          items: additionalDataProvider.identityCardTypes.map((t) => t.id).toList(),
-          itemLabels: additionalDataProvider.identityCardTypes.map((t) => t.name).toList(),
-          onChanged: (value) => setState(() => _selectedIdentityCardTypeId = value),
+          items: additionalDataProvider.identityCardTypes
+              .map((t) => t.id)
+              .toList(),
+          itemLabels: additionalDataProvider.identityCardTypes
+              .map((t) => t.name)
+              .toList(),
+          onChanged: (value) =>
+              setState(() => _selectedIdentityCardTypeId = value),
           validator: (value) {
             if (value == null) {
               return l10n.identityTypeRequired;
@@ -380,7 +396,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         CustomTextField(
           controller: _identityNumberController,
           label: l10n.identityNumber,
@@ -394,7 +410,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // School Level Dropdown
         CustomDropdown<int>(
           value: _selectedSchoolLevelId,
@@ -402,7 +418,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectEducationLevel,
           icon: Icons.school_outlined,
           items: additionalDataProvider.schoolLevels.map((s) => s.id).toList(),
-          itemLabels: additionalDataProvider.schoolLevels.map((s) => s.name).toList(),
+          itemLabels: additionalDataProvider.schoolLevels
+              .map((s) => s.name)
+              .toList(),
           onChanged: (value) => setState(() => _selectedSchoolLevelId = value),
           validator: (value) {
             if (value == null) {
@@ -414,18 +432,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ],
     );
   }
-  
+
   // Step 4: Location Information
   Widget _buildLocationInfoStep() {
     final l10n = AppLocalizations.of(context)!;
     final additionalDataProvider = Provider.of<AdditionalDataProvider>(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(l10n.addressInformation),
         const SizedBox(height: 20),
-        
+
         // Country Dropdown
         CustomDropdown<int>(
           value: _selectedCountryId,
@@ -433,7 +451,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectCountry,
           icon: Icons.public_outlined,
           items: additionalDataProvider.countries.map((c) => c.id).toList(),
-          itemLabels: additionalDataProvider.countries.map((c) => c.name).toList(),
+          itemLabels: additionalDataProvider.countries
+              .map((c) => c.name)
+              .toList(),
           onChanged: (value) {
             setState(() {
               _selectedCountryId = value;
@@ -452,18 +472,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Region Dropdown
         CustomDropdown<int>(
           value: _selectedRegionId,
           label: l10n.region,
           hint: l10n.selectRegion,
           icon: Icons.map_outlined,
-          items: _selectedCountryId != null 
-              ? additionalDataProvider.getRegionsByCountry(_selectedCountryId!).map((r) => r.id).toList()
+          items: _selectedCountryId != null
+              ? additionalDataProvider
+                    .getRegionsByCountry(_selectedCountryId!)
+                    .map((r) => r.id)
+                    .toList()
               : [],
           itemLabels: _selectedCountryId != null
-              ? additionalDataProvider.getRegionsByCountry(_selectedCountryId!).map((r) => r.name).toList()
+              ? additionalDataProvider
+                    .getRegionsByCountry(_selectedCountryId!)
+                    .map((r) => r.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -482,7 +508,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // District Dropdown
         CustomDropdown<int>(
           value: _selectedDistrictId,
@@ -490,10 +516,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectDistrict,
           icon: Icons.location_city_outlined,
           items: _selectedRegionId != null
-              ? additionalDataProvider.getDistrictsByRegion(_selectedRegionId!).map((d) => d.id).toList()
+              ? additionalDataProvider
+                    .getDistrictsByRegion(_selectedRegionId!)
+                    .map((d) => d.id)
+                    .toList()
               : [],
           itemLabels: _selectedRegionId != null
-              ? additionalDataProvider.getDistrictsByRegion(_selectedRegionId!).map((d) => d.name).toList()
+              ? additionalDataProvider
+                    .getDistrictsByRegion(_selectedRegionId!)
+                    .map((d) => d.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -511,7 +543,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Ward Dropdown
         CustomDropdown<int>(
           value: _selectedWardId,
@@ -519,10 +551,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectWard,
           icon: Icons.place_outlined,
           items: _selectedDistrictId != null
-              ? additionalDataProvider.getWardsByDistrict(_selectedDistrictId!).map((w) => w.id).toList()
+              ? additionalDataProvider
+                    .getWardsByDistrict(_selectedDistrictId!)
+                    .map((w) => w.id)
+                    .toList()
               : [],
           itemLabels: _selectedDistrictId != null
-              ? additionalDataProvider.getWardsByDistrict(_selectedDistrictId!).map((w) => w.name).toList()
+              ? additionalDataProvider
+                    .getWardsByDistrict(_selectedDistrictId!)
+                    .map((w) => w.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -539,7 +577,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Village Dropdown (Optional)
         CustomDropdown<int>(
           value: _selectedVillageId,
@@ -547,16 +585,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectVillage,
           icon: Icons.home_work_outlined,
           items: _selectedWardId != null
-              ? additionalDataProvider.getVillagesByWard(_selectedWardId!).map((v) => v.id).toList()
+              ? additionalDataProvider
+                    .getVillagesByWard(_selectedWardId!)
+                    .map((v) => v.id)
+                    .toList()
               : [],
           itemLabels: _selectedWardId != null
-              ? additionalDataProvider.getVillagesByWard(_selectedWardId!).map((v) => v.name).toList()
+              ? additionalDataProvider
+                    .getVillagesByWard(_selectedWardId!)
+                    .map((v) => v.name)
+                    .toList()
               : [],
           onChanged: (value) => setState(() => _selectedVillageId = value),
           // No validator - field is optional
         ),
         const SizedBox(height: 16),
-        
+
         // Street Dropdown (Optional)
         CustomDropdown<int>(
           value: _selectedStreetId,
@@ -564,10 +608,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: l10n.selectStreet,
           icon: Icons.signpost_outlined,
           items: _selectedWardId != null
-              ? additionalDataProvider.getStreetsByWard(_selectedWardId!).map((s) => s.id).toList()
+              ? additionalDataProvider
+                    .getStreetsByWard(_selectedWardId!)
+                    .map((s) => s.id)
+                    .toList()
               : [],
           itemLabels: _selectedWardId != null
-              ? additionalDataProvider.getStreetsByWard(_selectedWardId!).map((s) => s.name).toList()
+              ? additionalDataProvider
+                    .getStreetsByWard(_selectedWardId!)
+                    .map((s) => s.name)
+                    .toList()
               : [],
           onChanged: (value) => setState(() => _selectedStreetId = value),
           // No validator - field is optional
@@ -575,11 +625,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ],
     );
   }
-  
+
   // Step 5: Additional Information
   Widget _buildAdditionalInfoStep() {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -612,17 +662,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: BoxDecoration(
             color: Constants.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Constants.primaryColor.withOpacity(0.3),
-            ),
+            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: Constants.primaryColor,
-                size: 24,
-              ),
+              Icon(Icons.info_outline, color: Constants.primaryColor, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -639,7 +683,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ],
     );
   }
-  
+
   // Reusable widget builders
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -651,10 +695,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-  
-  
-  
-  
+
   // Step navigation logic
   void _onStepContinue() async {
     if (_currentStep < 4) {
@@ -669,19 +710,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }
   }
-  
+
   void _onStepCancel() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     }
   }
-  
-  
+
   Future<void> _submitRegistration() async {
     final l10n = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     setState(() => _isLoading = true);
-    
+
     try {
       // Prepare registration data with authentication fields
       final registrationData = {
@@ -690,7 +730,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'email': _emailController.text,
         'password': _emailController.text, // Use email as password
         // 'password_confirmation': _emailController.text,
-        
+
         // Personal information
         'firstName': _firstNameController.text,
         'middleName': _middleNameController.text,
@@ -701,12 +741,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'farmerOrganizationMembership': _farmerOrganizationController.text,
         'dateOfBirth': _dateOfBirthController.text,
         'gender': _selectedGender?.toLowerCase(),
-        
+
         // Identity information
         'identityCardTypeId': _selectedIdentityCardTypeId,
         'identityNumber': _identityNumberController.text,
         'schoolLevelId': _selectedSchoolLevelId,
-        
+
         // Location information
         'streetId': _selectedStreetId,
         'villageId': _selectedVillageId,
@@ -714,18 +754,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'districtId': _selectedDistrictId,
         'regionId': _selectedRegionId,
         'countryId': _selectedCountryId,
-        
+
         // Farmer information
         'farmerType': _selectedFarmerType?.toLowerCase(),
       };
 
-      final isRegistered = await authProvider.registerFarmer(context: context, farmerData: registrationData);
+      final isRegistered = await authProvider.registerFarmer(
+        context: context,
+        farmerData: registrationData,
+      );
 
       if (isRegistered && mounted) {
         // Registration successful - navigate to dashboard
         Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (context) => const HomeScreen())
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     } catch (e) {
@@ -733,7 +776,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Show user-friendly error dialog
         final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
         final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-        
+
         await AlertDialogs.showError(
           context: context,
           title: errorTitle,

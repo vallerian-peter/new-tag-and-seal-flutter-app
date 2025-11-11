@@ -7,6 +7,14 @@ import 'package:new_tag_and_seal_flutter_app/features/auth/data/local/auth_repos
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/data/repository/farm_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/repository/livestock_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/data/repository/log_additional_data_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/provider/vaccine_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +30,10 @@ void main() async {
   
   final additionalDataRepo = AllAdditionalDataRepository(database);
   final farmRepo = FarmRepository(database);
+  final livestockRepo = LivestockRepository(database);
+  final logAdditionalDataRepo = LogAdditionalDataRepository(database);
+  final eventsRepo = EventsRepository(database);
+  final vaccinesRepo = VaccinesRepository(database);
   
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
@@ -31,6 +43,11 @@ void main() async {
   final authProvider = AuthProvider(authRepository: authRepo, repository: authRepo);
   final syncProvider = SyncProvider(database: database);
   final farmProvider = FarmProvider(farmRepository: farmRepo);
+  final livestockProvider = LivestockProvider(livestockRepo: livestockRepo);
+  final logAdditionalDataProvider =
+      LogAdditionalDataProvider(repository: logAdditionalDataRepo);
+  final eventsProvider = EventsProvider(eventsRepository: eventsRepo);
+  final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
   
   runApp(
     MultiProvider(
@@ -41,6 +58,10 @@ void main() async {
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: syncProvider),
         ChangeNotifierProvider.value(value: farmProvider),
+        ChangeNotifierProvider.value(value: livestockProvider),
+        ChangeNotifierProvider.value(value: logAdditionalDataProvider),
+        ChangeNotifierProvider.value(value: eventsProvider),
+        ChangeNotifierProvider.value(value: vaccineProvider),
       ],
       child: const MyApp(),
     ),

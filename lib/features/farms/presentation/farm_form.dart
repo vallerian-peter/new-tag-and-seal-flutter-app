@@ -15,16 +15,13 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 /// Modern Farm Registration Form Screen
-/// 
+///
 /// A multi-step form for registering a new farm or updating an existing farm.
 /// Uses the same design pattern as RegisterScreen for consistency.
 class FarmFormScreen extends StatefulWidget {
   final Farm? farm; // Farm to edit (null for create mode)
-  
-  const FarmFormScreen({
-    super.key,
-    this.farm,
-  });
+
+  const FarmFormScreen({super.key, this.farm});
 
   @override
   State<FarmFormScreen> createState() => _FarmFormScreenState();
@@ -33,22 +30,22 @@ class FarmFormScreen extends StatefulWidget {
 class _FarmFormScreenState extends State<FarmFormScreen> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
-  
+
   // Check if we're in edit mode
   bool get isEditMode => widget.farm != null;
-  
+
   // Controllers for Step 1: Basic Farm Information
   final _nameController = TextEditingController();
   final _regionalRegNoController = TextEditingController();
-  
+
   // Controllers for Step 2: Farm Size & Measurements
   final _sizeController = TextEditingController();
   final _latitudesController = TextEditingController();
   final _longitudesController = TextEditingController();
-  
+
   // Controllers for Step 3: Address Information
   final _physicalAddressController = TextEditingController();
-  
+
   // Form field values
   String? _selectedSizeUnit;
   int? _selectedLegalStatusId;
@@ -57,7 +54,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
   int? _selectedDistrictId;
   int? _selectedWardId;
   int? _selectedVillageId;
-  
+
   // Local data from database
   List<Country> _countries = [];
   List<Region> _regions = [];
@@ -65,14 +62,16 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
   List<Ward> _wards = [];
   List<Village> _villages = [];
   List<LegalStatus> _legalStatuses = [];
-  
+
   bool _isLoadingData = true;
   bool _hasLoadedData = false;
-  
+
   @override
   void initState() {
     super.initState();
-    debugPrint('🔍 FarmFormScreen initState - farm: ${widget.farm?.name ?? "null"}');
+    debugPrint(
+      '🔍 FarmFormScreen initState - farm: ${widget.farm?.name ?? "null"}',
+    );
     debugPrint('🔍 isEditMode: $isEditMode');
     // Pre-fill form if editing existing farm
     if (isEditMode) {
@@ -80,18 +79,18 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
     }
     // Note: Cannot access Provider here - will load in didChangeDependencies
   }
-  
+
   /// Pre-fill form with existing farm data
   void _prefillFormData() {
     final farm = widget.farm!;
-    
+
     _nameController.text = farm.name;
     _regionalRegNoController.text = farm.regionalRegNo;
     _sizeController.text = farm.size.toString();
     _latitudesController.text = farm.latitudes.toString();
     _longitudesController.text = farm.longitudes.toString();
     _physicalAddressController.text = farm.physicalAddress;
-    
+
     _selectedSizeUnit = farm.sizeUnit;
     _selectedLegalStatusId = farm.legalStatusId;
     _selectedCountryId = farm.countryId;
@@ -100,7 +99,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
     _selectedWardId = farm.wardId;
     _selectedVillageId = farm.villageId;
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -110,21 +109,22 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       _loadDataFromDatabase();
     }
   }
-  
+
   Future<void> _loadDataFromDatabase() async {
     setState(() => _isLoadingData = true);
-    
+
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      
+
       // Load all location data and reference data from local database
       final countries = await database.locationDao.getAllCountries();
       final regions = await database.locationDao.getAllRegions();
       final districts = await database.locationDao.getAllDistricts();
       final wards = await database.locationDao.getAllWards();
       final villages = await database.locationDao.getAllVillages();
-      final legalStatuses = await database.referenceDataDao.getAllLegalStatuses();
-      
+      final legalStatuses = await database.referenceDataDao
+          .getAllLegalStatuses();
+
       setState(() {
         _countries = countries;
         _regions = regions;
@@ -137,7 +137,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
     } catch (e) {
       debugPrint('Error loading data from database: $e');
       setState(() => _isLoadingData = false);
-      
+
       // Show error after build completes
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -153,7 +153,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       }
     }
   }
-  
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -169,12 +169,12 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    
+
     // Debug: Check edit mode and button text
     debugPrint('🔍 Edit Mode: $isEditMode, Current Step: $_currentStep');
-    final buttonText = _currentStep == 2 
-      ? (isEditMode ? l10n.update : l10n.register)
-      : l10n.continueButton;
+    final buttonText = _currentStep == 2
+        ? (isEditMode ? l10n.update : l10n.register)
+        : l10n.continueButton;
     debugPrint('🔍 Button Text: $buttonText');
 
     return Scaffold(
@@ -184,8 +184,9 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         elevation: 0,
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,  // Dark icons for light background
-          statusBarBrightness: Brightness.light,     // iOS: light status bar
+          statusBarIconBrightness:
+              Brightness.dark, // Dark icons for light background
+          statusBarBrightness: Brightness.light, // iOS: light status bar
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -193,7 +194,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           iconSize: 24,
         ),
         title: Text(
-          isEditMode ? '${l10n.edit} ${l10n.farm}': l10n.registerNewFarm,
+          isEditMode ? '${l10n.edit} ${l10n.farm}' : l10n.registerNewFarm,
           style: TextStyle(
             fontSize: Constants.largeTextSize,
             fontWeight: FontWeight.bold,
@@ -202,46 +203,50 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         ),
         centerTitle: true,
       ),
-      body: _isLoadingData 
-        ? const Center(child: LoadingIndicator())
-        : SafeArea(
-            child: SingleChildScrollView(
+      body: _isLoadingData
+          ? const Center(child: LoadingIndicator())
+          : SafeArea(
               child: Form(
                 key: _formKey,
-                child: CustomStepper(
-                  currentStep: _currentStep,
-                  onStepContinue: _onStepContinue,
-                  onStepCancel: _onStepCancel,
-                  isLoading: false, // Loading handled by provider dialogs
-                  continueButtonText: buttonText,
-                  backButtonText: l10n.back,
-                  steps: [
-                    StepperStep(
-                      title: l10n.basicInformation,
-                      subtitle: l10n.farmNameReferenceDetails,
-                      icon: Icons.agriculture_outlined,
-                      content: _buildBasicInfoStep(l10n),
-                    ),
-                    StepperStep(
-                      title: l10n.sizeMeasurements,
-                      subtitle: l10n.farmMeasurementsCoordinates,
-                      icon: Icons.straighten_outlined,
-                      content: _buildSizeMeasurementsStep(l10n),
-                    ),
-                    StepperStep(
-                      title: l10n.addressLegal,
-                      subtitle: l10n.physicalLocationLegalStatus,
-                      icon: Icons.location_on_outlined,
-                      content: _buildAddressLegalStep(l10n),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CustomStepper(
+                        currentStep: _currentStep,
+                        onStepContinue: _onStepContinue,
+                        onStepCancel: _onStepCancel,
+                        isLoading: false, // Loading handled by provider dialogs
+                        continueButtonText: buttonText,
+                        backButtonText: l10n.back,
+                        steps: [
+                          StepperStep(
+                            title: l10n.basicInformation,
+                            subtitle: l10n.farmNameReferenceDetails,
+                            icon: Icons.agriculture_outlined,
+                            content: _buildBasicInfoStep(l10n),
+                          ),
+                          StepperStep(
+                            title: l10n.sizeMeasurements,
+                            subtitle: l10n.farmMeasurementsCoordinates,
+                            icon: Icons.straighten_outlined,
+                            content: _buildSizeMeasurementsStep(l10n),
+                          ),
+                          StepperStep(
+                            title: l10n.addressLegal,
+                            subtitle: l10n.physicalLocationLegalStatus,
+                            icon: Icons.location_on_outlined,
+                            content: _buildAddressLegalStep(l10n),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
     );
   }
-  
+
   // Step 1: Basic Farm Information
   Widget _buildBasicInfoStep(AppLocalizations l10n) {
     return Column(
@@ -283,17 +288,11 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           decoration: BoxDecoration(
             color: Constants.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Constants.primaryColor.withOpacity(0.3),
-            ),
+            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: Constants.primaryColor,
-                size: 24,
-              ),
+              Icon(Icons.info_outline, color: Constants.primaryColor, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -310,7 +309,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       ],
     );
   }
-  
+
   // Step 2: Size & Measurements
   Widget _buildSizeMeasurementsStep(AppLocalizations l10n) {
     return Column(
@@ -318,7 +317,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       children: [
         _buildSectionTitle(l10n.farmMeasurements),
         const SizedBox(height: 20),
-        
+
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -328,7 +327,9 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
                 label: l10n.farmSize,
                 hintText: l10n.enterSize,
                 prefixIcon: Icons.square_foot_outlined,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return l10n.sizeRequired;
@@ -364,11 +365,11 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         ),
 
         const SizedBox(height: 20),
-        
+
         _buildSectionTitle(l10n.gpsCoordinates),
 
         const SizedBox(height: 20),
-            
+
         GpsLocationButton(
           onLocationFetched: (latitude, longitude) {
             setState(() {
@@ -379,13 +380,16 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         ),
 
         const SizedBox(height: 16),
-        
+
         CustomTextField(
           controller: _latitudesController,
           label: l10n.latitude,
           hintText: l10n.latitudeExample,
           prefixIcon: Icons.my_location_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+          keyboardType: const TextInputType.numberWithOptions(
+            decimal: true,
+            signed: true,
+          ),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.latitudeRequired;
@@ -402,13 +406,16 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         ),
 
         const SizedBox(height: 16),
-        
+
         CustomTextField(
           controller: _longitudesController,
           label: l10n.longitude,
           hintText: l10n.longitudeExample,
           prefixIcon: Icons.explore_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+          keyboardType: const TextInputType.numberWithOptions(
+            decimal: true,
+            signed: true,
+          ),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.longitudeRequired;
@@ -423,11 +430,10 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
             return null;
           },
         ),
-    
       ],
     );
   }
-  
+
   // Step 3: Address & Legal Information
   Widget _buildAddressLegalStep(AppLocalizations l10n) {
     return Column(
@@ -435,7 +441,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       children: [
         _buildSectionTitle(l10n.physicalAddress),
         const SizedBox(height: 20),
-        
+
         CustomTextField(
           controller: _physicalAddressController,
           label: l10n.physicalAddress,
@@ -450,10 +456,10 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           },
         ),
         const SizedBox(height: 20),
-        
+
         _buildSectionTitle(l10n.locationDetails),
         const SizedBox(height: 16),
-        
+
         // Country Dropdown
         CustomDropdown<int>(
           value: _selectedCountryId,
@@ -479,18 +485,24 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Region Dropdown
         CustomDropdown<int>(
           value: _selectedRegionId,
           label: l10n.region,
           hint: l10n.selectRegion,
           icon: Icons.map_outlined,
-          items: _selectedCountryId != null 
-              ? _regions.where((r) => r.countryId == _selectedCountryId).map((r) => r.id).toList()
+          items: _selectedCountryId != null
+              ? _regions
+                    .where((r) => r.countryId == _selectedCountryId)
+                    .map((r) => r.id)
+                    .toList()
               : [],
           itemLabels: _selectedCountryId != null
-              ? _regions.where((r) => r.countryId == _selectedCountryId).map((r) => r.name).toList()
+              ? _regions
+                    .where((r) => r.countryId == _selectedCountryId)
+                    .map((r) => r.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -508,7 +520,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // District Dropdown
         CustomDropdown<int>(
           value: _selectedDistrictId,
@@ -516,10 +528,16 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           hint: l10n.selectDistrict,
           icon: Icons.location_city_outlined,
           items: _selectedRegionId != null
-              ? _districts.where((d) => d.regionId == _selectedRegionId).map((d) => d.id).toList()
+              ? _districts
+                    .where((d) => d.regionId == _selectedRegionId)
+                    .map((d) => d.id)
+                    .toList()
               : [],
           itemLabels: _selectedRegionId != null
-              ? _districts.where((d) => d.regionId == _selectedRegionId).map((d) => d.name).toList()
+              ? _districts
+                    .where((d) => d.regionId == _selectedRegionId)
+                    .map((d) => d.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -536,7 +554,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Ward Dropdown
         CustomDropdown<int>(
           value: _selectedWardId,
@@ -544,10 +562,16 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           hint: l10n.selectWard,
           icon: Icons.place_outlined,
           items: _selectedDistrictId != null
-              ? _wards.where((w) => w.districtId == _selectedDistrictId).map((w) => w.id).toList()
+              ? _wards
+                    .where((w) => w.districtId == _selectedDistrictId)
+                    .map((w) => w.id)
+                    .toList()
               : [],
           itemLabels: _selectedDistrictId != null
-              ? _wards.where((w) => w.districtId == _selectedDistrictId).map((w) => w.name).toList()
+              ? _wards
+                    .where((w) => w.districtId == _selectedDistrictId)
+                    .map((w) => w.name)
+                    .toList()
               : [],
           onChanged: (value) {
             setState(() {
@@ -563,7 +587,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Village Dropdown (Optional)
         CustomDropdown<int>(
           value: _selectedVillageId,
@@ -571,19 +595,25 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           hint: l10n.selectVillage,
           icon: Icons.home_work_outlined,
           items: _selectedWardId != null
-              ? _villages.where((v) => v.wardId == _selectedWardId).map((v) => v.id).toList()
+              ? _villages
+                    .where((v) => v.wardId == _selectedWardId)
+                    .map((v) => v.id)
+                    .toList()
               : [],
           itemLabels: _selectedWardId != null
-              ? _villages.where((v) => v.wardId == _selectedWardId).map((v) => v.name).toList()
+              ? _villages
+                    .where((v) => v.wardId == _selectedWardId)
+                    .map((v) => v.name)
+                    .toList()
               : [],
           onChanged: (value) => setState(() => _selectedVillageId = value),
           // No validator - field is optional
         ),
         const SizedBox(height: 20),
-        
+
         _buildSectionTitle(l10n.legalInformation),
         const SizedBox(height: 16),
-        
+
         // Legal Status Dropdown
         CustomDropdown<int>(
           value: _selectedLegalStatusId,
@@ -600,17 +630,15 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
             return null;
           },
         ),
-        
+
         const SizedBox(height: 24),
-        
+
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Constants.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Constants.primaryColor.withOpacity(0.3),
-            ),
+            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -635,7 +663,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       ],
     );
   }
-  
+
   // Reusable widget builders
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -647,9 +675,9 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       ),
     );
   }
-  
+
   /// Get size unit dropdown items with localized labels and API enum values
-  /// 
+  ///
   /// Returns list of items where:
   /// - value: API enum (e.g., 'acre', 'hectare') - stored in database
   /// - label: Localized text (e.g., 'Acres', 'Ekari') - shown to user
@@ -661,7 +689,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       DropdownItem(value: 'square_kilometer', label: l10n.squareKilometers),
     ];
   }
-  
+
   // Step navigation logic
   void _onStepContinue() async {
     if (_currentStep < 2) {
@@ -673,12 +701,14 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       // Final step - validate and show confirmation dialog
       if (_formKey.currentState!.validate()) {
         final l10n = AppLocalizations.of(context)!;
-        
+
         // Show confirmation dialog
         await AlertDialogs.showConfirmation(
           context: context,
           title: isEditMode ? l10n.update : l10n.register,
-          message: isEditMode ? l10n.confirmUpdateFarm : l10n.confirmRegisterFarm,
+          message: isEditMode
+              ? l10n.confirmUpdateFarm
+              : l10n.confirmRegisterFarm,
           confirmText: isEditMode ? l10n.update : l10n.register,
           cancelText: l10n.cancel,
           onConfirm: () async {
@@ -689,35 +719,40 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       }
     }
   }
-  
+
   void _onStepCancel() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     }
   }
-  
+
   Future<void> _submitFarmRegistration() async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     try {
       // Generate simple UUID (timestamp-based)
-      final uuid = '${DateTime.now().millisecondsSinceEpoch}-${_nameController.text.hashCode}';
-      
+      final uuid =
+          '${DateTime.now().millisecondsSinceEpoch}-${_nameController.text.hashCode}';
+
       // Generate Reference Number: REF-{timestamp}{random}
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final random = (timestamp % 999999).toString().padLeft(6, '0');
       final referenceNo = 'REF-$timestamp-$random';
-      
+
       // Prepare farm data
       final farmData = {
         'uuid': uuid,
         'name': _nameController.text,
         'referenceNo': referenceNo,
         'regionalRegNo': _regionalRegNoController.text,
-        'size': _sizeController.text.trim(),  // Send as String (matches backend varchar)
-        'sizeUnit': _selectedSizeUnit,  // Already stores API enum: 'acre', 'hectare', 'square_meter', 'square_kilometer'
-        'latitudes': _latitudesController.text.trim(),  // Send as String (matches backend varchar)
-        'longitudes': _longitudesController.text.trim(),  // Send as String (matches backend varchar)
+        'size': _sizeController.text
+            .trim(), // Send as String (matches backend varchar)
+        'sizeUnit':
+            _selectedSizeUnit, // Already stores API enum: 'acre', 'hectare', 'square_meter', 'square_kilometer'
+        'latitudes': _latitudesController.text
+            .trim(), // Send as String (matches backend varchar)
+        'longitudes': _longitudesController.text
+            .trim(), // Send as String (matches backend varchar)
         'physicalAddress': _physicalAddressController.text,
         'countryId': _selectedCountryId,
         'regionId': _selectedRegionId,
@@ -730,9 +765,9 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
 
       // Save to local database via FarmProvider
       if (!mounted) return;
-      
+
       final farmProvider = Provider.of<FarmProvider>(context, listen: false);
-      
+
       if (isEditMode) {
         // Update existing farm
         final updatedFarm = await farmProvider.updateFarmWithoutDialog(
@@ -741,10 +776,12 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           syncAction: 'update',
           synced: false,
         );
-        
+
         if (updatedFarm != null) {
-          debugPrint('✅ Farm updated locally: ${updatedFarm.name} (ID: ${updatedFarm.id})');
-          
+          debugPrint(
+            '✅ Farm updated locally: ${updatedFarm.name} (ID: ${updatedFarm.id})',
+          );
+
           // Show success dialog
           await AlertDialogs.showSuccess(
             context: context,
@@ -753,7 +790,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
             buttonText: l10n.ok,
             onPressed: () => Navigator.of(context).pop(),
           );
-          
+
           // Navigate back after success dialog is dismissed
           if (mounted) {
             Navigator.pop(context, true);
@@ -770,13 +807,20 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         }
       } else {
         // Create new farm
-        final createdFarm = await farmProvider.createFarmWithDialog(context, farmData);
-        
+        final createdFarm = await farmProvider.createFarmWithDialog(
+          context,
+          farmData,
+        );
+
         // Success/error dialogs are already shown by the provider
         if (createdFarm != null) {
-          debugPrint('✅ Farm saved locally: ${createdFarm.name} (ID: ${createdFarm.id})');
-          debugPrint('Farm details: uuid: ${createdFarm.uuid}, size: ${createdFarm.size}, status: ${createdFarm.status}');
-          
+          debugPrint(
+            '✅ Farm saved locally: ${createdFarm.name} (ID: ${createdFarm.id})',
+          );
+          debugPrint(
+            'Farm details: uuid: ${createdFarm.uuid}, size: ${createdFarm.size}, status: ${createdFarm.status}',
+          );
+
           // Navigate back after success dialog is dismissed
           if (mounted) {
             Navigator.pop(context, true);

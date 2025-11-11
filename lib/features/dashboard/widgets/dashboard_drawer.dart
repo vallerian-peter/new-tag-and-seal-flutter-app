@@ -4,6 +4,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_screen.dart';
 
 class DashboardDrawer extends StatelessWidget {
   final String userName;
@@ -119,11 +120,15 @@ class DashboardDrawer extends StatelessWidget {
                 
                 _buildDrawerItem(
                   context: context,
-                  icon: Iconsax.heart_outline,
+                  icon: Icons.vaccines_outlined,
                   title: l10n.vaccinesText,
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigate to vaccines
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const VaccineScreen(),
+                      ),
+                    );
                   },
                 ),
                 
@@ -183,7 +188,9 @@ class DashboardDrawer extends StatelessWidget {
                       onChanged: (value) {
                         themeProvider.toggleTheme();
                       },
-                      activeColor: Constants.primaryColor,
+                      activeThumbColor: Constants.primaryColor,
+                      activeTrackColor:
+                          Constants.primaryColor.withValues(alpha: 0.3),
                       inactiveTrackColor: Colors.grey.shade200,
                       inactiveThumbColor: Colors.grey.shade600,
                     );

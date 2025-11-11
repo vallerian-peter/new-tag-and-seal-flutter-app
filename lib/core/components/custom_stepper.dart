@@ -25,22 +25,29 @@ class CustomStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? Theme.of(context).colorScheme.surface.withAlpha(50) : Colors.white;
+    final shadow = isDark
+        ? <BoxShadow>[]
+        : <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ];
+    final primary = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
+
     return Column(
       children: [
         // Custom Stepper Header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardColor,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: shadow,
           ),
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SingleChildScrollView(
@@ -61,8 +68,12 @@ class CustomStepper extends StatelessWidget {
                       isActive: isActive,
                       isCompleted: isCompleted,
                       icon: step.icon,
+                      primary: primary,
+                      onPrimary: onPrimary,
+                      background: cardColor,
+                      showShadow: shadow.isNotEmpty,
                     ),
-                    if (!isLast) _buildStepConnector(context, isCompleted),
+                    if (!isLast) _buildStepConnector(context, isCompleted, primary),
                   ],
                 );
               }).toList(),
@@ -70,28 +81,29 @@ class CustomStepper extends StatelessWidget {
           ),
         ),
         
-        // Step Content
+        // Step Content (scrollable)
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              children: [
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardColor,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: shadow,
           ),
           child: steps[currentStep].content,
         ),
-        
         const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
         
         // Step Controls
-        _buildStepControls(context),
+        _buildStepControls(context, cardColor, shadow, primary, onPrimary),
       ],
     );
   }
@@ -102,78 +114,86 @@ class CustomStepper extends StatelessWidget {
     required bool isActive,
     required bool isCompleted,
     required IconData icon,
+    required Color primary,
+    required Color onPrimary,
+    required Color background,
+    required bool showShadow,
   }) {
-    
+    final theme = Theme.of(context);
+    final outline = theme.colorScheme.primary.withValues(alpha: 0.3);
+
     return Container(
       width: 48,
       height: 48,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isActive || isCompleted 
-            ? Constants.primaryColor 
-            : Colors.white,
+            ? primary 
+            : background,
         border: Border.all(
           color: isActive || isCompleted 
-              ? Constants.primaryColor 
-              : Constants.primaryColor.withOpacity(0.3),
+              ? primary 
+              : outline,
           width: 2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: showShadow
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : [],
       ),
       child: Center(
         child: isCompleted
             ? Icon(
                 Icons.check,
-                color: Colors.white,
+                color: onPrimary,
                 size: 20,
               )
             : Icon(
                 icon,
                 color: isActive 
-                    ? Colors.white 
+                    ? onPrimary 
                     : isCompleted 
-                        ? Colors.white 
-                        : Constants.primaryColor,
+                        ? onPrimary 
+                        : primary,
                 size: 18,
               ),
       ),
     );
   }
 
-  Widget _buildStepConnector(BuildContext context, bool isCompleted) {
+  Widget _buildStepConnector(BuildContext context, bool isCompleted, Color primary) {
     return Container(
       width: 32,
       height: 2,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: isCompleted 
-            ? Constants.primaryColor 
-            : Constants.primaryColor.withOpacity(0.2),
+            ? primary 
+            : primary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(1),
       ),
     );
   }
 
-  Widget _buildStepControls(BuildContext context) {
+  Widget _buildStepControls(
+    BuildContext context,
+    Color cardColor,
+    List<BoxShadow> shadow,
+    Color primary,
+    Color onPrimary,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: shadow,
       ),
       child: Row(
         children: [
@@ -183,7 +203,7 @@ class CustomStepper extends StatelessWidget {
                 onPressed: onStepCancel,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: BorderSide(color: Constants.primaryColor.withOpacity(0.3)),
+                  side: BorderSide(color: primary.withValues(alpha: 0.3)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -193,7 +213,7 @@ class CustomStepper extends StatelessWidget {
                   style: TextStyle(
                     fontSize: Constants.textSize,
                     fontWeight: FontWeight.w600,
-                    color: Constants.primaryColor,
+                    color: primary,
                   ),
                 ),
               ),
@@ -204,8 +224,8 @@ class CustomStepper extends StatelessWidget {
               onPressed: isLoading ? null : onStepContinue,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Constants.primaryColor,
-                foregroundColor: Colors.white,
+                backgroundColor: primary,
+                foregroundColor: onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

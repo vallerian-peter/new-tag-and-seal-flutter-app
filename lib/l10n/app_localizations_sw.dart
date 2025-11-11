@@ -215,6 +215,20 @@ class AppLocalizationsSw extends AppLocalizations {
   String get logout => 'Toka';
 
   @override
+  String get unsyncedDataWarning =>
+      'Una data ambayo haijasawazishwa. Ungependa kufanya nini?';
+
+  @override
+  String get noUnsyncedDataMessage =>
+      'Data yote imesawazishwa. Unaweza kujitoa salama.';
+
+  @override
+  String get syncAndLogout => 'Sawazisha & toka';
+
+  @override
+  String get syncingBeforeLogout => 'Inasawazisha data yako kabla ya kutoka...';
+
+  @override
   String get username => 'Jina la Mtumiaji';
 
   @override
@@ -234,6 +248,24 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get alreadyHaveAccount => 'Tayari una akaunti?';
+
+  @override
+  String get transfer => 'Hamisho';
+
+  @override
+  String get notProvided => 'Haijawekwa';
+
+  @override
+  String get role => 'Jukumu';
+
+  @override
+  String get recordsText => 'Rekodi';
+
+  @override
+  String get logsText => 'Rekodi';
+
+  @override
+  String get bulk => 'Jumla';
 
   @override
   String get onboarding1Title => 'Fuatilia Mifugo Yako';
@@ -273,6 +305,12 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get farmName => 'Jina la Shamba';
+
+  @override
+  String get farmUuidLabel => 'Kitambulisho cha Shamba';
+
+  @override
+  String get copiedToClipboard => 'Imenakiliwa kwenye ubao wa kunakili';
 
   @override
   String get farmSize => 'Ukubwa wa Shamba';
@@ -317,13 +355,72 @@ class AppLocalizationsSw extends AppLocalizations {
   String get theme => 'Mandhari';
 
   @override
-  String get notifications => 'Arifa';
+  String get notifications => 'Taarifa';
+
+  @override
+  String get upcomingToday => 'Taarifa za leo';
+
+  @override
+  String get upcomingNotifications => 'Taarifa zinazokaribia';
+
+  @override
+  String get allNotifications => 'Taarifa zote';
+
+  @override
+  String get notificationChipToday => 'Leo';
+
+  @override
+  String get notificationChipUpcoming => 'Inayokuja';
+
+  @override
+  String get addNotification => 'Ongeza tarifa';
+
+  @override
+  String get notificationTitle => 'Kichwa Taarifa';
+
+  @override
+  String get enterNotificationTitle => 'Ingiza kichwa cha Taarifa';
+
+  @override
+  String get notificationDescription => 'Maelezo';
+
+  @override
+  String get enterNotificationDescription => 'Ingiza maelezo (hiari)';
+
+  @override
+  String get scheduleDate => 'Chagua tarehe';
+
+  @override
+  String get scheduleTime => 'Chagua muda';
+
+  @override
+  String get saveNotification => 'Hifadhi tarifa';
+
+  @override
+  String get noNotifications => 'Hakuna tarifa kwa sasa.';
+
+  @override
+  String get optionalFieldHint => 'Hiari';
+
+  @override
+  String get markCompleted => 'Tia alama kuwa imekamilika';
+
+  @override
+  String get deleteNotification => 'Futa arifa';
+
+  @override
+  String notificationScheduledOn(String date) {
+    return 'Imeratibiwa $date';
+  }
 
   @override
   String get about => 'Kuhusu';
 
   @override
   String get helpSupport => 'Msaada na Usaidizi';
+
+  @override
+  String get farmDataNotFound => 'Data za Shamba Hazipo';
 
   @override
   String get howItWorks => 'Jinsi Inavyofanya Kazi';
@@ -345,6 +442,74 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get offlineCapability => 'Uwezo wa Kufanya Kazi Bila Mtandao';
+
+  @override
+  String get manageAndTrackLivestockText => 'Simamia na hariri mifugo wote';
+
+  @override
+  String get refresh => 'Onyesha Upya';
+
+  @override
+  String get age => 'Umri';
+
+  @override
+  String get weight => 'Uzito';
+
+  @override
+  String get year => 'mwaka';
+
+  @override
+  String get years => 'miaka';
+
+  @override
+  String get month => 'mwezi';
+
+  @override
+  String get months => 'miezi';
+
+  @override
+  String get unknownFarm => 'Shamba Lisilojulikana';
+
+  @override
+  String get unknownLocation => 'Mahali Pasiojulikana';
+
+  @override
+  String get tapForMoreDetails => 'Gusa kwa maelezo zaidi';
+
+  @override
+  String get addFirstLivestockMessage =>
+      'Ongeza mifugo wako wa kwanza ili kuanza';
+
+  @override
+  String get noResultsFound => 'Hakuna matokeo yaliyopatikana';
+
+  @override
+  String get tryDifferentKeywords => 'Jaribu kutafuta kwa maneno tofauti';
+
+  @override
+  String get sortAtoZ => 'Panga A hadi Z';
+
+  @override
+  String get sortZtoA => 'Panga Z hadi A';
+
+  @override
+  String get newestFirst => 'Mpya Kwanza';
+
+  @override
+  String get oldestFirst => 'Za Zamani Kwanza';
+
+  @override
+  String get livestockDetails => 'Maelezo ya Mifugo';
+
+  @override
+  String get invalidFarmId => 'Kitambulisho cha shamba si sahihi';
+
+  @override
+  String get failedToMarkFarmForDeletion =>
+      'Imeshindwa kuweka alama ya shamba kwa ufutaji';
+
+  @override
+  String get errorDeletingFarm => 'Hitilafu katika kufuta shamba';
 
   @override
   String get tagYourLivestock => 'Weka Lebo Mifugo Yako';
@@ -485,7 +650,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get addressInformation => 'Taarifa za Anwani';
 
   @override
-  String get additionalDetails => 'Maelezo ya Ziada';
+  String get additionalDetails => 'Taarifa Zaidi';
 
   @override
   String get firstName => 'Jina la Kwanza';
@@ -503,7 +668,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get phone2 => 'Simu ya Pili';
 
   @override
-  String get physicalAddress => 'Anwani ya Kimwili';
+  String get physicalAddress => 'Anwani ya Eneo';
 
   @override
   String get farmerOrganizationMembership => 'Uanachama wa Shirika la Wakulima';
@@ -677,7 +842,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get enterEmail => 'Ingiza barua pepe yako';
 
   @override
-  String get enterPhysicalAddress => 'Ingiza anwani yako ya kimwili';
+  String get enterPhysicalAddress => 'Ingiza anwani yako ya Eneo';
 
   @override
   String get selectIdType => 'Chagua aina ya kitambulisho';
@@ -759,7 +924,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get validEmailRequired => 'Ingiza barua pepe halali';
 
   @override
-  String get physicalAddressRequired => 'Anwani ya kimwili inahitajika';
+  String get physicalAddressRequired => 'Anwani ya eneo inahitajika';
 
   @override
   String get genderRequired => 'Jinsia inahitajika';
@@ -911,6 +1076,22 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get allEventsScreen => 'Skrini ya Matukio Yote';
+
+  @override
+  String get allEvents => 'Matukio yote';
+
+  @override
+  String get eventsScreenSubtitle =>
+      'Pitia kila kumbukumbu iliyorekodiwa katika mashamba yako.';
+
+  @override
+  String get totalLogs => 'Jumla ya kumbukumbu';
+
+  @override
+  String get eventTypes => 'Aina za matukio';
+
+  @override
+  String get readyOffline => 'Tayari nje ya mtandao';
 
   @override
   String get userProfileScreen => 'Skrini ya Wasifu wa Mtumiaji';
@@ -1172,6 +1353,921 @@ class AppLocalizationsSw extends AppLocalizations {
       'Shamba na mifugo limepokewa kwa mafanikio';
 
   @override
+  String get eventsLoadedSuccessfully => 'Matukio yamepakiwa kwa mafanikio';
+
+  @override
+  String get allEventsLoadedSuccessfully =>
+      'Matukio yote yamepakiwa kwa mafanikio';
+
+  @override
+  String get eventsLoadFailed =>
+      'Imeshindikana kupakia matukio. Tafadhali jaribu tena.';
+
+  @override
+  String get feedingLogSaved => 'Tukio la kulisha limehifadhiwa kwa mafanikio';
+
+  @override
+  String get feedingLogSaveFailed =>
+      'Imeshindikana kuhifadhi tukio la kulisha. Tafadhali jaribu tena.';
+
+  @override
+  String get feeding => 'Malisho';
+
+  @override
+  String get addFeeding => 'Ongeza Kulisha';
+
+  @override
+  String get feedingDetailsSubtitle =>
+      'Weka taarifa za kulisha kwa kumbukumbu sahihi';
+
+  @override
+  String get feedingNotesSubtitle => 'Toa maelezo ya ziada kwa hiari';
+
+  @override
+  String get feedingDetails => 'Maelezo ya Kulisha';
+
+  @override
+  String get feedingType => 'Aina ya Kulisha';
+
+  @override
+  String get selectFeedingType => 'Chagua aina ya kulisha';
+
+  @override
+  String get feedingTypeRequired => 'Aina ya kulisha inahitajika';
+
+  @override
+  String get amount => 'Kiasi';
+
+  @override
+  String get enterAmount => 'Ingiza kiasi';
+
+  @override
+  String get amountRequired => 'Kiasi kinahitajika';
+
+  @override
+  String get nextFeedingTime => 'Muda ujao wa kulisha';
+
+  @override
+  String get enterNextFeedingTime => 'Chagua muda ujao wa kulisha';
+
+  @override
+  String get nextFeedingTimeRequired => 'Muda ujao wa kulisha unahitajika';
+
+  @override
+  String get previousWeight => 'Uzito wa awali';
+
+  @override
+  String get currentWeight => 'Uzito wa sasa';
+
+  @override
+  String get updatedAt => 'Imesasishwa';
+
+  @override
+  String get nextAdministrationDate => 'Tarehe ya utoaji inayofuata';
+
+  @override
+  String get dose => 'Dozi';
+
+  @override
+  String get quantity => 'Kiasi';
+
+  @override
+  String get milkingMethod => 'Njia ya kukamua';
+
+  @override
+  String get lactometerReading => 'Usomaji wa lactometer';
+
+  @override
+  String get solids => 'Vimiminika vikali';
+
+  @override
+  String get solidNonFat => 'Imara zisizo na mafuta';
+
+  @override
+  String get protein => 'Protini';
+
+  @override
+  String get correctedLactometerReading =>
+      'Usomaji uliosahihishwa wa lactometer';
+
+  @override
+  String get totalSolids => 'Jumla ya vimiminika vikali';
+
+  @override
+  String get colonyFormingUnits => 'Koloni zinazounda vitengo';
+
+  @override
+  String get acidity => 'Asidi';
+
+  @override
+  String get session => 'Kipindi';
+
+  @override
+  String get testResult => 'Matokeo ya uchunguzi';
+
+  @override
+  String get numberOfMonths => 'Idadi ya miezi';
+
+  @override
+  String get testDate => 'Tarehe ya uchunguzi';
+
+  @override
+  String get startDate => 'Tarehe ya kuanza';
+
+  @override
+  String get endDate => 'Tarehe ya kumaliza';
+
+  @override
+  String get calvingType => 'Aina ya kuzaa';
+
+  @override
+  String get calvingProblem => 'Changamoto ya kuzaa';
+
+  @override
+  String get reproductiveProblem => 'Tatizo la uzazi';
+
+  @override
+  String get reason => 'Sababu';
+
+  @override
+  String get heatType => 'Aina ya joto';
+
+  @override
+  String get inseminationService => 'Huduma ya uhimilishaji';
+
+  @override
+  String get semenStrawType => 'Aina ya majimaji ya mbegu';
+
+  @override
+  String get inseminationDate => 'Tarehe ya uhimilishaji';
+
+  @override
+  String get bullCode => 'Nambari ya ng\'ombe dume';
+
+  @override
+  String get bullBreed => 'Aina ya ng\'ombe dume';
+
+  @override
+  String get semenProductionDate => 'Tarehe ya uzalishaji wa mbegu';
+
+  @override
+  String get productionCountry => 'Nchi ya uzalishaji';
+
+  @override
+  String get semenBatchNumber => 'Nambari ya kundi la mbegu';
+
+  @override
+  String get internationalId => 'Kitambulisho cha kimataifa';
+
+  @override
+  String get aiCode => 'Msimbo wa AI';
+
+  @override
+  String get manufacturerName => 'Jina la mtengenezaji';
+
+  @override
+  String get semenSupplier => 'Msambazaji wa mbegu';
+
+  @override
+  String get createdAt => 'Imeundwa';
+
+  @override
+  String get ensureFeedingDetailsAccuracy =>
+      'Hakikisha taarifa za kulisha ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get ensureWeightDetailsAccuracy =>
+      'Hakikisha taarifa za uzito ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get additionalNotes => 'Maelezo ya Ziada';
+
+  @override
+  String get remarks => 'Maelezo';
+
+  @override
+  String get enterRemarksOptional => 'Ingiza maelezo (hiari)';
+
+  @override
+  String get feedingNotesInfo =>
+      'Tumia maelezo kurekodi uchunguzi wowote maalumu wakati wa kulisha.';
+
+  @override
+  String get confirmUpdateFeeding =>
+      'Je, una uhakika unataka kusasisha tukio hili la kulisha?';
+
+  @override
+  String get confirmSaveFeeding =>
+      'Je, una uhakika unataka kuhifadhi tukio hili la kulisha?';
+
+  @override
+  String get confirmSaveWeightChange =>
+      'Je, una uhakika unataka kuhifadhi mabadiliko haya ya uzito?';
+
+  @override
+  String get confirmUpdateWeightChange =>
+      'Je, una uhakika unataka kusasisha mabadiliko haya ya uzito?';
+
+  @override
+  String get recordsAndLogs => 'Rekodi na Matukio';
+
+  @override
+  String get insemination => 'Upandikizaji';
+
+  @override
+  String get pregnancy => 'Ujauzito';
+
+  @override
+  String get deworming => 'Dawa za minyoo';
+
+  @override
+  String get addDeworming => 'Ongeza dawa za minyoo';
+
+  @override
+  String get dewormingDetails => 'Maelezo ya dawa za minyoo';
+
+  @override
+  String get dosageDetails => 'Maelezo ya dozi';
+
+  @override
+  String get administrationRoute => 'Njia ya utoaji';
+
+  @override
+  String get selectAdministrationRoute => 'Chagua njia ya utoaji';
+
+  @override
+  String get administrationRouteRequired => 'Njia ya utoaji inahitajika';
+
+  @override
+  String get medicine => 'Dawa';
+
+  @override
+  String get selectMedicine => 'Chagua dawa';
+
+  @override
+  String get medicineRequired => 'Dawa inahitajika';
+
+  @override
+  String get treatmentProvider => 'Mtoa huduma';
+
+  @override
+  String get selectTreatmentProvider => 'Chagua mtoa huduma';
+
+  @override
+  String get treatmentProviderNone => 'Hakuna mtoa huduma';
+
+  @override
+  String get treatmentProviderVet => 'Daktari wa mifugo';
+
+  @override
+  String get treatmentProviderExtensionOfficer => 'Afisa ugani';
+
+  @override
+  String get medicalLicenseNumber => 'Nambari ya leseni';
+
+  @override
+  String get enterMedicalLicenseNumber => 'Ingiza nambari ya leseni';
+
+  @override
+  String get medicalLicenseNumberRequired => 'Nambari ya leseni inahitajika';
+
+  @override
+  String get medicalLicenseNumberInvalid =>
+      'Nambari ya leseni inapaswa kuwa tarakimu pekee';
+
+  @override
+  String get vetLicense => 'Leseni ya daktari wa mifugo';
+
+  @override
+  String get extensionOfficerLicense => 'Leseni ya afisa ugani';
+
+  @override
+  String get enterQuantity => 'Ingiza kiasi';
+
+  @override
+  String get quantityRequired => 'Kiasi kinahitajika';
+
+  @override
+  String get enterDose => 'Ingiza dozi';
+
+  @override
+  String get doseRequired => 'Dozi inahitajika';
+
+  @override
+  String get ensureDewormingDetailsAccuracy =>
+      'Hakikisha taarifa za dawa za minyoo ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get weightChange => 'Mabadiliko ya Uzito';
+
+  @override
+  String get disposal => 'Uuzaji';
+
+  @override
+  String get calving => 'Kuzaa';
+
+  @override
+  String get vaccination => 'Chanjo';
+
+  @override
+  String get dryoff => 'Kuacha Kunyonyesha';
+
+  @override
+  String get medication => 'Matibabu';
+
+  @override
+  String get milking => 'Kukamua';
+
+  @override
+  String get comingSoon => 'Inakuja hivi karibuni';
+
+  @override
+  String get logContextMissing =>
+      'Haiwezekani kufungua rekodi hii kwa sababu taarifa za shamba au mnyama hazikupatikana.';
+
+  @override
+  String get selectFarm => 'Chagua shamba';
+
+  @override
+  String get farmRequired => 'Shamba linahitajika';
+
+  @override
+  String get selectLivestock => 'Chagua mnyama';
+
+  @override
+  String get livestockRequired => 'Mnyama anahitajika';
+
+  @override
+  String get weightLogSaved =>
+      'Tukio la mabadiliko ya uzito limehifadhiwa kwa mafanikio';
+
+  @override
+  String get weightLogSaveFailed =>
+      'Imeshindikana kuhifadhi tukio la mabadiliko ya uzito. Tafadhali jaribu tena.';
+
+  @override
+  String get dewormingLogSaved =>
+      'Tukio la kutoa minyoo limehifadhiwa kwa mafanikio';
+
+  @override
+  String get dewormingLogSaveFailed =>
+      'Imeshindikana kuhifadhi tukio la kutoa minyoo. Tafadhali jaribu tena.';
+
+  @override
+  String get confirmSaveDeworming =>
+      'Je, una uhakika unataka kuhifadhi tukio hili la dawa za minyoo?';
+
+  @override
+  String get confirmUpdateDeworming =>
+      'Je, una uhakika unataka kusasisha tukio hili la dawa za minyoo?';
+
+  @override
+  String get statusScheduled => 'Imepangwa';
+
+  @override
+  String get statusCompleted => 'Imekamilika';
+
+  @override
+  String get statusCancelled => 'Imebatilishwa';
+
+  @override
+  String get statusPending => 'Inasubiri';
+
+  @override
+  String get statusFailed => 'Imeshindikana';
+
+  @override
+  String get addVaccination => 'Ongeza chanjo';
+
+  @override
+  String get vaccinationDetails => 'Maelezo ya chanjo';
+
+  @override
+  String get vaccinationDetailsSubtitle =>
+      'Weka taarifa za kumbukumbu ya chanjo';
+
+  @override
+  String get vaccinationNumber => 'Nambari ya chanjo';
+
+  @override
+  String get enterVaccinationNumber => 'Ingiza nambari ya chanjo (hiari)';
+
+  @override
+  String get selectVaccine => 'Chagua chanjo';
+
+  @override
+  String get vaccineOptionsMissing =>
+      'Hakuna chanjo zilizopo. Tafadhali ongeza chanjo kwanza.';
+
+  @override
+  String get diseaseId => 'Kitambulisho cha ugonjwa';
+
+  @override
+  String get enterDiseaseIdOptional =>
+      'Ingiza kitambulisho cha ugonjwa (hiari)';
+
+  @override
+  String get selectDisease => 'Chagua ugonjwa';
+
+  @override
+  String get diseaseOptionsMissing =>
+      'Hakuna orodha ya magonjwa. Tafadhali fanya usawazishaji kupakua data ya magonjwa.';
+
+  @override
+  String get vaccinationStatus => 'Hali ya chanjo';
+
+  @override
+  String get vaccinationContextInfo =>
+      'Chagua shamba na mifugo ili kuhifadhi kumbukumbu ya chanjo.';
+
+  @override
+  String get vaccinationPersonnelDetails => 'Maelezo ya wahusika';
+
+  @override
+  String get vaccinationNotesInfo =>
+      'Rekodi taarifa za daktari au afisa ugani kwa ufuatiliaji.';
+
+  @override
+  String get confirmSaveVaccination =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya chanjo?';
+
+  @override
+  String get confirmUpdateVaccination =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya chanjo?';
+
+  @override
+  String get invalidDiseaseId => 'Kitambulisho batili cha ugonjwa.';
+
+  @override
+  String get vaccinationLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya chanjo.';
+
+  @override
+  String get vaccinationLogSaved => 'Kumbukumbu ya chanjo imehifadhiwa vizuri.';
+
+  @override
+  String get enterVetLicenseOptional => 'Ingiza leseni ya daktari (hiari)';
+
+  @override
+  String get enterExtensionOfficerLicenseOptional =>
+      'Ingiza leseni ya afisa ugani (hiari)';
+
+  @override
+  String get addMilking => 'Ongeza kukamua';
+
+  @override
+  String get milkingDetailsSubtitle =>
+      'Weka vipimo vya kukamua kwa mnyama huyu';
+
+  @override
+  String get milkingNotesSubtitle =>
+      'Andika vipimo vya maabara na maelezo mengine';
+
+  @override
+  String get milkingMethodRequired => 'Mbinu ya kukamua inahitajika';
+
+  @override
+  String get statusActive => 'Inafanya kazi';
+
+  @override
+  String get statusNotActive => 'Haifanyi kazi';
+
+  @override
+  String get ensureMilkingDetailsAccuracy =>
+      'Hakikisha taarifa za kukamua ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get milkingNotesInfo =>
+      'Rekodi vipimo kama solids na kusoma lakitometa (hiari).';
+
+  @override
+  String get confirmSaveMilking =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya kukamua?';
+
+  @override
+  String get confirmUpdateMilking =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya kukamua?';
+
+  @override
+  String get milkingLogSaved => 'Kumbukumbu ya kukamua imehifadhiwa vizuri.';
+
+  @override
+  String get milkingLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya kukamua.';
+
+  @override
+  String get addPregnancy => 'Ongeza mimba';
+
+  @override
+  String get pregnancyDetailsSubtitle => 'Weka taarifa za uchunguzi wa mimba';
+
+  @override
+  String get pregnancyNotesSubtitle => 'Ongeza maelezo kuhusu mimba (hiari)';
+
+  @override
+  String get testResultRequired => 'Matokeo ya vipimo yanahitajika';
+
+  @override
+  String get testDateRequired => 'Tarehe ya kipimo inahitajika';
+
+  @override
+  String get ensurePregnancyDetailsAccuracy =>
+      'Hakikisha taarifa za mimba ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get pregnancyNotesInfo =>
+      'Rekodi maelezo ya ziada kutoka kwa uchunguzi wa mimba.';
+
+  @override
+  String get confirmSavePregnancy =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya mimba?';
+
+  @override
+  String get confirmUpdatePregnancy =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya mimba?';
+
+  @override
+  String get pregnancyLogSaved => 'Kumbukumbu ya mimba imehifadhiwa vizuri.';
+
+  @override
+  String get pregnancyLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya mimba.';
+
+  @override
+  String get addCalving => 'Ongeza kuzaa';
+
+  @override
+  String get calvingDetailsSubtitle => 'Weka muda na matokeo ya kuzaa';
+
+  @override
+  String get calvingNotesSubtitle => 'Ongeza maelezo kuhusu mchakato wa kuzaa';
+
+  @override
+  String get calvingTypeRequired => 'Aina ya kuzaa inahitajika';
+
+  @override
+  String get startDateRequired => 'Tarehe ya kuanza inahitajika';
+
+  @override
+  String get ensureCalvingDetailsAccuracy =>
+      'Hakikisha taarifa za kuzaa ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get calvingNotesInfo => 'Rekodi matatizo ya uzazi au kuzaa.';
+
+  @override
+  String get confirmSaveCalving =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya kuzaa?';
+
+  @override
+  String get confirmUpdateCalving =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya kuzaa?';
+
+  @override
+  String get calvingLogSaved => 'Kumbukumbu ya kuzaa imehifadhiwa vizuri.';
+
+  @override
+  String get calvingLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya kuzaa.';
+
+  @override
+  String get addDryoff => 'Ongeza kukausha';
+
+  @override
+  String get dryoffDetailsSubtitle => 'Weka ratiba za kukausha kwa mnyama huyu';
+
+  @override
+  String get dryoffNotesSubtitle =>
+      'Ongeza maelezo kuhusu mchakato wa kukausha';
+
+  @override
+  String get ensureDryoffDetailsAccuracy =>
+      'Hakikisha taarifa za kukausha ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get dryoffNotesInfo => 'Rekodi maelezo kuhusu kukausha (hiari).';
+
+  @override
+  String get confirmSaveDryoff =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya kukausha?';
+
+  @override
+  String get confirmUpdateDryoff =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya kukausha?';
+
+  @override
+  String get dryoffLogSaved => 'Kumbukumbu ya kukausha imehifadhiwa vizuri.';
+
+  @override
+  String get dryoffLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya kukausha.';
+
+  @override
+  String get addInsemination => 'Ongeza ubandikizaji';
+
+  @override
+  String get inseminationDetailsSubtitle =>
+      'Weka huduma za ubandikizaji na taarifa za joto';
+
+  @override
+  String get inseminationNotesSubtitle =>
+      'Ongeza maelezo ya kundi na muuzaji wa mbegu';
+
+  @override
+  String get lastHeatDate => 'Tarehe ya joto la mwisho';
+
+  @override
+  String get heatTypeRequired => 'Aina ya joto inahitajika';
+
+  @override
+  String get inseminationServiceRequired =>
+      'Huduma ya ubandikizaji inahitajika';
+
+  @override
+  String get semenStrawTypeRequired => 'Aina ya straw ya mbegu inahitajika';
+
+  @override
+  String get ensureInseminationDetailsAccuracy =>
+      'Hakikisha taarifa za ubandikizaji ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get inseminationNotesInfo =>
+      'Rekodi maelezo ya kundi, muuzaji na fahari (hiari).';
+
+  @override
+  String get confirmSaveInsemination =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya ubandikizaji?';
+
+  @override
+  String get confirmUpdateInsemination =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya ubandikizaji?';
+
+  @override
+  String get inseminationLogSaved =>
+      'Kumbukumbu ya ubandikizaji imehifadhiwa vizuri.';
+
+  @override
+  String get inseminationLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya ubandikizaji.';
+
+  @override
+  String get addMedication => 'Ongeza matibabu';
+
+  @override
+  String get medicationDetails => 'Maelezo ya matibabu';
+
+  @override
+  String get medicationDetailsSubtitle =>
+      'Hifadhi taarifa za matibabu ya mifugo';
+
+  @override
+  String get medicationContextInfo =>
+      'Chagua shamba na mifugo kabla ya kuandika matibabu.';
+
+  @override
+  String get medicationNotesInfo =>
+      'Ongeza maelezo ya ziada kuhusu matibabu (hiari).';
+
+  @override
+  String get quantityAmount => 'Kiasi';
+
+  @override
+  String get quantityUnit => 'Kitengo';
+
+  @override
+  String get selectQuantityUnit => 'Chagua kitengo';
+
+  @override
+  String get quantityUnitMl => 'Mililita (ml)';
+
+  @override
+  String get quantityUnitL => 'Lita (l)';
+
+  @override
+  String get quantityUnitMg => 'Miligramu (mg)';
+
+  @override
+  String get quantityUnitG => 'Gramu (g)';
+
+  @override
+  String get quantityUnitKg => 'Kilogremu (kg)';
+
+  @override
+  String get withdrawalPeriod => 'Kipindi cha kusubiri';
+
+  @override
+  String get enterWithdrawalPeriodOptional =>
+      'Ingiza kipindi cha kusubiri (hiari)';
+
+  @override
+  String get withdrawalAmount => 'Kiasi cha kusubiri';
+
+  @override
+  String get withdrawalUnit => 'Kitengo cha kipindi';
+
+  @override
+  String get selectWithdrawalUnit => 'Chagua kitengo cha kipindi';
+
+  @override
+  String get withdrawalUnitMinutes => 'Dakika';
+
+  @override
+  String get withdrawalUnitHours => 'Saa';
+
+  @override
+  String get withdrawalUnitDays => 'Siku';
+
+  @override
+  String get withdrawalUnitWeeks => 'Wiki';
+
+  @override
+  String get withdrawalUnitMonths => 'Miezi';
+
+  @override
+  String get withdrawalUnitYears => 'Miaka';
+
+  @override
+  String get medicationDate => 'Tarehe ya matibabu';
+
+  @override
+  String get selectMedicationDate => 'Chagua tarehe ya matibabu';
+
+  @override
+  String get confirmSaveMedication =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya matibabu?';
+
+  @override
+  String get confirmUpdateMedication =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya matibabu?';
+
+  @override
+  String get medicationLogSaved =>
+      'Kumbukumbu ya matibabu imehifadhiwa vizuri.';
+
+  @override
+  String get medicationLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya matibabu.';
+
+  @override
+  String get addDisposal => 'Ongeza uhamisho/uharibifu';
+
+  @override
+  String get disposalDetails => 'Maelezo ya uuzaji/uharibifu';
+
+  @override
+  String get disposalDetailsSubtitle =>
+      'Weka sababu na hali ya uuzaji au uharibifu';
+
+  @override
+  String get disposalContextInfo =>
+      'Chagua shamba na mifugo kabla ya kuandika uuzaji au uharibifu.';
+
+  @override
+  String get disposalReasons => 'Sababu';
+
+  @override
+  String get enterDisposalReasons => 'Ingiza sababu';
+
+  @override
+  String get disposalTypeId => 'Aina ya uuzaji/uharibifu';
+
+  @override
+  String get enterDisposalTypeIdOptional =>
+      'Ingiza aina ya uhamisho/uharibifu (hiari)';
+
+  @override
+  String get selectDisposalType => 'Chagua aina ya uhamisho/uharibifu';
+
+  @override
+  String get disposalTypeRequired => 'Aina ya uuzaji/uharibifu inahitajika';
+
+  @override
+  String get disposalTypeOptionsMissing =>
+      'Hakuna aina za uuzaji/uharibifu. Tafadhali fanya usawazishaji kupakua data ya kumbukumbu.';
+
+  @override
+  String get disposalStatus => 'Hali ya uuzaji/uharibifu';
+
+  @override
+  String get confirmSaveDisposal =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya uhamisho/uharibifu?';
+
+  @override
+  String get confirmUpdateDisposal =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya uhamisho/uharibifu?';
+
+  @override
+  String get disposalNotesInfo =>
+      'Ongeza maelezo ya ziada kuhusu uuzaji au uharibifu (hiari).';
+
+  @override
+  String get disposalLogSaved =>
+      'Kumbukumbu ya uuzaji/uharibifu imehifadhiwa vizuri.';
+
+  @override
+  String get disposalLogSaveFailed =>
+      'Imeshindwa kuhifadhi kumbukumbu ya uuzaji/uharibifu.';
+
+  @override
+  String get invalidDisposalTypeId => 'Aina batili ya uhamisho/uharibifu.';
+
+  @override
+  String get addTransfer => 'Ongeza uhamisho';
+
+  @override
+  String get editTransfer => 'Hariri uhamisho';
+
+  @override
+  String get transferDetails => 'Maelezo ya uhamisho';
+
+  @override
+  String get transferDetailsSubtitle =>
+      'Weka shamba lengwa, taarifa za usafirishaji na maelezo ya ziada.';
+
+  @override
+  String get transferContextInfo =>
+      'Uhamisho hurekodi usafirishaji wa mifugo kati ya mashamba. Hakikisha UUID ya shamba lengwa ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get toFarmUuidLabel => 'Utambulisho wa shamba lengwa';
+
+  @override
+  String get enterToFarmUuid => 'Ingiza utambulisho wa shamba lengwa';
+
+  @override
+  String get toFarmUuidRequired => 'Utambulisho wa shamba lengwa unahitajika';
+
+  @override
+  String get transferToFarmUuidWarning =>
+      'Andika kwa usahihi utambulisho wa shamba lengwa (Utambulisho wa shamba jingine). Unaweza kunakili kutoka maelezo ya shamba.';
+
+  @override
+  String get transporterIdLabel => 'Kitambulisho cha msafirishaji (hiari)';
+
+  @override
+  String get enterTransporterId =>
+      'Ingiza kitambulisho cha msafirishaji (hiari)';
+
+  @override
+  String get invalidTransporterId =>
+      'Kitambulisho cha msafirishaji kinapaswa kuwa nambari';
+
+  @override
+  String get enterTransferReason => 'Ingiza sababu ya uhamisho (hiari)';
+
+  @override
+  String get transferPriceLabel => 'Bei ya uhamisho (hiari)';
+
+  @override
+  String get enterTransferPrice => 'Ingiza kiasi kilicholipwa (hiari)';
+
+  @override
+  String get transferDateLabel => 'Tarehe na muda wa uhamisho';
+
+  @override
+  String get selectTransferDate => 'Chagua tarehe na muda wa uhamisho';
+
+  @override
+  String get transferDateRequired => 'Tarehe ya uhamisho inahitajika';
+
+  @override
+  String get transferStatusLabel => 'Hali ya uhamisho';
+
+  @override
+  String get transferCurrencyLabel => 'Sarafu';
+
+  @override
+  String get selectTransferCurrency => 'Chagua sarafu';
+
+  @override
+  String get currencyTsh => 'Tshs';
+
+  @override
+  String get currencyUsd => 'USD (\$)';
+
+  @override
+  String get currencyGbp => 'GBP (£)';
+
+  @override
+  String get currencyEur => 'EUR (€)';
+
+  @override
+  String get confirmSaveTransfer =>
+      'Je, una uhakika unataka kuhifadhi kumbukumbu hii ya uhamisho?';
+
+  @override
+  String get confirmUpdateTransfer =>
+      'Je, una uhakika unataka kusasisha kumbukumbu hii ya uhamisho?';
+
+  @override
+  String get transferLogSaved =>
+      'Kumbukumbu ya uhamisho imehifadhiwa kwa mafanikio.';
+
+  @override
+  String get transferLogSaveFailed =>
+      'Imeshindikana kuhifadhi kumbukumbu ya uhamisho. Tafadhali jaribu tena.';
+
+  @override
   String get farmWithLivestockLoadFailed =>
       'Imeshindwa kupokea shamba na mifugo';
 
@@ -1215,6 +2311,115 @@ class AppLocalizationsSw extends AppLocalizations {
   String get genericError => 'Hitilafu imetokea. Tafadhali ujaribu tena.';
 
   @override
+  String get bulkActions => 'Vitendo vya pamoja';
+
+  @override
+  String get addVaccine => 'Ongeza chanjo';
+
+  @override
+  String get vaccineDetails => 'Maelezo ya chanjo';
+
+  @override
+  String get vaccineDetailsSubtitle => 'Weka taarifa za chanjo';
+
+  @override
+  String get vaccine => 'Chanjo';
+
+  @override
+  String get lotNumber => 'Nambari ya kundi';
+
+  @override
+  String get enterLotNumber => 'Ingiza nambari ya kundi (hiari)';
+
+  @override
+  String get formulationType => 'Aina ya muundo';
+
+  @override
+  String get enterFormulationType => 'Ingiza aina ya muundo (hiari)';
+
+  @override
+  String get selectFormulationType => 'Chagua aina ya muundo';
+
+  @override
+  String get formulationLiveAttenuated => 'Chanjo hai iliyodhoofishwa';
+
+  @override
+  String get formulationInactivated => 'Chanjo iliyouawa';
+
+  @override
+  String get doseAmount => 'Dozi';
+
+  @override
+  String get enterDoseAmount => 'Ingiza dozi (hiari)';
+
+  @override
+  String get doseUnit => 'Kipimo';
+
+  @override
+  String get selectDoseUnit => 'Chagua kipimo';
+
+  @override
+  String get vaccineSchedule => 'Ratiba';
+
+  @override
+  String get enterVaccineSchedule => 'Ingiza ratiba (hiari)';
+
+  @override
+  String get selectVaccineSchedule => 'Chagua ratiba';
+
+  @override
+  String get vaccineScheduleRegular => 'Ratiba ya kawaida';
+
+  @override
+  String get vaccineScheduleBooster => 'Ratiba ya nyongeza';
+
+  @override
+  String get vaccineScheduleSeasonal => 'Ratiba ya msimu';
+
+  @override
+  String get vaccineScheduleEmergency => 'Ratiba ya dharura';
+
+  @override
+  String get vaccineStatus => 'Hali ya chanjo';
+
+  @override
+  String get selectStatus => 'Chagua hali';
+
+  @override
+  String get vaccineType => 'Aina ya chanjo';
+
+  @override
+  String get selectVaccineType => 'Chagua aina ya chanjo';
+
+  @override
+  String get vaccineTypeRequired => 'Aina ya chanjo inahitajika';
+
+  @override
+  String get vaccineTypesMissing =>
+      'Hakuna aina za chanjo zilizopo. Tafadhali endesha usawazishaji kupakua data marejeleo.';
+
+  @override
+  String get ensureVaccineDetailsAccuracy =>
+      'Hakikisha taarifa za chanjo ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get confirmSaveVaccine =>
+      'Je, una uhakika unataka kuhifadhi chanjo hii?';
+
+  @override
+  String get confirmUpdateVaccine =>
+      'Je, una uhakika unataka kusasisha chanjo hii?';
+
+  @override
+  String get vaccineSavedSuccessfully => 'Chanjo imehifadhiwa kikamilifu';
+
+  @override
+  String get vaccineUpdatedSuccessfully => 'Chanjo imesasishwa kikamilifu';
+
+  @override
+  String get vaccineSaveFailed => 'Imeshindwa kuhifadhi chanjo';
+
+  @override
   String get name => 'Jina';
 
   @override
@@ -1233,7 +2438,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get notActive => 'Si Hai';
 
   @override
-  String get identificationNumber => 'Namba ya Kitambulisho';
+  String get identificationNumber => 'Nambari ya Kitambulisho';
 
   @override
   String get enterIdentificationNumber => 'Ingiza namba ya kitambulisho';
@@ -1307,7 +2512,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get obtainedMethod => 'Njia ya Kupata';
 
   @override
-  String get physicalDetails => 'Maelezo ya Kimwili';
+  String get physicalDetails => 'Maelezo ya Eneo';
 
   @override
   String get additionalInfo => 'Maelezo Zaidi';
@@ -1365,7 +2570,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get selectTypeSpeciesBreed => 'Chagua aina, spishi, na aina';
 
   @override
-  String get physicalCharacteristics => 'Sifa za Kimwili';
+  String get physicalCharacteristics => 'Sifa za Eneno';
 
   @override
   String get enterGenderWeightBirth =>
@@ -1397,4 +2602,119 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get parentsMethodAndDates => 'Wazazi, njia, na tarehe';
+
+  @override
+  String get actions => 'Vitendo';
+
+  @override
+  String get editLivestock => 'Hariri Mifugo';
+
+  @override
+  String get deleteLivestock => 'Futa Mifugo';
+
+  @override
+  String get confirmDelete => 'Je, una uhakika unataka kufuta';
+
+  @override
+  String get deletedSuccessfully => 'imefutwa kwa mafanikio';
+
+  @override
+  String get failedToDelete => 'Imeshindwa kufuta';
+
+  @override
+  String get scanOptionBarcode => 'Msimbo pau';
+
+  @override
+  String get scanOptionQr => 'Msimbo wa QR';
+
+  @override
+  String get scanTagsTitle => 'Changanua Vitambulisho';
+
+  @override
+  String get scanTagsSubtitle =>
+      'Chagua aina ya tagi ya kuchanganua na uiweke ndani ya fremu.';
+
+  @override
+  String get scanOptionQrDescription =>
+      'Changanua stika za QR zilizochapishwa.';
+
+  @override
+  String get scanOptionBarcodeDescription =>
+      'Changanua misimbo pau kutoka kwenye tagi au nyaraka.';
+
+  @override
+  String get scanOptionRfid => 'Tagi ya RFID';
+
+  @override
+  String get scanOptionRfidDescription =>
+      'Tumia kisoma cha RFID kukamata tagi mara moja.';
+
+  @override
+  String get scanRfidPlaceholder =>
+      'Unganisha kifaa cha RFID ili kukamata tagi kiotomati.';
+
+  @override
+  String get scanManualPlaceholder => 'Ingiza thamani ya tagi';
+
+  @override
+  String get scanManualConfirm => 'Tafuta tagi';
+
+  @override
+  String get scanStartButton => 'Anza kuchanganua';
+
+  @override
+  String get scanResultFoundTitle => 'Tagi imeoanishwa';
+
+  @override
+  String scanResultFoundSubtitle(Object name, Object farm) {
+    return 'Mnyama $name ameonekana kwenye shamba $farm.';
+  }
+
+  @override
+  String get scanResultFarm => 'Shamba';
+
+  @override
+  String get scanResultBarcode => 'Barcode';
+
+  @override
+  String get scanResultRfid => 'RFID';
+
+  @override
+  String scanResultNotFound(Object value) {
+    return 'Hakuna mnyama aliyepatikana kwa tagi $value.';
+  }
+
+  @override
+  String get scanPermissionDenied =>
+      'Ruhusa ya kamera inahitajika ili kuchanganua tagi.';
+
+  @override
+  String get scanPermissionPermanentlyDenied =>
+      'Ruhusa ya kamera imekataliwa kabisa. Washa kupitia Mipangilio ili kuendelea kuchanganua.';
+
+  @override
+  String get scanUnsupportedDevice => 'Kifaa hiki hakiungi mkono kuchanganua.';
+
+  @override
+  String get scanPermissionRationaleTitle => 'Ruhusu ufikivu wa kamera';
+
+  @override
+  String get scanPermissionRationaleMessage =>
+      'Tunahitaji kamera yako ili kuchanganua lebo za QR na barcode.';
+
+  @override
+  String get scanPermissionNotNow => 'Sio sasa';
+
+  @override
+  String get scanPermissionAllow => 'Ruhusu';
+
+  @override
+  String get scanPermissionSettingsTitle => 'Ruhusa ya kamera yahitajika';
+
+  @override
+  String get scanPermissionSettingsMessage =>
+      'Ufikiaji wa kamera umezimwa. Fungua Mipangilio ili uuwezeshe kabla ya kuchanganua.';
+
+  @override
+  String get scanPermissionGoToSettings => 'Fungua mipangilio';
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/data/remote/all.additional.data_api.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/country_model.dart';
@@ -46,6 +48,7 @@ class AllAdditionalDataRepository {
       // Extract the relevant sections
       final locations = data['locations'] ?? {};
       final referenceData = data['referenceData'] ?? {};
+      final livestockReferenceData = data['livestockReferenceData'] ?? {};
       
       // Combine them into a single map for processing
       final remoteData = {
@@ -59,6 +62,23 @@ class AllAdditionalDataRepository {
         'identityCardTypes': referenceData['identityCardTypes'],
         'schoolLevels': referenceData['schoolLevels'],
         'legalStatuses': referenceData['legalStatuses'],
+        'vaccineTypes': referenceData['vaccineTypes'],
+        'disposalTypes': referenceData['disposalTypes'],
+        
+        'diseases': referenceData['diseases'],
+        'heatTypes': referenceData['heatTypes'],
+        'semenStrawTypes': referenceData['semenStrawTypes'],
+        'inseminationServices': referenceData['inseminationServices'],
+        'milkingMethods': referenceData['milkingMethods'],
+        'calvingTypes': referenceData['calvingTypes'],
+        'calvingProblems': referenceData['calvingProblems'],
+        'reproductiveProblems': referenceData['reproductiveProblems'],
+        'testResults': referenceData['testResults'],
+        // Livestock reference data
+        'species': livestockReferenceData['species'] ?? data['species'],
+        'livestockTypes': livestockReferenceData['livestockTypes'] ?? data['livestockTypes'],
+        'livestockObtainedMethods': livestockReferenceData['livestockObtainedMethods'] ?? data['livestockObtainedMethods'],
+        'breeds': livestockReferenceData['breeds'] ?? data['breeds'],
       };
       
       // Store using the shared logic
@@ -235,6 +255,180 @@ class AllAdditionalDataRepository {
         await _database.referenceDataDao.insertLegalStatuses(legalStatusCompanions);
       }
 
+      if (remoteData['vaccineTypes'] != null && (remoteData['vaccineTypes'] as List).isNotEmpty) {
+        final vaccineTypeCompanions = (remoteData['vaccineTypes'] as List)
+            .map((json) => VaccineTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        log('💉 Upserting ${vaccineTypeCompanions.length} vaccine types from sync payload');
+        await _database.referenceDataDao.insertVaccineTypes(vaccineTypeCompanions);
+      }
+
+      if (remoteData['disposalTypes'] != null && (remoteData['disposalTypes'] as List).isNotEmpty) {
+        final disposalTypeCompanions = (remoteData['disposalTypes'] as List)
+            .map((json) => DisposalTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertDisposalTypes(disposalTypeCompanions);
+      }
+
+      if (remoteData['diseases'] != null && (remoteData['diseases'] as List).isNotEmpty) {
+        final diseaseCompanions = (remoteData['diseases'] as List)
+            .map((json) => DiseasesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                  status: Value(json['status'] as String?),
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertDiseases(diseaseCompanions);
+      }
+
+      if (remoteData['heatTypes'] != null && (remoteData['heatTypes'] as List).isNotEmpty) {
+        final heatTypeCompanions = (remoteData['heatTypes'] as List)
+            .map((json) => HeatTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertHeatTypes(heatTypeCompanions);
+      }
+
+      if (remoteData['semenStrawTypes'] != null && (remoteData['semenStrawTypes'] as List).isNotEmpty) {
+        final semenStrawTypeCompanions = (remoteData['semenStrawTypes'] as List)
+            .map((json) => SemenStrawTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                  category: Value(json['category'] ?? ''),
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertSemenStrawTypes(semenStrawTypeCompanions);
+      }
+
+      if (remoteData['inseminationServices'] != null && (remoteData['inseminationServices'] as List).isNotEmpty) {
+        final inseminationServiceCompanions = (remoteData['inseminationServices'] as List)
+            .map((json) => InseminationServicesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertInseminationServices(inseminationServiceCompanions);
+      }
+
+      if (remoteData['milkingMethods'] != null && (remoteData['milkingMethods'] as List).isNotEmpty) {
+        final milkingMethodCompanions = (remoteData['milkingMethods'] as List)
+            .map((json) => MilkingMethodsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertMilkingMethods(milkingMethodCompanions);
+      }
+
+      if (remoteData['calvingTypes'] != null && (remoteData['calvingTypes'] as List).isNotEmpty) {
+        final calvingTypeCompanions = (remoteData['calvingTypes'] as List)
+            .map((json) => CalvingTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertCalvingTypes(calvingTypeCompanions);
+      }
+
+      if (remoteData['calvingProblems'] != null && (remoteData['calvingProblems'] as List).isNotEmpty) {
+        final calvingProblemCompanions = (remoteData['calvingProblems'] as List)
+            .map((json) => CalvingProblemsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertCalvingProblems(calvingProblemCompanions);
+      }
+
+      if (remoteData['reproductiveProblems'] != null && (remoteData['reproductiveProblems'] as List).isNotEmpty) {
+        final reproductiveProblemCompanions = (remoteData['reproductiveProblems'] as List)
+            .map((json) => ReproductiveProblemsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertReproductiveProblems(reproductiveProblemCompanions);
+      }
+
+      if (remoteData['testResults'] != null && (remoteData['testResults'] as List).isNotEmpty) {
+        final testResultCompanions = (remoteData['testResults'] as List)
+            .map((json) => TestResultsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.logReferenceDao.upsertTestResults(testResultCompanions);
+      }
+
+      // Store species (UPSERT by ID - replace if exists)
+      if (remoteData['species'] != null && (remoteData['species'] as List).isNotEmpty) {
+        final specieCompanions = (remoteData['species'] as List)
+            .map((json) => SpeciesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.specieDao.insertSpecies(specieCompanions);
+      }
+
+      // Store livestock types (UPSERT by ID - replace if exists)
+      if (remoteData['livestockTypes'] != null && (remoteData['livestockTypes'] as List).isNotEmpty) {
+        final livestockTypeCompanions = (remoteData['livestockTypes'] as List)
+            .map((json) => LivestockTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.livestockTypeDao.insertLivestockTypes(livestockTypeCompanions);
+      }
+
+      // Store livestock obtained methods (UPSERT by ID - replace if exists)
+      if (remoteData['livestockObtainedMethods'] != null && (remoteData['livestockObtainedMethods'] as List).isNotEmpty) {
+        final obtainedMethodCompanions = (remoteData['livestockObtainedMethods'] as List)
+            .map((json) => LivestockObtainedMethodsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.livestockObtainedMethodDao.insertLivestockObtainedMethods(obtainedMethodCompanions);
+      }
+
+      // Store breeds (UPSERT by ID - replace if exists)
+      if (remoteData['breeds'] != null && (remoteData['breeds'] as List).isNotEmpty) {
+        final breedCompanions = (remoteData['breeds'] as List)
+            .map((json) => BreedsCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                  group: json['group'] ?? '',
+                  livestockTypeId: json['livestockTypeId'] ?? 0,
+                ))
+            .toList();
+
+        await _database.breedDao.insertBreeds(breedCompanions);
+      }
+
     } catch (e) {
       throw Exception('Repository: Failed to store data to database - $e');
     }
@@ -312,6 +506,118 @@ class AllAdditionalDataRepository {
   /// Useful for forcing a fresh fetch from the API.
   void clearCache() {
     _cachedAllAdditionalData = null;
+  }
+
+  // ============================================================================
+  // Livestock Reference Data Methods (Database Access)
+  // ============================================================================
+
+  /// Get species by ID from database
+  /// 
+  /// [speciesId] - The species ID to find
+  /// Returns the species name or null if not found
+  Future<String?> getSpeciesNameById(int speciesId) async {
+    try {
+      final species = await _database.specieDao.getSpecieById(speciesId);
+      return species?.name;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get breed by ID from database
+  /// 
+  /// [breedId] - The breed ID to find
+  /// Returns the breed name or null if not found
+  Future<String?> getBreedNameById(int breedId) async {
+    try {
+      final breed = await _database.breedDao.getBreedById(breedId);
+      return breed?.name;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get livestock type by ID from database
+  /// 
+  /// [livestockTypeId] - The livestock type ID to find
+  /// Returns the livestock type name or null if not found
+  Future<String?> getLivestockTypeNameById(int livestockTypeId) async {
+    try {
+      final livestockType = await _database.livestockTypeDao.getLivestockTypeById(livestockTypeId);
+      return livestockType?.name;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get livestock obtained method by ID from database
+  /// 
+  /// [methodId] - The method ID to find
+  /// Returns the method name or null if not found
+  Future<String?> getLivestockObtainedMethodNameById(int methodId) async {
+    try {
+      final method = await _database.livestockObtainedMethodDao.getLivestockObtainedMethodById(methodId);
+      return method?.name;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get all species from database
+  /// 
+  /// Returns list of all species stored locally
+  Future<List<Specie>> getAllSpecies() async {
+    try {
+      return await _database.specieDao.getAllSpecies();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Get all breeds from database
+  /// 
+  /// Returns list of all breeds stored locally
+  Future<List<Breed>> getAllBreeds() async {
+    try {
+      return await _database.breedDao.getAllBreeds();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Get breeds by livestock type ID from database
+  /// 
+  /// [livestockTypeId] - The livestock type ID to filter by
+  /// Returns list of breeds for the specified livestock type
+  Future<List<Breed>> getBreedsByLivestockTypeId(int livestockTypeId) async {
+    try {
+      return await _database.breedDao.getBreedsByLivestockTypeId(livestockTypeId);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Get all livestock types from database
+  /// 
+  /// Returns list of all livestock types stored locally
+  Future<List<LivestockType>> getAllLivestockTypes() async {
+    try {
+      return await _database.livestockTypeDao.getAllLivestockTypes();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Get all livestock obtained methods from database
+  /// 
+  /// Returns list of all livestock obtained methods stored locally
+  Future<List<LivestockObtainedMethod>> getAllLivestockObtainedMethods() async {
+    try {
+      return await _database.livestockObtainedMethodDao.getAllLivestockObtainedMethods();
+    } catch (e) {
+      return [];
+    }
   }
 
   /// Clear all reference data from local database

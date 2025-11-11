@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// A customizable text field with prefix icon support and password visibility toggle
@@ -50,6 +51,10 @@ class CustomTextField extends StatefulWidget {
   final Color? focusedBorderColor;
   final double? borderRadius;
   final EdgeInsetsGeometry? contentPadding;
+  final VoidCallback? onTap;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? prefixText;
+  final Widget? suffixIcon;
 
   const CustomTextField({
     super.key,
@@ -70,6 +75,10 @@ class CustomTextField extends StatefulWidget {
     this.focusedBorderColor,
     this.borderRadius,
     this.contentPadding,
+    this.onTap,
+    this.inputFormatters,
+    this.prefixText,
+    this.suffixIcon,
   });
 
   @override
@@ -120,9 +129,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusNode: _focusNode,
           keyboardType: widget.keyboardType,
           obscureText: widget.isPassword ? _obscureText : false,
+          inputFormatters: widget.inputFormatters,
           validator: widget.validator,
           onSaved: widget.onSaved,
           onChanged: widget.onChanged,
+          onTap: widget.onTap,
           maxLines: widget.isPassword ? 1 : widget.maxLines,
           enabled: widget.enabled,
           readOnly: widget.readOnly,
@@ -147,6 +158,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     size: Constants.iconsSize,
                   )
                 : null,
+            prefixText: widget.prefixText,
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
@@ -160,7 +172,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       });
                     },
                   )
-                : null,
+                : widget.suffixIcon,
             contentPadding: widget.contentPadding ??
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(

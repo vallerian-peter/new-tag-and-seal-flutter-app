@@ -35,6 +35,8 @@ class CustomDatePicker extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final bool isRequired;
+  final ValueChanged<DateTime>? onDateSelected;
+  final bool autoFillValue;
 
   const CustomDatePicker({
     super.key,
@@ -46,6 +48,8 @@ class CustomDatePicker extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.isRequired = true,
+    this.onDateSelected,
+    this.autoFillValue = true,
   });
 
   @override
@@ -54,11 +58,12 @@ class CustomDatePicker extends StatelessWidget {
     
     return GestureDetector(
       onTap: () async {
+        final now = DateTime.now();
         final date = await showDatePicker(
           context: context,
-          initialDate: initialDate ?? DateTime.now().subtract(const Duration(days: 365 * 18)),
+          initialDate: initialDate ?? now,
           firstDate: firstDate ?? DateTime(1900),
-          lastDate: lastDate ?? DateTime.now(),
+          lastDate: lastDate ?? DateTime(now.year + 5),
           builder: (context, child) {
             return Theme(
               data: theme.copyWith(
@@ -115,7 +120,10 @@ class CustomDatePicker extends StatelessWidget {
           },
         );
         if (date != null) {
-          controller.text = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+          if (autoFillValue) {
+            controller.text = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+          }
+          onDateSelected?.call(date);
         }
       },
       child: AbsorbPointer(

@@ -13,30 +13,45 @@ class LivestockMapper {
   /// [entity] - The database entity from the Livestocks table
   /// Returns a LivestockModel with the mapped data
   static LivestockModel livestockToEntity(Map<String, dynamic> entity) {
+    // Handle dateFirstEnteredToFarm which can be:
+    // - int (milliseconds timestamp from Drift DateTimeColumn)
+    // - DateTime object
+    // - String (from API)
+    final dateFirstEnteredToFarmRaw = entity['dateFirstEnteredToFarm'];
+    final parsedDate = dateFirstEnteredToFarmRaw is DateTime 
+        ? dateFirstEnteredToFarmRaw 
+        : dateFirstEnteredToFarmRaw is int
+            ? DateTime.fromMillisecondsSinceEpoch(dateFirstEnteredToFarmRaw)
+            : DateTime.parse(dateFirstEnteredToFarmRaw as String);
+    
+    // Safely convert synced field (can be int 0/1 from SQLite or bool from Dart)
+    final syncedRaw = entity['synced'];
+    final synced = syncedRaw is bool ? syncedRaw : (syncedRaw == 1 || syncedRaw == true);
+    
     return LivestockModel(
       id: entity['id'] as int,
-      farmUuid: entity['farmUuid'] as String,  // Farm UUID
-      uuid: entity['uuid'] as String,
-      identificationNumber: entity['identificationNumber'] as String,
-      dummyTagId: entity['dummyTagId'] as String,
-      barcodeTagId: entity['barcodeTagId'] as String,
-      rfidTagId: entity['rfidTagId'] as String,
+      farmUuid: entity['farmUuid'].toString(),  // Ensure string
+      uuid: entity['uuid'].toString(),  // Ensure string
+      identificationNumber: entity['identificationNumber'].toString(),  // Ensure string
+      dummyTagId: entity['dummyTagId'].toString(),  // Ensure string
+      barcodeTagId: entity['barcodeTagId'].toString(),  // Ensure string
+      rfidTagId: entity['rfidTagId'].toString(),  // Ensure string
       livestockTypeId: entity['livestockTypeId'] as int,
-      name: entity['name'] as String,
-      dateOfBirth: entity['dateOfBirth'] as String,
-      motherUuid: entity['motherUuid'] as String?,  // Mother UUID
-      fatherUuid: entity['fatherUuid'] as String?,  // Father UUID
-      gender: entity['gender'] as String,
+      name: entity['name'].toString(),  // Ensure string
+      dateOfBirth: entity['dateOfBirth'].toString(),  // Ensure string
+      motherUuid: entity['motherUuid']?.toString(),  // Nullable, ensure string
+      fatherUuid: entity['fatherUuid']?.toString(),  // Nullable, ensure string
+      gender: entity['gender'].toString(),  // Ensure string
       breedId: entity['breedId'] as int,
       speciesId: entity['speciesId'] as int,
-      status: entity['status'] as String? ?? 'active',
+      status: entity['status']?.toString() ?? 'active',  // Ensure string
       livestockObtainedMethodId: entity['livestockObtainedMethodId'] as int,
-      dateFirstEnteredToFarm: DateTime.parse(entity['dateFirstEnteredToFarm'] as String),
-      weightAsOnRegistration: (entity['weightAsOnRegistration'] as num).toDouble(),
-      synced: entity['synced'] as bool? ?? false,
-      syncAction: entity['syncAction'] as String? ?? 'create',
-      createdAt: entity['createdAt'] as String,
-      updatedAt: entity['updatedAt'] as String,
+      dateFirstEnteredToFarm: parsedDate,
+      weightAsOnRegistration: _parseWeight(entity['weightAsOnRegistration']),
+      synced: synced,
+      syncAction: entity['syncAction']?.toString() ?? 'create',  // Ensure string
+      createdAt: entity['createdAt'].toString(),  // Ensure string
+      updatedAt: entity['updatedAt'].toString(),  // Ensure string
     );
   }
 
@@ -101,6 +116,16 @@ class LivestockMapper {
       'createdAt': model.createdAt,
       'updatedAt': model.updatedAt,
     };
+  }
+
+  /// Helper to parse weight which can be String (from backend) or num (from local DB)
+  static double _parseWeight(dynamic weight) {
+    if (weight == null) return 0.0;
+    if (weight is num) return weight.toDouble();
+    if (weight is String) {
+      return double.tryParse(weight) ?? 0.0;
+    }
+    return 0.0;
   }
 
   // ==================== BATCH OPERATIONS ====================

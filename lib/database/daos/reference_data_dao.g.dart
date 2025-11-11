@@ -8,4 +8,5 @@ mixin _$ReferenceDataDaoMixin on DatabaseAccessor<AppDatabase> {
   $IdentityCardTypesTable get identityCardTypes =>
       attachedDatabase.identityCardTypes;
   $LegalStatusesTable get legalStatuses => attachedDatabase.legalStatuses;
+  $VaccineTypesTable get vaccineTypes => attachedDatabase.vaccineTypes;
 }

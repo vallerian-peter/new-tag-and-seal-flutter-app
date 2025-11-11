@@ -11,6 +11,8 @@ import 'package:new_tag_and_seal_flutter_app/core/components/weight_input_with_b
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:new_tag_and_seal_flutter_app/features/scanner/presentation/scanner_screen.dart'
+    show TagScanMode, showTagScannerBottomSheet;
 import 'package:provider/provider.dart';
 import 'package:drift/drift.dart' as drift;
 import 'dart:developer';
@@ -83,7 +85,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     // Pre-fill form if editing
     if (isEditMode) {
       _prefillFormData();
-    } 
+    }
     // Pre-select farm if provided and not editing
     else if (widget.preSelectedFarmUuid != null) {
       _selectedFarmUuid = widget.preSelectedFarmUuid;
@@ -134,11 +136,14 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
       // Load all necessary data
       final farms = await database.farmDao.getAllActiveFarms();
-      final livestockTypes = await database.livestockTypeDao.getAllLivestockTypes();
+      final livestockTypes = await database.livestockTypeDao
+          .getAllLivestockTypes();
       final species = await database.specieDao.getAllSpecies();
       final breeds = await database.breedDao.getAllBreeds();
-      final methods = await database.livestockObtainedMethodDao.getAllLivestockObtainedMethods();
-      final allLivestock = await database.livestockDao.getAllLivestock();
+      final methods = await database.livestockObtainedMethodDao
+          .getAllLivestockObtainedMethods();
+      final allLivestock = await database.livestockDao
+          .getAllActiveLivestock(); // ✅ Only active livestock
 
       setState(() {
         _farms = farms;
@@ -146,33 +151,49 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         _species = species;
         _breeds = breeds;
         _livestockObtainedMethods = methods;
-        
-        // Load eligible mothers (all female livestock, excluding current if editing)
+
+        // Load eligible mothers (active female livestock, excluding current if editing)
         _eligibleMothers = allLivestock
             .where((l) => l.gender.toLowerCase() == 'female')
-            .where((l) => isEditMode ? l.uuid != widget.livestock!.uuid : true) // Exclude self
+            .where(
+              (l) => isEditMode ? l.uuid != widget.livestock!.uuid : true,
+            ) // Exclude self
             .toList();
-        
-        // Load eligible fathers (all male livestock, excluding current if editing)
+
+        // Load eligible fathers (active male livestock, excluding current if editing)
         _eligibleFathers = allLivestock
             .where((l) => l.gender.toLowerCase() == 'male')
-            .where((l) => isEditMode ? l.uuid != widget.livestock!.uuid : true) // Exclude self
+            .where(
+              (l) => isEditMode ? l.uuid != widget.livestock!.uuid : true,
+            ) // Exclude self
             .toList();
-        
+
         // Filter breeds immediately if livestock type is already selected (edit mode)
         if (_selectedLivestockTypeId != null) {
-          _filteredBreeds = breeds.where((breed) => breed.livestockTypeId == _selectedLivestockTypeId).toList();
-          log('✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId');
+          _filteredBreeds = breeds
+              .where(
+                (breed) => breed.livestockTypeId == _selectedLivestockTypeId,
+              )
+              .toList();
+          log(
+            '✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId',
+          );
         } else {
           _filteredBreeds = breeds;
         }
-        
+
         _isLoadingData = false;
       });
 
-      log('✅ Data loaded: ${_farms.length} farms, ${_livestockTypes.length} types, ${_species.length} species');
-      log('✅ Eligible mothers: ${_eligibleMothers.length} (all females from all farms)');
-      log('✅ Eligible fathers: ${_eligibleFathers.length} (all males from all farms)');
+      log(
+        '✅ Data loaded: ${_farms.length} farms, ${_livestockTypes.length} types, ${_species.length} species',
+      );
+      log(
+        '✅ Eligible mothers: ${_eligibleMothers.length} (all females from all farms)',
+      );
+      log(
+        '✅ Eligible fathers: ${_eligibleFathers.length} (all males from all farms)',
+      );
     } catch (e) {
       log('❌ Error loading data: $e');
       setState(() => _isLoadingData = false);
@@ -197,7 +218,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     if (_selectedLivestockTypeId == null) return;
 
     setState(() {
-      _filteredBreeds = _breeds.where((breed) => breed.livestockTypeId == _selectedLivestockTypeId).toList();
+      _filteredBreeds = _breeds
+          .where((breed) => breed.livestockTypeId == _selectedLivestockTypeId)
+          .toList();
 
       // Reset breed if not valid for current type
       if (_selectedBreedId != null) {
@@ -207,7 +230,31 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         }
       }
     });
-    log('✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId');
+    log(
+      '✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId',
+    );
+  }
+
+  Future<void> _scanBarcodeTag() async {
+    final result = await showTagScannerBottomSheet(
+      context,
+      TagScanMode.barcode,
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _barcodeTagIdController.text = result;
+    });
+  }
+
+  Future<void> _scanRfidTag() async {
+    final result = await showTagScannerBottomSheet(
+      context,
+      TagScanMode.rfid,
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _rfidTagIdController.text = result;
+    });
   }
 
   @override
@@ -309,7 +356,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       await AlertDialogs.showConfirmation(
         context: context,
         title: isEditMode ? l10n.update : l10n.register,
-        message: isEditMode 
+        message: isEditMode
             ? l10n.confirmUpdateLivestock
             : l10n.confirmRegisterLivestock,
         confirmText: isEditMode ? l10n.update : l10n.register,
@@ -334,9 +381,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
       final now = DateTime.now().toIso8601String();
-      
+
       // Generate UUID if creating new livestock
-      final uuid = widget.livestock?.uuid ?? 
+      final uuid =
+          widget.livestock?.uuid ??
           '${DateTime.now().millisecondsSinceEpoch}-${_nameController.text.hashCode.abs()}';
 
       // Get species ID from selected livestock type (they should match)
@@ -415,7 +463,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             updatedAt: now,
           ),
         );
-        log('✅ Livestock registered: ${_nameController.text} (ID: $livestockId)');
+        log(
+          '✅ Livestock registered: ${_nameController.text} (ID: $livestockId)',
+        );
 
         // Show success dialog
         if (!mounted) return;
@@ -434,7 +484,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       }
     } catch (e) {
       log('❌ Error saving livestock: $e');
-      
+
       // Show error dialog
       if (!mounted) return;
       await AlertDialogs.showError(
@@ -451,20 +501,21 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    final buttonText = _currentStep == 2 
+    final buttonText = _currentStep == 2
         ? (isEditMode ? l10n.update : l10n.register)
         : l10n.continueButton;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -484,37 +535,41 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       body: _isLoadingData
           ? const Center(child: LoadingIndicator())
           : SafeArea(
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: CustomStepper(
-                    currentStep: _currentStep,
-                    onStepContinue: _onStepContinue,
-                    onStepCancel: _onStepCancel,
-                    isLoading: false,
-                    continueButtonText: buttonText,
-                    backButtonText: l10n.back,
-                    steps: [
-                      StepperStep(
-                        title: l10n.basicInformation,
-                        subtitle: l10n.farmNameAndIdentification,
-                        icon: Icons.pets_outlined,
-                        content: _buildBasicInfoStep(l10n),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CustomStepper(
+                        currentStep: _currentStep,
+                        onStepContinue: _onStepContinue,
+                        onStepCancel: _onStepCancel,
+                        isLoading: false,
+                        continueButtonText: buttonText,
+                        backButtonText: l10n.back,
+                        steps: [
+                          StepperStep(
+                            title: l10n.basicInformation,
+                            subtitle: l10n.farmNameAndIdentification,
+                            icon: Icons.pets_outlined,
+                            content: _buildBasicInfoStep(l10n),
+                          ),
+                          StepperStep(
+                            title: l10n.physicalDetails,
+                            subtitle: l10n.typeSpeciesBreedCharacteristics,
+                            icon: Icons.info_outline,
+                            content: _buildPhysicalDetailsStep(l10n),
+                          ),
+                          StepperStep(
+                            title: l10n.additionalInfo,
+                            subtitle: l10n.parentsMethodAndDates,
+                            icon: Icons.calendar_today_outlined,
+                            content: _buildAdditionalInfoStep(l10n),
+                          ),
+                        ],
                       ),
-                      StepperStep(
-                        title: l10n.physicalDetails,
-                        subtitle: l10n.typeSpeciesBreedCharacteristics,
-                        icon: Icons.info_outline,
-                        content: _buildPhysicalDetailsStep(l10n),
-                      ),
-                      StepperStep(
-                        title: l10n.additionalInfo,
-                        subtitle: l10n.parentsMethodAndDates,
-                        icon: Icons.calendar_today_outlined,
-                        content: _buildAdditionalInfoStep(l10n),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -523,6 +578,14 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   // STEP 1: Basic Information
   Widget _buildBasicInfoStep(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fieldFillColor = isDark
+        ? theme.colorScheme.surface.withAlpha(50)
+        : Colors.white;
+    final borderColor = theme.colorScheme.outline.withOpacity(isDark ? 0.4 : 0.2);
+    final focusedBorderColor = theme.colorScheme.primary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -541,10 +604,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           icon: Icons.agriculture_outlined,
           value: _selectedFarmUuid,
           dropdownItems: _farms.map((farm) {
-            return DropdownItem<String>(
-              value: farm.uuid,
-              label: farm.name,
-            );
+            return DropdownItem<String>(value: farm.uuid, label: farm.name);
           }).toList(),
           onChanged: (value) {
             setState(() => _selectedFarmUuid = value);
@@ -571,6 +631,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _nameController,
           label: '${l10n.livestock} ${l10n.name}',
           hintText: l10n.enterLivestockName,
+          fillColor: fieldFillColor,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.nameRequired;
@@ -585,6 +648,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _identificationNumberController,
           label: l10n.identificationNumber,
           hintText: l10n.enterIdentificationNumber,
+          fillColor: fieldFillColor,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.identificationNumberRequired;
@@ -607,6 +673,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _dummyTagIdController,
           label: l10n.dummyTagId,
           hintText: l10n.enterDummyTagId,
+          fillColor: fieldFillColor,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
         ),
         const SizedBox(height: 16),
 
@@ -615,6 +684,17 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _barcodeTagIdController,
           label: l10n.barcodeTagId,
           hintText: l10n.enterBarcodeTagId,
+          fillColor: fieldFillColor,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.qr_code_scanner,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: _scanBarcodeTag,
+            tooltip: l10n.scanOptionBarcode,
+          ),
         ),
         const SizedBox(height: 16),
 
@@ -623,6 +703,17 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _rfidTagIdController,
           label: l10n.rfidTagId,
           hintText: l10n.enterRfidTagId,
+          fillColor: fieldFillColor,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.nfc,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: _scanRfidTag,
+            tooltip: l10n.scanOptionRfid,
+          ),
         ),
       ],
     );
@@ -630,6 +721,13 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   // STEP 2: Physical Details
   Widget _buildPhysicalDetailsStep(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fieldFillColor = isDark
+        ? theme.colorScheme.surface.withAlpha(50)
+        : Colors.white;
+    final borderColor = theme.colorScheme.outline.withOpacity(isDark ? 0.4 : 0.2);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -648,10 +746,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           icon: Icons.category_outlined,
           value: _selectedLivestockTypeId,
           dropdownItems: _livestockTypes.map((type) {
-            return DropdownItem<int>(
-              value: type.id,
-              label: type.name,
-            );
+            return DropdownItem<int>(value: type.id, label: type.name);
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -675,10 +770,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           icon: Icons.pets_outlined,
           value: _selectedSpeciesId,
           dropdownItems: _species.map((species) {
-            return DropdownItem<int>(
-              value: species.id,
-              label: species.name,
-            );
+            return DropdownItem<int>(value: species.id, label: species.name);
           }).toList(),
           onChanged: (value) {
             setState(() => _selectedSpeciesId = value);
@@ -694,16 +786,15 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
         // Breed (Filtered by Livestock Type)
         CustomDropdown<int>(
-          key: ValueKey('breed_dropdown_${_selectedLivestockTypeId}_${_filteredBreeds.length}'), // Force rebuild when breeds change
+          key: ValueKey(
+            'breed_dropdown_${_selectedLivestockTypeId}_${_filteredBreeds.length}',
+          ), // Force rebuild when breeds change
           label: l10n.breed,
           hint: l10n.select,
           icon: Icons.menu_book_outlined,
           value: _selectedBreedId,
           dropdownItems: _filteredBreeds.map((breed) {
-            return DropdownItem<int>(
-              value: breed.id,
-              label: breed.name,
-            );
+            return DropdownItem<int>(value: breed.id, label: breed.name);
           }).toList(),
           onChanged: (value) {
             setState(() => _selectedBreedId = value);
@@ -777,22 +868,21 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
               builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.light(
-                      primary: Constants.primaryColor, // header background color
-                      onPrimary: Colors.white, // header text color
-                      onSurface: Colors.black, // body text color
+                final dateTheme = theme.copyWith(
+                  colorScheme: theme.colorScheme.copyWith(
+                    primary: theme.colorScheme.primary,
+                    onPrimary: theme.colorScheme.onPrimary,
+                    surface: theme.colorScheme.surface,
+                    onSurface: theme.colorScheme.onSurface,
                     ),
-                    dialogBackgroundColor: Colors.white,
+                  dialogBackgroundColor: theme.colorScheme.surface,
                     textButtonTheme: TextButtonThemeData(
                       style: TextButton.styleFrom(
-                        foregroundColor: Constants.primaryColor, // button text color
+                      foregroundColor: theme.colorScheme.primary,
                       ),
                     ),
-                  ),
-                  child: child!,
                 );
+                return Theme(data: dateTheme, child: child!);
               },
             );
             if (date != null) {
@@ -802,7 +892,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              color: fieldFillColor,
+              border: Border.all(color: borderColor),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -813,10 +904,12 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                       ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
                       : l10n.dateOfBirthRequired,
                   style: TextStyle(
-                    color: _selectedDateOfBirth != null ? Colors.black : Colors.grey,
+                    color: _selectedDateOfBirth != null
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
-                const Icon(Icons.calendar_today, color: Constants.primaryColor),
+                Icon(Icons.calendar_today, color: theme.colorScheme.primary),
               ],
             ),
           ),
@@ -827,6 +920,13 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   // STEP 3: Additional Info
   Widget _buildAdditionalInfoStep(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fieldFillColor = isDark
+        ? theme.colorScheme.surface.withAlpha(50)
+        : Colors.white;
+    final borderColor = theme.colorScheme.outline.withOpacity(isDark ? 0.4 : 0.2);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -850,10 +950,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               (f) => f.uuid == livestock.farmUuid,
               orElse: () => _farms.first, // fallback
             );
-            final livestockName = livestock.name.isNotEmpty 
-                ? livestock.name 
+            final livestockName = livestock.name.isNotEmpty
+                ? livestock.name
                 : '${l10n.livestock} #${livestock.id}';
-            
+
             return DropdownItem<String>(
               value: livestock.uuid,
               label: '$livestockName (${farm.name})', // Show farm name
@@ -877,10 +977,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               (f) => f.uuid == livestock.farmUuid,
               orElse: () => _farms.first, // fallback
             );
-            final livestockName = livestock.name.isNotEmpty 
-                ? livestock.name 
+            final livestockName = livestock.name.isNotEmpty
+                ? livestock.name
                 : '${l10n.livestock} #${livestock.id}';
-            
+
             return DropdownItem<String>(
               value: livestock.uuid,
               label: '$livestockName (${farm.name})', // Show farm name
@@ -907,10 +1007,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           icon: Icons.source_outlined,
           value: _selectedLivestockObtainedMethodId,
           dropdownItems: _livestockObtainedMethods.map((method) {
-            return DropdownItem<int>(
-              value: method.id,
-              label: method.name,
-            );
+            return DropdownItem<int>(value: method.id, label: method.name);
           }).toList(),
           onChanged: (value) {
             setState(() => _selectedLivestockObtainedMethodId = value);
@@ -927,22 +1024,21 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
               builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.light(
-                      primary: Constants.primaryColor, // header background color
-                      onPrimary: Colors.white, // header text color
-                      onSurface: Colors.black, // body text color
+                final dateTheme = theme.copyWith(
+                  colorScheme: theme.colorScheme.copyWith(
+                    primary: theme.colorScheme.primary,
+                    onPrimary: theme.colorScheme.onPrimary,
+                    surface: theme.colorScheme.surface,
+                    onSurface: theme.colorScheme.onSurface,
                     ),
-                    dialogBackgroundColor: Colors.white,
+                  dialogBackgroundColor: theme.colorScheme.surface,
                     textButtonTheme: TextButtonThemeData(
                       style: TextButton.styleFrom(
-                        foregroundColor: Constants.primaryColor, // button text color
+                      foregroundColor: theme.colorScheme.primary,
                       ),
                     ),
-                  ),
-                  child: child!,
                 );
+                return Theme(data: dateTheme, child: child!);
               },
             );
             if (date != null) {
@@ -952,7 +1048,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              color: fieldFillColor,
+              border: Border.all(color: borderColor),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -963,10 +1060,12 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                       ? '${_selectedDateFirstEnteredToFarm!.day}/${_selectedDateFirstEnteredToFarm!.month}/${_selectedDateFirstEnteredToFarm!.year}'
                       : l10n.dateEnteredFarmRequired,
                   style: TextStyle(
-                    color: _selectedDateFirstEnteredToFarm != null ? Colors.black : Colors.grey,
+                    color: _selectedDateFirstEnteredToFarm != null
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
-                const Icon(Icons.calendar_today, color: Constants.primaryColor),
+                Icon(Icons.calendar_today, color: theme.colorScheme.primary),
               ],
             ),
           ),
@@ -1005,23 +1104,24 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     required String title,
     required String subtitle,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final background = isDark
+        ? theme.colorScheme.surfaceVariant.withOpacity(0.6)
+        : theme.colorScheme.primary.withOpacity(0.08);
+    final borderColor = theme.colorScheme.primary.withOpacity(isDark ? 0.45 : 0.25);
+    final subtitleColor = theme.colorScheme.onSurface.withOpacity(isDark ? 0.65 : 0.6);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withOpacity(0.1),
+        color: background,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Constants.primaryColor.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Constants.primaryColor,
-            size: 24,
-          ),
+          Icon(icon, color: theme.colorScheme.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1029,19 +1129,16 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Constants.primaryColor,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Constants.primaryColor.withOpacity(0.8),
-                  ),
+                  style: TextStyle(fontSize: 12, color: subtitleColor),
                 ),
               ],
             ),
@@ -1051,4 +1148,3 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     );
   }
 }
-

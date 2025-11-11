@@ -11,8 +11,11 @@ part 'location_dao.g.dart';
 
 /// DAO for handling location-related data (Country, Region, District, Division, Ward, Village, Street)
 /// This provides simple, easy-to-understand methods for location queries
-@DriftAccessor(tables: [Countries, Regions, Districts, Divisions, Wards, Villages, Streets])
-class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin {
+@DriftAccessor(
+  tables: [Countries, Regions, Districts, Divisions, Wards, Villages, Streets],
+)
+class LocationDao extends DatabaseAccessor<AppDatabase>
+    with _$LocationDaoMixin {
   LocationDao(AppDatabase db) : super(db);
 
   // ==================== COUNTRY METHODS ====================
@@ -25,7 +28,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(countries)..where((c) => c.id.equals(id))).getSingleOrNull();
 
   /// Insert a new country
-  Future<int> insertCountry(CountriesCompanion entry) => into(countries).insert(entry);
+  Future<int> insertCountry(CountriesCompanion entry) =>
+      into(countries).insert(entry);
 
   /// Update a country
   Future<bool> updateCountry(Country entry) => update(countries).replace(entry);
@@ -48,7 +52,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(regions)..where((r) => r.id.equals(id))).getSingleOrNull();
 
   /// Insert a new region
-  Future<int> insertRegion(RegionsCompanion entry) => into(regions).insert(entry);
+  Future<int> insertRegion(RegionsCompanion entry) =>
+      into(regions).insert(entry);
 
   /// Update a region
   Future<bool> updateRegion(Region entry) => update(regions).replace(entry);
@@ -71,10 +76,12 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(districts)..where((d) => d.id.equals(id))).getSingleOrNull();
 
   /// Insert a new district
-  Future<int> insertDistrict(DistrictsCompanion entry) => into(districts).insert(entry);
+  Future<int> insertDistrict(DistrictsCompanion entry) =>
+      into(districts).insert(entry);
 
   /// Update a district
-  Future<bool> updateDistrict(District entry) => update(districts).replace(entry);
+  Future<bool> updateDistrict(District entry) =>
+      update(districts).replace(entry);
 
   /// Delete a district
   Future<int> deleteDistrict(int id) =>
@@ -94,10 +101,12 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(divisions)..where((d) => d.id.equals(id))).getSingleOrNull();
 
   /// Insert a new division
-  Future<int> insertDivision(DivisionsCompanion entry) => into(divisions).insert(entry);
+  Future<int> insertDivision(DivisionsCompanion entry) =>
+      into(divisions).insert(entry);
 
   /// Update a division
-  Future<bool> updateDivision(Division entry) => update(divisions).replace(entry);
+  Future<bool> updateDivision(Division entry) =>
+      update(divisions).replace(entry);
 
   /// Delete a division
   Future<int> deleteDivision(int id) =>
@@ -140,7 +149,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(villages)..where((v) => v.id.equals(id))).getSingleOrNull();
 
   /// Insert a new village
-  Future<int> insertVillage(VillagesCompanion entry) => into(villages).insert(entry);
+  Future<int> insertVillage(VillagesCompanion entry) =>
+      into(villages).insert(entry);
 
   /// Update a village
   Future<bool> updateVillage(Village entry) => update(villages).replace(entry);
@@ -161,7 +171,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
       (select(streets)..where((s) => s.id.equals(id))).getSingleOrNull();
 
   /// Insert a new street
-  Future<int> insertStreet(StreetsCompanion entry) => into(streets).insert(entry);
+  Future<int> insertStreet(StreetsCompanion entry) =>
+      into(streets).insert(entry);
 
   /// Update a street
   Future<bool> updateStreet(Street entry) => update(streets).replace(entry);
@@ -262,4 +273,3 @@ class LocationDao extends DatabaseAccessor<AppDatabase> with _$LocationDaoMixin 
   Future<List<Street>> searchStreets(String query) =>
       (select(streets)..where((s) => s.name.like('%$query%'))).get();
 }
-

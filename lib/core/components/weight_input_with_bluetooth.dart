@@ -60,6 +60,10 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fillColor = isDark
+        ? theme.colorScheme.surface
+        : Colors.white;
 
     return TextFormField(
       controller: widget.controller,
@@ -75,21 +79,19 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
         labelText: widget.label,
         hintText: widget.hintText,
         filled: true,
-        fillColor: theme.brightness == Brightness.dark 
-            ? Colors.grey[800] 
-            : Colors.grey[50],
+        fillColor: fillColor,
         suffixIcon: Container(
           margin: const EdgeInsets.only(right: 8),
           child: IconButton(
-            icon: const Icon(
+            icon: Icon(
               FontAwesome.bluetooth_brand,
-              color: Constants.primaryColor,
+              color: theme.colorScheme.primary,
               size: 22,
             ),
             tooltip: 'Connect Bluetooth Scale', // TODO: Add l10n.connectBluetoothScale
             onPressed: _showBluetoothBottomSheet,
             style: IconButton.styleFrom(
-              backgroundColor: Constants.primaryColor.withOpacity(0.1),
+              backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -98,15 +100,15 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Constants.primaryColor, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

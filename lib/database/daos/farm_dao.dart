@@ -20,15 +20,15 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
   Future<List<Farm>> getAllFarms() => select(farms).get();
 
   /// Get all farms excluding deleted ones
-  Future<List<Farm>> getAllActiveFarms() => 
+  Future<List<Farm>> getAllActiveFarms() =>
       (select(farms)..where((f) => f.syncAction.isNotValue('deleted'))).get();
 
   /// Get farm by ID
-  Future<Farm?> getFarmById(int id) => 
+  Future<Farm?> getFarmById(int id) =>
       (select(farms)..where((f) => f.id.equals(id))).getSingleOrNull();
 
   /// Get farm by UUID
-  Future<Farm?> getFarmByUuid(String uuid) => 
+  Future<Farm?> getFarmByUuid(String uuid) =>
       (select(farms)..where((f) => f.uuid.equals(uuid))).getSingleOrNull();
 
   /// Insert a new farm
@@ -38,21 +38,21 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
   Future<bool> updateFarm(Farm entry) => update(farms).replace(entry);
 
   /// Delete a farm
-  Future<int> deleteFarm(int id) => 
+  Future<int> deleteFarm(int id) =>
       (delete(farms)..where((f) => f.id.equals(id))).go();
 
   /// Get farms by farmer ID
-  Future<List<Farm>> getFarmsByFarmerId(int farmerId) => 
+  Future<List<Farm>> getFarmsByFarmerId(int farmerId) =>
       (select(farms)..where((f) => f.farmerId.equals(farmerId))).get();
 
   /// Get unsynced farms
-  Future<List<Farm>> getUnsyncedFarms() => 
+  Future<List<Farm>> getUnsyncedFarms() =>
       (select(farms)..where((f) => f.synced.equals(false))).get();
 
   // ==================== LIVESTOCK RELATIONSHIPS ====================
 
   /// Get all livestock for a specific farm by farm UUID
-  Future<List<Livestock>> getLivestockByFarmUuid(String farmUuid) => 
+  Future<List<Livestock>> getLivestockByFarmUuid(String farmUuid) =>
       (select(livestocks)..where((l) => l.farmUuid.equals(farmUuid))).get();
 
   /// Get farm with its livestock (one-to-many relationship)
@@ -61,10 +61,7 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
     if (farm == null) return null;
 
     final livestockList = await getLivestockByFarmUuid(farm.uuid);
-    return FarmWithLivestock(
-      farm: farm,
-      livestock: livestockList,
-    );
+    return FarmWithLivestock(farm: farm, livestock: livestockList);
   }
 
   /// Get all farms with their livestock
@@ -74,26 +71,26 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
 
     for (final farm in allFarms) {
       final livestockList = await getLivestockByFarmUuid(farm.uuid);
-      farmsWithLivestock.add(FarmWithLivestock(
-        farm: farm,
-        livestock: livestockList,
-      ));
+      farmsWithLivestock.add(
+        FarmWithLivestock(farm: farm, livestock: livestockList),
+      );
     }
 
     return farmsWithLivestock;
   }
 
   /// Get farms by farmer with their livestock
-  Future<List<FarmWithLivestock>> getFarmsByFarmerWithLivestock(int farmerId) async {
+  Future<List<FarmWithLivestock>> getFarmsByFarmerWithLivestock(
+    int farmerId,
+  ) async {
     final farms = await getFarmsByFarmerId(farmerId);
     final List<FarmWithLivestock> farmsWithLivestock = [];
 
     for (final farm in farms) {
       final livestockList = await getLivestockByFarmUuid(farm.uuid);
-      farmsWithLivestock.add(FarmWithLivestock(
-        farm: farm,
-        livestock: livestockList,
-      ));
+      farmsWithLivestock.add(
+        FarmWithLivestock(farm: farm, livestock: livestockList),
+      );
     }
 
     return farmsWithLivestock;
@@ -115,10 +112,9 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
 
     for (final farm in unsyncedFarms) {
       final livestockList = await getLivestockByFarmUuid(farm.uuid);
-      farmsWithLivestock.add(FarmWithLivestock(
-        farm: farm,
-        livestock: livestockList,
-      ));
+      farmsWithLivestock.add(
+        FarmWithLivestock(farm: farm, livestock: livestockList),
+      );
     }
 
     return farmsWithLivestock;
@@ -127,7 +123,7 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
   // ==================== SEARCH OPERATIONS ====================
 
   /// Search farms by name
-  Future<List<Farm>> searchFarmsByName(String name) => 
+  Future<List<Farm>> searchFarmsByName(String name) =>
       (select(farms)..where((f) => f.name.like('%$name%'))).get();
 
   /// Search farms by location (ward, district, region, country)
@@ -138,7 +134,7 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
     int? countryId,
   }) {
     var query = select(farms);
-    
+
     if (wardId != null) {
       query = query..where((f) => f.wardId.equals(wardId));
     }
@@ -151,7 +147,7 @@ class FarmDao extends DatabaseAccessor<AppDatabase> with _$FarmDaoMixin {
     if (countryId != null) {
       query = query..where((f) => f.countryId.equals(countryId));
     }
-    
+
     return query.get();
   }
 }
@@ -161,15 +157,13 @@ class FarmWithLivestock {
   final Farm farm;
   final List<Livestock> livestock;
 
-  const FarmWithLivestock({
-    required this.farm,
-    required this.livestock,
-  });
+  const FarmWithLivestock({required this.farm, required this.livestock});
 
   /// Convert to domain models
   FarmModel get farmModel => FarmMapper.farmToEntity(farm.toJson());
-  List<LivestockModel> get livestockModels => 
-      livestock.map((l) => LivestockMapper.livestockToEntity(l.toJson())).toList();
+  List<LivestockModel> get livestockModels => livestock
+      .map((l) => LivestockMapper.livestockToEntity(l.toJson()))
+      .toList();
 
   /// Get livestock count
   int get livestockCount => livestock.length;

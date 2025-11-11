@@ -208,11 +208,11 @@ class FarmRepository implements FarmRepositoryInterface {
       // Get all farms excluding deleted ones
       final farms = await _database.farmDao.getAllActiveFarms();
       
-      // For each farm, get its livestock
+      // For each farm, get its active livestock (excluding deleted ones)
       final List<Map<String, dynamic>> farmsWithLivestock = [];
       
       for (final farm in farms) {
-        final livestockList = await _database.livestockDao.getLivestockByFarmUuid(farm.uuid);
+        final livestockList = await _database.livestockDao.getActiveLivestockByFarmUuid(farm.uuid);
         
         farmsWithLivestock.add({
           'farm': farm,
@@ -477,43 +477,57 @@ class FarmRepository implements FarmRepositoryInterface {
       log('✅ Marking ${uuids.length} farms as synced...');
       
       int updatedCount = 0;
+      int deletedCount = 0;
       
       for (final uuid in uuids) {
         final farm = await _database.farmDao.getFarmByUuid(uuid);
         
         if (farm != null) {
-          final updatedFarm = Farm(
-            id: farm.id,
-            farmerId: farm.farmerId,
-            uuid: farm.uuid,
-            referenceNo: farm.referenceNo,
-            regionalRegNo: farm.regionalRegNo,
-            name: farm.name,
-            size: farm.size,  // Already String
-            sizeUnit: farm.sizeUnit,
-            latitudes: farm.latitudes,  // Already String
-            longitudes: farm.longitudes,  // Already String
-            physicalAddress: farm.physicalAddress,
-            villageId: farm.villageId,
-            wardId: farm.wardId,
-            districtId: farm.districtId,
-            regionId: farm.regionId,
-            countryId: farm.countryId,
-            legalStatusId: farm.legalStatusId,
-            status: farm.status,
-            synced: true, // Mark as synced
-            syncAction: farm.syncAction,
-            createdAt: farm.createdAt,
-            updatedAt: farm.updatedAt,
-          );
-          
-          final success = await _database.farmDao.updateFarm(updatedFarm);
-          if (success) updatedCount++;
+          // If syncAction is 'deleted', actually delete the farm from local DB
+          if (farm.syncAction == 'deleted') {
+            final rowsDeleted = await _database.farmDao.deleteFarm(farm.id);
+            if (rowsDeleted > 0) {
+              deletedCount++;
+              log('  🗑️ Deleted farm from local DB: ${farm.name} (${uuid})');
+            }
+          } else {
+            // Otherwise, just mark as synced
+            final updatedFarm = Farm(
+              id: farm.id,
+              farmerId: farm.farmerId,
+              uuid: farm.uuid,
+              referenceNo: farm.referenceNo,
+              regionalRegNo: farm.regionalRegNo,
+              name: farm.name,
+              size: farm.size,
+              sizeUnit: farm.sizeUnit,
+              latitudes: farm.latitudes,
+              longitudes: farm.longitudes,
+              physicalAddress: farm.physicalAddress,
+              villageId: farm.villageId,
+              wardId: farm.wardId,
+              districtId: farm.districtId,
+              regionId: farm.regionId,
+              countryId: farm.countryId,
+              legalStatusId: farm.legalStatusId,
+              status: farm.status,
+              synced: true, // Mark as synced
+              syncAction: farm.syncAction,
+              createdAt: farm.createdAt,
+              updatedAt: farm.updatedAt,
+            );
+            
+            final success = await _database.farmDao.updateFarm(updatedFarm);
+            if (success) updatedCount++;
+          }
         }
       }
       
       log('✅ Successfully marked $updatedCount farms as synced');
-      return updatedCount;
+      if (deletedCount > 0) {
+        log('✅ Successfully deleted $deletedCount farms from local DB');
+      }
+      return updatedCount + deletedCount;
     } catch (e) {
       log('❌ Error marking farms as synced: $e');
       throw Exception('Failed to mark farms as synced: $e');

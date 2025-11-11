@@ -9,6 +9,9 @@ import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/division_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/identity_card_type_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/school_level_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/specie_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/livestock_type_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/livestock_obtained_method_model.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
@@ -51,6 +54,9 @@ class AdditionalDataProvider extends ChangeNotifier {
   List<DivisionModel> _divisions = [];
   List<IdentityCardTypeModel> _identityCardTypes = [];
   List<SchoolLevelModel> _schoolLevels = [];
+  List<SpecieModel> _species = [];
+  List<LivestockTypeModel> _livestockTypes = [];
+  List<LivestockObtainedMethodModel> _livestockObtainedMethods = [];
 
   /// Getters for all data
   List<CountryModel> get countries => _countries;
@@ -62,6 +68,9 @@ class AdditionalDataProvider extends ChangeNotifier {
   List<DivisionModel> get divisions => _divisions;
   List<IdentityCardTypeModel> get identityCardTypes => _identityCardTypes;
   List<SchoolLevelModel> get schoolLevels => _schoolLevels;
+  List<SpecieModel> get species => _species;
+  List<LivestockTypeModel> get livestockTypes => _livestockTypes;
+  List<LivestockObtainedMethodModel> get livestockObtainedMethods => _livestockObtainedMethods;
 
   /// Check if data is loaded
   bool get hasLocationData => _countries.isNotEmpty && _identityCardTypes.isNotEmpty && _schoolLevels.isNotEmpty;
@@ -99,6 +108,9 @@ class AdditionalDataProvider extends ChangeNotifier {
       _divisions = additionalData['divisions'] as List<DivisionModel>? ?? [];
       _identityCardTypes = additionalData['identityCardTypes'] as List<IdentityCardTypeModel>? ?? [];
       _schoolLevels = additionalData['schoolLevels'] as List<SchoolLevelModel>? ?? [];
+      _species = additionalData['species'] as List<SpecieModel>? ?? [];
+      _livestockTypes = additionalData['livestockTypes'] as List<LivestockTypeModel>? ?? [];
+      _livestockObtainedMethods = additionalData['livestockObtainedMethods'] as List<LivestockObtainedMethodModel>? ?? [];
 
       // 5. Clear loading state
       _isLoadingLocations = false;
@@ -236,6 +248,9 @@ class AdditionalDataProvider extends ChangeNotifier {
     _divisions.clear();
     _identityCardTypes.clear();
     _schoolLevels.clear();
+    _species.clear();
+    _livestockTypes.clear();
+    _livestockObtainedMethods.clear();
     _locationError = null;
     _isLoadingLocations = false;
     notifyListeners();
@@ -269,6 +284,46 @@ class AdditionalDataProvider extends ChangeNotifier {
     return _divisions.where((division) => division.districtId == districtId).toList();
   }
 
+  // ============================================================================
+  // Livestock Reference Data Methods
+  // ============================================================================
+
+  /// Get species by ID
+  /// 
+  /// [speciesId] - The species ID to find
+  /// Returns the species model or null if not found
+  SpecieModel? getSpeciesById(int speciesId) {
+    try {
+      return _species.firstWhere((s) => s.id == speciesId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get livestock type by ID
+  /// 
+  /// [livestockTypeId] - The livestock type ID to find
+  /// Returns the livestock type model or null if not found
+  LivestockTypeModel? getLivestockTypeById(int livestockTypeId) {
+    try {
+      return _livestockTypes.firstWhere((lt) => lt.id == livestockTypeId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get livestock obtained method by ID
+  /// 
+  /// [methodId] - The method ID to find
+  /// Returns the livestock obtained method model or null if not found
+  LivestockObtainedMethodModel? getLivestockObtainedMethodById(int methodId) {
+    try {
+      return _livestockObtainedMethods.firstWhere((m) => m.id == methodId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Check if location data is available for a specific hierarchy
   /// 
   /// Returns true if all location data is loaded
@@ -278,6 +333,63 @@ class AdditionalDataProvider extends ChangeNotifier {
            _districts.isNotEmpty &&
            _wards.isNotEmpty &&
            _villages.isNotEmpty;
+  }
+
+  /// Check if livestock reference data is loaded
+  /// 
+  /// Returns true if all livestock reference data is loaded
+  bool isLivestockDataReady() {
+    return _species.isNotEmpty &&
+           _livestockTypes.isNotEmpty &&
+           _livestockObtainedMethods.isNotEmpty;
+  }
+
+  // ============================================================================
+  // Database Access Methods (via Repository)
+  // ============================================================================
+
+  /// Get species name by ID from database
+  /// 
+  /// [speciesId] - The species ID to find
+  /// Returns the species name or '---' if not found
+  Future<String> getSpeciesNameById(int speciesId) async {
+    final name = await _additionalDataRepository.getSpeciesNameById(speciesId);
+    return name ?? '---';
+  }
+
+  /// Get breed name by ID from database
+  /// 
+  /// [breedId] - The breed ID to find
+  /// Returns the breed name or '---' if not found
+  Future<String> getBreedNameById(int breedId) async {
+    final name = await _additionalDataRepository.getBreedNameById(breedId);
+    return name ?? '---';
+  }
+
+  /// Get livestock type name by ID from database
+  /// 
+  /// [livestockTypeId] - The livestock type ID to find
+  /// Returns the livestock type name or '---' if not found
+  Future<String> getLivestockTypeNameById(int livestockTypeId) async {
+    final name = await _additionalDataRepository.getLivestockTypeNameById(livestockTypeId);
+    return name ?? '---';
+  }
+
+  /// Get livestock obtained method name by ID from database
+  /// 
+  /// [methodId] - The method ID to find
+  /// Returns the method name or '---' if not found
+  Future<String> getLivestockObtainedMethodNameById(int methodId) async {
+    final name = await _additionalDataRepository.getLivestockObtainedMethodNameById(methodId);
+    return name ?? '---';
+  }
+
+  /// Get breeds by livestock type ID from database
+  /// 
+  /// [livestockTypeId] - The livestock type ID to filter by
+  /// Returns list of breeds for the specified livestock type
+  Future<List<dynamic>> getBreedsByLivestockTypeId(int livestockTypeId) async {
+    return await _additionalDataRepository.getBreedsByLivestockTypeId(livestockTypeId);
   }
 
   /// Get all data statistics

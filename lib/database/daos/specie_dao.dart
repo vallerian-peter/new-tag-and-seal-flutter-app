@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import '../app_database.dart';
-import '../../features/species/data/tables/specie_table.dart';
+import '../../features/all.additional.data/data/local/tables/specie_table.dart';
 
 part 'specie_dao.g.dart';
 
@@ -15,17 +15,18 @@ class SpecieDao extends DatabaseAccessor<AppDatabase> with _$SpecieDaoMixin {
   Future<List<Specie>> getAllSpecies() => select(species).get();
 
   /// Get specie by ID
-  Future<Specie?> getSpecieById(int id) => 
+  Future<Specie?> getSpecieById(int id) =>
       (select(species)..where((s) => s.id.equals(id))).getSingleOrNull();
 
   /// Insert a new specie
-  Future<int> insertSpecie(SpeciesCompanion entry) => into(species).insert(entry);
+  Future<int> insertSpecie(SpeciesCompanion entry) =>
+      into(species).insert(entry);
 
   /// Update a specie
   Future<bool> updateSpecie(Specie entry) => update(species).replace(entry);
 
   /// Delete a specie
-  Future<int> deleteSpecie(int id) => 
+  Future<int> deleteSpecie(int id) =>
       (delete(species)..where((s) => s.id.equals(id))).go();
 
   /// Delete all species (for clean sync)
@@ -43,6 +44,6 @@ class SpecieDao extends DatabaseAccessor<AppDatabase> with _$SpecieDaoMixin {
   // ==================== SEARCH OPERATIONS ====================
 
   /// Search species by name
-  Future<List<Specie>> searchSpeciesByName(String name) => 
+  Future<List<Specie>> searchSpeciesByName(String name) =>
       (select(species)..where((s) => s.name.like('%$name%'))).get();
 }

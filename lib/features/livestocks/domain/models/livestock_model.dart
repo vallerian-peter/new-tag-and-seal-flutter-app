@@ -105,6 +105,11 @@ class LivestockModel {
 
   /// Convert to JSON for API (excludes local ID)
   Map<String, dynamic> toApiJson() {
+    // Format dateFirstEnteredToFarm as date only (Y-m-d) to match backend migration
+    final dateOnly = '${dateFirstEnteredToFarm.year.toString().padLeft(4, '0')}-'
+        '${dateFirstEnteredToFarm.month.toString().padLeft(2, '0')}-'
+        '${dateFirstEnteredToFarm.day.toString().padLeft(2, '0')}';
+    
     return {
       'farmUuid': farmUuid,
       'uuid': uuid,
@@ -122,8 +127,8 @@ class LivestockModel {
       'speciesId': speciesId,
       'status': status,
       'livestockObtainedMethodId': livestockObtainedMethodId,
-      'dateFirstEnteredToFarm': dateFirstEnteredToFarm.toIso8601String(),
-      'weightAsOnRegistration': weightAsOnRegistration,
+      'dateFirstEnteredToFarm': dateOnly,  // Send as date only (Y-m-d)
+      'weightAsOnRegistration': weightAsOnRegistration.toString(),  // Send as string
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -162,6 +167,12 @@ class LivestockModel {
 
   /// Create from JSON
   factory LivestockModel.fromJson(Map<String, dynamic> json) {
+    // Parse weight safely - can be String (from backend) or num (from local)
+    final weightRaw = json['weightAsOnRegistration'];
+    final weight = weightRaw is num 
+        ? weightRaw.toDouble() 
+        : double.tryParse(weightRaw.toString()) ?? 0.0;
+    
     return LivestockModel(
       id: json['id'] as int,
       farmUuid: json['farmUuid'] as String,  // Farm UUID
@@ -181,7 +192,7 @@ class LivestockModel {
       status: json['status'] as String? ?? 'active',
       livestockObtainedMethodId: json['livestockObtainedMethodId'] as int,
       dateFirstEnteredToFarm: DateTime.parse(json['dateFirstEnteredToFarm'] as String),
-      weightAsOnRegistration: (json['weightAsOnRegistration'] as num).toDouble(),
+      weightAsOnRegistration: weight,
       synced: json['synced'] as bool? ?? false,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,

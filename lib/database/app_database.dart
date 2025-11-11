@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p; 
+import 'package:path/path.dart' as p;
 // Import all table definitions
 import '../features/all.additional.data/data/local/tables/country_table.dart';
 import '../features/all.additional.data/data/local/tables/region_table.dart';
@@ -16,10 +16,39 @@ import '../features/all.additional.data/data/local/tables/identity_card_type_tab
 import '../features/all.additional.data/data/local/tables/legal_status_table.dart';
 import '../features/farms/data/tables/farm-table.dart';
 import '../features/livestocks/data/tables/livestock_table.dart';
-import '../features/species/data/tables/specie_table.dart';
-import '../features/livestock_types/data/tables/livestock_type_table.dart';
-import '../features/breeds/data/tables/breed_table.dart';
-import '../features/livestock_obtained_methods/data/tables/livestock_obtained_method_table.dart';
+import '../features/all.additional.data/data/local/tables/specie_table.dart';
+import '../features/all.additional.data/data/local/tables/livestock_type_table.dart';
+import '../features/all.additional.data/data/local/tables/breed_table.dart';
+import '../features/all.additional.data/data/local/tables/livestock_obtained_method_table.dart';
+import '../features/events/data/tables/feeding_table.dart';
+import '../features/events/data/tables/weight_change_table.dart';
+import '../features/events/data/tables/deworming_table.dart';
+import '../features/events/data/tables/medication_table.dart';
+import '../features/events/data/tables/vaccination_table.dart';
+import '../features/events/data/tables/disposal_table.dart';
+import '../features/events/data/tables/milking_table.dart';
+import '../features/events/data/tables/pregnancy_table.dart';
+import '../features/events/data/tables/calving_table.dart';
+import '../features/events/data/tables/dryoff_table.dart';
+import '../features/events/data/tables/insemination_table.dart';
+import '../features/events/data/tables/transfer_table.dart';
+import '../features/notifications/data/tables/notification_table.dart';
+import '../features/vaccines/data/tables/vaccine_table.dart';
+import '../features/vaccines/data/tables/vaccine_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/feeding_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/administration_route_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/medicine_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/medicine_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/disease_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/disposal_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/heat_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/semen_straw_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/insemination_service_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/milking_method_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/calving_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/calving_problem_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/reproductive_problem_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/test_result_table.dart';
 
 // Import DAOs
 import 'daos/location_dao.dart';
@@ -31,6 +60,11 @@ import 'daos/breed_dao.dart';
 import 'daos/livestock_obtained_method_dao.dart';
 import 'daos/farm_dao.dart';
 import 'daos/livestock_dao.dart';
+import 'daos/event_dao.dart';
+import '../features/notifications/data/dao/notification_dao.dart';
+import 'daos/log_reference_dao.dart';
+import 'daos/vaccine_dao.dart';
+import 'daos/vaccine_type_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -53,18 +87,52 @@ part 'app_database.g.dart';
     LivestockTypes,
     Breeds,
     LivestockObtainedMethods,
+    FeedingTypes,
+    AdministrationRoutes,
+    MedicineTypes,
+    Medicines,
+    Diseases,
+    DisposalTypes,
+    HeatTypes,
+    SemenStrawTypes,
+    InseminationServices,
+    MilkingMethods,
+    CalvingTypes,
+    CalvingProblems,
+    ReproductiveProblems,
+    TestResults,
+    Feedings,
+    WeightChanges,
+    Dewormings,
+    Medications,
+    Vaccinations,
+    Disposals,
+    Milkings,
+    Pregnancies,
+    Calvings,
+    Dryoffs,
+    Inseminations,
+    Transfers,
+    NotificationEntries,
+    Vaccines,
+    VaccineTypes,
   ],
   daos: [
     LocationDao,
     ReferenceDataDao,
     LivestockManagementDao,
+    EventDao,
+    NotificationDao,
+    LogReferenceDao,
+    VaccineDao,
+    VaccineTypeDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3; // Increased to force database recreation with new UUID schema
+  int get schemaVersion => 18; // v18 rebuilds notifications table without uuid
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -84,6 +152,100 @@ class AppDatabase extends _$AppDatabase {
         await m.deleteTable(livestocks.actualTableName);
         await m.createTable(livestocks);
       }
+      if (from < 4) {
+        // Version 4: Introduced log reference data and event tables
+        await m.createTable(feedingTypes);
+        await m.createTable(administrationRoutes);
+        await m.createTable(medicineTypes);
+        await m.createTable(medicines);
+        await m.createTable(feedings);
+        await m.createTable(weightChanges);
+        await m.createTable(dewormings);
+      }
+      if (from < 5) {
+        // Version 5: Ensure log tables exist if previous migrations were skipped
+        await _createTableIfMissing(m, feedingTypes);
+        await _createTableIfMissing(m, administrationRoutes);
+        await _createTableIfMissing(m, medicineTypes);
+        await _createTableIfMissing(m, medicines);
+        await _createTableIfMissing(m, feedings);
+        await _createTableIfMissing(m, weightChanges);
+        await _createTableIfMissing(m, dewormings);
+      }
+      if (from < 6) {
+        await _renameColumnIfExists(
+          table: 'feedings',
+          oldColumn: 'feedingTime',
+          newColumn: 'nextFeedingTime',
+        );
+      }
+      if (from < 7) {
+        await _renameColumnIfExists(
+          table: 'feedings',
+          oldColumn: 'feeding_time',
+          newColumn: 'nextFeedingTime',
+        );
+      }
+      if (from < 8) {
+        await _migrateDewormingProviderColumns(m);
+      }
+      if (from < 9) {
+        await _createTableIfMissing(m, vaccines);
+      }
+      if (from < 10) {
+        await _createTableIfMissing(m, medications);
+        await _createTableIfMissing(m, vaccinations);
+        await _createTableIfMissing(m, disposals);
+      }
+      if (from < 11) {
+        await _createTableIfMissing(m, vaccineTypes);
+      }
+      if (from < 12) {
+        await _createTableIfMissing(m, disposalTypes);
+        await customStatement(
+          "UPDATE disposals SET status = 'pending' WHERE status = 'scheduled'",
+        );
+        await customStatement(
+          "UPDATE disposals SET status = 'failed' WHERE status = 'cancelled'",
+        );
+      }
+      if (from < 13) {
+        await customStatement('DROP TABLE IF EXISTS disposal_types');
+        await m.createTable(disposalTypes);
+        await customStatement(
+          "UPDATE disposals SET status = 'completed' WHERE status NOT IN ('pending','completed','failed')",
+        );
+      }
+      if (from < 14) {
+        await _createTableIfMissing(m, diseases);
+      }
+      if (from < 15) {
+        await _createTableIfMissing(m, heatTypes);
+        await _createTableIfMissing(m, semenStrawTypes);
+        await _createTableIfMissing(m, inseminationServices);
+        await _createTableIfMissing(m, milkingMethods);
+        await _createTableIfMissing(m, calvingTypes);
+        await _createTableIfMissing(m, calvingProblems);
+        await _createTableIfMissing(m, reproductiveProblems);
+        await _createTableIfMissing(m, testResults);
+        await _createTableIfMissing(m, milkings);
+        await _createTableIfMissing(m, pregnancies);
+        await _createTableIfMissing(m, calvings);
+        await _createTableIfMissing(m, dryoffs);
+        await _createTableIfMissing(m, inseminations);
+      }
+      if (from < 16) {
+        await _createTableIfMissing(m, transfers);
+      }
+      if (from < 17) {
+        await m.deleteTable(transfers.actualTableName);
+        await m.createTable(transfers);
+        await _createTableIfMissing(m, notificationEntries);
+      }
+      if (from < 18) {
+        await m.deleteTable(notificationEntries.actualTableName);
+        await m.createTable(notificationEntries);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
@@ -92,26 +254,44 @@ class AppDatabase extends _$AppDatabase {
   );
 
   // ==================== DAO GETTERS ====================
-  
+
   /// Access location-related data (Country, Region, District, etc.)
   @override
+  // ignore: overridden_fields
   late final LocationDao locationDao = LocationDao(this);
-  
+
   /// Access reference/lookup data (SchoolLevel, IdentityCardType, LegalStatus)
   @override
+  // ignore: overridden_fields
   late final ReferenceDataDao referenceDataDao = ReferenceDataDao(this);
 
   /// Access livestock management operations (livestock, farms, species, breeds, etc.)
   @override
-  late final LivestockManagementDao livestockManagementDao = LivestockManagementDao(this);
+  // ignore: overridden_fields
+  late final LivestockManagementDao livestockManagementDao =
+      LivestockManagementDao(this);
 
   // Individual DAOs for direct access
   late final SpecieDao specieDao = SpecieDao(this);
   late final LivestockTypeDao livestockTypeDao = LivestockTypeDao(this);
   late final BreedDao breedDao = BreedDao(this);
-  late final LivestockObtainedMethodDao livestockObtainedMethodDao = LivestockObtainedMethodDao(this);
+  late final LivestockObtainedMethodDao livestockObtainedMethodDao =
+      LivestockObtainedMethodDao(this);
   late final FarmDao farmDao = FarmDao(this);
   late final LivestockDao livestockDao = LivestockDao(this);
+  @override
+  // ignore: overridden_fields
+  late final EventDao eventDao = EventDao(this);
+  late final NotificationDao notificationDao = NotificationDao(this);
+  @override
+  // ignore: overridden_fields
+  late final LogReferenceDao logReferenceDao = LogReferenceDao(this);
+  @override
+  // ignore: overridden_fields
+  late final VaccineDao vaccineDao = VaccineDao(this);
+  @override
+  // ignore: overridden_fields
+  late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(this);
 
   // ==================== UTILITY METHODS ====================
 
@@ -128,6 +308,84 @@ class AppDatabase extends _$AppDatabase {
   Future<bool> isDatabaseEmpty() async {
     final countries = await locationDao.getAllCountries();
     return countries.isEmpty;
+  }
+
+  Future<void> _createTableIfMissing(
+    Migrator migrator,
+    TableInfo<Table, Object?> table,
+  ) async {
+    final tableName = table.actualTableName;
+    final result = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [const Variable<String>('table'), Variable<String>(tableName)],
+    ).get();
+
+    if (result.isEmpty) {
+      await migrator.createTable(table);
+    }
+  }
+
+  Future<void> _migrateDewormingProviderColumns(Migrator migrator) async {
+    await customStatement('ALTER TABLE dewormings RENAME TO dewormings_old');
+    await migrator.createTable(dewormings);
+    await customStatement('''
+      INSERT INTO dewormings (
+        id,
+        uuid,
+        farm_uuid,
+        livestock_uuid,
+        administration_route_id,
+        medicine_id,
+        vet_id,
+        extension_officer_id,
+        quantity,
+        dose,
+        next_administration_date,
+        synced,
+        sync_action,
+        created_at,
+        updated_at
+      )
+      SELECT
+        id,
+        uuid,
+        farm_uuid,
+        livestock_uuid,
+        administration_route_id,
+        medicine_id,
+        CASE
+          WHEN vet_id IS NULL THEN NULL
+          ELSE CAST(vet_id AS TEXT)
+        END,
+        CASE
+          WHEN extension_officer_id IS NULL THEN NULL
+          ELSE CAST(extension_officer_id AS TEXT)
+        END,
+        quantity,
+        dose,
+        next_administration_date,
+        synced,
+        sync_action,
+        created_at,
+        updated_at
+      FROM dewormings_old
+    ''');
+    await customStatement('DROP TABLE dewormings_old');
+  }
+
+  Future<void> _renameColumnIfExists({
+    required String table,
+    required String oldColumn,
+    required String newColumn,
+  }) async {
+    final columnInfo = await customSelect('PRAGMA table_info($table)').get();
+    final columnExists = columnInfo.any((row) => row.data['name'] == oldColumn);
+
+    if (columnExists) {
+      await customStatement(
+        'ALTER TABLE $table RENAME COLUMN $oldColumn TO $newColumn',
+      );
+    }
   }
 }
 

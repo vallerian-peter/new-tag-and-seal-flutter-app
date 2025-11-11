@@ -133,7 +133,9 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
     try {
       // Split JWT token (format: header.payload.signature)
       final parts = token.split('.');
-      if (parts.length != 3) return false;
+      if (parts.length != 3) {
+        return token.isNotEmpty;
+      }
 
       // Decode payload (base64)
       final payload = parts[1];
@@ -155,7 +157,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
       return true;
     } catch (e) {
       // If any error in parsing, consider token invalid
-      return false;
+      return token.isNotEmpty;
     }
   }
 
@@ -313,6 +315,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                    
                     Expanded(
                       child: CustomOutlinedButton(
+                        textColor: Colors.white,
                         text: loginText.toUpperCase(),
                         width: size.width * 0.4,
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()))

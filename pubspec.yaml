@@ -56,13 +56,16 @@ dependencies:
   smooth_page_indicator: ^1.2.0
   
   # Localization
-  intl: any
+  intl: ^0.20.2
+  mobile_scanner: ^3.5.5
   
   # HTTP Client
   http: ^1.2.0
   
   # Notifications
   flutter_local_notifications: ^17.1.2
+  timezone: ^0.9.2
+  flutter_native_timezone: ^2.0.0
   
   # Phone Number Input
   intl_phone_field: ^3.2.0

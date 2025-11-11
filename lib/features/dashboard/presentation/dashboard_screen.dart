@@ -5,6 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.d
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/provider/sync-provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/farm_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/section_header.dart';
@@ -12,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/action_c
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/stat_card.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farms_section.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/notification_screen.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final _secureStorage = const FlutterSecureStorage();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map<String, dynamic>> farmsWithLivestock = [];
+  int _totalEventCount = 0;
   
   String _userName = '';
   String _userEmail = '';
@@ -36,6 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _loadUserData();
     getALlFarmsWithThereLivestocks();
+    _loadEventSummary();
   }
   
   Future<void> _loadUserData() async {
@@ -54,6 +58,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> _loadEventSummary() async {
+    final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
+    final summary = await eventsProvider.getEventSummary();
+    if (mounted) {
+      setState(() {
+        _totalEventCount = summary.totalCount;
+      });
+    }
+  }
+
   Future<void> _syncData() async {
     if (_isSyncing) return;
     if (!mounted) return;
@@ -64,9 +78,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final syncProvider = Provider.of<SyncProvider>(context, listen: false);
     await syncProvider.splashSyncWithDialog(context);
+    
     setState(() {
       _isSyncing = false;
     });
+  }
+  
+  /// Calculate total livestock count from all farms
+  int get totalLivestockCount {
+    return farmsWithLivestock.fold<int>(
+      0, 
+      (sum, farm) => sum + (farm['livestockCount'] as int? ?? 0),
+    );
   }
 
   Future<void> getALlFarmsWithThereLivestocks() async {
@@ -86,7 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return {
           'name': farm.name,
           'livestockCount': livestockCount,
-          'location': farm.physicalAddress ?? 'Unknown Location',
+          'location': farm.physicalAddress ?? 'Unknown Location',  // Use fallback string
           'uuid': farm.uuid,
           'farmData': farm, // Keep full farm data for details
           'livestock': livestock, // Keep livestock list for details
@@ -118,6 +141,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         userEmail: _userEmail,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'dashboard_sync_fab',
         onPressed: () => _syncData(),
         child: _isSyncing ? const LoadingIndicator(size: 20, strokeWidth: 2, color: Colors.white) : Icon(Iconsax.refresh_outline),
       ),
@@ -163,7 +187,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               IconButton(
                 onPressed: () {
-                  // Handle notifications
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationScreen(),
+                    ),
+                  );
                 },
                 icon: Icon(
                   Iconsax.notification_outline,
@@ -195,6 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onRefresh: () async {
           // await _loadUserData();
           await getALlFarmsWithThereLivestocks();
+          await _loadEventSummary();
         },
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -297,7 +326,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: StatCard(
                       title: l10n.livestock,
-                      value: '0',
+                      value: '$totalLivestockCount',
                       icon: Iconsax.pet_outline,
                       color: Colors.blue,
                     ),
@@ -306,7 +335,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: StatCard(
                       title: l10n.events,
-                      value: '0',
+                      value: '$_totalEventCount',
                       icon: Iconsax.calendar_outline,
                       color: Colors.green,
                     ),

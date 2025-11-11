@@ -102,12 +102,13 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final screenWidth = MediaQuery.of(context).size.width;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     final appName = Constants.appName;
     final tagline = l10n.tagline;
 
     return Scaffold(
-      backgroundColor: Constants.primaryColor,
+      backgroundColor: theme.brightness != Brightness.dark ? Constants.primaryColor : Colors.grey[880],
       body: SafeArea(
         child: Container(
           width: double.infinity,

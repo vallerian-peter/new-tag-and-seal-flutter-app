@@ -3,12 +3,16 @@ import '../app_database.dart';
 import '../../features/all.additional.data/data/local/tables/school_level_table.dart';
 import '../../features/all.additional.data/data/local/tables/identity_card_type_table.dart';
 import '../../features/all.additional.data/data/local/tables/legal_status_table.dart';
+import '../../features/vaccines/data/tables/vaccine_type_table.dart';
 part 'reference_data_dao.g.dart';
 
 /// DAO for handling reference/lookup data (SchoolLevel, IdentityCardType, LegalStatus)
 /// This provides simple, easy-to-understand methods for reference data queries
-@DriftAccessor(tables: [SchoolLevels, IdentityCardTypes, LegalStatuses])
-class ReferenceDataDao extends DatabaseAccessor<AppDatabase> with _$ReferenceDataDaoMixin {
+@DriftAccessor(
+  tables: [SchoolLevels, IdentityCardTypes, LegalStatuses, VaccineTypes],
+)
+class ReferenceDataDao extends DatabaseAccessor<AppDatabase>
+    with _$ReferenceDataDaoMixin {
   ReferenceDataDao(AppDatabase db) : super(db);
 
   // ==================== SCHOOL LEVEL METHODS ====================
@@ -46,8 +50,9 @@ class ReferenceDataDao extends DatabaseAccessor<AppDatabase> with _$ReferenceDat
       select(identityCardTypes).get();
 
   /// Get a single identity card type by ID
-  Future<IdentityCardType?> getIdentityCardTypeById(int id) =>
-      (select(identityCardTypes)..where((i) => i.id.equals(id))).getSingleOrNull();
+  Future<IdentityCardType?> getIdentityCardTypeById(int id) => (select(
+    identityCardTypes,
+  )..where((i) => i.id.equals(id))).getSingleOrNull();
 
   /// Insert a new identity card type
   Future<int> insertIdentityCardType(IdentityCardTypesCompanion entry) =>
@@ -62,16 +67,23 @@ class ReferenceDataDao extends DatabaseAccessor<AppDatabase> with _$ReferenceDat
       (delete(identityCardTypes)..where((i) => i.id.equals(id))).go();
 
   /// Insert multiple identity card types at once
-  Future<void> insertIdentityCardTypes(List<IdentityCardTypesCompanion> entries) async {
+  Future<void> insertIdentityCardTypes(
+    List<IdentityCardTypesCompanion> entries,
+  ) async {
     await batch((batch) {
-      batch.insertAll(identityCardTypes, entries, mode: InsertMode.insertOrReplace);
+      batch.insertAll(
+        identityCardTypes,
+        entries,
+        mode: InsertMode.insertOrReplace,
+      );
     });
   }
 
   // ==================== LEGAL STATUS METHODS ====================
 
   /// Get all legal statuses
-  Future<List<LegalStatus>> getAllLegalStatuses() => select(legalStatuses).get();
+  Future<List<LegalStatus>> getAllLegalStatuses() =>
+      select(legalStatuses).get();
 
   /// Get a single legal status by ID
   Future<LegalStatus?> getLegalStatusById(int id) =>
@@ -107,6 +119,9 @@ class ReferenceDataDao extends DatabaseAccessor<AppDatabase> with _$ReferenceDat
   /// Delete all legal statuses (USE WITH CAUTION!)
   Future<int> deleteAllLegalStatuses() => delete(legalStatuses).go();
 
+  /// Delete all vaccine types (USE WITH CAUTION!)
+  Future<int> deleteAllVaccineTypes() => delete(vaccineTypes).go();
+
   // ==================== UTILITY METHODS ====================
 
   /// Search school levels by name
@@ -126,12 +141,24 @@ class ReferenceDataDao extends DatabaseAccessor<AppDatabase> with _$ReferenceDat
     final schoolLevels = await getAllSchoolLevels();
     final identityCardTypes = await getAllIdentityCardTypes();
     final legalStatuses = await getAllLegalStatuses();
+    final allVaccineTypes = await getAllVaccineTypes();
 
     return {
       'schoolLevels': schoolLevels,
       'identityCardTypes': identityCardTypes,
       'legalStatuses': legalStatuses,
+      'vaccineTypes': allVaccineTypes,
     };
   }
-}
 
+  Future<void> insertVaccineTypes(List<VaccineTypesCompanion> entries) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(vaccineTypes, entries);
+    });
+  }
+
+  Future<List<VaccineType>> getAllVaccineTypes() => (select(
+    vaccineTypes,
+  )..orderBy([(tbl) => OrderingTerm.asc(tbl.name)])).get();
+}
