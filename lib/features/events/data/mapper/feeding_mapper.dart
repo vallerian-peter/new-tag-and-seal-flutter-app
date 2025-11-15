@@ -5,6 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feedin
 /// This mapper provides conversion methods between Feeding domain models and database entities.
 /// It handles the mapping between database records and domain models for feeding information.
 class FeedingMapper {
+
   // ==================== FEEDING MAPPERS ====================
 
   /// Maps Feeding entity to FeedingModel
@@ -24,7 +25,7 @@ class FeedingMapper {
       synced: entity['synced'] as bool? ?? true,
       syncAction: entity['syncAction'] as String? ?? 'server-create',
       createdAt: entity['createdAt'] as String,
-      updatedAt: entity['updatedAt'] as String,
+      updatedAt: entity['updatedAt'] as String
     );
   }
 
@@ -75,9 +76,7 @@ class FeedingMapper {
   ///
   /// [entities] - List of database entities from the Feedings table
   /// Returns a list of FeedingModel objects
-  static List<FeedingModel> feedingsToEntities(
-    List<Map<String, dynamic>> entities,
-  ) {
+  static List<FeedingModel> feedingsToEntities(List<Map<String, dynamic>> entities) {
     return entities.map((entity) => feedingToEntity(entity)).toList();
   }
 }

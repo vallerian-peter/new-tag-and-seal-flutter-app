@@ -22,7 +22,8 @@ class Vaccinations extends Table {
   TextColumn get status =>
       text().withDefault(const Constant<String>('completed'))();
 
-  BoolColumn get synced => boolean().withDefault(const Constant<bool>(true))();
+  BoolColumn get synced =>
+      boolean().withDefault(const Constant<bool>(true))();
 
   TextColumn get syncAction =>
       text().withDefault(const Constant<String>('server-create'))();
@@ -34,3 +35,4 @@ class Vaccinations extends Table {
   @override
   Set<Column> get primaryKey => {uuid};
 }
+

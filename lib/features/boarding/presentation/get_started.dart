@@ -315,7 +315,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                    
                     Expanded(
                       child: CustomOutlinedButton(
-                        textColor: Colors.white,
                         text: loginText.toUpperCase(),
                         width: size.width * 0.4,
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()))

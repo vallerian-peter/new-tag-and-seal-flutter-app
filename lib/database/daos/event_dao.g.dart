@@ -10,10 +10,4 @@ mixin _$EventDaoMixin on DatabaseAccessor<AppDatabase> {
   $MedicationsTable get medications => attachedDatabase.medications;
   $VaccinationsTable get vaccinations => attachedDatabase.vaccinations;
   $DisposalsTable get disposals => attachedDatabase.disposals;
-  $MilkingsTable get milkings => attachedDatabase.milkings;
-  $PregnanciesTable get pregnancies => attachedDatabase.pregnancies;
-  $CalvingsTable get calvings => attachedDatabase.calvings;
-  $DryoffsTable get dryoffs => attachedDatabase.dryoffs;
-  $InseminationsTable get inseminations => attachedDatabase.inseminations;
-  $TransfersTable get transfers => attachedDatabase.transfers;
 }

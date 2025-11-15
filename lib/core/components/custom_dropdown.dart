@@ -77,14 +77,6 @@ class CustomDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final baseFillColor = isDark ? Colors.grey.shade800 : Colors.white;
-    final dropdownMenuColor = isDark ? Colors.grey.shade800 : Colors.white;
-    final disabledFillColor = isDark
-        ? Colors.grey.shade800.withOpacity(0.6)
-        : Colors.white.withOpacity(0.7);
-    final borderColor = theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3);
-    final focusColor = theme.colorScheme.primary;
     
     // Extract items and labels from dropdownItems if provided
     final actualItems = dropdownItems != null 
@@ -108,9 +100,9 @@ class CustomDropdown<T> extends StatelessWidget {
         const SizedBox(height: 8),
         Theme(
           data: Theme.of(context).copyWith(
-            canvasColor: dropdownMenuColor,
-            cardColor: dropdownMenuColor,
-            dialogBackgroundColor: dropdownMenuColor,
+            canvasColor: Colors.white,
+            cardColor: Colors.white,
+            dialogBackgroundColor: Colors.white,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -120,7 +112,7 @@ class CustomDropdown<T> extends StatelessWidget {
             child: DropdownButtonFormField<T>(
             value: value,
             isExpanded: true,
-            dropdownColor: dropdownMenuColor,
+            dropdownColor: Colors.white,
             onChanged: enabled ? onChanged : null,
             decoration: InputDecoration(
               hintText: hint,
@@ -130,30 +122,32 @@ class CustomDropdown<T> extends StatelessWidget {
               ),
               prefixIcon: Icon(
                 icon,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
                 size: Constants.iconsSize,
               ),
               filled: true,
-              fillColor: enabled ? baseFillColor : disabledFillColor,
+              fillColor: enabled
+                  ? Constants.veryLightGreyColor
+                  : Constants.veryLightGreyColor.withOpacity(0.6),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: borderColor,
+                  color: Constants.primaryColor.withOpacity(0.2),
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: borderColor,
+                  color: Constants.primaryColor.withOpacity(0.2),
                   width: 1.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: enabled ? focusColor : borderColor,
+                  color: enabled ? Constants.primaryColor : Constants.primaryColor.withOpacity(0.2),
                   width: enabled ? 2 : 1.5,
                 ),
               ),
@@ -169,13 +163,6 @@ class CustomDropdown<T> extends StatelessWidget {
                 borderSide: const BorderSide(
                   color: Constants.dangerColor,
                   width: 2,
-                ),
-              ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.15),
-                  width: 1.5,
                 ),
               ),
             ),

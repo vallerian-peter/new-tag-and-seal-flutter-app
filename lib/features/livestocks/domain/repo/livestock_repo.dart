@@ -12,6 +12,9 @@ abstract class LivestockRepo {
   /// Get livestock by UUID
   Future<Livestock?> getLivestockByUuid(String uuid);
   
+  /// Get livestock by identification number
+  Future<Livestock?> getLivestockByIdentificationNumber(String identificationNumber);
+  
   /// Get active livestock by farm UUID
   Future<List<Livestock>> getActiveLivestockByFarmUuid(String farmUuid);
   

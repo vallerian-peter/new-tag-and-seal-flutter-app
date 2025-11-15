@@ -55,6 +55,7 @@ class CustomTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? prefixText;
   final Widget? suffixIcon;
+  final BoxConstraints? suffixIconConstraints;
 
   const CustomTextField({
     super.key,
@@ -79,6 +80,7 @@ class CustomTextField extends StatefulWidget {
     this.inputFormatters,
     this.prefixText,
     this.suffixIcon,
+    this.suffixIconConstraints,
   });
 
   @override
@@ -173,6 +175,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     },
                   )
                 : widget.suffixIcon,
+            suffixIconConstraints: widget.suffixIconConstraints,
             contentPadding: widget.contentPadding ??
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(

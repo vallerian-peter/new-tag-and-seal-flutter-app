@@ -187,4 +187,19 @@ class LivestockProvider extends ChangeNotifier {
     _filteredLivestock = _allLivestock;
     notifyListeners();
   }
+
+  /// Check if identification number is unique (optionally excluding a livestock by UUID)
+  Future<bool> isIdentificationNumberUnique(
+    String identificationNumber, {
+    String? excludeUuid,
+  }) async {
+    final normalized = identificationNumber.trim();
+    if (normalized.isEmpty) return true;
+
+    final existing =
+        await _livestockRepo.getLivestockByIdentificationNumber(normalized);
+    if (existing == null) return true;
+    if (excludeUuid != null && existing.uuid == excludeUuid) return true;
+    return false;
+  }
 }

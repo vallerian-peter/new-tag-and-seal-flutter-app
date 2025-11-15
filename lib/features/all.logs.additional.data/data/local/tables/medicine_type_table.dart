@@ -9,3 +9,5 @@ class MedicineTypes extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+

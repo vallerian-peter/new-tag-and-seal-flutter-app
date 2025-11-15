@@ -3,7 +3,10 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/core/services/bluetooth/bluetooth_weight_service.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:io' show Platform;
 import 'dart:developer';
 
 /// Reusable Modern Bluetooth Weight Scale Bottom Sheet
@@ -46,11 +49,16 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
   String? _connectedDeviceName;
   List<BluetoothDevice> _availableDevices = [];
   String? _errorMessage;
+  BluetoothErrorType? _errorType;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
     _startBluetoothScan();
+      }
+    });
     _listenToStreams();
   }
 
@@ -87,18 +95,124 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
   }
 
   Future<void> _startBluetoothScan() async {
+    final l10n = AppLocalizations.of(context)!;
+    bool loadingShown = false;
+
+    // Ensure permissions are granted before anything else (prompt immediately)
+    final permissionResult = await _bluetoothService.checkBluetoothPermissions();
+    if (!permissionResult.granted) {
+      final message = permissionResult.errorMessage ?? l10n.bluetoothPermissionsRequired;
+      if (mounted) {
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: message,
+          buttonText: permissionResult.errorType == BluetoothErrorType.permissionsPermanentlyDenied
+              ? l10n.openSettings
+              : l10n.ok,
+          onPressed: () async {
+            Navigator.of(context, rootNavigator: true).pop();
+            if (permissionResult.errorType == BluetoothErrorType.permissionsPermanentlyDenied) {
+              await _bluetoothService.openSettings();
+            }
+          },
+        );
+      }
+      setState(() {
+        _isScanning = false;
+        _errorType = permissionResult.errorType ?? BluetoothErrorType.permissionsDenied;
+        _errorMessage = message;
+      });
+      return;
+    }
+
+    // Ensure Bluetooth adapter is on before we do anything else
+    final isBluetoothOn = await _bluetoothService.isBluetoothOn();
+    if (!isBluetoothOn) {
+      await _showEnableBluetoothDialog(l10n);
+      setState(() {
+        _isScanning = false;
+        _errorType = BluetoothErrorType.bluetoothOff;
+        _errorMessage = l10n.bluetoothTurnOnRequired;
+      });
+      return;
+    }
+    
+    // Show loading dialog (non-blocking)
+    if (mounted) {
+      loadingShown = true;
+      AlertDialogs.showLoading(
+        context: context,
+        title: l10n.scanningForDevices,
+        message: l10n.makeBluetoothEnabledAndScaleOn,
+      );
+    }
+
     setState(() {
       _isScanning = true;
       _errorMessage = null;
+      _errorType = null;
     });
 
     try {
-      await _bluetoothService.startScan();
+      // Check location services (required for BLE scanning on Android)
+      if (Platform.isAndroid) {
+        final locationEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!locationEnabled) {
+          if (mounted && loadingShown) {
+            Navigator.of(context, rootNavigator: true).pop();
+            loadingShown = false;
+          }
+          if (mounted) {
+            await AlertDialogs.showError(
+              context: context,
+              title: l10n.error,
+              message: l10n.bluetoothLocationRequired,
+              buttonText: l10n.ok,
+              onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            );
+          }
+          setState(() {
+            _isScanning = false;
+            _errorType = BluetoothErrorType.unknown;
+            _errorMessage = l10n.bluetoothLocationRequired;
+          });
+          return;
+        }
+      }
+
+      final errorType = await _bluetoothService.startScan();
+      
+      // Close loading dialog
+      if (mounted && loadingShown) {
+        Navigator.of(context, rootNavigator: true).pop();
+        loadingShown = false;
+      }
+      
+      if (mounted) {
+        if (errorType != null) {
+          setState(() {
+            _errorType = errorType;
+            _errorMessage = _getErrorMessage(errorType, l10n);
+          });
+        } else {
+          setState(() {
+            _errorMessage = null;
+            _errorType = null;
+          });
+        }
+      }
     } catch (e) {
       log('❌ Scan error: $e');
+      // Close loading dialog if still open
+      if (mounted && loadingShown) {
+        Navigator.of(context, rootNavigator: true).pop();
+        loadingShown = false;
+      }
       if (mounted) {
         setState(() {
-          _errorMessage = e.toString();
+          _errorType = BluetoothErrorType.unknown;
+          _errorMessage = l10n.bluetoothUnknownError;
         });
       }
     } finally {
@@ -107,6 +221,49 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           _isScanning = false;
         });
       }
+    }
+  }
+
+  Future<void> _showEnableBluetoothDialog(AppLocalizations l10n) async {
+    if (!mounted) return;
+
+    await AlertDialogs.showConfirmation(
+      context: context,
+      title: l10n.bluetoothTurnOnRequired,
+      message: l10n.bluetoothTurnOnInstructions,
+      confirmText: l10n.enableBluetooth,
+      cancelText: l10n.cancel,
+      onConfirm: () async {
+        Navigator.of(context).pop();
+        try {
+          await FlutterBluePlus.turnOn();
+          await Future.delayed(const Duration(milliseconds: 400));
+          if (mounted) {
+            await _startBluetoothScan();
+          }
+        } catch (e) {
+          log('❌ Unable to automatically enable Bluetooth: $e');
+          await _bluetoothService.openSettings();
+        }
+      },
+      onCancel: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+  String _getErrorMessage(BluetoothErrorType errorType, AppLocalizations l10n) {
+    switch (errorType) {
+      case BluetoothErrorType.notSupported:
+        return l10n.bluetoothNotSupported;
+      case BluetoothErrorType.permissionsDenied:
+        return l10n.bluetoothPermissionsRequired;
+      case BluetoothErrorType.permissionsPermanentlyDenied:
+        return l10n.bluetoothPermissionsPermanentlyDenied;
+      case BluetoothErrorType.bluetoothOff:
+        return l10n.bluetoothTurnOnRequired;
+      case BluetoothErrorType.unknown:
+        return l10n.bluetoothUnknownError;
     }
   }
 
@@ -204,7 +361,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Bluetooth Weight Scale', // TODO: Add l10n.bluetoothWeightScale
+                            l10n.bluetoothWeightScale,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: isDarkMode ? Colors.white : Colors.black87,
@@ -213,8 +370,8 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                           const SizedBox(height: 4),
                           Text(
                             _isConnected 
-                                ? 'Connected to $_connectedDeviceName' 
-                                : 'Connect to measure weight', // TODO: Add l10n.connectToMeasureWeight
+                                ? l10n.connectedToDevice(_connectedDeviceName ?? l10n.unknownDevice)
+                                : l10n.connectToMeasureWeight,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
@@ -239,16 +396,16 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                   padding: const EdgeInsets.all(20),
                   children: [
                     if (_errorMessage != null)
-                      _buildErrorState(theme, _errorMessage!),
+                      _buildErrorState(theme, l10n),
                     
                     if (!_isConnected) ...[
                       // Scanning/Device List State
                       if (_isScanning)
-                        _buildScanningState(theme)
+                        _buildScanningState(theme, l10n)
                       else if (_availableDevices.isEmpty)
                         _buildNoDevicesState(theme, l10n)
                       else
-                        _buildDeviceList(theme),
+                        _buildDeviceList(theme, l10n),
                     ] else ...[
                       // Connected State
                       _buildConnectedState(theme, l10n),
@@ -284,8 +441,8 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Save Weight', // TODO: Add l10n.saveWeight
+                        child: Text(
+                          l10n.saveWeight,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -302,7 +459,11 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
     );
   }
 
-  Widget _buildErrorState(ThemeData theme, String error) {
+  Widget _buildErrorState(ThemeData theme, AppLocalizations l10n) {
+    final showSettingsButton = _errorType == BluetoothErrorType.permissionsPermanentlyDenied;
+    final showRetryPermissionsButton = _errorType == BluetoothErrorType.permissionsDenied;
+    final showEnableBluetoothButton = _errorType == BluetoothErrorType.bluetoothOff;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -313,7 +474,10 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           color: Constants.dangerColor.withOpacity(0.3),
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
         children: [
           const Icon(
             Icons.error_outline,
@@ -323,18 +487,72 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              error,
+                  _errorMessage ?? l10n.bluetoothUnknownError,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Constants.dangerColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          if (showSettingsButton) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await _bluetoothService.openSettings();
+                },
+                icon: const Icon(Icons.settings, size: 18),
+                label: Text(l10n.openSettings),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Constants.dangerColor,
+                  side: BorderSide(color: Constants.dangerColor),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ] else if (showRetryPermissionsButton) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await _startBluetoothScan();
+                },
+                icon: const Icon(Icons.refresh, size: 18),
+                label: Text(l10n.retry),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Constants.dangerColor,
+                  side: BorderSide(color: Constants.dangerColor),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ] else if (showEnableBluetoothButton) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showEnableBluetoothDialog(l10n),
+                icon: const Icon(Icons.bluetooth, size: 18),
+                label: Text(l10n.enableBluetooth),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Constants.primaryColor,
+                  side: BorderSide(color: Constants.primaryColor),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
           ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildScanningState(ThemeData theme) {
+  Widget _buildScanningState(ThemeData theme, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -347,16 +565,18 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
               valueColor: AlwaysStoppedAnimation<Color>(Constants.primaryColor),
             ),
           ),
+
           const SizedBox(height: 24),
+          
           Text(
-            'Scanning for devices...', // TODO: Add l10n.scanningForDevices
+            l10n.scanningForDevices,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Make sure your scale is turned on', // TODO: Add l10n.makeSureScaleOn
+            l10n.makeBluetoothEnabledAndScaleOn,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
@@ -378,14 +598,14 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           ),
           const SizedBox(height: 24),
           Text(
-            'No devices found', // TODO: Add l10n.noDevicesFound
+            l10n.noDevicesFound,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Make sure Bluetooth is enabled and scale is on', // TODO: Add l10n.makeBluetoothEnabledAndScaleOn
+            l10n.makeBluetoothEnabledAndScaleOn,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
@@ -395,7 +615,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           ElevatedButton.icon(
             onPressed: _startBluetoothScan,
             icon: const Icon(Icons.refresh),
-            label: const Text('Scan Again'), // TODO: Add l10n.scanAgain
+            label: Text(l10n.scanAgain),
             style: ElevatedButton.styleFrom(
               backgroundColor: Constants.primaryColor,
               foregroundColor: Colors.white,
@@ -407,7 +627,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
     );
   }
 
-  Widget _buildDeviceList(ThemeData theme) {
+  Widget _buildDeviceList(ThemeData theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -415,7 +635,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Available Devices (${_availableDevices.length})', // TODO: Add l10n.availableDevices
+              l10n.availableDevices(_availableDevices.length),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -423,7 +643,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
             TextButton.icon(
               onPressed: _startBluetoothScan,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Scan'), // TODO: Add l10n.scan
+              label: Text(l10n.scan),
               style: TextButton.styleFrom(
                 foregroundColor: Constants.primaryColor,
               ),
@@ -434,12 +654,13 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
         ..._availableDevices.map((device) {
           final deviceName = device.platformName.isNotEmpty 
               ? device.platformName 
-              : 'Unknown Device';
+              : l10n.unknownDevice;
           
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             child: Material(
               elevation: 2,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               child: InkWell(
                 onTap: () => _connectToDevice(device),
@@ -524,7 +745,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Connected', // TODO: Add l10n.connected
+                      l10n.connected,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Constants.successColor,
@@ -532,7 +753,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _connectedDeviceName ?? 'Unknown Device',
+                      _connectedDeviceName ?? l10n.unknownDevice,
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
@@ -569,7 +790,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
               ),
               const SizedBox(height: 16),
               Text(
-                'Current Weight', // TODO: Add l10n.currentWeight
+                l10n.currentWeight,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.6),
                 ),
@@ -597,7 +818,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Waiting for weight data...', // TODO: Add l10n.waitingForWeightData
+                      l10n.waitingForWeightData,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.5),
                       ),
@@ -626,7 +847,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Place livestock on the scale and wait for stable reading', // TODO: Add l10n.placeOnScaleInstruction
+                  l10n.placeOnScaleInstruction,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
                   ),

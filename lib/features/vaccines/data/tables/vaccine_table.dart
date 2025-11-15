@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 class Vaccines extends Table {
   IntColumn get id => integer().nullable()();
 
-  TextColumn get uuid => text().unique()();
+  TextColumn get uuid => text()();
 
   TextColumn get farmUuid => text().nullable()();
 

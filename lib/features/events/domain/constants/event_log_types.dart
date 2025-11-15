@@ -5,6 +5,7 @@ class EventLogTypes {
   static const deworming = 'deworming';
   static const weightChange = 'weightChange';
   static const disposal = 'disposal';
+  static const disposalTransfer = disposal;
   static const calving = 'calving';
   static const vaccination = 'vaccination';
   static const dryoff = 'dryoff';
@@ -12,3 +13,6 @@ class EventLogTypes {
   static const milking = 'milking';
   static const transfer = 'transfer';
 }
+
+
+

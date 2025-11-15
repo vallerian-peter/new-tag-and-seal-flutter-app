@@ -98,6 +98,7 @@ class FarmBulkActionsSheet extends StatelessWidget {
       farmUuid: farmUuid,
       livestockUuid: null,
       isBulk: true,
+      allowEmptyContext: true,
       onCompleted: () => Navigator.of(context).maybePop(),
     );
   }

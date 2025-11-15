@@ -95,7 +95,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         MaterialPageRoute(builder: (_) => const GetStartedScreen()),
       );
     });
-  } 
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _scaleController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

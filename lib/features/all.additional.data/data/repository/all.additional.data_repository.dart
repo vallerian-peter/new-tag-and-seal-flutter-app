@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/data/remote/all.additional.data_api.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/country_model.dart';
@@ -62,18 +60,6 @@ class AllAdditionalDataRepository {
         'identityCardTypes': referenceData['identityCardTypes'],
         'schoolLevels': referenceData['schoolLevels'],
         'legalStatuses': referenceData['legalStatuses'],
-        'vaccineTypes': referenceData['vaccineTypes'],
-        'disposalTypes': referenceData['disposalTypes'],
-        
-        'diseases': referenceData['diseases'],
-        'heatTypes': referenceData['heatTypes'],
-        'semenStrawTypes': referenceData['semenStrawTypes'],
-        'inseminationServices': referenceData['inseminationServices'],
-        'milkingMethods': referenceData['milkingMethods'],
-        'calvingTypes': referenceData['calvingTypes'],
-        'calvingProblems': referenceData['calvingProblems'],
-        'reproductiveProblems': referenceData['reproductiveProblems'],
-        'testResults': referenceData['testResults'],
         // Livestock reference data
         'species': livestockReferenceData['species'] ?? data['species'],
         'livestockTypes': livestockReferenceData['livestockTypes'] ?? data['livestockTypes'],
@@ -253,130 +239,6 @@ class AllAdditionalDataRepository {
             .toList();
         
         await _database.referenceDataDao.insertLegalStatuses(legalStatusCompanions);
-      }
-
-      if (remoteData['vaccineTypes'] != null && (remoteData['vaccineTypes'] as List).isNotEmpty) {
-        final vaccineTypeCompanions = (remoteData['vaccineTypes'] as List)
-            .map((json) => VaccineTypesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        log('💉 Upserting ${vaccineTypeCompanions.length} vaccine types from sync payload');
-        await _database.referenceDataDao.insertVaccineTypes(vaccineTypeCompanions);
-      }
-
-      if (remoteData['disposalTypes'] != null && (remoteData['disposalTypes'] as List).isNotEmpty) {
-        final disposalTypeCompanions = (remoteData['disposalTypes'] as List)
-            .map((json) => DisposalTypesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertDisposalTypes(disposalTypeCompanions);
-      }
-
-      if (remoteData['diseases'] != null && (remoteData['diseases'] as List).isNotEmpty) {
-        final diseaseCompanions = (remoteData['diseases'] as List)
-            .map((json) => DiseasesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                  status: Value(json['status'] as String?),
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertDiseases(diseaseCompanions);
-      }
-
-      if (remoteData['heatTypes'] != null && (remoteData['heatTypes'] as List).isNotEmpty) {
-        final heatTypeCompanions = (remoteData['heatTypes'] as List)
-            .map((json) => HeatTypesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertHeatTypes(heatTypeCompanions);
-      }
-
-      if (remoteData['semenStrawTypes'] != null && (remoteData['semenStrawTypes'] as List).isNotEmpty) {
-        final semenStrawTypeCompanions = (remoteData['semenStrawTypes'] as List)
-            .map((json) => SemenStrawTypesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                  category: Value(json['category'] ?? ''),
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertSemenStrawTypes(semenStrawTypeCompanions);
-      }
-
-      if (remoteData['inseminationServices'] != null && (remoteData['inseminationServices'] as List).isNotEmpty) {
-        final inseminationServiceCompanions = (remoteData['inseminationServices'] as List)
-            .map((json) => InseminationServicesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertInseminationServices(inseminationServiceCompanions);
-      }
-
-      if (remoteData['milkingMethods'] != null && (remoteData['milkingMethods'] as List).isNotEmpty) {
-        final milkingMethodCompanions = (remoteData['milkingMethods'] as List)
-            .map((json) => MilkingMethodsCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertMilkingMethods(milkingMethodCompanions);
-      }
-
-      if (remoteData['calvingTypes'] != null && (remoteData['calvingTypes'] as List).isNotEmpty) {
-        final calvingTypeCompanions = (remoteData['calvingTypes'] as List)
-            .map((json) => CalvingTypesCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertCalvingTypes(calvingTypeCompanions);
-      }
-
-      if (remoteData['calvingProblems'] != null && (remoteData['calvingProblems'] as List).isNotEmpty) {
-        final calvingProblemCompanions = (remoteData['calvingProblems'] as List)
-            .map((json) => CalvingProblemsCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertCalvingProblems(calvingProblemCompanions);
-      }
-
-      if (remoteData['reproductiveProblems'] != null && (remoteData['reproductiveProblems'] as List).isNotEmpty) {
-        final reproductiveProblemCompanions = (remoteData['reproductiveProblems'] as List)
-            .map((json) => ReproductiveProblemsCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertReproductiveProblems(reproductiveProblemCompanions);
-      }
-
-      if (remoteData['testResults'] != null && (remoteData['testResults'] as List).isNotEmpty) {
-        final testResultCompanions = (remoteData['testResults'] as List)
-            .map((json) => TestResultsCompanion.insert(
-                  id: Value(json['id'] ?? 0),
-                  name: json['name'] ?? '',
-                ))
-            .toList();
-
-        await _database.logReferenceDao.upsertTestResults(testResultCompanions);
       }
 
       // Store species (UPSERT by ID - replace if exists)

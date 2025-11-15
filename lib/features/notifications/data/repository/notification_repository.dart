@@ -79,6 +79,12 @@ class NotificationRepository implements NotificationRepositoryInterface {
   @override
   Future<void> deleteNotification(int id) => _dao.deleteById(id);
 
+  @override
+  Future<NotificationModel?> getNotificationById(int id) async {
+    final entry = await _dao.getById(id);
+    return entry != null ? _map(entry) : null;
+  }
+
   Future<NotificationModel?> findByTitleAndTime(
     String title,
     String scheduledAt,
@@ -121,6 +127,12 @@ class NotificationRepository implements NotificationRepositoryInterface {
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
       updatedAt: Value(model.updatedAt),
+      soundPath: Value(model.soundPath),
+      soundName: Value(model.soundName),
+      loopAudio: Value(model.loopAudio),
+      vibrate: Value(model.vibrate),
+      volume: Value(model.volume),
+      repeatDaily: Value(model.repeatDaily),
     );
   }
 
@@ -139,6 +151,12 @@ class NotificationRepository implements NotificationRepositoryInterface {
       syncAction: entry.syncAction,
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
+      soundPath: entry.soundPath,
+      soundName: entry.soundName,
+      loopAudio: entry.loopAudio,
+      vibrate: entry.vibrate,
+      volume: entry.volume,
+      repeatDaily: entry.repeatDaily,
     );
   }
 }

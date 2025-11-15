@@ -15,17 +15,21 @@ class ApiEndpoints {
   static final String baseUrl = _getBaseUrl();
   
   static String _getBaseUrl() {
-    if (Platform.isAndroid) {
-      // Android emulator uses 10.0.2.2 to access host machine's localhost
-      return 'http://10.0.2.2:8000/api';
-    } else if (Platform.isIOS || Platform.isMacOS) {
-      // iOS simulator and macOS can use 127.0.0.1
-      return 'http://127.0.0.1:8000/api';
-    } else {
-      // Fallback for other platforms
-      return 'http://localhost:8000/api';
-    }
+    // if (Platform.isAndroid) {
+    //   // Android emulator uses 10.0.2.2 to access host machine's localhost
+    //   return 'http://10.0.2.2:8000/api';
+    // } else if (Platform.isIOS || Platform.isMacOS) {
+    //   // iOS simulator and macOS can use 127.0.0.1
+    //   return 'http://127.0.0.1:8000/api';
+    // } else {
+    //   // Fallback for other platforms
+    //   return 'http://localhost:8000/api';
+    // }
+    
+    return 'http://45.77.1.62:8000/api';
   }
+
+
   
   /// Farmer module base path
   static String get farmerBase => '$baseUrl/v1/farmers';

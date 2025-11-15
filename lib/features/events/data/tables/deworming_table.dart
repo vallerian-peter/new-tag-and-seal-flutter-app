@@ -21,3 +21,5 @@ class Dewormings extends Table {
   @override
   Set<Column> get primaryKey => {uuid};
 }
+
+

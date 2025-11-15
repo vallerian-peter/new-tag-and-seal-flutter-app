@@ -5,3 +5,5 @@ class EventSummary {
 
   int get totalCount => byType.values.fold(0, (sum, value) => sum + value);
 }
+
+

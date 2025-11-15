@@ -243,6 +243,42 @@ class ScannerScreen extends StatefulWidget {
 
 class _ScannerScreenState extends State<ScannerScreen> {
   TagScanMode _selectedMode = TagScanMode.qr;
+  bool _cameraPermissionGranted = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshCameraPermission();
+  }
+
+  Future<void> _refreshCameraPermission() async {
+    if (kIsWeb) {
+      setState(() {
+        _cameraPermissionGranted = true;
+      });
+      return;
+    }
+
+    final status = await Permission.camera.status;
+    if (!mounted) return;
+    setState(() {
+      _cameraPermissionGranted = status.isGranted;
+    });
+  }
+
+  bool get _shouldShowCameraPermissionCard {
+    if (kIsWeb) return false;
+    if (_selectedMode == TagScanMode.rfid) return false;
+    return !_cameraPermissionGranted;
+  }
+
+  Future<void> _requestCameraPermission() async {
+    final granted = await _ensureCameraPermission(context);
+    if (!mounted) return;
+    setState(() {
+      _cameraPermissionGranted = granted;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -285,6 +321,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            if (_shouldShowCameraPermissionCard) ...[
+              _CameraPermissionCard(
+                title: l10n.scanPermissionRationaleTitle,
+                message: l10n.scanPermissionRationaleMessage,
+                actionLabel: l10n.scanPermissionAllow,
+                onAction: _requestCameraPermission,
+              ),
+              const SizedBox(height: 16),
+            ],
             _ScanModeSelector(
               configs: configs,
               selectedMode: _selectedMode,
@@ -328,8 +373,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
       return;
     }
 
-    if (config.usesCamera && !await _ensureCameraPermission(context)) {
+    if (config.usesCamera) {
+      final granted = await _ensureCameraPermission(context);
+      if (!mounted) return;
+      setState(() {
+        _cameraPermissionGranted = granted;
+      });
+      if (!granted) {
       return;
+      }
     }
 
     MobileScannerController? controller;
@@ -398,6 +450,105 @@ class _ScannerScreenState extends State<ScannerScreen> {
       livestock: match,
       farmNames: farmNames,
       onRefresh: () {},
+    );
+  }
+}
+
+class _CameraPermissionCard extends StatelessWidget {
+  final String title;
+  final String message;
+  final String actionLabel;
+  final VoidCallback onAction;
+
+  const _CameraPermissionCard({
+    required this.title,
+    required this.message,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.04),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: primary.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.camera_alt_outlined,
+              color: primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  message,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.65),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 42,
+                  child: ElevatedButton(
+                    onPressed: onAction,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                    ),
+                    child: Text(
+                      actionLabel,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -18,5 +18,16 @@ class NotificationEntries extends Table {
       text().withDefault(const Constant<String>('create'))();
   TextColumn get createdAt => text()();
   TextColumn get updatedAt => text()();
+  TextColumn get soundPath => text()
+      .withDefault(const Constant<String>('alarm_sounds/default_alarm.wav'))();
+  TextColumn get soundName =>
+      text().withDefault(const Constant<String>('Default Alarm'))();
+  BoolColumn get loopAudio =>
+      boolean().withDefault(const Constant<bool>(true))();
+  BoolColumn get vibrate =>
+      boolean().withDefault(const Constant<bool>(true))();
+  RealColumn get volume => real().withDefault(const Constant<double>(1.0))();
+  BoolColumn get repeatDaily =>
+      boolean().withDefault(const Constant<bool>(false))();
 }
 

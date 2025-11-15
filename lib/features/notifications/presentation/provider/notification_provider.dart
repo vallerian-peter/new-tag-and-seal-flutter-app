@@ -2,19 +2,20 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:new_tag_and_seal_flutter_app/core/alarm/app_alarm_manager.dart';
+
 import '../../domain/model/notification_model.dart';
 import '../../domain/repo/notification_repo.dart';
-import '../../data/services/notification_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
   final NotificationRepositoryInterface _repository;
-  final NotificationService _notificationService;
+  final AppAlarmManager _alarmManager;
 
   NotificationProvider({
     required NotificationRepositoryInterface repository,
-    required NotificationService notificationService,
+    required AppAlarmManager alarmManager,
   })  : _repository = repository,
-        _notificationService = notificationService;
+        _alarmManager = alarmManager;
 
   List<NotificationModel> _notifications = const [];
   bool _loading = false;
@@ -24,14 +25,22 @@ class NotificationProvider extends ChangeNotifier {
   bool get isLoading => _loading;
   String? get error => _error;
 
+  NotificationModel? getNotificationById(int id) {
+    try {
+      return _notifications.firstWhere((n) => n.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> loadNotifications() async {
     _loading = true;
     notifyListeners();
 
     try {
-      await _notificationService.initialize();
       _notifications = await _repository.getNotifications();
-      await _notificationService.syncScheduledNotifications(_notifications);
+      await _alarmManager.initialize();
+      await _alarmManager.syncAlarms(_notifications);
       _error = null;
     } catch (e, stackTrace) {
       log('❌ Failed to load notifications: $e', stackTrace: stackTrace);
@@ -56,7 +65,7 @@ class NotificationProvider extends ChangeNotifier {
   Future<void> markCompleted(int id) async {
     try {
       await _repository.markCompleted(id);
-      await _notificationService.cancelNotification(id);
+      await _alarmManager.cancelAlarm(id);
       await loadNotifications();
     } catch (e, stackTrace) {
       log('❌ Failed to mark notification complete: $e', stackTrace: stackTrace);
@@ -67,12 +76,39 @@ class NotificationProvider extends ChangeNotifier {
   Future<void> deleteNotification(int id) async {
     try {
       await _repository.deleteNotification(id);
-      await _notificationService.cancelNotification(id);
+      await _alarmManager.cancelAlarm(id);
       await loadNotifications();
     } catch (e, stackTrace) {
       log('❌ Failed to delete notification: $e', stackTrace: stackTrace);
       rethrow;
     }
+  }
+
+  Future<void> rescheduleRecurring(NotificationModel model) async {
+    try {
+      final next = _nextDailyOccurrence(model);
+      final updated = model.copyWith(
+        scheduledAt: next.toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+        synced: false,
+        syncAction: 'update',
+        isCompleted: false,
+      );
+      await _repository.upsertNotification(updated);
+      await loadNotifications();
+    } catch (e, stackTrace) {
+      log('❌ Failed to reschedule recurring notification: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  DateTime _nextDailyOccurrence(NotificationModel model) {
+    DateTime next = DateTime.parse(model.scheduledAt).toLocal();
+    final now = DateTime.now();
+    while (!next.isAfter(now)) {
+      next = next.add(const Duration(days: 1));
+    }
+    return next;
   }
 }
 

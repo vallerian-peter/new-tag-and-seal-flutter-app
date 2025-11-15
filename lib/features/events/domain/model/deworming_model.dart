@@ -54,15 +54,13 @@ class DewormingModel {
       uuid: uuid,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
-      administrationRouteId:
-          administrationRouteId ?? this.administrationRouteId,
+      administrationRouteId: administrationRouteId ?? this.administrationRouteId,
       medicineId: medicineId ?? this.medicineId,
       vetId: vetId ?? this.vetId,
       extensionOfficerId: extensionOfficerId ?? this.extensionOfficerId,
       quantity: quantity ?? this.quantity,
       dose: dose ?? this.dose,
-      nextAdministrationDate:
-          nextAdministrationDate ?? this.nextAdministrationDate,
+      nextAdministrationDate: nextAdministrationDate ?? this.nextAdministrationDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -129,3 +127,5 @@ class DewormingModel {
     };
   }
 }
+
+

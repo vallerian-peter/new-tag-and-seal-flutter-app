@@ -214,20 +214,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
-  String get unsyncedDataWarning =>
-      'You have unsynced changes. What would you like to do?';
-
-  @override
-  String get noUnsyncedDataMessage =>
-      'All data is synced. You can safely logout.';
-
-  @override
-  String get syncAndLogout => 'Sync & logout';
-
-  @override
-  String get syncingBeforeLogout => 'Syncing your data before logging out...';
-
-  @override
   String get username => 'Username';
 
   @override
@@ -249,22 +235,140 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alreadyHaveAccount => 'Already have an account?';
 
   @override
-  String get transfer => 'Transfer';
-
-  @override
-  String get notProvided => 'Not Provoded';
-
-  @override
-  String get role => 'Role';
-
-  @override
   String get recordsText => 'Records';
 
   @override
-  String get logsText => 'Logs';
+  String get allEvents => 'All Events';
+
+  @override
+  String get eventsScreenSubtitle => 'Review every farm activity log';
+
+  @override
+  String get totalLogs => 'Total Logs';
+
+  @override
+  String get eventTypes => 'Event Types';
+
+  @override
+  String get readyOffline => 'Ready Offline';
+
+  @override
+  String get unsyncedData => 'Unsynced Data';
+
+  @override
+  String get settingsAppHeaderTitle => 'App Settings';
+
+  @override
+  String get settingsAppHeaderSubtitle => 'Customize your app experience';
+
+  @override
+  String get settingsAppearanceTitle => 'Appearance';
+
+  @override
+  String get settingsLanguageRegionTitle => 'Language & Region';
+
+  @override
+  String get settingsSupportTitle => 'Support & About';
+
+  @override
+  String get settingsThemeDark => 'Dark Mode';
+
+  @override
+  String get settingsThemeLight => 'Light Mode';
+
+  @override
+  String get settingsAboutSubtitle => 'App version and information';
+
+  @override
+  String get settingsHelpSubtitle => 'Get help and support';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle => 'Read our privacy policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get termsOfServiceSubtitle => 'Read our terms of service';
+
+  @override
+  String settingsVersionLabel(String version) {
+    return 'Version: $version';
+  }
+
+  @override
+  String get settingsAppDescription =>
+      'A comprehensive livestock management application.';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageSwahili => 'Kiswahili';
+
+  @override
+  String get bluetoothWeightScale => 'Bluetooth Weight Scale';
+
+  @override
+  String get connectToMeasureWeight => 'Connect to measure weight';
+
+  @override
+  String connectedToDevice(String deviceName) {
+    return 'Connected to $deviceName';
+  }
+
+  @override
+  String get unknownDevice => 'Unknown device';
+
+  @override
+  String get scanningForDevices => 'Scanning for devices...';
+
+  @override
+  String get makeBluetoothEnabledAndScaleOn =>
+      'Make sure Bluetooth is enabled and the scale is on';
+
+  @override
+  String get noDevicesFound => 'No devices found';
+
+  @override
+  String get scanAgain => 'Scan Again';
+
+  @override
+  String get scan => 'Scan';
+
+  @override
+  String availableDevices(int count) {
+    return 'Available Devices ($count)';
+  }
+
+  @override
+  String get connected => 'Connected';
+
+  @override
+  String get waitingForWeightData => 'Waiting for weight data...';
+
+  @override
+  String get placeOnScaleInstruction =>
+      'Place livestock on the scale and wait for a stable reading';
+
+  @override
+  String get saveWeight => 'Save Weight';
+
+  @override
+  String get dashboardSyncPrompt =>
+      'Tap the sync button to pull the latest farms, livestock, and logs before you start working.';
 
   @override
   String get bulk => 'Bulk';
+
+  @override
+  String get bulkActions => 'Bulk Actions';
+
+  @override
+  String get logsText => 'Logs';
 
   @override
   String get onboarding1Title => 'Track Your Livestock';
@@ -288,6 +392,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keep detailed health records, vaccinations, and breeding information for better livestock care';
 
   @override
+  String get livestockName => 'Livestock Name';
+
+  @override
   String get farm => 'Farm';
 
   @override
@@ -304,12 +411,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get farmName => 'Farm Name';
-
-  @override
-  String get farmUuidLabel => 'Farm UUID';
-
-  @override
-  String get copiedToClipboard => 'Copied to clipboard';
 
   @override
   String get farmSize => 'Farm Size';
@@ -355,62 +456,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifications => 'Notifications';
-
-  @override
-  String get upcomingToday => 'Upcoming today';
-
-  @override
-  String get upcomingNotifications => 'Upcoming notifications';
-
-  @override
-  String get allNotifications => 'All notifications';
-
-  @override
-  String get notificationChipToday => 'Today';
-
-  @override
-  String get notificationChipUpcoming => 'Upcoming';
-
-  @override
-  String get addNotification => 'Add notification';
-
-  @override
-  String get notificationTitle => 'Title';
-
-  @override
-  String get enterNotificationTitle => 'Enter title';
-
-  @override
-  String get notificationDescription => 'Description';
-
-  @override
-  String get enterNotificationDescription => 'Enter description (optional)';
-
-  @override
-  String get scheduleDate => 'Select date';
-
-  @override
-  String get scheduleTime => 'Select time';
-
-  @override
-  String get saveNotification => 'Save notification';
-
-  @override
-  String get noNotifications => 'No notifications yet.';
-
-  @override
-  String get optionalFieldHint => 'Optional';
-
-  @override
-  String get markCompleted => 'Mark completed';
-
-  @override
-  String get deleteNotification => 'Delete notification';
-
-  @override
-  String notificationScheduledOn(String date) {
-    return 'Scheduled on $date';
-  }
 
   @override
   String get about => 'About';
@@ -1075,22 +1120,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allEventsScreen => 'All Events Screen';
 
   @override
-  String get allEvents => 'All events';
-
-  @override
-  String get eventsScreenSubtitle =>
-      'Review every log recorded across your farms.';
-
-  @override
-  String get totalLogs => 'Total logs';
-
-  @override
-  String get eventTypes => 'Event types';
-
-  @override
-  String get readyOffline => 'Ready offline';
-
-  @override
   String get userProfileScreen => 'User Profile Screen';
 
   @override
@@ -1425,102 +1454,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quantity => 'Quantity';
 
   @override
-  String get milkingMethod => 'Milking Method';
-
-  @override
-  String get lactometerReading => 'Lactometer Reading';
-
-  @override
-  String get solids => 'Solids';
-
-  @override
-  String get solidNonFat => 'Solid Non-Fat';
-
-  @override
-  String get protein => 'Protein';
-
-  @override
-  String get correctedLactometerReading => 'Corrected Lactometer Reading';
-
-  @override
-  String get totalSolids => 'Total Solids';
-
-  @override
-  String get colonyFormingUnits => 'Colony Forming Units';
-
-  @override
-  String get acidity => 'Acidity';
-
-  @override
-  String get session => 'Session';
-
-  @override
-  String get testResult => 'Test Result';
-
-  @override
-  String get numberOfMonths => 'Number of Months';
-
-  @override
-  String get testDate => 'Test Date';
-
-  @override
-  String get startDate => 'Start Date';
-
-  @override
-  String get endDate => 'End Date';
-
-  @override
-  String get calvingType => 'Calving Type';
-
-  @override
-  String get calvingProblem => 'Calving Problem';
-
-  @override
-  String get reproductiveProblem => 'Reproductive Problem';
-
-  @override
-  String get reason => 'Reason';
-
-  @override
-  String get heatType => 'Heat Type';
-
-  @override
-  String get inseminationService => 'Insemination Service';
-
-  @override
-  String get semenStrawType => 'Semen Straw Type';
-
-  @override
-  String get inseminationDate => 'Insemination Date';
-
-  @override
-  String get bullCode => 'Bull Code';
-
-  @override
-  String get bullBreed => 'Bull Breed';
-
-  @override
-  String get semenProductionDate => 'Semen Production Date';
-
-  @override
-  String get productionCountry => 'Production Country';
-
-  @override
-  String get semenBatchNumber => 'Semen Batch Number';
-
-  @override
-  String get internationalId => 'International ID';
-
-  @override
-  String get aiCode => 'AI Code';
-
-  @override
-  String get manufacturerName => 'Manufacturer Name';
-
-  @override
-  String get semenSupplier => 'Semen Supplier';
-
-  @override
   String get createdAt => 'Created at';
 
   @override
@@ -1653,7 +1586,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weightChange => 'Weight Change';
 
   @override
-  String get disposal => 'Disposal';
+  String get disposalTransfer => 'Disposal / Transfer';
 
   @override
   String get calving => 'Calving';
@@ -1704,336 +1637,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to save deworming log. Please try again.';
 
   @override
-  String get confirmSaveDeworming =>
-      'Are you sure you want to save this deworming log?';
-
-  @override
-  String get confirmUpdateDeworming =>
-      'Are you sure you want to update this deworming log?';
-
-  @override
-  String get statusScheduled => 'Scheduled';
-
-  @override
-  String get statusCompleted => 'Completed';
-
-  @override
-  String get statusCancelled => 'Cancelled';
-
-  @override
-  String get statusPending => 'Pending';
-
-  @override
-  String get statusFailed => 'Failed';
-
-  @override
-  String get addVaccination => 'Add vaccination';
-
-  @override
-  String get vaccinationDetails => 'Vaccination details';
-
-  @override
-  String get vaccinationDetailsSubtitle =>
-      'Capture vaccination log information';
-
-  @override
-  String get vaccinationNumber => 'Vaccination number';
-
-  @override
-  String get enterVaccinationNumber => 'Enter vaccination number (optional)';
-
-  @override
-  String get selectVaccine => 'Select vaccine';
-
-  @override
-  String get vaccineOptionsMissing =>
-      'No vaccines available. Please add vaccines first.';
-
-  @override
-  String get diseaseId => 'Disease ID';
-
-  @override
-  String get enterDiseaseIdOptional => 'Enter disease ID (optional)';
-
-  @override
-  String get selectDisease => 'Select disease';
-
-  @override
-  String get diseaseOptionsMissing =>
-      'No diseases available. Please sync to download disease data.';
-
-  @override
-  String get vaccinationStatus => 'Vaccination status';
-
-  @override
-  String get vaccinationContextInfo =>
-      'Select the farm and livestock to log this vaccination.';
-
-  @override
-  String get vaccinationPersonnelDetails => 'Personnel details';
-
-  @override
-  String get vaccinationNotesInfo =>
-      'Record vet or extension officer details for auditing.';
-
-  @override
-  String get confirmSaveVaccination =>
-      'Are you sure you want to save this vaccination log?';
-
-  @override
-  String get confirmUpdateVaccination =>
-      'Are you sure you want to update this vaccination log?';
-
-  @override
-  String get invalidDiseaseId => 'Invalid disease ID.';
-
-  @override
-  String get vaccinationLogSaveFailed => 'Failed to save vaccination log.';
-
-  @override
-  String get vaccinationLogSaved => 'Vaccination log saved successfully.';
-
-  @override
-  String get enterVetLicenseOptional => 'Enter vet license (optional)';
-
-  @override
-  String get enterExtensionOfficerLicenseOptional =>
-      'Enter extension officer license (optional)';
-
-  @override
-  String get addMilking => 'Add milking';
-
-  @override
-  String get milkingDetailsSubtitle =>
-      'Capture milking measurements for this livestock';
-
-  @override
-  String get milkingNotesSubtitle =>
-      'Record laboratory metrics and additional notes';
-
-  @override
-  String get milkingMethodRequired => 'Milking method is required';
-
-  @override
-  String get statusActive => 'Active';
-
-  @override
-  String get statusNotActive => 'Not active';
-
-  @override
-  String get ensureMilkingDetailsAccuracy =>
-      'Ensure the milking information is accurate before saving.';
-
-  @override
-  String get milkingNotesInfo =>
-      'Record measurements such as solids and lactometer readings (optional).';
-
-  @override
-  String get confirmSaveMilking =>
-      'Are you sure you want to save this milking log?';
-
-  @override
-  String get confirmUpdateMilking =>
-      'Are you sure you want to update this milking log?';
-
-  @override
-  String get milkingLogSaved => 'Milking log saved successfully.';
-
-  @override
-  String get milkingLogSaveFailed => 'Failed to save milking log.';
-
-  @override
-  String get addPregnancy => 'Add pregnancy';
-
-  @override
-  String get pregnancyDetailsSubtitle => 'Capture pregnancy diagnosis details';
-
-  @override
-  String get pregnancyNotesSubtitle =>
-      'Add remarks about the pregnancy (optional)';
-
-  @override
-  String get testResultRequired => 'Test result is required';
-
-  @override
-  String get testDateRequired => 'Test date is required';
-
-  @override
-  String get ensurePregnancyDetailsAccuracy =>
-      'Ensure the pregnancy information is accurate before saving.';
-
-  @override
-  String get pregnancyNotesInfo =>
-      'Record any additional notes from the pregnancy diagnosis.';
-
-  @override
-  String get confirmSavePregnancy =>
-      'Are you sure you want to save this pregnancy log?';
-
-  @override
-  String get confirmUpdatePregnancy =>
-      'Are you sure you want to update this pregnancy log?';
-
-  @override
-  String get pregnancyLogSaved => 'Pregnancy log saved successfully.';
-
-  @override
-  String get pregnancyLogSaveFailed => 'Failed to save pregnancy log.';
-
-  @override
-  String get addCalving => 'Add calving';
-
-  @override
-  String get calvingDetailsSubtitle => 'Capture calving timelines and outcomes';
-
-  @override
-  String get calvingNotesSubtitle => 'Add remarks about the calving process';
-
-  @override
-  String get calvingTypeRequired => 'Calving type is required';
-
-  @override
-  String get startDateRequired => 'Start date is required';
-
-  @override
-  String get ensureCalvingDetailsAccuracy =>
-      'Ensure the calving information is accurate before saving.';
-
-  @override
-  String get calvingNotesInfo =>
-      'Record any reproductive or calving complications.';
-
-  @override
-  String get confirmSaveCalving =>
-      'Are you sure you want to save this calving log?';
-
-  @override
-  String get confirmUpdateCalving =>
-      'Are you sure you want to update this calving log?';
-
-  @override
-  String get calvingLogSaved => 'Calving log saved successfully.';
-
-  @override
-  String get calvingLogSaveFailed => 'Failed to save calving log.';
-
-  @override
-  String get addDryoff => 'Add dryoff';
-
-  @override
-  String get dryoffDetailsSubtitle =>
-      'Capture dryoff schedules for this livestock';
-
-  @override
-  String get dryoffNotesSubtitle => 'Add remarks about the dryoff process';
-
-  @override
-  String get ensureDryoffDetailsAccuracy =>
-      'Ensure the dryoff information is accurate before saving.';
-
-  @override
-  String get dryoffNotesInfo => 'Record notes about the dryoff (optional).';
-
-  @override
-  String get confirmSaveDryoff =>
-      'Are you sure you want to save this dryoff log?';
-
-  @override
-  String get confirmUpdateDryoff =>
-      'Are you sure you want to update this dryoff log?';
-
-  @override
-  String get dryoffLogSaved => 'Dryoff log saved successfully.';
-
-  @override
-  String get dryoffLogSaveFailed => 'Failed to save dryoff log.';
-
-  @override
-  String get addInsemination => 'Add insemination';
-
-  @override
-  String get inseminationDetailsSubtitle =>
-      'Capture insemination services and heat details';
-
-  @override
-  String get inseminationNotesSubtitle =>
-      'Add insemination batch and supplier notes';
-
-  @override
-  String get lastHeatDate => 'Last heat date';
-
-  @override
-  String get heatTypeRequired => 'Heat type is required';
-
-  @override
-  String get inseminationServiceRequired => 'Insemination service is required';
-
-  @override
-  String get semenStrawTypeRequired => 'Semen straw type is required';
-
-  @override
-  String get ensureInseminationDetailsAccuracy =>
-      'Ensure the insemination information is accurate before saving.';
-
-  @override
-  String get inseminationNotesInfo =>
-      'Record batch, supplier, and bull details (optional).';
-
-  @override
-  String get confirmSaveInsemination =>
-      'Are you sure you want to save this insemination log?';
-
-  @override
-  String get confirmUpdateInsemination =>
-      'Are you sure you want to update this insemination log?';
-
-  @override
-  String get inseminationLogSaved => 'Insemination log saved successfully.';
-
-  @override
-  String get inseminationLogSaveFailed => 'Failed to save insemination log.';
-
-  @override
-  String get addMedication => 'Add medication';
-
-  @override
   String get medicationDetails => 'Medication details';
 
   @override
   String get medicationDetailsSubtitle =>
-      'Capture treatment details for this livestock';
+      'Capture dosage, disease, and scheduling information.';
+
+  @override
+  String get addMedication => 'Add medication log';
+
+  @override
+  String get medicationLogSaved => 'Medication log saved successfully';
+
+  @override
+  String get medicationLogSaveFailed =>
+      'Failed to save medication log. Please try again.';
 
   @override
   String get medicationContextInfo =>
-      'Select the farm and livestock before recording the medication.';
+      'Provide context about this medication treatment.';
 
   @override
-  String get medicationNotesInfo =>
-      'Add any additional notes about the treatment (optional).';
+  String get quantityUnit => 'Quantity unit';
 
   @override
-  String get quantityAmount => 'Quantity amount';
-
-  @override
-  String get quantityUnit => 'Unit';
-
-  @override
-  String get selectQuantityUnit => 'Select unit';
-
-  @override
-  String get quantityUnitMl => 'Milliliters (ml)';
-
-  @override
-  String get quantityUnitL => 'Liters (l)';
-
-  @override
-  String get quantityUnitMg => 'Milligrams (mg)';
-
-  @override
-  String get quantityUnitG => 'Grams (g)';
-
-  @override
-  String get quantityUnitKg => 'Kilograms (kg)';
+  String get selectQuantityUnit => 'Select quantity unit';
 
   @override
   String get withdrawalPeriod => 'Withdrawal period';
@@ -2043,31 +1671,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter withdrawal period (optional)';
 
   @override
-  String get withdrawalAmount => 'Withdrawal amount';
+  String get withdrawalUnit => 'Withdrawal unit';
 
   @override
-  String get withdrawalUnit => 'Period unit';
+  String get selectWithdrawalUnit => 'Select withdrawal unit';
 
   @override
-  String get selectWithdrawalUnit => 'Select period unit';
+  String get diseaseOptionsMissing =>
+      'Diseases not available. Sync reference data first.';
 
   @override
-  String get withdrawalUnitMinutes => 'Minutes';
+  String get diseaseId => 'Disease';
 
   @override
-  String get withdrawalUnitHours => 'Hours';
-
-  @override
-  String get withdrawalUnitDays => 'Days';
-
-  @override
-  String get withdrawalUnitWeeks => 'Weeks';
-
-  @override
-  String get withdrawalUnitMonths => 'Months';
-
-  @override
-  String get withdrawalUnitYears => 'Years';
+  String get selectDisease => 'Select disease';
 
   @override
   String get medicationDate => 'Medication date';
@@ -2076,44 +1693,130 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectMedicationDate => 'Select medication date';
 
   @override
-  String get confirmSaveMedication =>
-      'Are you sure you want to save this medication log?';
+  String get medicationNotesInfo =>
+      'Provide any additional notes about this medication.';
 
   @override
-  String get confirmUpdateMedication =>
-      'Are you sure you want to update this medication log?';
+  String get confirmUpdateMedication => 'Update medication record?';
 
   @override
-  String get medicationLogSaved => 'Medication log saved successfully.';
+  String get confirmSaveMedication => 'Save medication record?';
 
   @override
-  String get medicationLogSaveFailed => 'Failed to save medication log.';
+  String get quantityUnitMl => 'ml';
 
   @override
-  String get addDisposal => 'Add disposal';
+  String get quantityUnitL => 'L';
+
+  @override
+  String get quantityUnitMg => 'mg';
+
+  @override
+  String get quantityUnitG => 'g';
+
+  @override
+  String get quantityUnitKg => 'kg';
+
+  @override
+  String get withdrawalUnitMinutes => 'minutes';
+
+  @override
+  String get withdrawalUnitHours => 'hours';
+
+  @override
+  String get withdrawalUnitDays => 'days';
+
+  @override
+  String get withdrawalUnitWeeks => 'weeks';
+
+  @override
+  String get withdrawalUnitMonths => 'months';
+
+  @override
+  String get withdrawalUnitYears => 'years';
+
+  @override
+  String get vaccinationDetails => 'Vaccination details';
+
+  @override
+  String get vaccinationDetailsSubtitle =>
+      'Record vaccine, disease, and schedule info.';
+
+  @override
+  String get addVaccination => 'Add vaccination log';
+
+  @override
+  String get vaccinationNumber => 'Vaccination number';
+
+  @override
+  String get enterVaccinationNumber => 'Enter vaccination number';
+
+  @override
+  String get selectVaccine => 'Select vaccine';
+
+  @override
+  String get vaccinationStatus => 'Vaccination status';
+
+  @override
+  String get vaccinationContextInfo =>
+      'Provide context about this vaccination event.';
+
+  @override
+  String get vaccinationPersonnelDetails => 'Personnel details';
+
+  @override
+  String get enterVetLicenseOptional => 'Enter vet license (optional)';
+
+  @override
+  String get enterExtensionOfficerLicenseOptional =>
+      'Enter extension officer license (optional)';
+
+  @override
+  String get vaccinationNotesInfo => 'Add remarks about this vaccination.';
+
+  @override
+  String get confirmUpdateVaccination => 'Update vaccination log?';
+
+  @override
+  String get confirmSaveVaccination => 'Save vaccination log?';
+
+  @override
+  String get vaccinationLogSaved => 'Vaccination log saved successfully';
+
+  @override
+  String get vaccinationLogSaveFailed =>
+      'Failed to save vaccination log. Please try again.';
+
+  @override
+  String get vaccineOptionsMissing =>
+      'Vaccines not available. Sync vaccine reference data first.';
+
+  @override
+  String get addDisposal => 'Add disposal log';
 
   @override
   String get disposalDetails => 'Disposal details';
 
   @override
   String get disposalDetailsSubtitle =>
-      'Capture the reason and status of the disposal';
+      'Capture why and how the livestock was disposed.';
 
   @override
   String get disposalContextInfo =>
-      'Select the farm and livestock before recording the disposal.';
+      'Provide the method, reason, and any supporting notes.';
 
   @override
-  String get disposalReasons => 'Reasons';
+  String get disposalReasons => 'Disposal reasons';
 
   @override
-  String get enterDisposalReasons => 'Enter reasons';
+  String get enterDisposalReasons => 'Enter reasons for disposal';
+
+  @override
+  String get disposalTypeOptionsMissing =>
+      'Disposal types unavailable. Sync reference data.';
 
   @override
   String get disposalTypeId => 'Disposal type';
-
-  @override
-  String get enterDisposalTypeIdOptional => 'Enter disposal type (optional)';
 
   @override
   String get selectDisposalType => 'Select disposal type';
@@ -2122,92 +1825,183 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disposalTypeRequired => 'Disposal type is required';
 
   @override
-  String get disposalTypeOptionsMissing =>
-      'No disposal types available. Please sync to download reference data.';
-
-  @override
   String get disposalStatus => 'Disposal status';
 
   @override
-  String get confirmSaveDisposal =>
-      'Are you sure you want to save this disposal log?';
+  String get disposalNotesInfo => 'Add any remarks related to this disposal.';
 
   @override
-  String get confirmUpdateDisposal =>
-      'Are you sure you want to update this disposal log?';
+  String get confirmUpdateDisposal => 'Update disposal log?';
 
   @override
-  String get disposalNotesInfo =>
-      'Add any additional notes about the disposal (optional).';
+  String get confirmSaveDisposal => 'Save disposal log?';
 
   @override
-  String get disposalLogSaved => 'Disposal log saved successfully.';
+  String get disposalLogSaved => 'Disposal log saved successfully';
 
   @override
-  String get disposalLogSaveFailed => 'Failed to save disposal log.';
+  String get disposalLogSaveFailed =>
+      'Failed to save disposal log. Please try again.';
 
   @override
-  String get invalidDisposalTypeId => 'Invalid disposal type.';
+  String get addMilking => 'Add milking log';
 
   @override
-  String get addTransfer => 'Add transfer';
+  String get milkingDetailsSubtitle =>
+      'Capture session details for this milking event.';
 
   @override
-  String get editTransfer => 'Edit transfer';
+  String get milkingNotesSubtitle =>
+      'Provide lab readings and quality observations.';
+
+  @override
+  String get milkingMethod => 'Milking method';
+
+  @override
+  String get milkingMethodRequired => 'Milking method is required';
+
+  @override
+  String get session => 'Session';
+
+  @override
+  String get statusActive => 'Active';
+
+  @override
+  String get statusNotActive => 'Not active';
+
+  @override
+  String get ensureMilkingDetailsAccuracy =>
+      'Ensure the milking details are accurate before saving.';
+
+  @override
+  String get lactometerReading => 'Lactometer reading';
+
+  @override
+  String get solids => 'Solids';
+
+  @override
+  String get solidNonFat => 'Solids non-fat';
+
+  @override
+  String get protein => 'Protein';
+
+  @override
+  String get correctedLactometerReading => 'Corrected lactometer reading';
+
+  @override
+  String get totalSolids => 'Total solids';
+
+  @override
+  String get colonyFormingUnits => 'Colony forming units';
+
+  @override
+  String get acidity => 'Acidity';
+
+  @override
+  String get milkingNotesInfo =>
+      'Record lab analysis, quality metrics, or remarks.';
+
+  @override
+  String get confirmUpdateMilking => 'Update milking log?';
+
+  @override
+  String get confirmSaveMilking => 'Save milking log?';
+
+  @override
+  String get milkingLogSaveFailed =>
+      'Failed to save milking log. Please try again.';
+
+  @override
+  String get addPregnancy => 'Add pregnancy log';
+
+  @override
+  String get pregnancyDetailsSubtitle =>
+      'Record pregnancy test outcomes and status.';
+
+  @override
+  String get pregnancyNotesSubtitle =>
+      'Provide notes about this pregnancy check.';
+
+  @override
+  String get testResult => 'Test result';
+
+  @override
+  String get testResultRequired => 'Test result is required';
+
+  @override
+  String get numberOfMonths => 'Number of months';
+
+  @override
+  String get testDate => 'Test date';
+
+  @override
+  String get testDateRequired => 'Test date is required';
+
+  @override
+  String get ensurePregnancyDetailsAccuracy =>
+      'Ensure pregnancy information is accurate before saving.';
+
+  @override
+  String get pregnancyNotesInfo =>
+      'Add notes about symptoms, vet observations, or remarks.';
+
+  @override
+  String get confirmUpdatePregnancy => 'Update pregnancy log?';
+
+  @override
+  String get confirmSavePregnancy => 'Save pregnancy log?';
+
+  @override
+  String get pregnancyLogSaveFailed =>
+      'Failed to save pregnancy log. Please try again.';
+
+  @override
+  String get transfer => 'Transfer';
+
+  @override
+  String get addTransfer => 'Add transfer log';
 
   @override
   String get transferDetails => 'Transfer details';
 
   @override
   String get transferDetailsSubtitle =>
-      'Provide destination farm, transporter details, and remarks.';
+      'Track livestock movement between farms.';
 
   @override
   String get transferContextInfo =>
-      'Transfers track livestock movements between farms. Ensure the destination farm UUID is correct before saving.';
+      'Provide the destination farm and transporter information.';
 
   @override
-  String get toFarmUuidLabel => 'Destination farm identity';
+  String get toFarmUuidLabel => 'Destination farm UUID';
 
   @override
-  String get enterToFarmUuid => 'Enter destination farm identity';
+  String get enterToFarmUuid => 'Enter destination farm UUID';
 
   @override
-  String get toFarmUuidRequired => 'Destination farm identity is required';
+  String get toFarmUuidRequired => 'Destination farm UUID is required';
 
   @override
   String get transferToFarmUuidWarning =>
-      'Enter the exact farm identity of the destination farm (Utambulisho wa shamba jingine). You can copy it from the farm details.';
+      'Ensure the destination farm exists before saving.';
 
   @override
-  String get transporterIdLabel => 'Transporter ID (optional)';
+  String get transporterIdLabel => 'Transporter ID';
 
   @override
-  String get enterTransporterId => 'Enter transporter ID (optional)';
+  String get enterTransporterId => 'Enter transporter identifier';
 
   @override
-  String get invalidTransporterId => 'Transporter ID must be a number';
+  String get reason => 'Reason';
 
   @override
-  String get enterTransferReason => 'Enter transfer reason (optional)';
+  String get enterTransferReason => 'Enter reason for transfer';
 
   @override
-  String get transferPriceLabel => 'Transfer price (optional)';
+  String get transferPriceLabel => 'Transfer price';
 
   @override
-  String get enterTransferPrice => 'Enter price paid (optional)';
-
-  @override
-  String get transferDateLabel => 'Transfer date & time';
-
-  @override
-  String get selectTransferDate => 'Select transfer date & time';
-
-  @override
-  String get transferDateRequired => 'Transfer date is required';
-
-  @override
-  String get transferStatusLabel => 'Transfer status';
+  String get enterTransferPrice => 'Enter price (optional)';
 
   @override
   String get transferCurrencyLabel => 'Currency';
@@ -2216,31 +2010,184 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectTransferCurrency => 'Select currency';
 
   @override
-  String get currencyTsh => 'Tshs';
+  String get currencyTsh => 'TZS';
 
   @override
-  String get currencyUsd => 'USD (\$)';
+  String get currencyUsd => 'USD';
 
   @override
-  String get currencyGbp => 'GBP (£)';
+  String get currencyGbp => 'GBP';
 
   @override
-  String get currencyEur => 'EUR (€)';
+  String get currencyEur => 'EUR';
 
   @override
-  String get confirmSaveTransfer =>
-      'Are you sure you want to save this transfer log?';
+  String get transferDateLabel => 'Transfer date';
 
   @override
-  String get confirmUpdateTransfer =>
-      'Are you sure you want to update this transfer log?';
+  String get selectTransferDate => 'Select transfer date';
 
   @override
-  String get transferLogSaved => 'Transfer log saved successfully.';
+  String get transferDateRequired => 'Transfer date is required';
+
+  @override
+  String get transferStatusLabel => 'Transfer status';
+
+  @override
+  String get confirmUpdateTransfer => 'Update transfer log?';
+
+  @override
+  String get confirmSaveTransfer => 'Save transfer log?';
+
+  @override
+  String get invalidTransporterId => 'Transporter ID must be alphanumeric.';
 
   @override
   String get transferLogSaveFailed =>
       'Failed to save transfer log. Please try again.';
+
+  @override
+  String get addDryoff => 'Add dryoff log';
+
+  @override
+  String get dryoffDetailsSubtitle => 'Record the planned dryoff window.';
+
+  @override
+  String get dryoffNotesSubtitle => 'Capture any feeding or management notes.';
+
+  @override
+  String get startDate => 'Start date';
+
+  @override
+  String get startDateRequired => 'Start date is required';
+
+  @override
+  String get endDate => 'End date';
+
+  @override
+  String get ensureDryoffDetailsAccuracy =>
+      'Ensure the dryoff details are accurate before saving.';
+
+  @override
+  String get dryoffNotesInfo =>
+      'Add remarks about feed changes, health checks, or reminders.';
+
+  @override
+  String get confirmUpdateDryoff => 'Update dryoff log?';
+
+  @override
+  String get confirmSaveDryoff => 'Save dryoff log?';
+
+  @override
+  String get dryoffLogSaveFailed =>
+      'Failed to save dryoff log. Please try again.';
+
+  @override
+  String get confirmSaveDeworming =>
+      'Are you sure you want to save this deworming log?';
+
+  @override
+  String get confirmUpdateDeworming =>
+      'Are you sure you want to update this deworming log?';
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusFailed => 'Failed';
+
+  @override
+  String get statusScheduled => 'Scheduled';
+
+  @override
+  String get bulkOperationInProgress =>
+      'Saving records for all selected livestock...';
+
+  @override
+  String get addInsemination => 'Add insemination log';
+
+  @override
+  String get inseminationDetailsSubtitle =>
+      'Record heat cycle, service type, and straw details.';
+
+  @override
+  String get inseminationNotesSubtitle =>
+      'Capture remarks about semen quality or procedures.';
+
+  @override
+  String get lastHeatDate => 'Last heat date';
+
+  @override
+  String get heatType => 'Heat type';
+
+  @override
+  String get heatTypeRequired => 'Heat type is required';
+
+  @override
+  String get inseminationService => 'Insemination service';
+
+  @override
+  String get inseminationServiceRequired => 'Insemination service is required';
+
+  @override
+  String get semenStrawType => 'Semen straw type';
+
+  @override
+  String get semenStrawTypeRequired => 'Semen straw type is required';
+
+  @override
+  String get inseminationDate => 'Insemination date';
+
+  @override
+  String get ensureInseminationDetailsAccuracy =>
+      'Ensure insemination details are accurate before saving.';
+
+  @override
+  String get bullCode => 'Bull code';
+
+  @override
+  String get bullBreed => 'Bull breed';
+
+  @override
+  String get semenProductionDate => 'Semen production date';
+
+  @override
+  String get productionCountry => 'Production country';
+
+  @override
+  String get semenBatchNumber => 'Batch number';
+
+  @override
+  String get internationalId => 'International ID';
+
+  @override
+  String get aiCode => 'AI code';
+
+  @override
+  String get manufacturerName => 'Manufacturer name';
+
+  @override
+  String get semenSupplier => 'Semen supplier';
+
+  @override
+  String get inseminationNotesInfo =>
+      'Add notes about handling, technician, or follow-up plans.';
+
+  @override
+  String get confirmUpdateInsemination => 'Update insemination log?';
+
+  @override
+  String get confirmSaveInsemination => 'Save insemination log?';
+
+  @override
+  String get inseminationLogSaveFailed =>
+      'Failed to save insemination log. Please try again.';
 
   @override
   String get farmWithLivestockLoadFailed =>
@@ -2251,6 +2198,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFarmsFound => 'No farms found';
+
+  @override
+  String get addCalving => 'Add calving log';
+
+  @override
+  String get calvingDetailsSubtitle =>
+      'Record calving outcomes and supporting details.';
+
+  @override
+  String get calvingNotesSubtitle =>
+      'Capture observations, issues, or follow-up actions.';
+
+  @override
+  String get calvingProblem => 'Calving problem';
+
+  @override
+  String get reproductiveProblem => 'Reproductive problem';
+
+  @override
+  String get calvingType => 'Calving type';
+
+  @override
+  String get calvingTypeRequired => 'Calving type is required';
+
+  @override
+  String get ensureCalvingDetailsAccuracy =>
+      'Ensure calving information is accurate before saving.';
+
+  @override
+  String get calvingNotesInfo =>
+      'Add notes about calves, complications, or support provided.';
+
+  @override
+  String get confirmUpdateCalving => 'Update calving log?';
+
+  @override
+  String get confirmSaveCalving => 'Save calving log?';
+
+  @override
+  String get calvingLogSaveFailed =>
+      'Failed to save calving log. Please try again.';
 
   @override
   String get noLivestockFound => 'No livestock found';
@@ -2286,113 +2274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genericError => 'An error occurred. Please try again.';
 
   @override
-  String get bulkActions => 'Bulk actions';
-
-  @override
   String get addVaccine => 'Add vaccine';
-
-  @override
-  String get vaccineDetails => 'Vaccine details';
-
-  @override
-  String get vaccineDetailsSubtitle => 'Provide the vaccine information';
-
-  @override
-  String get vaccine => 'Vaccine';
-
-  @override
-  String get lotNumber => 'Lot number';
-
-  @override
-  String get enterLotNumber => 'Enter lot number (optional)';
-
-  @override
-  String get formulationType => 'Formulation type';
-
-  @override
-  String get enterFormulationType => 'Enter formulation type (optional)';
-
-  @override
-  String get selectFormulationType => 'Select formulation type';
-
-  @override
-  String get formulationLiveAttenuated => 'Live attenuated';
-
-  @override
-  String get formulationInactivated => 'Inactivated vaccine';
-
-  @override
-  String get doseAmount => 'Dose';
-
-  @override
-  String get enterDoseAmount => 'Enter dose (optional)';
-
-  @override
-  String get doseUnit => 'Unit';
-
-  @override
-  String get selectDoseUnit => 'Select unit';
-
-  @override
-  String get vaccineSchedule => 'Schedule';
-
-  @override
-  String get enterVaccineSchedule => 'Enter schedule (optional)';
-
-  @override
-  String get selectVaccineSchedule => 'Select schedule';
-
-  @override
-  String get vaccineScheduleRegular => 'Regular schedule';
-
-  @override
-  String get vaccineScheduleBooster => 'Booster schedule';
-
-  @override
-  String get vaccineScheduleSeasonal => 'Seasonal program';
-
-  @override
-  String get vaccineScheduleEmergency => 'Emergency schedule';
-
-  @override
-  String get vaccineStatus => 'Vaccine status';
-
-  @override
-  String get selectStatus => 'Select status';
-
-  @override
-  String get vaccineType => 'Vaccine type';
-
-  @override
-  String get selectVaccineType => 'Select vaccine type';
-
-  @override
-  String get vaccineTypeRequired => 'Vaccine type is required';
-
-  @override
-  String get vaccineTypesMissing =>
-      'No vaccine types available. Please sync to download reference data.';
-
-  @override
-  String get ensureVaccineDetailsAccuracy =>
-      'Ensure the vaccine information is accurate before saving.';
-
-  @override
-  String get confirmSaveVaccine =>
-      'Are you sure you want to save this vaccine?';
-
-  @override
-  String get confirmUpdateVaccine =>
-      'Are you sure you want to update this vaccine?';
-
-  @override
-  String get vaccineSavedSuccessfully => 'Vaccine saved successfully';
-
-  @override
-  String get vaccineUpdatedSuccessfully => 'Vaccine updated successfully';
-
-  @override
-  String get vaccineSaveFailed => 'Failed to save vaccine';
 
   @override
   String get name => 'Name';
@@ -2417,6 +2299,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterIdentificationNumber => 'Enter identification number';
+
+  @override
+  String get identificationNumberExists =>
+      'Another livestock already uses this identification number. Please enter a unique ID.';
 
   @override
   String get identificationNumberRequired =>
@@ -2597,85 +2483,145 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToDelete => 'Failed to delete';
 
   @override
-  String get scanOptionBarcode => 'Barcode';
+  String get disposal => 'Disposal';
 
   @override
-  String get scanOptionQr => 'QR Code';
+  String get notProvided => 'Not provided';
 
   @override
-  String get scanTagsTitle => 'Scan Tags';
+  String get role => 'Role';
 
   @override
-  String get scanTagsSubtitle =>
-      'Select a tag type to scan and keep it within the frame.';
+  String get unsyncedDataWarning =>
+      'You have unsynced data. Sync before logging out to avoid losing recent changes.';
 
   @override
-  String get scanOptionQrDescription => 'Scan printed QR stickers.';
+  String get noUnsyncedDataMessage =>
+      'No unsynced data found. It is safe to log out.';
 
   @override
-  String get scanOptionBarcodeDescription =>
-      'Scan barcodes from ear tags or documents.';
+  String get syncAndLogout => 'Sync & Logout';
 
   @override
-  String get scanOptionRfid => 'RFID Tag';
+  String get syncingBeforeLogout =>
+      'Syncing pending data before logging out...';
 
   @override
-  String get scanOptionRfidDescription =>
-      'Use the RFID reader to capture tags instantly.';
+  String get addNotification => 'Add notification';
 
   @override
-  String get scanRfidPlaceholder =>
-      'Connect an RFID reader to capture tags automatically.';
+  String get noNotifications => 'No notifications yet';
 
   @override
-  String get scanManualPlaceholder => 'Enter tag value';
+  String get upcomingToday => 'Today';
 
   @override
-  String get scanManualConfirm => 'Search tag';
+  String get upcomingNotifications => 'Upcoming';
 
   @override
-  String get scanStartButton => 'Start scan';
+  String get allNotifications => 'All notifications';
 
   @override
-  String get scanResultFoundTitle => 'Tag matched';
+  String get notificationTitle => 'Notification title';
 
   @override
-  String scanResultFoundSubtitle(Object name, Object farm) {
-    return 'Livestock $name found on $farm.';
+  String get enterNotificationTitle => 'Enter a notification title';
+
+  @override
+  String get notificationDescription => 'Description';
+
+  @override
+  String get enterNotificationDescription => 'Enter a description';
+
+  @override
+  String get optionalFieldHint => 'Optional';
+
+  @override
+  String get scheduleDate => 'Schedule date';
+
+  @override
+  String get scheduleTime => 'Schedule time';
+
+  @override
+  String get saveNotification => 'Save notification';
+
+  @override
+  String get notificationChipToday => 'Today';
+
+  @override
+  String get notificationChipUpcoming => 'Upcoming';
+
+  @override
+  String get markCompleted => 'Mark completed';
+
+  @override
+  String get deleteNotification => 'Delete notification';
+
+  @override
+  String notificationScheduledOn(String dateLabel) {
+    return 'Scheduled on $dateLabel';
   }
 
   @override
-  String get scanResultFarm => 'Farm';
+  String get selectAlarmSound => 'Alarm sound';
 
   @override
-  String get scanResultBarcode => 'Barcode';
-
-  @override
-  String get scanResultRfid => 'RFID';
-
-  @override
-  String scanResultNotFound(Object value) {
-    return 'No livestock found for tag $value.';
+  String alarmSoundSelected(String soundName) {
+    return 'Current sound: $soundName';
   }
 
   @override
-  String get scanPermissionDenied =>
-      'Camera permission is required to scan tags.';
+  String get chooseSound => 'Choose audio';
 
   @override
-  String get scanPermissionPermanentlyDenied =>
-      'Camera permission is permanently denied. Enable it in Settings to continue scanning.';
+  String get previewSound => 'Preview';
+
+  @override
+  String get stopPreview => 'Stop preview';
+
+  @override
+  String get loopSound => 'Loop sound until stopped';
+
+  @override
+  String get vibrateDevice => 'Vibrate device';
+
+  @override
+  String get alarmVolume => 'Alarm volume';
+
+  @override
+  String get previewSoundFailed => 'Unable to preview sound';
+
+  @override
+  String get stopAlarm => 'Stop alarm';
+
+  @override
+  String get repeatDailyLabel => 'Repeat every day';
+
+  @override
+  String get repeatDailyHint => 'Alarm will ring at this time daily.';
+
+  @override
+  String get selectTimeLabel => 'Alarm time';
+
+  @override
+  String get selectTimeHint => 'Tap to choose a daily time';
+
+  @override
+  String get selectTimeRequired => 'Please select a time';
 
   @override
   String get scanUnsupportedDevice =>
       'Scanning is not supported on this device.';
 
   @override
-  String get scanPermissionRationaleTitle => 'Allow camera access';
+  String get scanPermissionDenied => 'Camera permission denied.';
+
+  @override
+  String get scanPermissionRationaleTitle => 'Camera access required';
 
   @override
   String get scanPermissionRationaleMessage =>
-      'We need your camera to scan QR and barcode tags.';
+      'Tag scanning needs camera access. Please allow permission to continue.';
 
   @override
   String get scanPermissionNotNow => 'Not now';
@@ -2684,12 +2630,182 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanPermissionAllow => 'Allow';
 
   @override
-  String get scanPermissionSettingsTitle => 'Camera permission required';
+  String get scanPermissionSettingsTitle => 'Permission required';
 
   @override
   String get scanPermissionSettingsMessage =>
-      'Camera access is disabled. Open Settings to enable it before scanning.';
+      'Enable camera permission in settings to continue scanning.';
 
   @override
   String get scanPermissionGoToSettings => 'Open settings';
+
+  @override
+  String get scanOptionQr => 'QR code';
+
+  @override
+  String get scanOptionQrDescription => 'Scan QR code tags';
+
+  @override
+  String get scanOptionBarcode => 'Barcode';
+
+  @override
+  String get scanOptionBarcodeDescription => 'Scan printed barcodes';
+
+  @override
+  String get scanOptionRfid => 'RFID';
+
+  @override
+  String get scanOptionRfidDescription => 'Use RFID reader';
+
+  @override
+  String get scanTagsTitle => 'Scan tags';
+
+  @override
+  String get scanTagsSubtitle => 'Choose how you want to scan';
+
+  @override
+  String get scanStartButton => 'Start scanning';
+
+  @override
+  String scanResultNotFound(String tag) {
+    return 'No livestock found for tag $tag';
+  }
+
+  @override
+  String get scanRfidPlaceholder => 'Enter RFID code';
+
+  @override
+  String get scanManualPlaceholder => 'Enter tag manually';
+
+  @override
+  String get scanManualConfirm => 'Confirm tag';
+
+  @override
+  String get vaccineSavedSuccessfully => 'Vaccine saved successfully';
+
+  @override
+  String get vaccineSaveFailed => 'Failed to save vaccine. Please try again.';
+
+  @override
+  String get vaccineUpdatedSuccessfully => 'Vaccine updated successfully';
+
+  @override
+  String get vaccineDetails => 'Vaccine details';
+
+  @override
+  String get vaccineDetailsSubtitle => 'Provide accurate vaccine information';
+
+  @override
+  String get vaccineType => 'Vaccine type';
+
+  @override
+  String get selectVaccineType => 'Select vaccine type';
+
+  @override
+  String get vaccineTypesMissing =>
+      'Vaccine types missing. Sync reference data first.';
+
+  @override
+  String get vaccineTypeRequired => 'Vaccine type is required';
+
+  @override
+  String get formulationLiveAttenuated => 'Live attenuated';
+
+  @override
+  String get formulationInactivated => 'Inactivated';
+
+  @override
+  String get lotNumber => 'Lot number';
+
+  @override
+  String get enterLotNumber => 'Enter lot number';
+
+  @override
+  String get formulationType => 'Formulation type';
+
+  @override
+  String get selectFormulationType => 'Select formulation type';
+
+  @override
+  String get doseAmount => 'Dose amount';
+
+  @override
+  String get enterDoseAmount => 'Enter dose amount';
+
+  @override
+  String get doseUnit => 'Dose unit';
+
+  @override
+  String get selectDoseUnit => 'Select dose unit';
+
+  @override
+  String get vaccineSchedule => 'Schedule';
+
+  @override
+  String get selectVaccineSchedule => 'Select schedule';
+
+  @override
+  String get vaccineStatus => 'Vaccine status';
+
+  @override
+  String get selectStatus => 'Select status';
+
+  @override
+  String get ensureVaccineDetailsAccuracy =>
+      'Ensure the vaccine details are accurate before saving.';
+
+  @override
+  String get confirmUpdateVaccine => 'Update vaccine details?';
+
+  @override
+  String get confirmSaveVaccine => 'Save this vaccine?';
+
+  @override
+  String get vaccineScheduleRegular => 'Regular schedule';
+
+  @override
+  String get vaccineScheduleBooster => 'Booster';
+
+  @override
+  String get vaccineScheduleSeasonal => 'Seasonal';
+
+  @override
+  String get vaccineScheduleEmergency => 'Emergency';
+
+  @override
+  String get bluetoothNotSupported =>
+      'Bluetooth is not supported on this device';
+
+  @override
+  String get bluetoothPermissionsRequired =>
+      'Bluetooth permissions are required to scan for devices. Please grant permissions when prompted.';
+
+  @override
+  String get bluetoothPermissionsPermanentlyDenied =>
+      'Bluetooth permissions were permanently denied. Please enable them in app settings.';
+
+  @override
+  String get bluetoothTurnOnRequired =>
+      'Please turn on Bluetooth to scan for devices';
+
+  @override
+  String get bluetoothTurnOnInstructions =>
+      'Go to your device settings and turn on Bluetooth, then try again.';
+
+  @override
+  String get bluetoothUnknownError =>
+      'An unexpected error occurred. Please try again.';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get makeSureScaleOn => 'Make sure your scale is turned on';
+
+  @override
+  String get enableBluetooth => 'Enable Bluetooth';
+
+  @override
+  String get bluetoothLocationRequired =>
+      'Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings.';
 }

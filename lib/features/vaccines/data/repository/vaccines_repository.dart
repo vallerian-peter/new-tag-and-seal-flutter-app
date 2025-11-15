@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/database/daos/vaccine_dao.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/tables/vaccine_table.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/models/vaccine_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/repo/vaccine_repo.dart';
 
@@ -96,51 +97,19 @@ class VaccinesRepository implements VaccineRepositoryInterface {
   }
 
   @override
-  Future<VaccineModel?> getVaccineByUuid(String uuid) async {
-    final entity = await _dao.getVaccineByUuid(uuid);
-    return entity != null ? _mapEntityToModel(entity) : null;
-  }
-
-  @override
   Future<VaccineModel> createVaccine(VaccineModel model) async {
-    final nowIso = DateTime.now().toIso8601String();
-    final sanitized = model.copyWith(
-      synced: false,
-      syncAction: 'create',
-      createdAt: model.createdAt.isNotEmpty ? model.createdAt : nowIso,
-      updatedAt: nowIso,
-    );
-
-    await _dao.upsertVaccines([_modelToCompanion(sanitized)]);
-    final inserted = await _dao.getVaccineByUuid(sanitized.uuid);
-    if (inserted == null) {
-      throw StateError('Failed to insert vaccine ${sanitized.uuid}');
-    }
-    log('💾 Created vaccine locally: ${sanitized.uuid} (farm=${sanitized.farmUuid})');
-    return _mapEntityToModel(inserted);
+    final prepared = _prepareForLocalWrite(model, isCreate: true);
+    await _dao.upsertVaccines([_modelToCompanion(prepared)]);
+    log('💾 Vaccine created locally: ${prepared.uuid}');
+    return prepared;
   }
 
   @override
   Future<VaccineModel> updateVaccine(VaccineModel model) async {
-    final nowIso = DateTime.now().toIso8601String();
-    final nextSyncAction =
-        model.syncAction == 'create' || model.syncAction == 'update'
-            ? model.syncAction
-            : 'update';
-
-    final sanitized = model.copyWith(
-      synced: false,
-      syncAction: nextSyncAction,
-      updatedAt: nowIso,
-    );
-
-    await _dao.upsertVaccines([_modelToCompanion(sanitized)]);
-    final updated = await _dao.getVaccineByUuid(sanitized.uuid);
-    if (updated == null) {
-      throw StateError('Failed to update vaccine ${sanitized.uuid}');
-    }
-    log('📝 Updated vaccine locally: ${sanitized.uuid} (syncAction=${sanitized.syncAction})');
-    return _mapEntityToModel(updated);
+    final prepared = _prepareForLocalWrite(model, isCreate: false);
+    await _dao.upsertVaccines([_modelToCompanion(prepared)]);
+    log('💾 Vaccine updated locally: ${prepared.uuid}');
+    return prepared;
   }
 
   VaccinesCompanion _modelToCompanion(VaccineModel model) {
@@ -202,6 +171,24 @@ class VaccinesRepository implements VaccineRepositoryInterface {
       syncAction: entity.syncAction,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+    );
+  }
+
+  VaccineModel _prepareForLocalWrite(
+    VaccineModel model, {
+    required bool isCreate,
+  }) {
+    final nowIso = DateTime.now().toIso8601String();
+    final createdAt = model.createdAt.isNotEmpty ? model.createdAt : nowIso;
+    final syncAction = isCreate
+        ? 'create'
+        : (model.syncAction == 'create' ? 'create' : 'update');
+
+    return model.copyWith(
+      synced: false,
+      syncAction: syncAction,
+      createdAt: createdAt,
+      updatedAt: nowIso,
     );
   }
 }

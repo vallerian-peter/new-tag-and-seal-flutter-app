@@ -9,16 +9,16 @@ mixin _$LogReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.administrationRoutes;
   $MedicineTypesTable get medicineTypes => attachedDatabase.medicineTypes;
   $MedicinesTable get medicines => attachedDatabase.medicines;
-  $DisposalTypesTable get disposalTypes => attachedDatabase.disposalTypes;
   $DiseasesTable get diseases => attachedDatabase.diseases;
+  $DisposalTypesTable get disposalTypes => attachedDatabase.disposalTypes;
+  $MilkingMethodsTable get milkingMethods => attachedDatabase.milkingMethods;
   $HeatTypesTable get heatTypes => attachedDatabase.heatTypes;
-  $SemenStrawTypesTable get semenStrawTypes => attachedDatabase.semenStrawTypes;
   $InseminationServicesTable get inseminationServices =>
       attachedDatabase.inseminationServices;
-  $MilkingMethodsTable get milkingMethods => attachedDatabase.milkingMethods;
+  $SemenStrawTypesTable get semenStrawTypes => attachedDatabase.semenStrawTypes;
+  $TestResultsTable get testResults => attachedDatabase.testResults;
   $CalvingTypesTable get calvingTypes => attachedDatabase.calvingTypes;
   $CalvingProblemsTable get calvingProblems => attachedDatabase.calvingProblems;
   $ReproductiveProblemsTable get reproductiveProblems =>
       attachedDatabase.reproductiveProblems;
-  $TestResultsTable get testResults => attachedDatabase.testResults;
 }

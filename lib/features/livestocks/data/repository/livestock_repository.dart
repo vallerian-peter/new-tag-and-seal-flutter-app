@@ -3,14 +3,19 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/domain/models/livestock_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/domain/repo/livestock_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/mapper/livestock_mapper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'dart:developer';
 
 /// Repository for Livestocks data management
 /// Implements the domain repository interface
 class LivestockRepository implements LivestockRepo {
   final AppDatabase _database;
+  late final EventsRepositoryInterface _eventsRepository;
 
-  LivestockRepository(this._database);
+  LivestockRepository(this._database) {
+    _eventsRepository = EventsRepository(_database);
+  }
 
   /// Sync livestock data from provided data and store locally
   /// 
@@ -178,6 +183,12 @@ class LivestockRepository implements LivestockRepo {
     return await _database.livestockDao.getLivestockByUuid(uuid);
   }
 
+  /// Get livestock by identification number
+  @override
+  Future<Livestock?> getLivestockByIdentificationNumber(String identificationNumber) async {
+    return await _database.livestockDao.getLivestockByIdentificationNumber(identificationNumber);
+  }
+
   /// Get active livestock by farm UUID (excluding deleted ones)
   @override
   Future<List<Livestock>> getActiveLivestockByFarmUuid(String farmUuid) async {
@@ -286,6 +297,12 @@ class LivestockRepository implements LivestockRepo {
       if (livestock == null) {
         log('⚠️ Livestock not found: ID $livestockId');
         return false;
+      }
+
+      try {
+        await _eventsRepository.markAllLogsForLivestockAsDeleted(livestock.uuid);
+      } catch (e) {
+        log('⚠️ Failed to mark logs as deleted for livestock ${livestock.uuid}: $e');
       }
       
       // Create updated livestock with syncAction='deleted'

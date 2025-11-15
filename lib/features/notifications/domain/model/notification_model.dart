@@ -1,4 +1,7 @@
 class NotificationModel {
+  static const String defaultSoundPath = 'alarm_sounds/default_alarm.wav';
+  static const String defaultSoundName = 'Default Alarm';
+
   final int? id;
   final String? farmUuid;
   final String? farmName;
@@ -12,6 +15,12 @@ class NotificationModel {
   final String syncAction;
   final String createdAt;
   final String updatedAt;
+  final String soundPath;
+  final String soundName;
+  final bool loopAudio;
+  final bool vibrate;
+  final double volume;
+  final bool repeatDaily;
 
   const NotificationModel({
     this.id,
@@ -27,6 +36,12 @@ class NotificationModel {
     this.syncAction = 'create',
     required this.createdAt,
     required this.updatedAt,
+    this.soundPath = defaultSoundPath,
+    this.soundName = defaultSoundName,
+    this.loopAudio = true,
+    this.vibrate = true,
+    this.volume = 1.0,
+    this.repeatDaily = false,
   });
 
   NotificationModel copyWith({
@@ -43,6 +58,12 @@ class NotificationModel {
     String? syncAction,
     String? createdAt,
     String? updatedAt,
+    String? soundPath,
+    String? soundName,
+    bool? loopAudio,
+    bool? vibrate,
+    double? volume,
+    bool? repeatDaily,
   }) {
     return NotificationModel(
       id: identical(id, _unset) ? this.id : id as int?,
@@ -66,6 +87,12 @@ class NotificationModel {
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      soundPath: soundPath ?? this.soundPath,
+      soundName: soundName ?? this.soundName,
+      loopAudio: loopAudio ?? this.loopAudio,
+      vibrate: vibrate ?? this.vibrate,
+      volume: volume ?? this.volume,
+      repeatDaily: repeatDaily ?? this.repeatDaily,
     );
   }
 
@@ -84,6 +111,12 @@ class NotificationModel {
       'syncAction': syncAction,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'soundPath': soundPath,
+      'soundName': soundName,
+      'loopAudio': loopAudio,
+      'vibrate': vibrate,
+      'volume': volume,
+      'repeatDaily': repeatDaily,
     };
   }
 
@@ -102,6 +135,12 @@ class NotificationModel {
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
       updatedAt: json['updatedAt'] as String,
+      soundPath: json['soundPath'] as String? ?? defaultSoundPath,
+      soundName: json['soundName'] as String? ?? defaultSoundName,
+      loopAudio: json['loopAudio'] as bool? ?? true,
+      vibrate: json['vibrate'] as bool? ?? true,
+      volume: (json['volume'] as num?)?.toDouble() ?? 1.0,
+      repeatDaily: json['repeatDaily'] as bool? ?? false,
     );
   }
 

@@ -16,18 +16,9 @@ class VaccineDao extends DatabaseAccessor<AppDatabase> with _$VaccineDaoMixin {
     });
   }
 
-  Future<int> insertVaccine(VaccinesCompanion entry) {
-    return into(vaccines).insert(entry);
-  }
-
-  Future<bool> updateVaccine(Vaccine entry) {
-    return update(vaccines).replace(entry);
-  }
-
   Future<Vaccine?> getVaccineByUuid(String uuid) {
-    return (select(
-      vaccines,
-    )..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
+    return (select(vaccines)..where((tbl) => tbl.uuid.equals(uuid)))
+        .getSingleOrNull();
   }
 
   Future<List<Vaccine>> getVaccines({String? farmUuid}) {
@@ -70,3 +61,4 @@ class VaccineDao extends DatabaseAccessor<AppDatabase> with _$VaccineDaoMixin {
     return (delete(vaccines)..where((tbl) => tbl.uuid.equals(uuid))).go();
   }
 }
+

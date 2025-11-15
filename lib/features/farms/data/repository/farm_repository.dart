@@ -4,6 +4,7 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/domain/models/farm_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/domain/repo/farm_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/data/mapper/farm_mapper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/repository/livestock_repository.dart';
 import 'dart:developer';
 
 /// Repository for Farms data management
@@ -349,6 +350,8 @@ class FarmRepository implements FarmRepositoryInterface {
       
       if (success) {
         log('✅ Farm marked as deleted: ${farm.name} (ID: $farmId)');
+        final livestockRepository = LivestockRepository(_database);
+        await livestockRepository.markLivestockByFarmUuidAsDeleted(farm.uuid);
       } else {
         log('⚠️ Failed to mark farm as deleted: ID $farmId');
       }

@@ -1,6 +1,7 @@
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
 
 class WeightChangeMapper {
+
   // ==================== WEIGHT CHANGE MAPPERS ====================
 
   static WeightChangeModel weightToEntity(Map<String, dynamic> entity) {
@@ -50,9 +51,7 @@ class WeightChangeMapper {
     };
   }
 
-  static List<WeightChangeModel> weightsToEntities(
-    List<Map<String, dynamic>> entities,
-  ) {
+  static List<WeightChangeModel> weightsToEntities(List<Map<String, dynamic>> entities) {
     return entities.map((entity) => weightToEntity(entity)).toList();
   }
 }

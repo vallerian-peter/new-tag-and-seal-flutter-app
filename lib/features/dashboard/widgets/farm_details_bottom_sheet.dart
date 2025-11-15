@@ -1,18 +1,13 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
-import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
-import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_form.dart';
-import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
 
-class FarmDetailsBottomSheet extends StatefulWidget {
+class FarmDetailsBottomSheet extends StatelessWidget {
   final Map<String, dynamic> farm;
 
   const FarmDetailsBottomSheet({
@@ -21,28 +16,12 @@ class FarmDetailsBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<FarmDetailsBottomSheet> createState() =>
-      _FarmDetailsBottomSheetState();
-}
-
-class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
-  bool _farmUuidCopied = false;
-  Timer? _copyResetTimer;
-
-  @override
-  void dispose() {
-    _copyResetTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     
     // Get actual livestock data from farm
-    final livestock = widget.farm['livestock'] as List? ?? [];
-    final farmUuid = widget.farm['uuid'] as String? ?? '';
+    final livestock = farm['livestock'] as List? ?? [];
     
     // Count livestock by gender
     int maleCount = 0;
@@ -112,7 +91,7 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.farm['name'] ?? l10n.farm,
+                        farm['name'] ?? l10n.farm,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -120,7 +99,7 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                         ),
                       ),
                       Text(
-                        widget.farm['location'] ?? l10n.location,
+                        farm['location'] ?? l10n.location,
                         style: TextStyle(
                           fontSize: 14,
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -130,7 +109,6 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                   ),
                 ),
                 PopupMenuButton<_FarmAction>(
-                  color: theme.colorScheme.secondary,
                   icon: Icon(
                     Icons.more_vert,
                     color: theme.colorScheme.onSurface,
@@ -139,17 +117,19 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                     switch (action) {
                       case _FarmAction.bulkActions:
                         Navigator.pop(context);
-                        _showBulkActionsSheet(context);
+                        // TODO: Navigate to bulk actions flow once implemented.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.comingSoon),
+                          ),
+                        );
                         break;
                       case _FarmAction.addVaccine:
-                        final navigator = Navigator.of(context);
-                        navigator.pop();
-                        final farmUuid = widget.farm['uuid'] as String?;
-                        navigator.push(
-                          MaterialPageRoute(
-                            builder: (_) => VaccineFormScreen(
-                              farmUuid: farmUuid,
-                            ),
+                        Navigator.pop(context);
+                        // TODO: Navigate to vaccine form when available.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.comingSoon),
                           ),
                         );
                         break;
@@ -191,7 +171,7 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                   child: _buildStatCard(
                     context: context,
                     title: l10n.total,
-                    value: '${widget.farm['livestockCount'] ?? 0}',
+                    value: '${farm['livestockCount'] ?? 0}',
                     icon: Iconsax.pet_outline,
                     color: Constants.primaryColor,
                   ),
@@ -220,23 +200,6 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
             ),
           ),
           
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _buildCopyableField(
-              context: context,
-              label: l10n.farmUuidLabel,
-              value: farmUuid.isEmpty ? '---' : farmUuid,
-              copied: _farmUuidCopied,
-              onCopy: farmUuid.isEmpty
-                  ? null
-                  : () => _handleCopy(
-                        context: context,
-                        value: farmUuid,
-                        message: l10n.copiedToClipboard,
-                      ),
-            ),
-          ),
           const SizedBox(height: 20),
           
           // Livestock List Header
@@ -260,7 +223,7 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => LivestockFormScreen(
-                          preSelectedFarmUuid: widget.farm['uuid'] as String,
+                          preSelectedFarmUuid: farm['uuid'] as String,
                         ),
                       ),
                     );
@@ -321,89 +284,6 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildCopyableField({
-    required BuildContext context,
-    required String label,
-    required String value,
-    required bool copied,
-    VoidCallback? onCopy,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark
-        ? theme.colorScheme.surface.withValues(alpha: 0.6)
-        : Colors.white;
-
-    return InkWell(
-      onTap: copied ? null : onCopy,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.15),
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (copied)
-              const Icon(
-                Icons.check_circle,
-                size: 18,
-                color: Colors.green,
-              )
-            else
-              Icon(
-                Iconsax.copy_outline,
-                size: 18,
-                color: onCopy != null
-                    ? Constants.primaryColor
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.4),
-              ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showBulkActionsSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => FarmBulkActionsSheet(farm: widget.farm),
     );
   }
 
@@ -739,33 +619,6 @@ class _FarmDetailsBottomSheetState extends State<FarmDetailsBottomSheet> {
       print('Error fetching breed: $e');
       return '---';
     }
-  }
-
-  void _handleCopy({
-    required BuildContext context,
-    required String value,
-    required String message,
-  }) {
-    Clipboard.setData(ClipboardData(text: value));
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-
-    setState(() {
-      _farmUuidCopied = true;
-    });
-
-    _copyResetTimer?.cancel();
-    _copyResetTimer = Timer(const Duration(seconds: 5), () {
-      if (!mounted) return;
-      setState(() {
-        _farmUuidCopied = false;
-      });
-    });
   }
 }
 

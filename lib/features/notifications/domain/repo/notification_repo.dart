@@ -7,5 +7,6 @@ abstract class NotificationRepositoryInterface {
   Future<NotificationModel> upsertNotification(NotificationModel model);
   Future<void> markCompleted(int id);
   Future<void> deleteNotification(int id);
+  Future<NotificationModel?> getNotificationById(int id);
 }
 

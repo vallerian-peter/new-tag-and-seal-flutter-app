@@ -320,10 +320,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
+
         const SizedBox(height: 16),
+        
         CustomTextField(
           controller: _phone2Controller,
-          label: l10n.phone2,
+          label: '${l10n.phone2} (${l10n.optional})',
           hintText: l10n.enterAlternatePhone,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,

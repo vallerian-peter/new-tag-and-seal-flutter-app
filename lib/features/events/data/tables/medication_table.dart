@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 class Medications extends Table {
   IntColumn get id => integer().nullable()();
 
-  TextColumn get uuid => text()();
+  TextColumn get uuid => text().unique()();
 
   TextColumn get farmUuid => text()();
 
@@ -21,7 +21,8 @@ class Medications extends Table {
 
   TextColumn get remarks => text().nullable()();
 
-  BoolColumn get synced => boolean().withDefault(const Constant<bool>(true))();
+  BoolColumn get synced =>
+      boolean().withDefault(const Constant<bool>(true))();
 
   TextColumn get syncAction =>
       text().withDefault(const Constant<String>('server-create'))();
@@ -33,3 +34,4 @@ class Medications extends Table {
   @override
   Set<Column> get primaryKey => {uuid};
 }
+

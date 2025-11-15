@@ -20,7 +20,7 @@ class DisposalModel {
     this.disposalTypeId,
     required this.reasons,
     this.remarks,
-    this.status = 'pending',
+    this.status = 'completed',
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -106,3 +106,4 @@ class DisposalModel {
     };
   }
 }
+

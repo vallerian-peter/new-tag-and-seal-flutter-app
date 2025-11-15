@@ -9,11 +9,13 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vacc
 class DashboardDrawer extends StatelessWidget {
   final String userName;
   final String userEmail;
+  final VoidCallback? onLogout;
 
   const DashboardDrawer({
     super.key,
     required this.userName,
     required this.userEmail,
+    this.onLogout,
   });
 
   @override
@@ -161,7 +163,7 @@ class DashboardDrawer extends StatelessWidget {
                   isLogout: true,
                   onTap: () {
                     Navigator.pop(context);
-                    // Handle logout
+                    onLogout?.call();
                   },
                 ),
               ],

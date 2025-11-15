@@ -59,9 +59,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   List<DropdownItem<int>> _feedingTypeItems = const [];
   List<Farm> _farms = const [];
   List<Livestock> _farmLivestock = const [];
+  List<Livestock> _selectedBulkLivestock = const [];
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
-  List<Livestock> _selectedBulkLivestock = [];
   bool _isLoadingLivestock = false;
   DateTime? _selectedNextFeedingTime;
   static const List<DropdownItem<String>> _unitItems = [
@@ -70,7 +70,6 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     DropdownItem<String>(value: 'ton', label: 'ton'),
   ];
   String _selectedUnit = 'kg';
-
   bool get _isBulk => widget.isBulk;
 
   @override
@@ -99,9 +98,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     }
     _selectedNextFeedingTime = DateTime.tryParse(feeding.nextFeedingTime);
     if (_selectedNextFeedingTime != null) {
-      _nextFeedingTimeController.text = _formatDisplayDateTime(
-        _selectedNextFeedingTime!,
-      );
+      _nextFeedingTimeController.text = _formatDisplayDateTime(_selectedNextFeedingTime!);
     } else {
       _nextFeedingTimeController.clear();
     }
@@ -110,10 +107,8 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
   Future<void> _loadFeedingTypes() async {
     try {
-      final logAdditionalProvider = Provider.of<LogAdditionalDataProvider>(
-        context,
-        listen: false,
-      );
+      final logAdditionalProvider =
+          Provider.of<LogAdditionalDataProvider>(context, listen: false);
       await logAdditionalProvider.loadFromLocal();
 
       final feedingTypes = logAdditionalProvider.feedingTypes;
@@ -124,11 +119,13 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       if (!mounted) return;
       setState(() {
         _feedingTypeItems = feedingTypes
-            .map((type) => DropdownItem<int>(value: type.id, label: type.name))
+            .map(
+              (type) => DropdownItem<int>(
+                value: type.id,
+                label: type.name,
+              ),
+            )
             .toList();
-        if (_selectedFeedingTypeId == null && _feedingTypeItems.isNotEmpty) {
-          _selectedFeedingTypeId = _feedingTypeItems.first.value;
-        }
       });
     } catch (e) {
       debugPrint('❌ Failed to load feeding types: $e');
@@ -173,34 +170,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
       List<Livestock> livestock = [];
       if (farmUuid != null && farmUuid.isNotEmpty) {
-        livestock = await database.livestockDao.getActiveLivestockByFarmUuid(
-          farmUuid,
-        );
+        livestock =
+            await database.livestockDao.getActiveLivestockByFarmUuid(farmUuid);
       }
 
       String? livestockUuid = _selectedLivestockUuid;
-      if (!_isBulk) {
       if (livestockUuid != null &&
           livestock.every((item) => item.uuid != livestockUuid)) {
         livestockUuid = null;
       }
       if (livestockUuid == null && livestock.isNotEmpty) {
         livestockUuid = livestock.first.uuid;
-        }
-      }
-
-      List<Livestock> selectedBulkLivestock = _selectedBulkLivestock;
-      if (_isBulk) {
-        final initialSelection = widget.bulkLivestockUuids ?? const [];
-        if (selectedBulkLivestock.isEmpty && initialSelection.isNotEmpty) {
-          selectedBulkLivestock = livestock
-              .where((item) => initialSelection.contains(item.uuid))
-              .toList();
-        } else {
-          selectedBulkLivestock = selectedBulkLivestock
-              .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
-              .toList();
-        }
       }
 
       if (!mounted) return;
@@ -208,8 +188,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         _farms = farms;
         _farmLivestock = livestock;
         _selectedFarmUuid = farmUuid;
-        _selectedLivestockUuid = livestockUuid;
-        _selectedBulkLivestock = selectedBulkLivestock;
+        if (_isBulk) {
+          final initialSelectionUuids = widget.bulkLivestockUuids ??
+              _selectedBulkLivestock.map((item) => item.uuid).toList();
+          _selectedBulkLivestock = livestock
+              .where((item) => initialSelectionUuids.contains(item.uuid))
+              .toList();
+          _selectedLivestockUuid = null;
+        } else {
+          _selectedLivestockUuid = livestockUuid;
+          _selectedBulkLivestock = const [];
+        }
       });
     } catch (e) {
       debugPrint('❌ Failed to load farm/livestock context: $e');
@@ -219,25 +208,33 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   Future<void> _onFarmSelected(String value) async {
     setState(() {
       _selectedFarmUuid = value;
-      if (!_isBulk && widget.livestockUuid == null) {
+      if (widget.livestockUuid == null) {
         _selectedLivestockUuid = null;
-      }
-      if (_isBulk) {
-        _selectedBulkLivestock = [];
       }
       _isLoadingLivestock = true;
     });
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await database.livestockDao
-          .getActiveLivestockByFarmUuid(value);
+      final livestock =
+          await database.livestockDao.getActiveLivestockByFarmUuid(value);
 
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (!_isBulk && _selectedLivestockUuid == null && livestock.isNotEmpty) {
-          _selectedLivestockUuid = livestock.first.uuid;
+        if (_isBulk) {
+          final validUuids = livestock.map((item) => item.uuid).toSet();
+          _selectedBulkLivestock = _selectedBulkLivestock
+              .where((item) => validUuids.contains(item.uuid))
+              .toList();
+        } else {
+          if (_selectedLivestockUuid == null && livestock.isNotEmpty) {
+            _selectedLivestockUuid = livestock.first.uuid;
+          } else if (_selectedLivestockUuid != null &&
+              livestock.every((item) => item.uuid != _selectedLivestockUuid)) {
+            _selectedLivestockUuid =
+                livestock.isNotEmpty ? livestock.first.uuid : null;
+          }
         }
       });
     } catch (e) {
@@ -257,7 +254,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   }
 
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
-    final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
+    final farmUuid = _selectedFarmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
@@ -273,43 +270,11 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       ),
     );
 
-    if (!mounted || selection == null) return;
-    setState(() {
-      _selectedBulkLivestock = selection;
-    });
-  }
-
-  Widget _buildNextFeedingPicker(AppLocalizations l10n, ThemeData theme) {
-    return CustomTextField(
-      label: l10n.nextFeedingTime,
-      hintText: l10n.tapForMoreDetails,
-      prefixIcon: Icons.event_available_outlined,
-      controller: _nextFeedingTimeController,
-      readOnly: true,
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-        _pickNextFeedingDateTime();
-      },
-    );
-  }
-
-  bool _hasValidLivestockSelection(AppLocalizations l10n) {
-    if (_isBulk) {
-      if (_selectedBulkLivestock.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
-        return false;
-      }
-      return true;
+    if (selection != null) {
+      setState(() {
+        _selectedBulkLivestock = selection;
+      });
     }
-
-    if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
-      return false;
-    }
-
-    return true;
   }
 
   (String, String) _parseAmountAndUnit(String amount) {
@@ -330,13 +295,16 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
   List<DropdownItem<String>> _buildFarmDropdownItems() {
     return _farms
-        .map((farm) => DropdownItem<String>(value: farm.uuid, label: farm.name))
+        .map(
+          (farm) => DropdownItem<String>(
+            value: farm.uuid,
+            label: farm.name,
+          ),
+        )
         .toList();
   }
 
-  List<DropdownItem<String>> _buildLivestockDropdownItems(
-    AppLocalizations l10n,
-  ) {
+  List<DropdownItem<String>> _buildLivestockDropdownItems(AppLocalizations l10n) {
     return _farmLivestock
         .map(
           (item) => DropdownItem<String>(
@@ -362,12 +330,10 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final title = widget.isEditMode
-        ? '${l10n.edit} ${l10n.feeding}'
-        : l10n.addFeeding;
-    final submitText = widget.isEditMode
-        ? l10n.update
-        : l10n.save; // localization required
+    final title =
+        widget.isEditMode ? '${l10n.edit} ${l10n.feeding}' : l10n.addFeeding;
+    final submitText =
+        widget.isEditMode ? l10n.update : l10n.save; // localization required
 
     return Scaffold(
       backgroundColor: Constants.veryLightGreyColor,
@@ -396,39 +362,33 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       body: _isLoadingData
           ? const Center(child: LoadingIndicator())
           : SafeArea(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: CustomStepper(
-                          key: _stepperKey,
-                          currentStep: _currentStep,
-                          onStepContinue: _onStepContinue,
-                          onStepCancel: _onStepCancel,
-                          continueButtonText: null,
-                          backButtonText: l10n.back,
-                          finalStepButtonText: submitText,
-                          steps: [
-                            StepperStep(
-                              title: l10n.basicInformation,
-                              subtitle: l10n.feedingDetailsSubtitle,
-                              icon: Icons.restaurant_outlined,
-                              content: _buildStepOne(l10n, theme),
-                            ),
-                            StepperStep(
-                              title: l10n.additionalDetails,
-                              subtitle: l10n.feedingNotesSubtitle,
-                              icon: Icons.note_alt_outlined,
-                              content: _buildStepTwo(l10n, theme),
-                            ),
-                          ],
-                        ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Form(
+                  key: _formKey,
+                  child: CustomStepper(
+                    key: _stepperKey,
+                    currentStep: _currentStep,
+                    onStepContinue: _onStepContinue,
+                    onStepCancel: _onStepCancel,
+                    continueButtonText: null,
+                    backButtonText: l10n.back,
+                    finalStepButtonText: submitText,
+                    steps: [
+                      StepperStep(
+                        title: l10n.basicInformation,
+                        subtitle: l10n.feedingDetailsSubtitle,
+                        icon: Icons.restaurant_outlined,
+                        content: _buildStepOne(l10n, theme),
                       ),
-                    ),
-                  ],
+                      StepperStep(
+                        title: l10n.additionalDetails,
+                        subtitle: l10n.feedingNotesSubtitle,
+                        icon: Icons.note_alt_outlined,
+                        content: _buildStepTwo(l10n, theme),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -467,7 +427,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
             icon: Icons.agriculture,
             value: _selectedFarmUuid,
             dropdownItems: farmDropdownItems,
-            enabled: !_isBulk && !isFarmLocked,
+            enabled: !isFarmLocked,
             onChanged: (value) {
               if (value == null || value == _selectedFarmUuid) return;
               _onFarmSelected(value);
@@ -486,25 +446,37 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Center(child: CircularProgressIndicator()),
             )
-          else if (_isBulk)
-            BulkLivestockSummaryTile(
-              count: _selectedBulkLivestock.length,
-              onTap: () => _openBulkLivestockSelector(l10n),
-            )
           else if (_farmLivestock.isEmpty)
             _buildNoLivestockInfo(theme, l10n)
+          else if (_isBulk)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BulkLivestockSummaryTile(
+                  count: _selectedBulkLivestock.length,
+                  onTap: () => _openBulkLivestockSelector(l10n),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => _openBulkLivestockSelector(l10n),
+                  icon: const Icon(Icons.playlist_add_check),
+                  label: Text(
+                    _selectedBulkLivestock.isEmpty
+                        ? l10n.selectLivestock
+                        : l10n.edit,
+                  ),
+                ),
+              ],
+            )
           else
             CustomDropdown<String>(
               label: l10n.selectLivestock,
               hint: l10n.selectLivestock,
-              icon: Icons.pets_outlined,
+              icon: Icons.pets,
               value: _selectedLivestockUuid,
               dropdownItems: livestockDropdownItems,
               enabled: !isLivestockLocked,
-              onChanged: (value) {
-                if (value == null) return;
-                _onLivestockSelected(value);
-              },
+              onChanged: (value) => _onLivestockSelected(value),
               validator: (value) {
                 if ((value == null || value.isEmpty) &&
                     (widget.livestockUuid == null ||
@@ -515,10 +487,14 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
               },
             ),
           const SizedBox(height: 24),
+        ],
+
+        _buildSectionTitle(l10n.feedingDetails),
+        const SizedBox(height: 20),
         CustomDropdown<int>(
           label: l10n.feedingType,
           hint: l10n.selectFeedingType,
-            icon: Icons.restaurant_menu,
+          icon: Icons.category_outlined,
           value: _selectedFeedingTypeId,
           dropdownItems: _feedingTypeItems,
           onChanged: (value) => setState(() => _selectedFeedingTypeId = value),
@@ -533,6 +509,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         Row(
           children: [
             Expanded(
+              flex: 2,
               child: CustomTextField(
                 controller: _amountController,
                 label: l10n.amount,
@@ -551,25 +528,44 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
               ),
             ),
             const SizedBox(width: 12),
-              SizedBox(
-                width: 120,
+            Expanded(
               child: CustomDropdown<String>(
                 label: l10n.unit,
                 hint: l10n.unit,
-                  icon: Icons.straighten,
+                icon: Icons.straighten_outlined,
                 value: _selectedUnit,
                 dropdownItems: _unitItems,
                 onChanged: (value) {
                   if (value == null) return;
-                    setState(() => _selectedUnit = value);
+                  setState(() {
+                    _selectedUnit = value;
+                  });
                 },
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-          _buildNextFeedingPicker(l10n, theme),
-        ],
+        CustomTextField(
+          controller: _nextFeedingTimeController,
+          label: l10n.nextFeedingTime,
+          hintText: l10n.enterNextFeedingTime,
+          prefixIcon: Icons.schedule_outlined,
+          readOnly: true,
+          onTap: _pickNextFeedingDateTime,
+          validator: (value) {
+            if (_selectedNextFeedingTime == null) {
+              return l10n.nextFeedingTimeRequired;
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 24),
+        _buildInfoCard(
+          icon: Icons.info_outline,
+          message: l10n.ensureFeedingDetailsAccuracy,
+          theme: theme,
+        ),
       ],
     );
   }
@@ -607,11 +603,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       decoration: BoxDecoration(
         color: Constants.primaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
+        border: Border.all(
+          color: Constants.primaryColor.withOpacity(0.3),
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Constants.primaryColor, size: 24),
+          Icon(
+            icon,
+            color: Constants.primaryColor,
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -634,11 +636,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       decoration: BoxDecoration(
         color: Colors.amber.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.withOpacity(0.4), width: 1),
+        border: Border.all(
+          color: Colors.amber.withOpacity(0.4),
+          width: 1,
+        ),
       ),
       child: Text(
         l10n.logContextMissing,
-        style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
+        style: TextStyle(
+          color: theme.colorScheme.onSurface,
+          fontSize: 14,
+        ),
       ),
     );
   }
@@ -662,8 +670,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   }
 
   Future<void> _pickNextFeedingDateTime() async {
-    final initialDate =
-        _selectedNextFeedingTime ??
+    final initialDate = _selectedNextFeedingTime ??
         (widget.feeding != null
             ? DateTime.parse(widget.feeding!.nextFeedingTime)
             : DateTime.now());
@@ -752,18 +759,16 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   }
 
   void _onStepContinue() async {
-    final l10n = AppLocalizations.of(context)!;
     if (_currentStep == 0) {
-      if (_formKey.currentState!.validate() &&
-          _hasValidLivestockSelection(l10n)) {
+      if (_formKey.currentState!.validate()) {
         setState(() => _currentStep = 1);
       }
       return;
     }
 
     if (!_formKey.currentState!.validate()) return;
-    if (!_hasValidLivestockSelection(l10n)) return;
 
+    final l10n = AppLocalizations.of(context)!;
     await AlertDialogs.showConfirmation(
       context: context,
       title: widget.isEditMode ? l10n.update : l10n.save,
@@ -791,83 +796,95 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
     final feedingTypeId = _selectedFeedingTypeId!;
     final amount = _amountController.text.trim();
-    final amountWithUnit = amount.isNotEmpty ? '$amount$_selectedUnit' : amount;
-    final nextFeedingTimeIso =
-        _selectedNextFeedingTime?.toIso8601String() ?? '';
+    final amountWithUnit =
+        amount.isNotEmpty ? '$amount$_selectedUnit' : amount;
+    final nextFeedingTimeIso = _selectedNextFeedingTime?.toIso8601String() ?? '';
     final remarks = _remarksController.text.trim().isEmpty
         ? null
         : _remarksController.text.trim();
     final selectedFarmUuid = widget.farmUuid ?? _selectedFarmUuid;
-    final livestockUuids = _isBulk
-        ? _selectedBulkLivestock.map((livestock) => livestock.uuid).toList()
-        : [
-            if (widget.livestockUuid != null && widget.livestockUuid!.isNotEmpty)
-              widget.livestockUuid!
-            else if (_selectedLivestockUuid != null &&
-                _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
-          ];
+    final selectedLivestockUuid = widget.livestockUuid ?? _selectedLivestockUuid;
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
-      return;
-    }
-    if (livestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.logContextMissing)),
+      );
       return;
     }
 
-    final baseNextFeedingTime = nextFeedingTimeIso.isNotEmpty
-        ? nextFeedingTimeIso
-        : DateTime.now().toIso8601String();
+    if (!_isBulk &&
+        (selectedLivestockUuid == null || selectedLivestockUuid.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.logContextMissing)),
+      );
+      return;
+    }
+
+    final bulkLivestockUuids =
+        _selectedBulkLivestock.map((livestock) => livestock.uuid).toList();
+    if (_isBulk && bulkLivestockUuids.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.livestockRequired)),
+      );
+      return;
+    }
 
     try {
-      if (widget.isEditMode && !_isBulk) {
+      if (widget.isEditMode && _isBulk) {
+        log('⚠️ Bulk editing is not supported for feedings.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.comingSoon)),
+        );
+        return;
+      }
+
+      if (widget.isEditMode) {
         final existing = widget.feeding!;
+        final effectiveNextFeedingTime =
+            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : existing.nextFeedingTime;
         final updatedModel = existing.copyWith(
           feedingTypeId: feedingTypeId,
           farmUuid: selectedFarmUuid,
-          livestockUuid: livestockUuids.first,
-          nextFeedingTime: baseNextFeedingTime,
+          livestockUuid: selectedLivestockUuid!,
+          nextFeedingTime: effectiveNextFeedingTime,
           amount: amountWithUnit,
           remarks: remarks,
           updatedAt: DateTime.now().toIso8601String(),
         );
 
-        final updated = await eventsProvider.updateFeedingWithDialog(
-          context,
-          updatedModel,
-        );
+        final updated =
+            await eventsProvider.updateFeedingWithDialog(context, updatedModel);
         if (updated != null && mounted) {
           Navigator.pop(context, updated);
         }
       } else if (_isBulk) {
-        final created = await eventsProvider.addFeedingBatchWithDialog(
+        final effectiveNextFeedingTime =
+            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : DateTime.now().toIso8601String();
+        await eventsProvider.addFeedingBatchWithDialog(
           context: context,
           farmUuid: selectedFarmUuid,
-          livestockUuids: livestockUuids,
+          livestockUuids: bulkLivestockUuids,
           feedingTypeId: feedingTypeId,
+          nextFeedingTime: effectiveNextFeedingTime,
           amount: amountWithUnit,
-          nextFeedingTime: baseNextFeedingTime,
           remarks: remarks,
         );
-
-        if (created.isNotEmpty && mounted) {
+        if (mounted) {
           Navigator.pop(context, true);
         }
       } else {
         final now = DateTime.now().toIso8601String();
+        final effectiveNextFeedingTime =
+            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : now;
         final uuid =
-            '${DateTime.now().millisecondsSinceEpoch}-${livestockUuids.first.hashCode}-$feedingTypeId';
+            '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-$feedingTypeId';
 
         final newModel = FeedingModel(
           uuid: uuid,
           feedingTypeId: feedingTypeId,
           farmUuid: selectedFarmUuid,
-          livestockUuid: livestockUuids.first,
-          nextFeedingTime: baseNextFeedingTime,
+          livestockUuid: selectedLivestockUuid!,
+          nextFeedingTime: effectiveNextFeedingTime,
           amount: amountWithUnit,
           remarks: remarks,
           synced: false,
@@ -876,10 +893,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
           updatedAt: now,
         );
 
-        final created = await eventsProvider.addFeedingWithDialog(
-          context,
-          newModel,
-        );
+        final created = await eventsProvider.addFeedingWithDialog(context, newModel);
         if (created != null && mounted) {
           Navigator.pop(context, created);
         }

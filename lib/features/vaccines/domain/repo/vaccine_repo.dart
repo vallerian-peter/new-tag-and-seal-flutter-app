@@ -12,7 +12,5 @@ abstract class VaccineRepositoryInterface {
   Future<VaccineModel> createVaccine(VaccineModel model);
 
   Future<VaccineModel> updateVaccine(VaccineModel model);
-
-  Future<VaccineModel?> getVaccineByUuid(String uuid);
 }
 

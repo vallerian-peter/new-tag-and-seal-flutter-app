@@ -4,6 +4,28 @@ import 'dart:typed_data';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Bluetooth error types
+enum BluetoothErrorType {
+  notSupported,
+  permissionsDenied,
+  permissionsPermanentlyDenied,
+  bluetoothOff,
+  unknown,
+}
+
+/// Result class for permission checking
+class PermissionResult {
+  final bool granted;
+  final BluetoothErrorType? errorType;
+  final String? errorMessage;
+
+  PermissionResult({
+    required this.granted,
+    this.errorType,
+    this.errorMessage,
+  });
+}
+
 /// Service for handling Bluetooth weight scale connections
 ///
 /// Manages scanning, connecting, and receiving weight data from Bluetooth scales
@@ -33,12 +55,16 @@ class BluetoothWeightService {
   /// - Android 12+ (API 31+): BLUETOOTH_SCAN, BLUETOOTH_CONNECT
   /// - Android < 12: BLUETOOTH, BLUETOOTH_ADMIN, ACCESS_FINE_LOCATION
   /// - iOS: Bluetooth usage description in Info.plist
-  Future<bool> checkBluetoothPermissions() async {
+  Future<PermissionResult> checkBluetoothPermissions() async {
     try {
       // Check if Bluetooth is supported
       if (await FlutterBluePlus.isSupported == false) {
         log('❌ Bluetooth not supported on this device');
-        return false;
+        return PermissionResult(
+          granted: false,
+          errorType: BluetoothErrorType.notSupported,
+          errorMessage: 'Bluetooth is not supported on this device',
+        );
       }
 
       log('🔐 Requesting Bluetooth permissions...');
@@ -53,37 +79,46 @@ class BluetoothWeightService {
 
       // Check if all required permissions are granted
       bool allGranted = true;
+      bool permanentlyDenied = false;
+      
       statuses.forEach((permission, status) {
         log('  ${permission.toString()}: ${status.toString()}');
         if (!status.isGranted && !status.isLimited) {
           allGranted = false;
         }
+        if (status.isPermanentlyDenied) {
+          permanentlyDenied = true;
+        }
       });
 
       if (allGranted) {
         log('✅ All Bluetooth permissions granted');
-        return true;
+        return PermissionResult(granted: true);
       } else {
         log('⚠️ Some Bluetooth permissions denied');
         
-        // Check if user permanently denied permissions
-        bool permanentlyDenied = false;
-        for (var entry in statuses.entries) {
-          if (entry.value.isPermanentlyDenied) {
-            permanentlyDenied = true;
-            break;
-          }
-        }
-        
         if (permanentlyDenied) {
           log('⚠️ Permissions permanently denied - user must enable in settings');
+          return PermissionResult(
+            granted: false,
+            errorType: BluetoothErrorType.permissionsPermanentlyDenied,
+            errorMessage: 'Bluetooth permissions were permanently denied. Please enable them in app settings.',
+          );
+        } else {
+          return PermissionResult(
+            granted: false,
+            errorType: BluetoothErrorType.permissionsDenied,
+            errorMessage: 'Bluetooth permissions are required to scan for devices',
+          );
         }
-        
-        return false;
       }
     } catch (e) {
       log('❌ Error checking Bluetooth permissions: $e');
-      return false;
+      return PermissionResult(
+        granted: false,
+        errorType: BluetoothErrorType.unknown,
+        errorMessage: 'An error occurred while checking permissions: $e',
+      );
     }
   }
 
@@ -103,30 +138,48 @@ class BluetoothWeightService {
     }
   }
 
+  /// Check if Bluetooth is turned on
+  Future<bool> isBluetoothOn() async {
+    try {
+      final adapterState = await FlutterBluePlus.adapterState.first;
+      return adapterState == BluetoothAdapterState.on;
+    } catch (e) {
+      log('❌ Error checking Bluetooth state: $e');
+      return false;
+    }
+  }
+
   /// Open app settings for user to manually grant permissions
   Future<void> openSettings() async {
     await openAppSettings();
   }
 
   /// Start scanning for Bluetooth weight scales
-  Future<void> startScan() async {
+  /// Returns error type if scan fails, null if successful
+  Future<BluetoothErrorType?> startScan() async {
     try {
       if (_isScanning) {
         log('⚠️ Already scanning');
-        return;
+        return null;
+      }
+
+      // Check if Bluetooth is supported
+      if (await FlutterBluePlus.isSupported == false) {
+        log('❌ Bluetooth not supported');
+        return BluetoothErrorType.notSupported;
       }
 
       // Check permissions first
-      final hasPermissions = await checkBluetoothPermissions();
-      if (!hasPermissions) {
-        throw Exception('Bluetooth permissions not granted');
+      final permissionResult = await checkBluetoothPermissions();
+      if (!permissionResult.granted) {
+        return permissionResult.errorType;
       }
 
       // Check if Bluetooth is turned on
-      final adapterState = await FlutterBluePlus.adapterState.first;
-      if (adapterState != BluetoothAdapterState.on) {
+      final isOn = await isBluetoothOn();
+      if (!isOn) {
         log('⚠️ Bluetooth is turned off');
-        throw Exception('Please turn on Bluetooth');
+        return BluetoothErrorType.bluetoothOff;
       }
 
       _isScanning = true;
@@ -165,10 +218,11 @@ class BluetoothWeightService {
       await Future.delayed(const Duration(seconds: 10));
       await stopScan();
 
+      return null; // Success
     } catch (e) {
       log('❌ Error during Bluetooth scan: $e');
       _isScanning = false;
-      rethrow;
+      return BluetoothErrorType.unknown;
     }
   }
 
@@ -275,9 +329,16 @@ class BluetoothWeightService {
     try {
       // Try parsing as ASCII string first (common for many scales)
       final asciiString = String.fromCharCodes(data).trim();
-      final weight = double.tryParse(asciiString);
-      if (weight != null && weight > 0) {
-        return weight;
+      if (asciiString.isNotEmpty) {
+        final parsedFromAscii = _parseAsciiPayload(asciiString);
+        if (parsedFromAscii != null) {
+          return parsedFromAscii;
+        }
+
+        final directWeight = double.tryParse(asciiString);
+        if (directWeight != null && directWeight >= 0) {
+          return directWeight;
+        }
       }
 
       // Try binary parsing (4-byte float, little-endian)
@@ -285,7 +346,7 @@ class BluetoothWeightService {
         final bytes = Uint8List.fromList(data.sublist(0, 4));
         final buffer = ByteData.sublistView(bytes);
         final weight = buffer.getFloat32(0, Endian.little);
-        if (weight > 0 && weight < 10000) { // Sanity check (0-10000 kg)
+        if (weight >= 0 && weight < 10000) { // Sanity check (0-10000 kg)
           return weight;
         }
       }
@@ -295,7 +356,7 @@ class BluetoothWeightService {
         final bytes = Uint8List.fromList(data.sublist(0, 2));
         final buffer = ByteData.sublistView(bytes);
         final weight = buffer.getUint16(0, Endian.little) / 100.0; // Divide by 100 if in grams
-        if (weight > 0 && weight < 10000) {
+        if (weight >= 0 && weight < 10000) {
           return weight;
         }
       }
@@ -305,6 +366,55 @@ class BluetoothWeightService {
     } catch (e) {
       log('❌ Error parsing weight data: $e');
       return null;
+    }
+  }
+
+  double? _parseAsciiPayload(String payload) {
+    if (payload.isEmpty) return null;
+
+    final normalized = payload.replaceAll('\r', '').replaceAll('\n', '').trim();
+    if (normalized.isEmpty) return null;
+
+    // Pattern: ST,GS,123.45kg (optionally with trailing TW/BCC codes)
+    final fullPattern = RegExp(r'ST,GS,([+-]?\d{1,7}\.\d+)([a-zA-Z]+)(\d{3})(.)');
+    final shortPattern = RegExp(r'ST,GS,([+-]?\d{1,7}\.\d+)([a-zA-Z]+)');
+    final simplePattern = RegExp(r'([+-]?\d+(?:\.\d+)?)[\s]*([a-zA-Z]+)');
+
+    RegExpMatch? match = fullPattern.firstMatch(normalized);
+    if (match == null) {
+      match = shortPattern.firstMatch(normalized);
+    }
+    match ??= simplePattern.firstMatch(normalized);
+
+    if (match != null) {
+      final weightStr = match.group(1);
+      final unit = match.groupCount >= 2 ? match.group(2) : null;
+
+      if (weightStr != null) {
+        final value = double.tryParse(weightStr);
+        if (value != null) {
+          return _convertWeightByUnit(value, unit);
+        }
+      }
+    }
+
+    final numericOnly = double.tryParse(normalized);
+    return numericOnly;
+  }
+
+  double? _convertWeightByUnit(double value, String? unit) {
+    if (unit == null || unit.isEmpty) return value;
+    switch (unit.toLowerCase()) {
+      case 'kg':
+        return value;
+      case 'g':
+        return value / 1000.0;
+      case 'oz':
+        return value * 0.0283495;
+      case 'lb':
+        return value * 0.453592;
+      default:
+        return value;
     }
   }
 

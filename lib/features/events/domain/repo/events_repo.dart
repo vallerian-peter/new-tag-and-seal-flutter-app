@@ -4,12 +4,6 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/calving_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
 /// Contract for all event (logs) repository operations.
@@ -55,83 +49,23 @@ abstract class EventsRepositoryInterface {
   /// Update a disposal event locally (unsynced, marked for update).
   Future<DisposalModel> updateDisposalLocally(DisposalModel model);
 
-  Future<MilkingModel> createMilking(MilkingModel model);
-  Future<MilkingModel> updateMilkingLocally(MilkingModel model);
-
-  Future<PregnancyModel> createPregnancy(PregnancyModel model);
-  Future<PregnancyModel> updatePregnancyLocally(PregnancyModel model);
-
-  Future<CalvingModel> createCalving(CalvingModel model);
-  Future<CalvingModel> updateCalvingLocally(CalvingModel model);
-
-  Future<DryoffModel> createDryoff(DryoffModel model);
-  Future<DryoffModel> updateDryoffLocally(DryoffModel model);
-
-  Future<InseminationModel> createInsemination(InseminationModel model);
-  Future<InseminationModel> updateInseminationLocally(InseminationModel model);
-  Future<TransferModel> createTransfer(TransferModel model);
-  Future<TransferModel> updateTransferLocally(TransferModel model);
-
   /// Retrieve feedings optionally filtered by farm/livestock.
-  Future<List<FeedingModel>> getFeedings({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<FeedingModel>> getFeedings({String? farmUuid, String? livestockUuid});
 
   /// Retrieve weight change logs optionally filtered by farm/livestock.
-  Future<List<WeightChangeModel>> getWeightChanges({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<WeightChangeModel>> getWeightChanges({String? farmUuid, String? livestockUuid});
 
   /// Retrieve deworming logs optionally filtered by farm/livestock.
-  Future<List<DewormingModel>> getDewormings({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<DewormingModel>> getDewormings({String? farmUuid, String? livestockUuid});
 
   /// Retrieve medication logs optionally filtered by farm/livestock.
-  Future<List<MedicationModel>> getMedications({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<MedicationModel>> getMedications({String? farmUuid, String? livestockUuid});
 
   /// Retrieve vaccination logs optionally filtered by farm/livestock.
-  Future<List<VaccinationModel>> getVaccinations({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<VaccinationModel>> getVaccinations({String? farmUuid, String? livestockUuid});
 
   /// Retrieve disposal logs optionally filtered by farm/livestock.
-  Future<List<DisposalModel>> getDisposals({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-
-  Future<List<MilkingModel>> getMilkings({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-  Future<List<PregnancyModel>> getPregnancies({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-  Future<List<CalvingModel>> getCalvings({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-  Future<List<DryoffModel>> getDryoffs({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-  Future<List<InseminationModel>> getInseminations({
-    String? farmUuid,
-    String? livestockUuid,
-  });
-  Future<List<TransferModel>> getTransfers({
-    String? farmUuid,
-    String? livestockUuid,
-  });
+  Future<List<DisposalModel>> getDisposals({String? farmUuid, String? livestockUuid});
 
   /// Retrieve all local feedings.
   Future<List<FeedingModel>> getAllFeedings();
@@ -144,18 +78,6 @@ abstract class EventsRepositoryInterface {
   Future<List<MedicationModel>> getAllMedications();
   Future<List<VaccinationModel>> getAllVaccinations();
   Future<List<DisposalModel>> getAllDisposals();
-  Future<List<MilkingModel>> getAllMilkings();
-  Future<List<PregnancyModel>> getAllPregnancies();
-  Future<List<CalvingModel>> getAllCalvings();
-  Future<List<DryoffModel>> getAllDryoffs();
-  Future<List<InseminationModel>> getAllInseminations();
-  Future<List<TransferModel>> getAllTransfers();
-  Future<Map<String, String>> getFarmNamesByUuid(
-      Iterable<String> farmUuids,
-  );
-  Future<Map<String, String>> getLivestockNamesByUuid(
-      Iterable<String> livestockUuids,
-  );
   Future<Map<String, int>> getLogCounts({
     String? farmUuid,
     String? livestockUuid,
@@ -180,13 +102,6 @@ abstract class EventsRepositoryInterface {
   /// Get unsynced disposal logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedDisposalsForApi();
 
-  Future<List<Map<String, dynamic>>> getUnsyncedMilkingsForApi();
-  Future<List<Map<String, dynamic>>> getUnsyncedPregnanciesForApi();
-  Future<List<Map<String, dynamic>>> getUnsyncedCalvingsForApi();
-  Future<List<Map<String, dynamic>>> getUnsyncedDryoffsForApi();
-  Future<List<Map<String, dynamic>>> getUnsyncedInseminationsForApi();
-  Future<List<Map<String, dynamic>>> getUnsyncedTransfersForApi();
-
   /// Mark feedings as synced or delete them if marked for deletion.
   Future<void> markFeedingsAsSynced(List<String> uuids);
 
@@ -204,13 +119,6 @@ abstract class EventsRepositoryInterface {
 
   /// Mark disposal logs as synced or delete them if marked for deletion.
   Future<void> markDisposalsAsSynced(List<String> uuids);
-
-  Future<void> markMilkingsAsSynced(List<String> uuids);
-  Future<void> markPregnanciesAsSynced(List<String> uuids);
-  Future<void> markCalvingsAsSynced(List<String> uuids);
-  Future<void> markDryoffsAsSynced(List<String> uuids);
-  Future<void> markInseminationsAsSynced(List<String> uuids);
-  Future<void> markTransfersAsSynced(List<String> uuids);
 
   /// Flag a feeding log for deletion during next sync.
   Future<bool> markFeedingAsDeleted(String uuid);
@@ -230,10 +138,8 @@ abstract class EventsRepositoryInterface {
   /// Flag a disposal log for deletion during next sync.
   Future<bool> markDisposalAsDeleted(String uuid);
 
-  Future<bool> markMilkingAsDeleted(String uuid);
-  Future<bool> markPregnancyAsDeleted(String uuid);
-  Future<bool> markCalvingAsDeleted(String uuid);
-  Future<bool> markDryoffAsDeleted(String uuid);
-  Future<bool> markInseminationAsDeleted(String uuid);
-  Future<bool> markTransferAsDeleted(String uuid);
+  /// Mark every log associated with a livestock UUID as deleted.
+  Future<void> markAllLogsForLivestockAsDeleted(String livestockUuid);
 }
+
+

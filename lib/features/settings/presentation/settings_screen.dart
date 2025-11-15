@@ -79,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'App Settings',
+                        l10n.settingsAppHeaderTitle,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -90,7 +90,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Customize your app experience',
+                    l10n.settingsAppHeaderSubtitle,
                     style: TextStyle(
                       fontSize: 14,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -105,21 +105,26 @@ class SettingsScreen extends StatelessWidget {
             // Theme Settings
             _buildSettingsSection(
               context: context,
-              title: 'Appearance',
+              title: l10n.settingsAppearanceTitle,
               children: [
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.moon_outline,
                   title: l10n.theme,
-                  subtitle: isDark ? 'Dark Mode' : 'Light Mode',
+                  subtitle: isDark ? l10n.settingsThemeDark : l10n.settingsThemeLight,
                   trailing: Consumer<ThemeProvider>(
                     builder: (context, themeProvider, child) {
                       return Switch(
                         value: themeProvider.isDarkMode,
+                        activeTrackColor: Constants.primaryColor,
+                        inactiveTrackColor: Colors.grey.shade300,
+                        inactiveThumbColor: Colors.grey.shade800,
+                        activeColor: Constants.primaryColor,
+                        trackOutlineColor: WidgetStateProperty.all(Colors.grey.shade700),
+                        trackOutlineWidth: WidgetStateProperty.all(1),
                         onChanged: (value) {
                           themeProvider.toggleTheme();
                         },
-                        activeColor: Constants.primaryColor,
                       );
                     },
                   ),
@@ -132,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
             // Language Settings
             _buildSettingsSection(
               context: context,
-              title: 'Language & Region',
+              title: l10n.settingsLanguageRegionTitle,
               children: [
                 _buildSettingOption(
                   context: context,
@@ -151,13 +156,13 @@ class SettingsScreen extends StatelessWidget {
             // Support & About
             _buildSettingsSection(
               context: context,
-              title: 'Support & About',
+              title: l10n.settingsSupportTitle,
               children: [
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.info_circle_outline,
                   title: l10n.about,
-                  subtitle: 'App version and information',
+                  subtitle: l10n.settingsAboutSubtitle,
                   onTap: () {
                     _showAboutDialog(context, l10n);
                   },
@@ -166,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
                   context: context,
                   icon: Iconsax.support_outline,
                   title: l10n.helpSupport,
-                  subtitle: 'Get help and support',
+                  subtitle: l10n.settingsHelpSubtitle,
                   onTap: () {
                     // Handle help and support
                   },
@@ -174,8 +179,8 @@ class SettingsScreen extends StatelessWidget {
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.document_text_outline,
-                  title: 'Privacy Policy',
-                  subtitle: 'Read our privacy policy',
+                  title: l10n.privacyPolicy,
+                  subtitle: l10n.privacyPolicySubtitle,
                   onTap: () {
                     // Handle privacy policy
                   },
@@ -183,8 +188,8 @@ class SettingsScreen extends StatelessWidget {
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.document_outline,
-                  title: 'Terms of Service',
-                  subtitle: 'Read our terms of service',
+                  title: l10n.termsOfService,
+                  subtitle: l10n.termsOfServiceSubtitle,
                   onTap: () {
                     // Handle terms of service
                   },
@@ -361,9 +366,9 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Text('Tag & Seal'),
               const SizedBox(height: 8),
-              Text('Version: 1.0.0'),
+              Text(l10n.settingsVersionLabel('1.0.0')),
               const SizedBox(height: 8),
-              Text('A comprehensive livestock management application.'),
+              Text(l10n.settingsAppDescription),
             ],
           ),
           actions: [
@@ -593,7 +598,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               _LocaleOptionTile(
                 flag: '🇺🇸',
-                label: 'English',
+                label: l10n.settingsLanguageEnglish,
                 selected: AppLocalizations.of(context)!.localeName == 'en',
                 onTap: () {
                   Navigator.of(context).pop();
@@ -603,7 +608,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _LocaleOptionTile(
                 flag: '🇹🇿',
-                label: 'Kiswahili',
+                label: l10n.settingsLanguageSwahili,
                 selected: AppLocalizations.of(context)!.localeName == 'sw',
                 onTap: () {
                   Navigator.of(context).pop();

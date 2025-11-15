@@ -60,9 +60,9 @@ class DewormingMapper {
     };
   }
 
-  static List<DewormingModel> fromEntities(
-    List<Map<String, dynamic>> entities,
-  ) {
+  static List<DewormingModel> fromEntities(List<Map<String, dynamic>> entities) {
     return entities.map(fromEntity).toList();
   }
 }
+
+

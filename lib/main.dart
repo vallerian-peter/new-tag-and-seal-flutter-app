@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/alarm/app_alarm_manager.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/provider/sync-provider.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/data/repository/all.additional.data_repository.dart';
@@ -13,14 +14,16 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
-import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/provider/vaccine_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/data/repository/notification_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/boarding/presentation/splash_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +36,7 @@ void main() async {
   final livestockRepo = LivestockRepository(database);
   final logAdditionalDataRepo = LogAdditionalDataRepository(database);
   final eventsRepo = EventsRepository(database);
-  final vaccinesRepo = VaccinesRepository(database);
+  final notificationRepo = NotificationRepository(database);
   
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
@@ -47,8 +50,17 @@ void main() async {
   final logAdditionalDataProvider =
       LogAdditionalDataProvider(repository: logAdditionalDataRepo);
   final eventsProvider = EventsProvider(eventsRepository: eventsRepo);
-  final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
-  
+  final alarmManager = AppAlarmManager(
+    navigatorKey: appNavigatorKey,
+    repository: notificationRepo,
+  );
+  await alarmManager.initialize();
+  final notificationProvider = NotificationProvider(
+    repository: notificationRepo,
+    alarmManager: alarmManager,
+  );
+  await notificationProvider.loadNotifications();
+
   runApp(
     MultiProvider(
       providers: [
@@ -61,7 +73,8 @@ void main() async {
         ChangeNotifierProvider.value(value: livestockProvider),
         ChangeNotifierProvider.value(value: logAdditionalDataProvider),
         ChangeNotifierProvider.value(value: eventsProvider),
-        ChangeNotifierProvider.value(value: vaccineProvider),
+        Provider<AppAlarmManager>.value(value: alarmManager),
+        ChangeNotifierProvider.value(value: notificationProvider),
       ],
       child: const MyApp(),
     ),
@@ -120,6 +133,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Tag & Seal',
       debugShowCheckedModeBanner: false,
+      navigatorKey: appNavigatorKey,
       
       // Theme (persisted with SharedPreferences)
       theme: themeProvider.themeData,

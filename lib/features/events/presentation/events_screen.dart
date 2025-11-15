@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/view_events.dart';
@@ -13,13 +15,46 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+  SyncUnsyncedSummary _unsyncedSummary = const SyncUnsyncedSummary.empty();
+  bool _isUnsyncedLoading = false;
+  String? _unsyncedError;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<EventsProvider>().loadAllEvents();
+      _refreshData();
     });
+  }
+
+  Future<void> _refreshData() async {
+    final provider = context.read<EventsProvider>();
+    provider.loadAllEvents();
+    await _loadUnsyncedSummary();
+  }
+
+  Future<void> _loadUnsyncedSummary() async {
+    setState(() {
+      _isUnsyncedLoading = true;
+      _unsyncedError = null;
+    });
+
+    try {
+      final database = context.read<AppDatabase>();
+      final summary = await Sync.getUnsyncedSummary(database);
+      if (!mounted) return;
+      setState(() {
+        _unsyncedSummary = summary;
+        _isUnsyncedLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isUnsyncedLoading = false;
+        _unsyncedError = e.toString();
+      });
+    }
   }
 
   @override
@@ -60,7 +95,7 @@ class _EventsScreenState extends State<EventsScreen> {
         actions: [
           IconButton(
             tooltip: l10n.refresh,
-            onPressed: () => eventsProvider.loadAllEvents(),
+            onPressed: _refreshData,
             icon: Icon(Icons.refresh, color: theme.colorScheme.onSurface),
           ),
         ],
@@ -102,6 +137,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         title: config.title,
                         logType: config.logType,
                         eventsProvider: eventsProvider,
+                        initialLogs: logs,
                       ),
                     ),
                   );
@@ -143,10 +179,14 @@ class _EventsScreenState extends State<EventsScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: _SummaryCard(
-            icon: Icons.sync_outlined,
+            icon: Icons.sync_problem_outlined,
             color: Colors.indigo,
-            title: l10n.readyOffline,
-            value: l10n.yes,
+            title: l10n.unsyncedData,
+            value: _isUnsyncedLoading
+                ? '...'
+                : _unsyncedError != null
+                    ? '--'
+                    : _unsyncedSummary.totalPending.toString(),
           ),
         ),
       ],
@@ -162,10 +202,16 @@ class _EventsScreenState extends State<EventsScreen> {
         icon: Icons.restaurant_outlined,
       ),
       _EventTypeConfig(
-        logType: EventLogTypes.milking,
-        title: l10n.milking,
-        color: Colors.blueAccent,
-        icon: Icons.water_drop_outlined,
+        logType: EventLogTypes.insemination,
+        title: l10n.insemination,
+        color: Colors.pinkAccent,
+        icon: Icons.favorite_outline,
+      ),
+      _EventTypeConfig(
+        logType: EventLogTypes.pregnancy,
+        title: l10n.pregnancy,
+        color: Colors.deepPurple,
+        icon: Icons.pregnant_woman,
       ),
       _EventTypeConfig(
         logType: EventLogTypes.deworming,
@@ -198,28 +244,22 @@ class _EventsScreenState extends State<EventsScreen> {
         icon: Icons.monitor_weight_outlined,
       ),
       _EventTypeConfig(
-        logType: EventLogTypes.pregnancy,
-        title: l10n.pregnancy,
-        color: Colors.pinkAccent,
-        icon: Icons.pregnant_woman,
+        logType: EventLogTypes.milking,
+        title: l10n.milking,
+        color: Colors.lightBlueAccent,
+        icon: Icons.water_drop_outlined,
       ),
       _EventTypeConfig(
         logType: EventLogTypes.calving,
         title: l10n.calving,
-        color: Colors.redAccent,
-        icon: Icons.child_friendly_outlined,
+        color: Colors.brown,
+        icon: Icons.child_friendly,
       ),
       _EventTypeConfig(
         logType: EventLogTypes.dryoff,
         title: l10n.dryoff,
-        color: Colors.deepPurple,
-        icon: Icons.hourglass_bottom,
-      ),
-      _EventTypeConfig(
-        logType: EventLogTypes.insemination,
-        title: l10n.insemination,
-        color: Colors.teal,
-        icon: Icons.favorite_outline,
+        color: Colors.blueGrey,
+        icon: Icons.opacity_outlined,
       ),
     ];
   }
@@ -228,8 +268,6 @@ class _EventsScreenState extends State<EventsScreen> {
     switch (logType) {
       case EventLogTypes.feeding:
         return provider.allFeedings;
-      case EventLogTypes.milking:
-        return provider.allMilkings;
       case EventLogTypes.deworming:
         return provider.allDewormings;
       case EventLogTypes.medication:
@@ -238,16 +276,17 @@ class _EventsScreenState extends State<EventsScreen> {
         return provider.allVaccinations;
       case EventLogTypes.disposal:
         return provider.allDisposals;
+      case EventLogTypes.insemination:
+      case EventLogTypes.pregnancy:
+      case EventLogTypes.milking:
+      case EventLogTypes.calving:
+      case EventLogTypes.dryoff:
+        // These event types are part of the product roadmap but their
+        // repositories are not yet implemented. Return empty lists so the UI
+        // can still display the cards while data support is added.
+        return const [];
       case EventLogTypes.weightChange:
         return provider.allWeightChanges;
-      case EventLogTypes.pregnancy:
-        return provider.allPregnancies;
-      case EventLogTypes.calving:
-        return provider.allCalvings;
-      case EventLogTypes.dryoff:
-        return provider.allDryoffs;
-      case EventLogTypes.insemination:
-        return provider.allInseminations;
       default:
         return const [];
     }

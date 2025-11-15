@@ -14,6 +14,8 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_selector_page.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -26,12 +28,16 @@ class WeightChangeFormScreen extends StatefulWidget {
   final WeightChangeModel? weightChange;
   final String? farmUuid;
   final String? livestockUuid;
+  final bool isBulk;
+  final List<String>? bulkLivestockUuids;
 
   const WeightChangeFormScreen({
     super.key,
     this.weightChange,
     this.farmUuid,
     this.livestockUuid,
+    this.isBulk = false,
+    this.bulkLivestockUuids,
   });
 
   bool get isEditMode => weightChange != null;
@@ -59,12 +65,14 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
   List<Farm> _farms = const [];
   List<Livestock> _farmLivestock = const [];
+  List<Livestock> _selectedBulkLivestock = const [];
   bool _isLoadingLivestock = false;
 
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
   String _selectedOldWeightUnit = 'kg';
   String _selectedNewWeightUnit = 'kg';
+  bool get _isBulk => widget.isBulk;
 
   @override
   void initState() {
@@ -80,12 +88,11 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
   void _prefillIfEditing() {
     final weightChange = widget.weightChange;
     _selectedFarmUuid = widget.farmUuid;
-    _selectedLivestockUuid = widget.livestockUuid;
+    _selectedLivestockUuid = _isBulk ? null : widget.livestockUuid;
 
     if (weightChange == null) return;
 
-    if (weightChange.oldWeight != null &&
-        weightChange.oldWeight!.trim().isNotEmpty) {
+    if (weightChange.oldWeight != null && weightChange.oldWeight!.trim().isNotEmpty) {
       final parsedOld = _parseWeight(weightChange.oldWeight!.trim());
       _oldWeightController.text = parsedOld.$1;
       _selectedOldWeightUnit = parsedOld.$2;
@@ -98,6 +105,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     }
 
     _remarksController.text = weightChange.remarks ?? '';
+
   }
 
   Future<void> _initializeContext() async {
@@ -116,9 +124,8 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
       List<Livestock> livestock = [];
       if (farmUuid != null && farmUuid.isNotEmpty) {
-        livestock = await database.livestockDao.getActiveLivestockByFarmUuid(
-          farmUuid,
-        );
+        livestock =
+            await database.livestockDao.getActiveLivestockByFarmUuid(farmUuid);
       }
 
       String? livestockUuid = _selectedLivestockUuid;
@@ -135,7 +142,17 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         _farms = farms;
         _farmLivestock = livestock;
         _selectedFarmUuid = farmUuid;
-        _selectedLivestockUuid = livestockUuid;
+        if (_isBulk) {
+          final initialSelectionUuids = widget.bulkLivestockUuids ??
+              _selectedBulkLivestock.map((item) => item.uuid).toList();
+          _selectedBulkLivestock = livestock
+              .where((item) => initialSelectionUuids.contains(item.uuid))
+              .toList();
+          _selectedLivestockUuid = null;
+        } else {
+          _selectedLivestockUuid = livestockUuid;
+          _selectedBulkLivestock = const [];
+        }
       });
     } catch (e) {
       debugPrint('❌ Failed to load context data: $e');
@@ -157,14 +174,25 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await database.livestockDao
-          .getActiveLivestockByFarmUuid(value);
+      final livestock =
+          await database.livestockDao.getActiveLivestockByFarmUuid(value);
 
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (_selectedLivestockUuid == null && livestock.isNotEmpty) {
-          _selectedLivestockUuid = livestock.first.uuid;
+        if (_isBulk) {
+          final validUuids = livestock.map((item) => item.uuid).toSet();
+          _selectedBulkLivestock = _selectedBulkLivestock
+              .where((item) => validUuids.contains(item.uuid))
+              .toList();
+        } else {
+          if (_selectedLivestockUuid == null && livestock.isNotEmpty) {
+            _selectedLivestockUuid = livestock.first.uuid;
+          } else if (_selectedLivestockUuid != null &&
+              livestock.every((item) => item.uuid != _selectedLivestockUuid)) {
+            _selectedLivestockUuid =
+                livestock.isNotEmpty ? livestock.first.uuid : null;
+          }
         }
       });
     } catch (e) {
@@ -181,6 +209,30 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     setState(() {
       _selectedLivestockUuid = value;
     });
+  }
+
+  Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
+    final farmUuid = _selectedFarmUuid;
+    if (farmUuid == null || farmUuid.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      return;
+    }
+
+    final selection = await Navigator.of(context).push<List<Livestock>>(
+      MaterialPageRoute(
+        builder: (_) => BulkLivestockSelectorPage(
+          farmUuid: farmUuid,
+          preselectedLivestock: _selectedBulkLivestock,
+        ),
+      ),
+    );
+
+    if (selection != null) {
+      setState(() {
+        _selectedBulkLivestock = selection;
+      });
+    }
   }
 
   (String, String) _parseWeight(String weight) {
@@ -243,39 +295,33 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
       body: _isLoadingContext
           ? const Center(child: LoadingIndicator())
           : SafeArea(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: CustomStepper(
-                          key: _stepperKey,
-                          currentStep: _currentStep,
-                          onStepContinue: _onStepContinue,
-                          onStepCancel: _onStepCancel,
-                          continueButtonText: null,
-                          backButtonText: l10n.back,
-                          finalStepButtonText: submitText,
-                          steps: [
-                            StepperStep(
-                              title: l10n.basicInformation,
-                              subtitle: l10n.recordsAndLogs,
-                              icon: Icons.monitor_weight_outlined,
-                              content: _buildStepOne(l10n, theme),
-                            ),
-                            StepperStep(
-                              title: l10n.additionalDetails,
-                              subtitle: l10n.additionalNotes,
-                              icon: Icons.note_alt_outlined,
-                              content: _buildStepTwo(l10n, theme),
-                            ),
-                          ],
-                        ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Form(
+                  key: _formKey,
+                  child: CustomStepper(
+                    key: _stepperKey,
+                    currentStep: _currentStep,
+                    onStepContinue: _onStepContinue,
+                    onStepCancel: _onStepCancel,
+                    continueButtonText: null,
+                    backButtonText: l10n.back,
+                    finalStepButtonText: submitText,
+                    steps: [
+                      StepperStep(
+                        title: l10n.basicInformation,
+                        subtitle: l10n.recordsAndLogs,
+                        icon: Icons.monitor_weight_outlined,
+                        content: _buildStepOne(l10n, theme),
                       ),
-                    ),
-                  ],
+                      StepperStep(
+                        title: l10n.additionalDetails,
+                        subtitle: l10n.additionalNotes,
+                        icon: Icons.note_alt_outlined,
+                        content: _buildStepTwo(l10n, theme),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -284,15 +330,18 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
   Widget _buildStepOne(AppLocalizations l10n, ThemeData theme) {
     final farmItems = _farms
-        .map((farm) => DropdownItem<String>(value: farm.uuid, label: farm.name))
+        .map(
+          (farm) => DropdownItem<String>(
+            value: farm.uuid,
+            label: farm.name,
+          ),
+        )
         .toList();
     final livestockItems = _farmLivestock
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: item.name.isNotEmpty ? item.name : '${l10n.livestock} #${item.id}',
           ),
         )
         .toList();
@@ -344,6 +393,26 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
               theme: theme,
               color: theme.colorScheme.primary,
             )
+          else if (_isBulk)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BulkLivestockSummaryTile(
+                  count: _selectedBulkLivestock.length,
+                  onTap: () => _openBulkLivestockSelector(l10n),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => _openBulkLivestockSelector(l10n),
+                  icon: const Icon(Icons.playlist_add_check),
+                  label: Text(
+                    _selectedBulkLivestock.isEmpty
+                        ? l10n.selectLivestock
+                        : l10n.edit,
+                  ),
+                ),
+              ],
+            )
           else
             CustomDropdown<String>(
               label: l10n.selectLivestock,
@@ -371,10 +440,8 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
           label: l10n.previousWeight,
           hintText: l10n.previousWeight,
           prefixIcon: Icons.history,
-          keyboardType: const TextInputType.numberWithOptions(
-            decimal: true,
-            signed: false,
-          ),
+          keyboardType:
+              const TextInputType.numberWithOptions(decimal: true, signed: false),
         ),
         const SizedBox(height: 12),
         CustomDropdown<String>(
@@ -465,7 +532,10 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
       ),
       child: Text(
         message,
-        style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
+        style: TextStyle(
+          color: theme.colorScheme.onSurface,
+          fontSize: 14,
+        ),
       ),
     );
   }
@@ -480,11 +550,17 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
       decoration: BoxDecoration(
         color: Constants.primaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
+        border: Border.all(
+          color: Constants.primaryColor.withOpacity(0.3),
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Constants.primaryColor, size: 24),
+          Icon(
+            icon,
+            color: Constants.primaryColor,
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -537,32 +613,50 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
 
     final selectedFarmUuid = widget.farmUuid ?? _selectedFarmUuid;
-    final selectedLivestockUuid =
-        widget.livestockUuid ?? _selectedLivestockUuid;
+    final selectedLivestockUuid = widget.livestockUuid ?? _selectedLivestockUuid;
 
-    if (selectedFarmUuid == null ||
-        selectedFarmUuid.isEmpty ||
-        selectedLivestockUuid == null ||
-        selectedLivestockUuid.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
+    if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.logContextMissing)),
+      );
+      return;
+    }
+
+    if (!_isBulk &&
+        (selectedLivestockUuid == null || selectedLivestockUuid.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.logContextMissing)),
+      );
+      return;
+    }
+
+    final bulkLivestockUuids =
+        _selectedBulkLivestock.map((item) => item.uuid).toList();
+    if (_isBulk && bulkLivestockUuids.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return;
     }
 
     try {
       final oldWeightValue = _oldWeightController.text.trim();
-      final formattedOldWeight = oldWeightValue.isEmpty
-          ? null
-          : '$oldWeightValue$_selectedOldWeightUnit';
+      final formattedOldWeight =
+          oldWeightValue.isEmpty ? null : '$oldWeightValue$_selectedOldWeightUnit';
       final newWeightValue = _newWeightController.text.trim();
       final formattedNewWeight = '$newWeightValue$_selectedNewWeightUnit';
+
+      if (widget.isEditMode && _isBulk) {
+        log('⚠️ Bulk editing not supported for weight changes.');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
+        return;
+      }
 
       if (widget.isEditMode) {
         final existing = widget.weightChange!;
         final updated = existing.copyWith(
           farmUuid: selectedFarmUuid,
-          livestockUuid: selectedLivestockUuid,
+          livestockUuid: selectedLivestockUuid!,
           oldWeight: formattedOldWeight,
           newWeight: formattedNewWeight,
           remarks: _remarksController.text.trim().isEmpty
@@ -578,6 +672,20 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         if (saved != null && mounted) {
           Navigator.pop(context, saved);
         }
+      } else if (_isBulk) {
+        await eventsProvider.addWeightChangeBatchWithDialog(
+          context: context,
+          farmUuid: selectedFarmUuid,
+          livestockUuids: bulkLivestockUuids,
+          oldWeight: formattedOldWeight,
+          newWeight: formattedNewWeight,
+          remarks: _remarksController.text.trim().isEmpty
+              ? null
+              : _remarksController.text.trim(),
+        );
+        if (mounted) {
+          Navigator.pop(context, true);
+        }
       } else {
         final now = DateTime.now().toIso8601String();
         final uuid =
@@ -586,7 +694,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         final model = WeightChangeModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
-          livestockUuid: selectedLivestockUuid,
+          livestockUuid: selectedLivestockUuid!,
           oldWeight: formattedOldWeight,
           newWeight: formattedNewWeight,
           remarks: _remarksController.text.trim().isEmpty
@@ -619,3 +727,4 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     }
   }
 }
+

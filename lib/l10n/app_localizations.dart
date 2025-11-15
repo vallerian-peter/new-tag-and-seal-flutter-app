@@ -482,30 +482,6 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logout;
 
-  /// No description provided for @unsyncedDataWarning.
-  ///
-  /// In en, this message translates to:
-  /// **'You have unsynced changes. What would you like to do?'**
-  String get unsyncedDataWarning;
-
-  /// No description provided for @noUnsyncedDataMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'All data is synced. You can safely logout.'**
-  String get noUnsyncedDataMessage;
-
-  /// No description provided for @syncAndLogout.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync & logout'**
-  String get syncAndLogout;
-
-  /// No description provided for @syncingBeforeLogout.
-  ///
-  /// In en, this message translates to:
-  /// **'Syncing your data before logging out...'**
-  String get syncingBeforeLogout;
-
   /// No description provided for @username.
   ///
   /// In en, this message translates to:
@@ -548,41 +524,257 @@ abstract class AppLocalizations {
   /// **'Already have an account?'**
   String get alreadyHaveAccount;
 
-  /// No description provided for @transfer.
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer'**
-  String get transfer;
-
-  /// No description provided for @notProvided.
-  ///
-  /// In en, this message translates to:
-  /// **'Not Provoded'**
-  String get notProvided;
-
-  /// No description provided for @role.
-  ///
-  /// In en, this message translates to:
-  /// **'Role'**
-  String get role;
-
   /// No description provided for @recordsText.
   ///
   /// In en, this message translates to:
   /// **'Records'**
   String get recordsText;
 
-  /// No description provided for @logsText.
+  /// No description provided for @allEvents.
   ///
   /// In en, this message translates to:
-  /// **'Logs'**
-  String get logsText;
+  /// **'All Events'**
+  String get allEvents;
+
+  /// No description provided for @eventsScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review every farm activity log'**
+  String get eventsScreenSubtitle;
+
+  /// No description provided for @totalLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Logs'**
+  String get totalLogs;
+
+  /// No description provided for @eventTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Types'**
+  String get eventTypes;
+
+  /// No description provided for @readyOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready Offline'**
+  String get readyOffline;
+
+  /// No description provided for @unsyncedData.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsynced Data'**
+  String get unsyncedData;
+
+  /// No description provided for @settingsAppHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get settingsAppHeaderTitle;
+
+  /// No description provided for @settingsAppHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your app experience'**
+  String get settingsAppHeaderSubtitle;
+
+  /// No description provided for @settingsAppearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearanceTitle;
+
+  /// No description provided for @settingsLanguageRegionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language & Region'**
+  String get settingsLanguageRegionTitle;
+
+  /// No description provided for @settingsSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support & About'**
+  String get settingsSupportTitle;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Mode'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsAboutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App version and information'**
+  String get settingsAboutSubtitle;
+
+  /// No description provided for @settingsHelpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help and support'**
+  String get settingsHelpSubtitle;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our privacy policy'**
+  String get privacyPolicySubtitle;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @termsOfServiceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our terms of service'**
+  String get termsOfServiceSubtitle;
+
+  /// No description provided for @settingsVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version: {version}'**
+  String settingsVersionLabel(String version);
+
+  /// No description provided for @settingsAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A comprehensive livestock management application.'**
+  String get settingsAppDescription;
+
+  /// No description provided for @settingsLanguageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// No description provided for @settingsLanguageSwahili.
+  ///
+  /// In en, this message translates to:
+  /// **'Kiswahili'**
+  String get settingsLanguageSwahili;
+
+  /// No description provided for @bluetoothWeightScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth Weight Scale'**
+  String get bluetoothWeightScale;
+
+  /// No description provided for @connectToMeasureWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to measure weight'**
+  String get connectToMeasureWeight;
+
+  /// No description provided for @connectedToDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected to {deviceName}'**
+  String connectedToDevice(String deviceName);
+
+  /// No description provided for @unknownDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown device'**
+  String get unknownDevice;
+
+  /// No description provided for @scanningForDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning for devices...'**
+  String get scanningForDevices;
+
+  /// No description provided for @makeBluetoothEnabledAndScaleOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure Bluetooth is enabled and the scale is on'**
+  String get makeBluetoothEnabledAndScaleOn;
+
+  /// No description provided for @noDevicesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices found'**
+  String get noDevicesFound;
+
+  /// No description provided for @scanAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Again'**
+  String get scanAgain;
+
+  /// No description provided for @scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
+  /// No description provided for @availableDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Devices ({count})'**
+  String availableDevices(int count);
+
+  /// No description provided for @connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get connected;
+
+  /// No description provided for @waitingForWeightData.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for weight data...'**
+  String get waitingForWeightData;
+
+  /// No description provided for @placeOnScaleInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Place livestock on the scale and wait for a stable reading'**
+  String get placeOnScaleInstruction;
+
+  /// No description provided for @saveWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Weight'**
+  String get saveWeight;
+
+  /// No description provided for @dashboardSyncPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the sync button to pull the latest farms, livestock, and logs before you start working.'**
+  String get dashboardSyncPrompt;
 
   /// No description provided for @bulk.
   ///
   /// In en, this message translates to:
   /// **'Bulk'**
   String get bulk;
+
+  /// No description provided for @bulkActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk Actions'**
+  String get bulkActions;
+
+  /// No description provided for @logsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get logsText;
 
   /// No description provided for @onboarding1Title.
   ///
@@ -620,6 +812,12 @@ abstract class AppLocalizations {
   /// **'Keep detailed health records, vaccinations, and breeding information for better livestock care'**
   String get onboarding3Subtitle;
 
+  /// No description provided for @livestockName.
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock Name'**
+  String get livestockName;
+
   /// No description provided for @farm.
   ///
   /// In en, this message translates to:
@@ -655,18 +853,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Farm Name'**
   String get farmName;
-
-  /// Label for displaying the farm unique identifier
-  ///
-  /// In en, this message translates to:
-  /// **'Farm UUID'**
-  String get farmUuidLabel;
-
-  /// Snack bar message shown when a value is copied
-  ///
-  /// In en, this message translates to:
-  /// **'Copied to clipboard'**
-  String get copiedToClipboard;
 
   /// No description provided for @farmSize.
   ///
@@ -757,114 +943,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get notifications;
-
-  /// No description provided for @upcomingToday.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming today'**
-  String get upcomingToday;
-
-  /// No description provided for @upcomingNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming notifications'**
-  String get upcomingNotifications;
-
-  /// No description provided for @allNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'All notifications'**
-  String get allNotifications;
-
-  /// No description provided for @notificationChipToday.
-  ///
-  /// In en, this message translates to:
-  /// **'Today'**
-  String get notificationChipToday;
-
-  /// No description provided for @notificationChipUpcoming.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming'**
-  String get notificationChipUpcoming;
-
-  /// No description provided for @addNotification.
-  ///
-  /// In en, this message translates to:
-  /// **'Add notification'**
-  String get addNotification;
-
-  /// No description provided for @notificationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Title'**
-  String get notificationTitle;
-
-  /// No description provided for @enterNotificationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter title'**
-  String get enterNotificationTitle;
-
-  /// No description provided for @notificationDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Description'**
-  String get notificationDescription;
-
-  /// No description provided for @enterNotificationDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter description (optional)'**
-  String get enterNotificationDescription;
-
-  /// No description provided for @scheduleDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Select date'**
-  String get scheduleDate;
-
-  /// No description provided for @scheduleTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Select time'**
-  String get scheduleTime;
-
-  /// No description provided for @saveNotification.
-  ///
-  /// In en, this message translates to:
-  /// **'Save notification'**
-  String get saveNotification;
-
-  /// No description provided for @noNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'No notifications yet.'**
-  String get noNotifications;
-
-  /// No description provided for @optionalFieldHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Optional'**
-  String get optionalFieldHint;
-
-  /// No description provided for @markCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Mark completed'**
-  String get markCompleted;
-
-  /// No description provided for @deleteNotification.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete notification'**
-  String get deleteNotification;
-
-  /// No description provided for @notificationScheduledOn.
-  ///
-  /// In en, this message translates to:
-  /// **'Scheduled on {date}'**
-  String notificationScheduledOn(String date);
 
   /// No description provided for @about.
   ///
@@ -2156,36 +2234,6 @@ abstract class AppLocalizations {
   /// **'All Events Screen'**
   String get allEventsScreen;
 
-  /// No description provided for @allEvents.
-  ///
-  /// In en, this message translates to:
-  /// **'All events'**
-  String get allEvents;
-
-  /// No description provided for @eventsScreenSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Review every log recorded across your farms.'**
-  String get eventsScreenSubtitle;
-
-  /// No description provided for @totalLogs.
-  ///
-  /// In en, this message translates to:
-  /// **'Total logs'**
-  String get totalLogs;
-
-  /// No description provided for @eventTypes.
-  ///
-  /// In en, this message translates to:
-  /// **'Event types'**
-  String get eventTypes;
-
-  /// No description provided for @readyOffline.
-  ///
-  /// In en, this message translates to:
-  /// **'Ready offline'**
-  String get readyOffline;
-
   /// No description provided for @userProfileScreen.
   ///
   /// In en, this message translates to:
@@ -2834,198 +2882,6 @@ abstract class AppLocalizations {
   /// **'Quantity'**
   String get quantity;
 
-  /// No description provided for @milkingMethod.
-  ///
-  /// In en, this message translates to:
-  /// **'Milking Method'**
-  String get milkingMethod;
-
-  /// No description provided for @lactometerReading.
-  ///
-  /// In en, this message translates to:
-  /// **'Lactometer Reading'**
-  String get lactometerReading;
-
-  /// No description provided for @solids.
-  ///
-  /// In en, this message translates to:
-  /// **'Solids'**
-  String get solids;
-
-  /// No description provided for @solidNonFat.
-  ///
-  /// In en, this message translates to:
-  /// **'Solid Non-Fat'**
-  String get solidNonFat;
-
-  /// No description provided for @protein.
-  ///
-  /// In en, this message translates to:
-  /// **'Protein'**
-  String get protein;
-
-  /// No description provided for @correctedLactometerReading.
-  ///
-  /// In en, this message translates to:
-  /// **'Corrected Lactometer Reading'**
-  String get correctedLactometerReading;
-
-  /// No description provided for @totalSolids.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Solids'**
-  String get totalSolids;
-
-  /// No description provided for @colonyFormingUnits.
-  ///
-  /// In en, this message translates to:
-  /// **'Colony Forming Units'**
-  String get colonyFormingUnits;
-
-  /// No description provided for @acidity.
-  ///
-  /// In en, this message translates to:
-  /// **'Acidity'**
-  String get acidity;
-
-  /// No description provided for @session.
-  ///
-  /// In en, this message translates to:
-  /// **'Session'**
-  String get session;
-
-  /// No description provided for @testResult.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Result'**
-  String get testResult;
-
-  /// No description provided for @numberOfMonths.
-  ///
-  /// In en, this message translates to:
-  /// **'Number of Months'**
-  String get numberOfMonths;
-
-  /// No description provided for @testDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Date'**
-  String get testDate;
-
-  /// No description provided for @startDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Start Date'**
-  String get startDate;
-
-  /// No description provided for @endDate.
-  ///
-  /// In en, this message translates to:
-  /// **'End Date'**
-  String get endDate;
-
-  /// No description provided for @calvingType.
-  ///
-  /// In en, this message translates to:
-  /// **'Calving Type'**
-  String get calvingType;
-
-  /// No description provided for @calvingProblem.
-  ///
-  /// In en, this message translates to:
-  /// **'Calving Problem'**
-  String get calvingProblem;
-
-  /// No description provided for @reproductiveProblem.
-  ///
-  /// In en, this message translates to:
-  /// **'Reproductive Problem'**
-  String get reproductiveProblem;
-
-  /// No description provided for @reason.
-  ///
-  /// In en, this message translates to:
-  /// **'Reason'**
-  String get reason;
-
-  /// No description provided for @heatType.
-  ///
-  /// In en, this message translates to:
-  /// **'Heat Type'**
-  String get heatType;
-
-  /// No description provided for @inseminationService.
-  ///
-  /// In en, this message translates to:
-  /// **'Insemination Service'**
-  String get inseminationService;
-
-  /// No description provided for @semenStrawType.
-  ///
-  /// In en, this message translates to:
-  /// **'Semen Straw Type'**
-  String get semenStrawType;
-
-  /// No description provided for @inseminationDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Insemination Date'**
-  String get inseminationDate;
-
-  /// No description provided for @bullCode.
-  ///
-  /// In en, this message translates to:
-  /// **'Bull Code'**
-  String get bullCode;
-
-  /// No description provided for @bullBreed.
-  ///
-  /// In en, this message translates to:
-  /// **'Bull Breed'**
-  String get bullBreed;
-
-  /// No description provided for @semenProductionDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Semen Production Date'**
-  String get semenProductionDate;
-
-  /// No description provided for @productionCountry.
-  ///
-  /// In en, this message translates to:
-  /// **'Production Country'**
-  String get productionCountry;
-
-  /// No description provided for @semenBatchNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Semen Batch Number'**
-  String get semenBatchNumber;
-
-  /// No description provided for @internationalId.
-  ///
-  /// In en, this message translates to:
-  /// **'International ID'**
-  String get internationalId;
-
-  /// No description provided for @aiCode.
-  ///
-  /// In en, this message translates to:
-  /// **'AI Code'**
-  String get aiCode;
-
-  /// No description provided for @manufacturerName.
-  ///
-  /// In en, this message translates to:
-  /// **'Manufacturer Name'**
-  String get manufacturerName;
-
-  /// No description provided for @semenSupplier.
-  ///
-  /// In en, this message translates to:
-  /// **'Semen Supplier'**
-  String get semenSupplier;
-
   /// No description provided for @createdAt.
   ///
   /// In en, this message translates to:
@@ -3272,11 +3128,11 @@ abstract class AppLocalizations {
   /// **'Weight Change'**
   String get weightChange;
 
-  /// No description provided for @disposal.
+  /// No description provided for @disposalTransfer.
   ///
   /// In en, this message translates to:
-  /// **'Disposal'**
-  String get disposal;
+  /// **'Disposal / Transfer'**
+  String get disposalTransfer;
 
   /// No description provided for @calving.
   ///
@@ -3368,53 +3224,191 @@ abstract class AppLocalizations {
   /// **'Failed to save deworming log. Please try again.'**
   String get dewormingLogSaveFailed;
 
-  /// No description provided for @confirmSaveDeworming.
+  /// No description provided for @medicationDetails.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to save this deworming log?'**
-  String get confirmSaveDeworming;
+  /// **'Medication details'**
+  String get medicationDetails;
 
-  /// No description provided for @confirmUpdateDeworming.
+  /// No description provided for @medicationDetailsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to update this deworming log?'**
-  String get confirmUpdateDeworming;
+  /// **'Capture dosage, disease, and scheduling information.'**
+  String get medicationDetailsSubtitle;
 
-  /// No description provided for @statusScheduled.
+  /// No description provided for @addMedication.
   ///
   /// In en, this message translates to:
-  /// **'Scheduled'**
-  String get statusScheduled;
+  /// **'Add medication log'**
+  String get addMedication;
 
-  /// No description provided for @statusCompleted.
+  /// No description provided for @medicationLogSaved.
   ///
   /// In en, this message translates to:
-  /// **'Completed'**
-  String get statusCompleted;
+  /// **'Medication log saved successfully'**
+  String get medicationLogSaved;
 
-  /// No description provided for @statusCancelled.
+  /// No description provided for @medicationLogSaveFailed.
   ///
   /// In en, this message translates to:
-  /// **'Cancelled'**
-  String get statusCancelled;
+  /// **'Failed to save medication log. Please try again.'**
+  String get medicationLogSaveFailed;
 
-  /// No description provided for @statusPending.
+  /// No description provided for @medicationContextInfo.
   ///
   /// In en, this message translates to:
-  /// **'Pending'**
-  String get statusPending;
+  /// **'Provide context about this medication treatment.'**
+  String get medicationContextInfo;
 
-  /// No description provided for @statusFailed.
+  /// No description provided for @quantityUnit.
   ///
   /// In en, this message translates to:
-  /// **'Failed'**
-  String get statusFailed;
+  /// **'Quantity unit'**
+  String get quantityUnit;
 
-  /// No description provided for @addVaccination.
+  /// No description provided for @selectQuantityUnit.
   ///
   /// In en, this message translates to:
-  /// **'Add vaccination'**
-  String get addVaccination;
+  /// **'Select quantity unit'**
+  String get selectQuantityUnit;
+
+  /// No description provided for @withdrawalPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawal period'**
+  String get withdrawalPeriod;
+
+  /// No description provided for @enterWithdrawalPeriodOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter withdrawal period (optional)'**
+  String get enterWithdrawalPeriodOptional;
+
+  /// No description provided for @withdrawalUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawal unit'**
+  String get withdrawalUnit;
+
+  /// No description provided for @selectWithdrawalUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Select withdrawal unit'**
+  String get selectWithdrawalUnit;
+
+  /// No description provided for @diseaseOptionsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Diseases not available. Sync reference data first.'**
+  String get diseaseOptionsMissing;
+
+  /// No description provided for @diseaseId.
+  ///
+  /// In en, this message translates to:
+  /// **'Disease'**
+  String get diseaseId;
+
+  /// No description provided for @selectDisease.
+  ///
+  /// In en, this message translates to:
+  /// **'Select disease'**
+  String get selectDisease;
+
+  /// No description provided for @medicationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication date'**
+  String get medicationDate;
+
+  /// No description provided for @selectMedicationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select medication date'**
+  String get selectMedicationDate;
+
+  /// No description provided for @medicationNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide any additional notes about this medication.'**
+  String get medicationNotesInfo;
+
+  /// No description provided for @confirmUpdateMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Update medication record?'**
+  String get confirmUpdateMedication;
+
+  /// No description provided for @confirmSaveMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Save medication record?'**
+  String get confirmSaveMedication;
+
+  /// No description provided for @quantityUnitMl.
+  ///
+  /// In en, this message translates to:
+  /// **'ml'**
+  String get quantityUnitMl;
+
+  /// No description provided for @quantityUnitL.
+  ///
+  /// In en, this message translates to:
+  /// **'L'**
+  String get quantityUnitL;
+
+  /// No description provided for @quantityUnitMg.
+  ///
+  /// In en, this message translates to:
+  /// **'mg'**
+  String get quantityUnitMg;
+
+  /// No description provided for @quantityUnitG.
+  ///
+  /// In en, this message translates to:
+  /// **'g'**
+  String get quantityUnitG;
+
+  /// No description provided for @quantityUnitKg.
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get quantityUnitKg;
+
+  /// No description provided for @withdrawalUnitMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get withdrawalUnitMinutes;
+
+  /// No description provided for @withdrawalUnitHours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get withdrawalUnitHours;
+
+  /// No description provided for @withdrawalUnitDays.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get withdrawalUnitDays;
+
+  /// No description provided for @withdrawalUnitWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks'**
+  String get withdrawalUnitWeeks;
+
+  /// No description provided for @withdrawalUnitMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'months'**
+  String get withdrawalUnitMonths;
+
+  /// No description provided for @withdrawalUnitYears.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get withdrawalUnitYears;
 
   /// No description provided for @vaccinationDetails.
   ///
@@ -3425,8 +3419,14 @@ abstract class AppLocalizations {
   /// No description provided for @vaccinationDetailsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Capture vaccination log information'**
+  /// **'Record vaccine, disease, and schedule info.'**
   String get vaccinationDetailsSubtitle;
+
+  /// No description provided for @addVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vaccination log'**
+  String get addVaccination;
 
   /// No description provided for @vaccinationNumber.
   ///
@@ -3437,7 +3437,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterVaccinationNumber.
   ///
   /// In en, this message translates to:
-  /// **'Enter vaccination number (optional)'**
+  /// **'Enter vaccination number'**
   String get enterVaccinationNumber;
 
   /// No description provided for @selectVaccine.
@@ -3445,36 +3445,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select vaccine'**
   String get selectVaccine;
-
-  /// No description provided for @vaccineOptionsMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'No vaccines available. Please add vaccines first.'**
-  String get vaccineOptionsMissing;
-
-  /// No description provided for @diseaseId.
-  ///
-  /// In en, this message translates to:
-  /// **'Disease ID'**
-  String get diseaseId;
-
-  /// No description provided for @enterDiseaseIdOptional.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter disease ID (optional)'**
-  String get enterDiseaseIdOptional;
-
-  /// No description provided for @selectDisease.
-  ///
-  /// In en, this message translates to:
-  /// **'Select disease'**
-  String get selectDisease;
-
-  /// No description provided for @diseaseOptionsMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'No diseases available. Please sync to download disease data.'**
-  String get diseaseOptionsMissing;
 
   /// No description provided for @vaccinationStatus.
   ///
@@ -3485,7 +3455,7 @@ abstract class AppLocalizations {
   /// No description provided for @vaccinationContextInfo.
   ///
   /// In en, this message translates to:
-  /// **'Select the farm and livestock to log this vaccination.'**
+  /// **'Provide context about this vaccination event.'**
   String get vaccinationContextInfo;
 
   /// No description provided for @vaccinationPersonnelDetails.
@@ -3493,42 +3463,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Personnel details'**
   String get vaccinationPersonnelDetails;
-
-  /// No description provided for @vaccinationNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Record vet or extension officer details for auditing.'**
-  String get vaccinationNotesInfo;
-
-  /// No description provided for @confirmSaveVaccination.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this vaccination log?'**
-  String get confirmSaveVaccination;
-
-  /// No description provided for @confirmUpdateVaccination.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this vaccination log?'**
-  String get confirmUpdateVaccination;
-
-  /// No description provided for @invalidDiseaseId.
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid disease ID.'**
-  String get invalidDiseaseId;
-
-  /// No description provided for @vaccinationLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save vaccination log.'**
-  String get vaccinationLogSaveFailed;
-
-  /// No description provided for @vaccinationLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccination log saved successfully.'**
-  String get vaccinationLogSaved;
 
   /// No description provided for @enterVetLicenseOptional.
   ///
@@ -3542,29 +3476,173 @@ abstract class AppLocalizations {
   /// **'Enter extension officer license (optional)'**
   String get enterExtensionOfficerLicenseOptional;
 
+  /// No description provided for @vaccinationNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add remarks about this vaccination.'**
+  String get vaccinationNotesInfo;
+
+  /// No description provided for @confirmUpdateVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Update vaccination log?'**
+  String get confirmUpdateVaccination;
+
+  /// No description provided for @confirmSaveVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Save vaccination log?'**
+  String get confirmSaveVaccination;
+
+  /// No description provided for @vaccinationLogSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination log saved successfully'**
+  String get vaccinationLogSaved;
+
+  /// No description provided for @vaccinationLogSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save vaccination log. Please try again.'**
+  String get vaccinationLogSaveFailed;
+
+  /// No description provided for @vaccineOptionsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccines not available. Sync vaccine reference data first.'**
+  String get vaccineOptionsMissing;
+
+  /// No description provided for @addDisposal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add disposal log'**
+  String get addDisposal;
+
+  /// No description provided for @disposalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal details'**
+  String get disposalDetails;
+
+  /// No description provided for @disposalDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture why and how the livestock was disposed.'**
+  String get disposalDetailsSubtitle;
+
+  /// No description provided for @disposalContextInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide the method, reason, and any supporting notes.'**
+  String get disposalContextInfo;
+
+  /// No description provided for @disposalReasons.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal reasons'**
+  String get disposalReasons;
+
+  /// No description provided for @enterDisposalReasons.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter reasons for disposal'**
+  String get enterDisposalReasons;
+
+  /// No description provided for @disposalTypeOptionsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal types unavailable. Sync reference data.'**
+  String get disposalTypeOptionsMissing;
+
+  /// No description provided for @disposalTypeId.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal type'**
+  String get disposalTypeId;
+
+  /// No description provided for @selectDisposalType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select disposal type'**
+  String get selectDisposalType;
+
+  /// No description provided for @disposalTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal type is required'**
+  String get disposalTypeRequired;
+
+  /// No description provided for @disposalStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal status'**
+  String get disposalStatus;
+
+  /// No description provided for @disposalNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add any remarks related to this disposal.'**
+  String get disposalNotesInfo;
+
+  /// No description provided for @confirmUpdateDisposal.
+  ///
+  /// In en, this message translates to:
+  /// **'Update disposal log?'**
+  String get confirmUpdateDisposal;
+
+  /// No description provided for @confirmSaveDisposal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save disposal log?'**
+  String get confirmSaveDisposal;
+
+  /// No description provided for @disposalLogSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal log saved successfully'**
+  String get disposalLogSaved;
+
+  /// No description provided for @disposalLogSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save disposal log. Please try again.'**
+  String get disposalLogSaveFailed;
+
   /// No description provided for @addMilking.
   ///
   /// In en, this message translates to:
-  /// **'Add milking'**
+  /// **'Add milking log'**
   String get addMilking;
 
   /// No description provided for @milkingDetailsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Capture milking measurements for this livestock'**
+  /// **'Capture session details for this milking event.'**
   String get milkingDetailsSubtitle;
 
   /// No description provided for @milkingNotesSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Record laboratory metrics and additional notes'**
+  /// **'Provide lab readings and quality observations.'**
   String get milkingNotesSubtitle;
+
+  /// No description provided for @milkingMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking method'**
+  String get milkingMethod;
 
   /// No description provided for @milkingMethodRequired.
   ///
   /// In en, this message translates to:
   /// **'Milking method is required'**
   String get milkingMethodRequired;
+
+  /// No description provided for @session.
+  ///
+  /// In en, this message translates to:
+  /// **'Session'**
+  String get session;
 
   /// No description provided for @statusActive.
   ///
@@ -3581,62 +3659,122 @@ abstract class AppLocalizations {
   /// No description provided for @ensureMilkingDetailsAccuracy.
   ///
   /// In en, this message translates to:
-  /// **'Ensure the milking information is accurate before saving.'**
+  /// **'Ensure the milking details are accurate before saving.'**
   String get ensureMilkingDetailsAccuracy;
+
+  /// No description provided for @lactometerReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Lactometer reading'**
+  String get lactometerReading;
+
+  /// No description provided for @solids.
+  ///
+  /// In en, this message translates to:
+  /// **'Solids'**
+  String get solids;
+
+  /// No description provided for @solidNonFat.
+  ///
+  /// In en, this message translates to:
+  /// **'Solids non-fat'**
+  String get solidNonFat;
+
+  /// No description provided for @protein.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get protein;
+
+  /// No description provided for @correctedLactometerReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Corrected lactometer reading'**
+  String get correctedLactometerReading;
+
+  /// No description provided for @totalSolids.
+  ///
+  /// In en, this message translates to:
+  /// **'Total solids'**
+  String get totalSolids;
+
+  /// No description provided for @colonyFormingUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Colony forming units'**
+  String get colonyFormingUnits;
+
+  /// No description provided for @acidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Acidity'**
+  String get acidity;
 
   /// No description provided for @milkingNotesInfo.
   ///
   /// In en, this message translates to:
-  /// **'Record measurements such as solids and lactometer readings (optional).'**
+  /// **'Record lab analysis, quality metrics, or remarks.'**
   String get milkingNotesInfo;
-
-  /// No description provided for @confirmSaveMilking.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this milking log?'**
-  String get confirmSaveMilking;
 
   /// No description provided for @confirmUpdateMilking.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to update this milking log?'**
+  /// **'Update milking log?'**
   String get confirmUpdateMilking;
 
-  /// No description provided for @milkingLogSaved.
+  /// No description provided for @confirmSaveMilking.
   ///
   /// In en, this message translates to:
-  /// **'Milking log saved successfully.'**
-  String get milkingLogSaved;
+  /// **'Save milking log?'**
+  String get confirmSaveMilking;
 
   /// No description provided for @milkingLogSaveFailed.
   ///
   /// In en, this message translates to:
-  /// **'Failed to save milking log.'**
+  /// **'Failed to save milking log. Please try again.'**
   String get milkingLogSaveFailed;
 
   /// No description provided for @addPregnancy.
   ///
   /// In en, this message translates to:
-  /// **'Add pregnancy'**
+  /// **'Add pregnancy log'**
   String get addPregnancy;
 
   /// No description provided for @pregnancyDetailsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Capture pregnancy diagnosis details'**
+  /// **'Record pregnancy test outcomes and status.'**
   String get pregnancyDetailsSubtitle;
 
   /// No description provided for @pregnancyNotesSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Add remarks about the pregnancy (optional)'**
+  /// **'Provide notes about this pregnancy check.'**
   String get pregnancyNotesSubtitle;
+
+  /// No description provided for @testResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Test result'**
+  String get testResult;
 
   /// No description provided for @testResultRequired.
   ///
   /// In en, this message translates to:
   /// **'Test result is required'**
   String get testResultRequired;
+
+  /// No description provided for @numberOfMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of months'**
+  String get numberOfMonths;
+
+  /// No description provided for @testDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Test date'**
+  String get testDate;
 
   /// No description provided for @testDateRequired.
   ///
@@ -3647,536 +3785,44 @@ abstract class AppLocalizations {
   /// No description provided for @ensurePregnancyDetailsAccuracy.
   ///
   /// In en, this message translates to:
-  /// **'Ensure the pregnancy information is accurate before saving.'**
+  /// **'Ensure pregnancy information is accurate before saving.'**
   String get ensurePregnancyDetailsAccuracy;
 
   /// No description provided for @pregnancyNotesInfo.
   ///
   /// In en, this message translates to:
-  /// **'Record any additional notes from the pregnancy diagnosis.'**
+  /// **'Add notes about symptoms, vet observations, or remarks.'**
   String get pregnancyNotesInfo;
-
-  /// No description provided for @confirmSavePregnancy.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this pregnancy log?'**
-  String get confirmSavePregnancy;
 
   /// No description provided for @confirmUpdatePregnancy.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to update this pregnancy log?'**
+  /// **'Update pregnancy log?'**
   String get confirmUpdatePregnancy;
 
-  /// No description provided for @pregnancyLogSaved.
+  /// No description provided for @confirmSavePregnancy.
   ///
   /// In en, this message translates to:
-  /// **'Pregnancy log saved successfully.'**
-  String get pregnancyLogSaved;
+  /// **'Save pregnancy log?'**
+  String get confirmSavePregnancy;
 
   /// No description provided for @pregnancyLogSaveFailed.
   ///
   /// In en, this message translates to:
-  /// **'Failed to save pregnancy log.'**
+  /// **'Failed to save pregnancy log. Please try again.'**
   String get pregnancyLogSaveFailed;
 
-  /// No description provided for @addCalving.
+  /// No description provided for @transfer.
   ///
   /// In en, this message translates to:
-  /// **'Add calving'**
-  String get addCalving;
-
-  /// No description provided for @calvingDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Capture calving timelines and outcomes'**
-  String get calvingDetailsSubtitle;
-
-  /// No description provided for @calvingNotesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add remarks about the calving process'**
-  String get calvingNotesSubtitle;
-
-  /// No description provided for @calvingTypeRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Calving type is required'**
-  String get calvingTypeRequired;
-
-  /// No description provided for @startDateRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Start date is required'**
-  String get startDateRequired;
-
-  /// No description provided for @ensureCalvingDetailsAccuracy.
-  ///
-  /// In en, this message translates to:
-  /// **'Ensure the calving information is accurate before saving.'**
-  String get ensureCalvingDetailsAccuracy;
-
-  /// No description provided for @calvingNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Record any reproductive or calving complications.'**
-  String get calvingNotesInfo;
-
-  /// No description provided for @confirmSaveCalving.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this calving log?'**
-  String get confirmSaveCalving;
-
-  /// No description provided for @confirmUpdateCalving.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this calving log?'**
-  String get confirmUpdateCalving;
-
-  /// No description provided for @calvingLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Calving log saved successfully.'**
-  String get calvingLogSaved;
-
-  /// No description provided for @calvingLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save calving log.'**
-  String get calvingLogSaveFailed;
-
-  /// No description provided for @addDryoff.
-  ///
-  /// In en, this message translates to:
-  /// **'Add dryoff'**
-  String get addDryoff;
-
-  /// No description provided for @dryoffDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Capture dryoff schedules for this livestock'**
-  String get dryoffDetailsSubtitle;
-
-  /// No description provided for @dryoffNotesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add remarks about the dryoff process'**
-  String get dryoffNotesSubtitle;
-
-  /// No description provided for @ensureDryoffDetailsAccuracy.
-  ///
-  /// In en, this message translates to:
-  /// **'Ensure the dryoff information is accurate before saving.'**
-  String get ensureDryoffDetailsAccuracy;
-
-  /// No description provided for @dryoffNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Record notes about the dryoff (optional).'**
-  String get dryoffNotesInfo;
-
-  /// No description provided for @confirmSaveDryoff.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this dryoff log?'**
-  String get confirmSaveDryoff;
-
-  /// No description provided for @confirmUpdateDryoff.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this dryoff log?'**
-  String get confirmUpdateDryoff;
-
-  /// No description provided for @dryoffLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Dryoff log saved successfully.'**
-  String get dryoffLogSaved;
-
-  /// No description provided for @dryoffLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save dryoff log.'**
-  String get dryoffLogSaveFailed;
-
-  /// No description provided for @addInsemination.
-  ///
-  /// In en, this message translates to:
-  /// **'Add insemination'**
-  String get addInsemination;
-
-  /// No description provided for @inseminationDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Capture insemination services and heat details'**
-  String get inseminationDetailsSubtitle;
-
-  /// No description provided for @inseminationNotesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add insemination batch and supplier notes'**
-  String get inseminationNotesSubtitle;
-
-  /// No description provided for @lastHeatDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Last heat date'**
-  String get lastHeatDate;
-
-  /// No description provided for @heatTypeRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Heat type is required'**
-  String get heatTypeRequired;
-
-  /// No description provided for @inseminationServiceRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Insemination service is required'**
-  String get inseminationServiceRequired;
-
-  /// No description provided for @semenStrawTypeRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Semen straw type is required'**
-  String get semenStrawTypeRequired;
-
-  /// No description provided for @ensureInseminationDetailsAccuracy.
-  ///
-  /// In en, this message translates to:
-  /// **'Ensure the insemination information is accurate before saving.'**
-  String get ensureInseminationDetailsAccuracy;
-
-  /// No description provided for @inseminationNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Record batch, supplier, and bull details (optional).'**
-  String get inseminationNotesInfo;
-
-  /// No description provided for @confirmSaveInsemination.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this insemination log?'**
-  String get confirmSaveInsemination;
-
-  /// No description provided for @confirmUpdateInsemination.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this insemination log?'**
-  String get confirmUpdateInsemination;
-
-  /// No description provided for @inseminationLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Insemination log saved successfully.'**
-  String get inseminationLogSaved;
-
-  /// No description provided for @inseminationLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save insemination log.'**
-  String get inseminationLogSaveFailed;
-
-  /// No description provided for @addMedication.
-  ///
-  /// In en, this message translates to:
-  /// **'Add medication'**
-  String get addMedication;
-
-  /// No description provided for @medicationDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'Medication details'**
-  String get medicationDetails;
-
-  /// No description provided for @medicationDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Capture treatment details for this livestock'**
-  String get medicationDetailsSubtitle;
-
-  /// No description provided for @medicationContextInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Select the farm and livestock before recording the medication.'**
-  String get medicationContextInfo;
-
-  /// No description provided for @medicationNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Add any additional notes about the treatment (optional).'**
-  String get medicationNotesInfo;
-
-  /// No description provided for @quantityAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Quantity amount'**
-  String get quantityAmount;
-
-  /// No description provided for @quantityUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Unit'**
-  String get quantityUnit;
-
-  /// No description provided for @selectQuantityUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Select unit'**
-  String get selectQuantityUnit;
-
-  /// No description provided for @quantityUnitMl.
-  ///
-  /// In en, this message translates to:
-  /// **'Milliliters (ml)'**
-  String get quantityUnitMl;
-
-  /// No description provided for @quantityUnitL.
-  ///
-  /// In en, this message translates to:
-  /// **'Liters (l)'**
-  String get quantityUnitL;
-
-  /// No description provided for @quantityUnitMg.
-  ///
-  /// In en, this message translates to:
-  /// **'Milligrams (mg)'**
-  String get quantityUnitMg;
-
-  /// No description provided for @quantityUnitG.
-  ///
-  /// In en, this message translates to:
-  /// **'Grams (g)'**
-  String get quantityUnitG;
-
-  /// No description provided for @quantityUnitKg.
-  ///
-  /// In en, this message translates to:
-  /// **'Kilograms (kg)'**
-  String get quantityUnitKg;
-
-  /// No description provided for @withdrawalPeriod.
-  ///
-  /// In en, this message translates to:
-  /// **'Withdrawal period'**
-  String get withdrawalPeriod;
-
-  /// No description provided for @enterWithdrawalPeriodOptional.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter withdrawal period (optional)'**
-  String get enterWithdrawalPeriodOptional;
-
-  /// No description provided for @withdrawalAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Withdrawal amount'**
-  String get withdrawalAmount;
-
-  /// No description provided for @withdrawalUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Period unit'**
-  String get withdrawalUnit;
-
-  /// No description provided for @selectWithdrawalUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Select period unit'**
-  String get selectWithdrawalUnit;
-
-  /// No description provided for @withdrawalUnitMinutes.
-  ///
-  /// In en, this message translates to:
-  /// **'Minutes'**
-  String get withdrawalUnitMinutes;
-
-  /// No description provided for @withdrawalUnitHours.
-  ///
-  /// In en, this message translates to:
-  /// **'Hours'**
-  String get withdrawalUnitHours;
-
-  /// No description provided for @withdrawalUnitDays.
-  ///
-  /// In en, this message translates to:
-  /// **'Days'**
-  String get withdrawalUnitDays;
-
-  /// No description provided for @withdrawalUnitWeeks.
-  ///
-  /// In en, this message translates to:
-  /// **'Weeks'**
-  String get withdrawalUnitWeeks;
-
-  /// No description provided for @withdrawalUnitMonths.
-  ///
-  /// In en, this message translates to:
-  /// **'Months'**
-  String get withdrawalUnitMonths;
-
-  /// No description provided for @withdrawalUnitYears.
-  ///
-  /// In en, this message translates to:
-  /// **'Years'**
-  String get withdrawalUnitYears;
-
-  /// No description provided for @medicationDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Medication date'**
-  String get medicationDate;
-
-  /// No description provided for @selectMedicationDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Select medication date'**
-  String get selectMedicationDate;
-
-  /// No description provided for @confirmSaveMedication.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this medication log?'**
-  String get confirmSaveMedication;
-
-  /// No description provided for @confirmUpdateMedication.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this medication log?'**
-  String get confirmUpdateMedication;
-
-  /// No description provided for @medicationLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Medication log saved successfully.'**
-  String get medicationLogSaved;
-
-  /// No description provided for @medicationLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save medication log.'**
-  String get medicationLogSaveFailed;
-
-  /// No description provided for @addDisposal.
-  ///
-  /// In en, this message translates to:
-  /// **'Add disposal'**
-  String get addDisposal;
-
-  /// No description provided for @disposalDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'Disposal details'**
-  String get disposalDetails;
-
-  /// No description provided for @disposalDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Capture the reason and status of the disposal'**
-  String get disposalDetailsSubtitle;
-
-  /// No description provided for @disposalContextInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Select the farm and livestock before recording the disposal.'**
-  String get disposalContextInfo;
-
-  /// No description provided for @disposalReasons.
-  ///
-  /// In en, this message translates to:
-  /// **'Reasons'**
-  String get disposalReasons;
-
-  /// No description provided for @enterDisposalReasons.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter reasons'**
-  String get enterDisposalReasons;
-
-  /// No description provided for @disposalTypeId.
-  ///
-  /// In en, this message translates to:
-  /// **'Disposal type'**
-  String get disposalTypeId;
-
-  /// No description provided for @enterDisposalTypeIdOptional.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter disposal type (optional)'**
-  String get enterDisposalTypeIdOptional;
-
-  /// No description provided for @selectDisposalType.
-  ///
-  /// In en, this message translates to:
-  /// **'Select disposal type'**
-  String get selectDisposalType;
-
-  /// No description provided for @disposalTypeRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Disposal type is required'**
-  String get disposalTypeRequired;
-
-  /// No description provided for @disposalTypeOptionsMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'No disposal types available. Please sync to download reference data.'**
-  String get disposalTypeOptionsMissing;
-
-  /// No description provided for @disposalStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Disposal status'**
-  String get disposalStatus;
-
-  /// No description provided for @confirmSaveDisposal.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this disposal log?'**
-  String get confirmSaveDisposal;
-
-  /// No description provided for @confirmUpdateDisposal.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this disposal log?'**
-  String get confirmUpdateDisposal;
-
-  /// No description provided for @disposalNotesInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Add any additional notes about the disposal (optional).'**
-  String get disposalNotesInfo;
-
-  /// No description provided for @disposalLogSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Disposal log saved successfully.'**
-  String get disposalLogSaved;
-
-  /// No description provided for @disposalLogSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save disposal log.'**
-  String get disposalLogSaveFailed;
-
-  /// No description provided for @invalidDisposalTypeId.
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid disposal type.'**
-  String get invalidDisposalTypeId;
+  /// **'Transfer'**
+  String get transfer;
 
   /// No description provided for @addTransfer.
   ///
   /// In en, this message translates to:
-  /// **'Add transfer'**
+  /// **'Add transfer log'**
   String get addTransfer;
-
-  /// No description provided for @editTransfer.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit transfer'**
-  String get editTransfer;
 
   /// No description provided for @transferDetails.
   ///
@@ -4187,98 +3833,74 @@ abstract class AppLocalizations {
   /// No description provided for @transferDetailsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Provide destination farm, transporter details, and remarks.'**
+  /// **'Track livestock movement between farms.'**
   String get transferDetailsSubtitle;
 
   /// No description provided for @transferContextInfo.
   ///
   /// In en, this message translates to:
-  /// **'Transfers track livestock movements between farms. Ensure the destination farm UUID is correct before saving.'**
+  /// **'Provide the destination farm and transporter information.'**
   String get transferContextInfo;
 
   /// No description provided for @toFarmUuidLabel.
   ///
   /// In en, this message translates to:
-  /// **'Destination farm identity'**
+  /// **'Destination farm UUID'**
   String get toFarmUuidLabel;
 
   /// No description provided for @enterToFarmUuid.
   ///
   /// In en, this message translates to:
-  /// **'Enter destination farm identity'**
+  /// **'Enter destination farm UUID'**
   String get enterToFarmUuid;
 
   /// No description provided for @toFarmUuidRequired.
   ///
   /// In en, this message translates to:
-  /// **'Destination farm identity is required'**
+  /// **'Destination farm UUID is required'**
   String get toFarmUuidRequired;
 
   /// No description provided for @transferToFarmUuidWarning.
   ///
   /// In en, this message translates to:
-  /// **'Enter the exact farm identity of the destination farm (Utambulisho wa shamba jingine). You can copy it from the farm details.'**
+  /// **'Ensure the destination farm exists before saving.'**
   String get transferToFarmUuidWarning;
 
   /// No description provided for @transporterIdLabel.
   ///
   /// In en, this message translates to:
-  /// **'Transporter ID (optional)'**
+  /// **'Transporter ID'**
   String get transporterIdLabel;
 
   /// No description provided for @enterTransporterId.
   ///
   /// In en, this message translates to:
-  /// **'Enter transporter ID (optional)'**
+  /// **'Enter transporter identifier'**
   String get enterTransporterId;
 
-  /// No description provided for @invalidTransporterId.
+  /// No description provided for @reason.
   ///
   /// In en, this message translates to:
-  /// **'Transporter ID must be a number'**
-  String get invalidTransporterId;
+  /// **'Reason'**
+  String get reason;
 
   /// No description provided for @enterTransferReason.
   ///
   /// In en, this message translates to:
-  /// **'Enter transfer reason (optional)'**
+  /// **'Enter reason for transfer'**
   String get enterTransferReason;
 
   /// No description provided for @transferPriceLabel.
   ///
   /// In en, this message translates to:
-  /// **'Transfer price (optional)'**
+  /// **'Transfer price'**
   String get transferPriceLabel;
 
   /// No description provided for @enterTransferPrice.
   ///
   /// In en, this message translates to:
-  /// **'Enter price paid (optional)'**
+  /// **'Enter price (optional)'**
   String get enterTransferPrice;
-
-  /// No description provided for @transferDateLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer date & time'**
-  String get transferDateLabel;
-
-  /// No description provided for @selectTransferDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Select transfer date & time'**
-  String get selectTransferDate;
-
-  /// No description provided for @transferDateRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer date is required'**
-  String get transferDateRequired;
-
-  /// No description provided for @transferStatusLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Transfer status'**
-  String get transferStatusLabel;
 
   /// No description provided for @transferCurrencyLabel.
   ///
@@ -4295,50 +3917,338 @@ abstract class AppLocalizations {
   /// No description provided for @currencyTsh.
   ///
   /// In en, this message translates to:
-  /// **'Tshs'**
+  /// **'TZS'**
   String get currencyTsh;
 
   /// No description provided for @currencyUsd.
   ///
   /// In en, this message translates to:
-  /// **'USD (\$)'**
+  /// **'USD'**
   String get currencyUsd;
 
   /// No description provided for @currencyGbp.
   ///
   /// In en, this message translates to:
-  /// **'GBP (£)'**
+  /// **'GBP'**
   String get currencyGbp;
 
   /// No description provided for @currencyEur.
   ///
   /// In en, this message translates to:
-  /// **'EUR (€)'**
+  /// **'EUR'**
   String get currencyEur;
 
-  /// No description provided for @confirmSaveTransfer.
+  /// No description provided for @transferDateLabel.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to save this transfer log?'**
-  String get confirmSaveTransfer;
+  /// **'Transfer date'**
+  String get transferDateLabel;
+
+  /// No description provided for @selectTransferDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transfer date'**
+  String get selectTransferDate;
+
+  /// No description provided for @transferDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer date is required'**
+  String get transferDateRequired;
+
+  /// No description provided for @transferStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer status'**
+  String get transferStatusLabel;
 
   /// No description provided for @confirmUpdateTransfer.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to update this transfer log?'**
+  /// **'Update transfer log?'**
   String get confirmUpdateTransfer;
 
-  /// No description provided for @transferLogSaved.
+  /// No description provided for @confirmSaveTransfer.
   ///
   /// In en, this message translates to:
-  /// **'Transfer log saved successfully.'**
-  String get transferLogSaved;
+  /// **'Save transfer log?'**
+  String get confirmSaveTransfer;
+
+  /// No description provided for @invalidTransporterId.
+  ///
+  /// In en, this message translates to:
+  /// **'Transporter ID must be alphanumeric.'**
+  String get invalidTransporterId;
 
   /// No description provided for @transferLogSaveFailed.
   ///
   /// In en, this message translates to:
   /// **'Failed to save transfer log. Please try again.'**
   String get transferLogSaveFailed;
+
+  /// No description provided for @addDryoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Add dryoff log'**
+  String get addDryoff;
+
+  /// No description provided for @dryoffDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record the planned dryoff window.'**
+  String get dryoffDetailsSubtitle;
+
+  /// No description provided for @dryoffNotesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture any feeding or management notes.'**
+  String get dryoffNotesSubtitle;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get startDate;
+
+  /// No description provided for @startDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date is required'**
+  String get startDateRequired;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get endDate;
+
+  /// No description provided for @ensureDryoffDetailsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure the dryoff details are accurate before saving.'**
+  String get ensureDryoffDetailsAccuracy;
+
+  /// No description provided for @dryoffNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add remarks about feed changes, health checks, or reminders.'**
+  String get dryoffNotesInfo;
+
+  /// No description provided for @confirmUpdateDryoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Update dryoff log?'**
+  String get confirmUpdateDryoff;
+
+  /// No description provided for @confirmSaveDryoff.
+  ///
+  /// In en, this message translates to:
+  /// **'Save dryoff log?'**
+  String get confirmSaveDryoff;
+
+  /// No description provided for @dryoffLogSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save dryoff log. Please try again.'**
+  String get dryoffLogSaveFailed;
+
+  /// No description provided for @confirmSaveDeworming.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to save this deworming log?'**
+  String get confirmSaveDeworming;
+
+  /// No description provided for @confirmUpdateDeworming.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to update this deworming log?'**
+  String get confirmUpdateDeworming;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get statusFailed;
+
+  /// No description provided for @statusScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get statusScheduled;
+
+  /// No description provided for @bulkOperationInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving records for all selected livestock...'**
+  String get bulkOperationInProgress;
+
+  /// No description provided for @addInsemination.
+  ///
+  /// In en, this message translates to:
+  /// **'Add insemination log'**
+  String get addInsemination;
+
+  /// No description provided for @inseminationDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record heat cycle, service type, and straw details.'**
+  String get inseminationDetailsSubtitle;
+
+  /// No description provided for @inseminationNotesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture remarks about semen quality or procedures.'**
+  String get inseminationNotesSubtitle;
+
+  /// No description provided for @lastHeatDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last heat date'**
+  String get lastHeatDate;
+
+  /// No description provided for @heatType.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat type'**
+  String get heatType;
+
+  /// No description provided for @heatTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat type is required'**
+  String get heatTypeRequired;
+
+  /// No description provided for @inseminationService.
+  ///
+  /// In en, this message translates to:
+  /// **'Insemination service'**
+  String get inseminationService;
+
+  /// No description provided for @inseminationServiceRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Insemination service is required'**
+  String get inseminationServiceRequired;
+
+  /// No description provided for @semenStrawType.
+  ///
+  /// In en, this message translates to:
+  /// **'Semen straw type'**
+  String get semenStrawType;
+
+  /// No description provided for @semenStrawTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Semen straw type is required'**
+  String get semenStrawTypeRequired;
+
+  /// No description provided for @inseminationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Insemination date'**
+  String get inseminationDate;
+
+  /// No description provided for @ensureInseminationDetailsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure insemination details are accurate before saving.'**
+  String get ensureInseminationDetailsAccuracy;
+
+  /// No description provided for @bullCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull code'**
+  String get bullCode;
+
+  /// No description provided for @bullBreed.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull breed'**
+  String get bullBreed;
+
+  /// No description provided for @semenProductionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Semen production date'**
+  String get semenProductionDate;
+
+  /// No description provided for @productionCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Production country'**
+  String get productionCountry;
+
+  /// No description provided for @semenBatchNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch number'**
+  String get semenBatchNumber;
+
+  /// No description provided for @internationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'International ID'**
+  String get internationalId;
+
+  /// No description provided for @aiCode.
+  ///
+  /// In en, this message translates to:
+  /// **'AI code'**
+  String get aiCode;
+
+  /// No description provided for @manufacturerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer name'**
+  String get manufacturerName;
+
+  /// No description provided for @semenSupplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Semen supplier'**
+  String get semenSupplier;
+
+  /// No description provided for @inseminationNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes about handling, technician, or follow-up plans.'**
+  String get inseminationNotesInfo;
+
+  /// No description provided for @confirmUpdateInsemination.
+  ///
+  /// In en, this message translates to:
+  /// **'Update insemination log?'**
+  String get confirmUpdateInsemination;
+
+  /// No description provided for @confirmSaveInsemination.
+  ///
+  /// In en, this message translates to:
+  /// **'Save insemination log?'**
+  String get confirmSaveInsemination;
+
+  /// No description provided for @inseminationLogSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save insemination log. Please try again.'**
+  String get inseminationLogSaveFailed;
 
   /// No description provided for @farmWithLivestockLoadFailed.
   ///
@@ -4357,6 +4267,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No farms found'**
   String get noFarmsFound;
+
+  /// No description provided for @addCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Add calving log'**
+  String get addCalving;
+
+  /// No description provided for @calvingDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record calving outcomes and supporting details.'**
+  String get calvingDetailsSubtitle;
+
+  /// No description provided for @calvingNotesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture observations, issues, or follow-up actions.'**
+  String get calvingNotesSubtitle;
+
+  /// No description provided for @calvingProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving problem'**
+  String get calvingProblem;
+
+  /// No description provided for @reproductiveProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Reproductive problem'**
+  String get reproductiveProblem;
+
+  /// No description provided for @calvingType.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving type'**
+  String get calvingType;
+
+  /// No description provided for @calvingTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving type is required'**
+  String get calvingTypeRequired;
+
+  /// No description provided for @ensureCalvingDetailsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure calving information is accurate before saving.'**
+  String get ensureCalvingDetailsAccuracy;
+
+  /// No description provided for @calvingNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes about calves, complications, or support provided.'**
+  String get calvingNotesInfo;
+
+  /// No description provided for @confirmUpdateCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Update calving log?'**
+  String get confirmUpdateCalving;
+
+  /// No description provided for @confirmSaveCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Save calving log?'**
+  String get confirmSaveCalving;
+
+  /// No description provided for @calvingLogSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save calving log. Please try again.'**
+  String get calvingLogSaveFailed;
 
   /// No description provided for @noLivestockFound.
   ///
@@ -4418,215 +4400,11 @@ abstract class AppLocalizations {
   /// **'An error occurred. Please try again.'**
   String get genericError;
 
-  /// No description provided for @bulkActions.
-  ///
-  /// In en, this message translates to:
-  /// **'Bulk actions'**
-  String get bulkActions;
-
   /// No description provided for @addVaccine.
   ///
   /// In en, this message translates to:
   /// **'Add vaccine'**
   String get addVaccine;
-
-  /// No description provided for @vaccineDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine details'**
-  String get vaccineDetails;
-
-  /// No description provided for @vaccineDetailsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Provide the vaccine information'**
-  String get vaccineDetailsSubtitle;
-
-  /// No description provided for @vaccine.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine'**
-  String get vaccine;
-
-  /// No description provided for @lotNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Lot number'**
-  String get lotNumber;
-
-  /// No description provided for @enterLotNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter lot number (optional)'**
-  String get enterLotNumber;
-
-  /// No description provided for @formulationType.
-  ///
-  /// In en, this message translates to:
-  /// **'Formulation type'**
-  String get formulationType;
-
-  /// No description provided for @enterFormulationType.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter formulation type (optional)'**
-  String get enterFormulationType;
-
-  /// No description provided for @selectFormulationType.
-  ///
-  /// In en, this message translates to:
-  /// **'Select formulation type'**
-  String get selectFormulationType;
-
-  /// No description provided for @formulationLiveAttenuated.
-  ///
-  /// In en, this message translates to:
-  /// **'Live attenuated'**
-  String get formulationLiveAttenuated;
-
-  /// No description provided for @formulationInactivated.
-  ///
-  /// In en, this message translates to:
-  /// **'Inactivated vaccine'**
-  String get formulationInactivated;
-
-  /// No description provided for @doseAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Dose'**
-  String get doseAmount;
-
-  /// No description provided for @enterDoseAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter dose (optional)'**
-  String get enterDoseAmount;
-
-  /// No description provided for @doseUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Unit'**
-  String get doseUnit;
-
-  /// No description provided for @selectDoseUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'Select unit'**
-  String get selectDoseUnit;
-
-  /// No description provided for @vaccineSchedule.
-  ///
-  /// In en, this message translates to:
-  /// **'Schedule'**
-  String get vaccineSchedule;
-
-  /// No description provided for @enterVaccineSchedule.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter schedule (optional)'**
-  String get enterVaccineSchedule;
-
-  /// No description provided for @selectVaccineSchedule.
-  ///
-  /// In en, this message translates to:
-  /// **'Select schedule'**
-  String get selectVaccineSchedule;
-
-  /// No description provided for @vaccineScheduleRegular.
-  ///
-  /// In en, this message translates to:
-  /// **'Regular schedule'**
-  String get vaccineScheduleRegular;
-
-  /// No description provided for @vaccineScheduleBooster.
-  ///
-  /// In en, this message translates to:
-  /// **'Booster schedule'**
-  String get vaccineScheduleBooster;
-
-  /// No description provided for @vaccineScheduleSeasonal.
-  ///
-  /// In en, this message translates to:
-  /// **'Seasonal program'**
-  String get vaccineScheduleSeasonal;
-
-  /// No description provided for @vaccineScheduleEmergency.
-  ///
-  /// In en, this message translates to:
-  /// **'Emergency schedule'**
-  String get vaccineScheduleEmergency;
-
-  /// No description provided for @vaccineStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine status'**
-  String get vaccineStatus;
-
-  /// No description provided for @selectStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Select status'**
-  String get selectStatus;
-
-  /// No description provided for @vaccineType.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine type'**
-  String get vaccineType;
-
-  /// No description provided for @selectVaccineType.
-  ///
-  /// In en, this message translates to:
-  /// **'Select vaccine type'**
-  String get selectVaccineType;
-
-  /// No description provided for @vaccineTypeRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine type is required'**
-  String get vaccineTypeRequired;
-
-  /// No description provided for @vaccineTypesMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'No vaccine types available. Please sync to download reference data.'**
-  String get vaccineTypesMissing;
-
-  /// No description provided for @ensureVaccineDetailsAccuracy.
-  ///
-  /// In en, this message translates to:
-  /// **'Ensure the vaccine information is accurate before saving.'**
-  String get ensureVaccineDetailsAccuracy;
-
-  /// No description provided for @confirmSaveVaccine.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to save this vaccine?'**
-  String get confirmSaveVaccine;
-
-  /// No description provided for @confirmUpdateVaccine.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to update this vaccine?'**
-  String get confirmUpdateVaccine;
-
-  /// No description provided for @vaccineSavedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine saved successfully'**
-  String get vaccineSavedSuccessfully;
-
-  /// No description provided for @vaccineUpdatedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Vaccine updated successfully'**
-  String get vaccineUpdatedSuccessfully;
-
-  /// No description provided for @vaccineSaveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to save vaccine'**
-  String get vaccineSaveFailed;
 
   /// No description provided for @name.
   ///
@@ -4675,6 +4453,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter identification number'**
   String get enterIdentificationNumber;
+
+  /// No description provided for @identificationNumberExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Another livestock already uses this identification number. Please enter a unique ID.'**
+  String get identificationNumberExists;
 
   /// No description provided for @identificationNumberRequired.
   ///
@@ -5018,125 +4802,245 @@ abstract class AppLocalizations {
   /// **'Failed to delete'**
   String get failedToDelete;
 
-  /// No description provided for @scanOptionBarcode.
+  /// No description provided for @disposal.
   ///
   /// In en, this message translates to:
-  /// **'Barcode'**
-  String get scanOptionBarcode;
+  /// **'Disposal'**
+  String get disposal;
 
-  /// No description provided for @scanOptionQr.
+  /// No description provided for @notProvided.
   ///
   /// In en, this message translates to:
-  /// **'QR Code'**
-  String get scanOptionQr;
+  /// **'Not provided'**
+  String get notProvided;
 
-  /// No description provided for @scanTagsTitle.
+  /// No description provided for @role.
   ///
   /// In en, this message translates to:
-  /// **'Scan Tags'**
-  String get scanTagsTitle;
+  /// **'Role'**
+  String get role;
 
-  /// No description provided for @scanTagsSubtitle.
+  /// No description provided for @unsyncedDataWarning.
   ///
   /// In en, this message translates to:
-  /// **'Select a tag type to scan and keep it within the frame.'**
-  String get scanTagsSubtitle;
+  /// **'You have unsynced data. Sync before logging out to avoid losing recent changes.'**
+  String get unsyncedDataWarning;
 
-  /// No description provided for @scanOptionQrDescription.
+  /// No description provided for @noUnsyncedDataMessage.
   ///
   /// In en, this message translates to:
-  /// **'Scan printed QR stickers.'**
-  String get scanOptionQrDescription;
+  /// **'No unsynced data found. It is safe to log out.'**
+  String get noUnsyncedDataMessage;
 
-  /// No description provided for @scanOptionBarcodeDescription.
+  /// No description provided for @syncAndLogout.
   ///
   /// In en, this message translates to:
-  /// **'Scan barcodes from ear tags or documents.'**
-  String get scanOptionBarcodeDescription;
+  /// **'Sync & Logout'**
+  String get syncAndLogout;
 
-  /// No description provided for @scanOptionRfid.
+  /// No description provided for @syncingBeforeLogout.
   ///
   /// In en, this message translates to:
-  /// **'RFID Tag'**
-  String get scanOptionRfid;
+  /// **'Syncing pending data before logging out...'**
+  String get syncingBeforeLogout;
 
-  /// No description provided for @scanOptionRfidDescription.
+  /// No description provided for @addNotification.
   ///
   /// In en, this message translates to:
-  /// **'Use the RFID reader to capture tags instantly.'**
-  String get scanOptionRfidDescription;
+  /// **'Add notification'**
+  String get addNotification;
 
-  /// No description provided for @scanRfidPlaceholder.
+  /// No description provided for @noNotifications.
   ///
   /// In en, this message translates to:
-  /// **'Connect an RFID reader to capture tags automatically.'**
-  String get scanRfidPlaceholder;
+  /// **'No notifications yet'**
+  String get noNotifications;
 
-  /// No description provided for @scanManualPlaceholder.
+  /// No description provided for @upcomingToday.
   ///
   /// In en, this message translates to:
-  /// **'Enter tag value'**
-  String get scanManualPlaceholder;
+  /// **'Today'**
+  String get upcomingToday;
 
-  /// No description provided for @scanManualConfirm.
+  /// No description provided for @upcomingNotifications.
   ///
   /// In en, this message translates to:
-  /// **'Search tag'**
-  String get scanManualConfirm;
+  /// **'Upcoming'**
+  String get upcomingNotifications;
 
-  /// No description provided for @scanStartButton.
+  /// No description provided for @allNotifications.
   ///
   /// In en, this message translates to:
-  /// **'Start scan'**
-  String get scanStartButton;
+  /// **'All notifications'**
+  String get allNotifications;
 
-  /// No description provided for @scanResultFoundTitle.
+  /// No description provided for @notificationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Tag matched'**
-  String get scanResultFoundTitle;
+  /// **'Notification title'**
+  String get notificationTitle;
 
-  /// No description provided for @scanResultFoundSubtitle.
+  /// No description provided for @enterNotificationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Livestock {name} found on {farm}.'**
-  String scanResultFoundSubtitle(Object name, Object farm);
+  /// **'Enter a notification title'**
+  String get enterNotificationTitle;
 
-  /// No description provided for @scanResultFarm.
+  /// No description provided for @notificationDescription.
   ///
   /// In en, this message translates to:
-  /// **'Farm'**
-  String get scanResultFarm;
+  /// **'Description'**
+  String get notificationDescription;
 
-  /// No description provided for @scanResultBarcode.
+  /// No description provided for @enterNotificationDescription.
   ///
   /// In en, this message translates to:
-  /// **'Barcode'**
-  String get scanResultBarcode;
+  /// **'Enter a description'**
+  String get enterNotificationDescription;
 
-  /// No description provided for @scanResultRfid.
+  /// No description provided for @optionalFieldHint.
   ///
   /// In en, this message translates to:
-  /// **'RFID'**
-  String get scanResultRfid;
+  /// **'Optional'**
+  String get optionalFieldHint;
 
-  /// No description provided for @scanResultNotFound.
+  /// No description provided for @scheduleDate.
   ///
   /// In en, this message translates to:
-  /// **'No livestock found for tag {value}.'**
-  String scanResultNotFound(Object value);
+  /// **'Schedule date'**
+  String get scheduleDate;
 
-  /// No description provided for @scanPermissionDenied.
+  /// No description provided for @scheduleTime.
   ///
   /// In en, this message translates to:
-  /// **'Camera permission is required to scan tags.'**
-  String get scanPermissionDenied;
+  /// **'Schedule time'**
+  String get scheduleTime;
 
-  /// No description provided for @scanPermissionPermanentlyDenied.
+  /// No description provided for @saveNotification.
   ///
   /// In en, this message translates to:
-  /// **'Camera permission is permanently denied. Enable it in Settings to continue scanning.'**
-  String get scanPermissionPermanentlyDenied;
+  /// **'Save notification'**
+  String get saveNotification;
+
+  /// No description provided for @notificationChipToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get notificationChipToday;
+
+  /// No description provided for @notificationChipUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get notificationChipUpcoming;
+
+  /// No description provided for @markCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark completed'**
+  String get markCompleted;
+
+  /// No description provided for @deleteNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete notification'**
+  String get deleteNotification;
+
+  /// No description provided for @notificationScheduledOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled on {dateLabel}'**
+  String notificationScheduledOn(String dateLabel);
+
+  /// No description provided for @selectAlarmSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm sound'**
+  String get selectAlarmSound;
+
+  /// No description provided for @alarmSoundSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Current sound: {soundName}'**
+  String alarmSoundSelected(String soundName);
+
+  /// No description provided for @chooseSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose audio'**
+  String get chooseSound;
+
+  /// No description provided for @previewSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get previewSound;
+
+  /// No description provided for @stopPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop preview'**
+  String get stopPreview;
+
+  /// No description provided for @loopSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Loop sound until stopped'**
+  String get loopSound;
+
+  /// No description provided for @vibrateDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrate device'**
+  String get vibrateDevice;
+
+  /// No description provided for @alarmVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm volume'**
+  String get alarmVolume;
+
+  /// No description provided for @previewSoundFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to preview sound'**
+  String get previewSoundFailed;
+
+  /// No description provided for @stopAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop alarm'**
+  String get stopAlarm;
+
+  /// No description provided for @repeatDailyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat every day'**
+  String get repeatDailyLabel;
+
+  /// No description provided for @repeatDailyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm will ring at this time daily.'**
+  String get repeatDailyHint;
+
+  /// No description provided for @selectTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm time'**
+  String get selectTimeLabel;
+
+  /// No description provided for @selectTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose a daily time'**
+  String get selectTimeHint;
+
+  /// No description provided for @selectTimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a time'**
+  String get selectTimeRequired;
 
   /// No description provided for @scanUnsupportedDevice.
   ///
@@ -5144,16 +5048,22 @@ abstract class AppLocalizations {
   /// **'Scanning is not supported on this device.'**
   String get scanUnsupportedDevice;
 
+  /// No description provided for @scanPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission denied.'**
+  String get scanPermissionDenied;
+
   /// No description provided for @scanPermissionRationaleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Allow camera access'**
+  /// **'Camera access required'**
   String get scanPermissionRationaleTitle;
 
   /// No description provided for @scanPermissionRationaleMessage.
   ///
   /// In en, this message translates to:
-  /// **'We need your camera to scan QR and barcode tags.'**
+  /// **'Tag scanning needs camera access. Please allow permission to continue.'**
   String get scanPermissionRationaleMessage;
 
   /// No description provided for @scanPermissionNotNow.
@@ -5171,13 +5081,13 @@ abstract class AppLocalizations {
   /// No description provided for @scanPermissionSettingsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Camera permission required'**
+  /// **'Permission required'**
   String get scanPermissionSettingsTitle;
 
   /// No description provided for @scanPermissionSettingsMessage.
   ///
   /// In en, this message translates to:
-  /// **'Camera access is disabled. Open Settings to enable it before scanning.'**
+  /// **'Enable camera permission in settings to continue scanning.'**
   String get scanPermissionSettingsMessage;
 
   /// No description provided for @scanPermissionGoToSettings.
@@ -5185,6 +5095,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open settings'**
   String get scanPermissionGoToSettings;
+
+  /// No description provided for @scanOptionQr.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code'**
+  String get scanOptionQr;
+
+  /// No description provided for @scanOptionQrDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code tags'**
+  String get scanOptionQrDescription;
+
+  /// No description provided for @scanOptionBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode'**
+  String get scanOptionBarcode;
+
+  /// No description provided for @scanOptionBarcodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan printed barcodes'**
+  String get scanOptionBarcodeDescription;
+
+  /// No description provided for @scanOptionRfid.
+  ///
+  /// In en, this message translates to:
+  /// **'RFID'**
+  String get scanOptionRfid;
+
+  /// No description provided for @scanOptionRfidDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use RFID reader'**
+  String get scanOptionRfidDescription;
+
+  /// No description provided for @scanTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan tags'**
+  String get scanTagsTitle;
+
+  /// No description provided for @scanTagsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to scan'**
+  String get scanTagsSubtitle;
+
+  /// No description provided for @scanStartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start scanning'**
+  String get scanStartButton;
+
+  /// No description provided for @scanResultNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No livestock found for tag {tag}'**
+  String scanResultNotFound(String tag);
+
+  /// No description provided for @scanRfidPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter RFID code'**
+  String get scanRfidPlaceholder;
+
+  /// No description provided for @scanManualPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag manually'**
+  String get scanManualPlaceholder;
+
+  /// No description provided for @scanManualConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm tag'**
+  String get scanManualConfirm;
+
+  /// No description provided for @vaccineSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine saved successfully'**
+  String get vaccineSavedSuccessfully;
+
+  /// No description provided for @vaccineSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save vaccine. Please try again.'**
+  String get vaccineSaveFailed;
+
+  /// No description provided for @vaccineUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine updated successfully'**
+  String get vaccineUpdatedSuccessfully;
+
+  /// No description provided for @vaccineDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine details'**
+  String get vaccineDetails;
+
+  /// No description provided for @vaccineDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide accurate vaccine information'**
+  String get vaccineDetailsSubtitle;
+
+  /// No description provided for @vaccineType.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine type'**
+  String get vaccineType;
+
+  /// No description provided for @selectVaccineType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select vaccine type'**
+  String get selectVaccineType;
+
+  /// No description provided for @vaccineTypesMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine types missing. Sync reference data first.'**
+  String get vaccineTypesMissing;
+
+  /// No description provided for @vaccineTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine type is required'**
+  String get vaccineTypeRequired;
+
+  /// No description provided for @formulationLiveAttenuated.
+  ///
+  /// In en, this message translates to:
+  /// **'Live attenuated'**
+  String get formulationLiveAttenuated;
+
+  /// No description provided for @formulationInactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactivated'**
+  String get formulationInactivated;
+
+  /// No description provided for @lotNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Lot number'**
+  String get lotNumber;
+
+  /// No description provided for @enterLotNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter lot number'**
+  String get enterLotNumber;
+
+  /// No description provided for @formulationType.
+  ///
+  /// In en, this message translates to:
+  /// **'Formulation type'**
+  String get formulationType;
+
+  /// No description provided for @selectFormulationType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select formulation type'**
+  String get selectFormulationType;
+
+  /// No description provided for @doseAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose amount'**
+  String get doseAmount;
+
+  /// No description provided for @enterDoseAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter dose amount'**
+  String get enterDoseAmount;
+
+  /// No description provided for @doseUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose unit'**
+  String get doseUnit;
+
+  /// No description provided for @selectDoseUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Select dose unit'**
+  String get selectDoseUnit;
+
+  /// No description provided for @vaccineSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get vaccineSchedule;
+
+  /// No description provided for @selectVaccineSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Select schedule'**
+  String get selectVaccineSchedule;
+
+  /// No description provided for @vaccineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine status'**
+  String get vaccineStatus;
+
+  /// No description provided for @selectStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Select status'**
+  String get selectStatus;
+
+  /// No description provided for @ensureVaccineDetailsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure the vaccine details are accurate before saving.'**
+  String get ensureVaccineDetailsAccuracy;
+
+  /// No description provided for @confirmUpdateVaccine.
+  ///
+  /// In en, this message translates to:
+  /// **'Update vaccine details?'**
+  String get confirmUpdateVaccine;
+
+  /// No description provided for @confirmSaveVaccine.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this vaccine?'**
+  String get confirmSaveVaccine;
+
+  /// No description provided for @vaccineScheduleRegular.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular schedule'**
+  String get vaccineScheduleRegular;
+
+  /// No description provided for @vaccineScheduleBooster.
+  ///
+  /// In en, this message translates to:
+  /// **'Booster'**
+  String get vaccineScheduleBooster;
+
+  /// No description provided for @vaccineScheduleSeasonal.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal'**
+  String get vaccineScheduleSeasonal;
+
+  /// No description provided for @vaccineScheduleEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get vaccineScheduleEmergency;
+
+  /// No description provided for @bluetoothNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is not supported on this device'**
+  String get bluetoothNotSupported;
+
+  /// No description provided for @bluetoothPermissionsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permissions are required to scan for devices. Please grant permissions when prompted.'**
+  String get bluetoothPermissionsRequired;
+
+  /// No description provided for @bluetoothPermissionsPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permissions were permanently denied. Please enable them in app settings.'**
+  String get bluetoothPermissionsPermanentlyDenied;
+
+  /// No description provided for @bluetoothTurnOnRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please turn on Bluetooth to scan for devices'**
+  String get bluetoothTurnOnRequired;
+
+  /// No description provided for @bluetoothTurnOnInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to your device settings and turn on Bluetooth, then try again.'**
+  String get bluetoothTurnOnInstructions;
+
+  /// No description provided for @bluetoothUnknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. Please try again.'**
+  String get bluetoothUnknownError;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @makeSureScaleOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure your scale is turned on'**
+  String get makeSureScaleOn;
+
+  /// No description provided for @enableBluetooth.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Bluetooth'**
+  String get enableBluetooth;
+
+  /// No description provided for @bluetoothLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings.'**
+  String get bluetoothLocationRequired;
 }
 
 class _AppLocalizationsDelegate

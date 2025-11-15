@@ -2,7 +2,10 @@ class AdministrationRoute {
   final int id;
   final String name;
 
-  const AdministrationRoute({required this.id, required this.name});
+  const AdministrationRoute({
+    required this.id,
+    required this.name
+  });
 
   factory AdministrationRoute.fromJson(Map<String, dynamic> json) {
     return AdministrationRoute(
@@ -12,6 +15,11 @@ class AdministrationRoute {
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name};
+    return {
+      'id': id,
+      'name': name
+    };
   }
 }
+
+
