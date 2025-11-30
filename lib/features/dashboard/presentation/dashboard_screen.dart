@@ -197,7 +197,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () => _syncData(),
           child: _isSyncing
               ? const LoadingIndicator(size: 20, strokeWidth: 2, color: Colors.white)
-              : const Icon(Iconsax.refresh_outline),
+              : const Icon(Iconsax.refresh_outline, color: Colors.white,),
         ),
         appBar: AppBar(
         title: Column(
@@ -222,6 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
+        
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: Align(

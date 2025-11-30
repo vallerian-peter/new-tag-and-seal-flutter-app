@@ -40,6 +40,7 @@ class CustomStepper extends StatelessWidget {
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Custom Stepper Header
         Container(
@@ -81,26 +82,20 @@ class CustomStepper extends StatelessWidget {
           ),
         ),
         
-        // Step Content (scrollable)
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: shadow,
+        // Step Content
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: shadow,
+            ),
+            child: steps[currentStep].content,
           ),
-          child: steps[currentStep].content,
         ),
         const SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
         
         // Step Controls
         _buildStepControls(context, cardColor, shadow, primary, onPrimary),

@@ -18,6 +18,7 @@ class LivestockDetailsModal {
     required Livestock livestock,
     required Map<String, String> farmNames,
     required VoidCallback onRefresh,
+    bool fromScanner = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -86,6 +87,7 @@ class LivestockDetailsModal {
                         farmNames[livestock.farmUuid],
                         isDark,
                         onRefresh,
+                        fromScanner: fromScanner,
                       ),
 
                       const SizedBox(height: 40),
@@ -347,8 +349,9 @@ class LivestockDetailsModal {
     Livestock livestock,
     String? farmName,
     bool isDark,
-    VoidCallback onRefresh,
-  ) {
+    VoidCallback onRefresh, {
+    bool fromScanner = false,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     final isFemale = livestock.gender.toLowerCase() == 'female';
 
@@ -392,6 +395,7 @@ class LivestockDetailsModal {
                 config: applicableLogs[i],
                 isDark: isDark,
                 count: counts[applicableLogs[i].logType] ?? 0,
+                fromScanner: fromScanner,
               ),
               if (i != applicableLogs.length - 1) const SizedBox(height: 12),
             ],
@@ -651,6 +655,7 @@ class LivestockDetailsModal {
     required _LogConfig config,
     required bool isDark,
     required int count,
+    bool fromScanner = false,
   }) {
     return SizedBox(
       width: double.infinity,
@@ -668,7 +673,7 @@ class LivestockDetailsModal {
             ),
           ),
         ),
-        onPressed: () => config.onAdd?.call(context),
+        onPressed: fromScanner ? null : () => config.onAdd?.call(context),
         child: Row(
           children: [
             Container(
@@ -731,26 +736,29 @@ class LivestockDetailsModal {
               ),
             ),
 
-            const SizedBox(width: 15),
+            // Only show add button if not from scanner
+            if (!fromScanner) ...[
+              const SizedBox(width: 15),
 
-            // Click to add log
-            GestureDetector(
-              onTap: config.onAdd != null
-                  ? () => config.onAdd!(context)
-                  : () => _showComingSoon(context, config.title),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: config.color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.add,
-                  size: 18,
-                  color: config.color,
+              // Click to add log
+              GestureDetector(
+                onTap: config.onAdd != null
+                    ? () => config.onAdd!(context)
+                    : () => _showComingSoon(context, config.title),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: config.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 18,
+                    color: config.color,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

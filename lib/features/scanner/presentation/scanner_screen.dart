@@ -450,6 +450,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       livestock: match,
       farmNames: farmNames,
       onRefresh: () {},
+      fromScanner: true,
     );
   }
 }

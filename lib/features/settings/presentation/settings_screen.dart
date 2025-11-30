@@ -24,6 +24,7 @@ class SettingsScreen extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      
       appBar: AppBar(
         title: Text(
           l10n.settings,
@@ -33,7 +34,9 @@ class SettingsScreen extends StatelessWidget {
             color: theme.colorScheme.onSurface,
           ),
         ),
+
         backgroundColor: theme.scaffoldBackgroundColor,
+        
         elevation: 0,
         automaticallyImplyLeading: false,
         leading: IconButton(
@@ -48,6 +51,7 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             // Settings Header
             Container(
               width: double.infinity,
@@ -77,7 +81,9 @@ class SettingsScreen extends StatelessWidget {
                         color: Constants.primaryColor,
                         size: 24,
                       ),
+
                       const SizedBox(width: 12),
+                      
                       Text(
                         l10n.settingsAppHeaderTitle,
                         style: TextStyle(
@@ -88,7 +94,9 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 8),
+                  
                   Text(
                     l10n.settingsAppHeaderSubtitle,
                     style: TextStyle(
@@ -99,9 +107,9 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Theme Settings
             _buildSettingsSection(
               context: context,
@@ -120,6 +128,7 @@ class SettingsScreen extends StatelessWidget {
                         inactiveTrackColor: Colors.grey.shade300,
                         inactiveThumbColor: Colors.grey.shade800,
                         activeColor: Constants.primaryColor,
+                        thumbColor: WidgetStateProperty.all(const Color.fromARGB(255, 43, 68, 53)),
                         trackOutlineColor: WidgetStateProperty.all(Colors.grey.shade700),
                         trackOutlineWidth: WidgetStateProperty.all(1),
                         onChanged: (value) {
@@ -150,7 +159,6 @@ class SettingsScreen extends StatelessWidget {
             ),
             
             // Notifications & Account sections are hidden for now.
-            
             const SizedBox(height: 24),
             
             // Support & About
@@ -167,6 +175,7 @@ class SettingsScreen extends StatelessWidget {
                     _showAboutDialog(context, l10n);
                   },
                 ),
+
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.support_outline,
@@ -176,6 +185,7 @@ class SettingsScreen extends StatelessWidget {
                     // Handle help and support
                   },
                 ),
+
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.document_text_outline,
@@ -185,6 +195,7 @@ class SettingsScreen extends StatelessWidget {
                     // Handle privacy policy
                   },
                 ),
+
                 _buildSettingOption(
                   context: context,
                   icon: Iconsax.document_outline,
@@ -194,6 +205,7 @@ class SettingsScreen extends StatelessWidget {
                     // Handle terms of service
                   },
                 ),
+
               ],
             ),
             

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -75,7 +76,14 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     ).toList();
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Bootstrap.chevron_left, size: 19,)
+        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
         title: Text(l10n.notifications),
         actions: [
           IconButton(
@@ -85,6 +93,7 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
           ),
         ],
       ),
+
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : notifications.isEmpty
@@ -115,6 +124,7 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                       }),
                       const SizedBox(height: 24),
                     ],
+                    
                     if (upcoming.isNotEmpty) ...[
                       NotificationSectionHeader(title: l10n.upcomingNotifications),
                       const SizedBox(height: 8),
