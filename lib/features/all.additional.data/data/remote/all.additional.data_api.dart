@@ -212,8 +212,13 @@ class AllAdditionalDataService {
       
       // Parse and transform each location/reference type
       final locations = data['locations'] ?? {};
-      final referenceData = data['referenceData'] ?? {}; // Fix: Get referenceData section from response
+      final referenceData = data['referenceData'] ?? {}; // May not exist in initialRegisterSync
       final livestockRef = data['livestockReferenceData'] ?? {};
+
+      // Note: initialRegisterSync returns identityCardTypes and schoolLevels directly in data,
+      // not nested in referenceData. Check both locations for compatibility.
+      final identityCardTypes = data['identityCardTypes'] ?? referenceData['identityCardTypes'];
+      final schoolLevels = data['schoolLevels'] ?? referenceData['schoolLevels'];
 
       return {
         'countries': _parseCountries(locations['countries']),
@@ -223,8 +228,8 @@ class AllAdditionalDataService {
         'villages': _parseVillages(locations['villages']),
         'streets': _parseStreets(locations['streets']),
         'divisions': _parseDivisions(locations['divisions']),
-        'identityCardTypes': _parseIdentityCardTypes(referenceData['identityCardTypes']),
-        'schoolLevels': _parseSchoolLevels(referenceData['schoolLevels']),
+        'identityCardTypes': _parseIdentityCardTypes(identityCardTypes),
+        'schoolLevels': _parseSchoolLevels(schoolLevels),
         // Livestock reference data (optional on this endpoint)
         'species': _parseSpecies(livestockRef['species'] ?? data['species']),
         'livestockTypes': _parseLivestockTypes(livestockRef['livestockTypes'] ?? data['livestockTypes']),

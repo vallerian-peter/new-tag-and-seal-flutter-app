@@ -8,9 +8,11 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/gps_location_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/data/repository/all.additional.data_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -125,29 +127,93 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       final legalStatuses = await database.referenceDataDao
           .getAllLegalStatuses();
 
-      setState(() {
-        _countries = countries;
-        _regions = regions;
-        _districts = districts;
-        _wards = wards;
-        _villages = villages;
-        _legalStatuses = legalStatuses;
-        _isLoadingData = false;
-      });
+      // Check if database is empty (first time registration)
+      // If empty, fetch data from initialRegisterSync endpoint
+      final bool isDataEmpty = countries.isEmpty && 
+                               regions.isEmpty && 
+                               districts.isEmpty && 
+                               wards.isEmpty && 
+                               legalStatuses.isEmpty;
+
+      if (isDataEmpty) {
+        debugPrint('🔍 Database is empty, fetching data from initialRegisterSync...');
+        
+        try {
+          // Fetch and store data from initialRegisterSync endpoint
+          final repository = AllAdditionalDataRepository(database);
+          await repository.syncAndStoreLocally();
+          
+          debugPrint('✅ Successfully synced data from initialRegisterSync');
+          
+          // Reload data from database after sync
+          final updatedCountries = await database.locationDao.getAllCountries();
+          final updatedRegions = await database.locationDao.getAllRegions();
+          final updatedDistricts = await database.locationDao.getAllDistricts();
+          final updatedWards = await database.locationDao.getAllWards();
+          final updatedVillages = await database.locationDao.getAllVillages();
+          final updatedLegalStatuses = await database.referenceDataDao
+              .getAllLegalStatuses();
+
+          setState(() {
+            _countries = updatedCountries;
+            _regions = updatedRegions;
+            _districts = updatedDistricts;
+            _wards = updatedWards;
+            _villages = updatedVillages;
+            _legalStatuses = updatedLegalStatuses;
+            _isLoadingData = false;
+          });
+          
+          debugPrint('✅ Form data loaded successfully after sync');
+        } catch (syncError) {
+          debugPrint('❌ Error syncing data from initialRegisterSync: $syncError');
+          setState(() => _isLoadingData = false);
+
+          // Show error after build completes
+          if (mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                final l10n = AppLocalizations.of(context);
+                if (l10n != null) {
+                  ToastAlerts.showError(
+                    context,
+                    message: l10n.checkInternetConnection,
+                  );
+                }
+              }
+            });
+          }
+          return;
+        }
+      } else {
+        // Data exists in database, use it directly
+        setState(() {
+          _countries = countries;
+          _regions = regions;
+          _districts = districts;
+          _wards = wards;
+          _villages = villages;
+          _legalStatuses = legalStatuses;
+          _isLoadingData = false;
+        });
+        
+        debugPrint('✅ Form data loaded from local database');
+      }
     } catch (e) {
-      debugPrint('Error loading data from database: $e');
+      debugPrint('❌ Error loading data from database: $e');
       setState(() => _isLoadingData = false);
 
       // Show error after build completes
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to load location data: ${e.toString()}'),
-                backgroundColor: Constants.dangerColor,
-              ),
-            );
+            final l10n = AppLocalizations.of(context);
+            if (l10n != null) {
+              ToastAlerts.showError(
+                context,
+                message: l10n.failedToLoadLocations,
+              );
+            }
           }
         });
       }

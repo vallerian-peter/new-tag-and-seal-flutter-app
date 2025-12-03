@@ -28,8 +28,6 @@ class ApiEndpoints {
     
     // return 'http://45.77.1.62:8000/api';
   }
-
-
   
   /// Farmer module base path
   static String get farmerBase => '$baseUrl/v1/farmers';

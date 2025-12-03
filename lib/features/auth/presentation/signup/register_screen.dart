@@ -77,9 +77,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       listen: false,
     );
 
-    // Only load if not already loaded
+    // Load if not already loaded and not currently loading
+    // Also retry if there was an error (locationError is not null)
     if (!additionalDataProvider.hasLocationData &&
         !additionalDataProvider.isLoadingLocations) {
+      // Clear any previous errors before retrying
+      additionalDataProvider.clearLocationError();
       await additionalDataProvider.fetchLocationsWithDialogs(context);
     }
   }
@@ -135,6 +138,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: Consumer<AdditionalDataProvider>(
         builder: (context, additionalDataProvider, child) {
+          // Show loading indicator while fetching data
+          if (additionalDataProvider.isLoadingLocations) {
+            return const Center(child: LoadingIndicator());
+          }
+          
+          // Show error message if data failed to load
+          if (additionalDataProvider.locationError != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Constants.dangerColor,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.networkError,
+                      style: TextStyle(
+                        fontSize: Constants.largeTextSize,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      additionalDataProvider.locationError!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: Constants.textSize,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _loadLocationsIfNeeded(),
+                      icon: const Icon(Icons.refresh),
+                      label: Text(l10n.tryAgain),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Constants.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          
+          // Show loading if data is not yet loaded
           if (!additionalDataProvider.hasLocationData) {
             return const Center(child: LoadingIndicator());
           }
