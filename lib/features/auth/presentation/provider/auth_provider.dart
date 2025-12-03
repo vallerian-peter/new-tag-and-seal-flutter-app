@@ -5,7 +5,9 @@ import 'package:new_tag_and_seal_flutter_app/features/auth/data/local/auth_repos
 import 'package:new_tag_and_seal_flutter_app/features/auth/domain/models/farmer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/farmUser/domain/farm_user_permissions.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Auth Provider
 /// 
@@ -50,6 +52,10 @@ class AuthProvider extends ChangeNotifier {
   /// Current logged in user data
   Map<String, dynamic>? _currentUser;
   Map<String, dynamic>? get currentUser => _currentUser;
+
+  /// Current logged in profile data (Farmer / SystemUser / FarmUser)
+  Map<String, dynamic>? _currentProfile;
+  Map<String, dynamic>? get currentProfile => _currentProfile;
 
   /// Current logged in farmer data
   FarmerModel? _currentFarmer;
@@ -194,14 +200,21 @@ class AuthProvider extends ChangeNotifier {
 
       // Extract response data
       final user = loginData['user'] as Map<String, dynamic>?;
-      final profile = loginData['profile'];
+      final profile = loginData['profile'] as Map<String, dynamic>?;
       final accessToken = loginData['accessToken'] as String?;
       final tokenType = loginData['tokenType'] as String?;
 
       // Update state
       _currentUser = user;
+      _currentProfile = profile;
       _isAuthenticated = true;
       _isLoggingIn = false;
+
+      // Extract roleTitle/jobTitle from profile for farm users
+      String? roleTitle;
+      if (profile != null && user != null && user['role'] == 'farmInvitedUser') {
+        roleTitle = (profile as Map<String, dynamic>?)?['roleTitle'] as String?;
+      }
 
       // Store all data in secure storage (using camelCase keys)
       if (user != null) {
@@ -221,7 +234,12 @@ class AuthProvider extends ChangeNotifier {
           tokenType: tokenType ?? 'Bearer',
           password: user['password'] ?? user['email'] ?? '',
           profile: profile,
+          roleTitle: roleTitle ?? '',
         );
+
+        // Reset dashboard sync prompt (stored in SharedPreferences)
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('dashboard_sync_prompt_shown');
       }
 
       // Load farmer data if user is a farmer
@@ -290,13 +308,20 @@ class AuthProvider extends ChangeNotifier {
 
       // Extract response data
       final user = loginData['user'] as Map<String, dynamic>?;
-      final profile = loginData['profile'];
+      final profile = loginData['profile'] as Map<String, dynamic>?;
       final accessToken = loginData['accessToken'] as String?;
       final tokenType = loginData['tokenType'] as String?;
 
       // Update state
       _currentUser = user;
+      _currentProfile = profile;
       _isAuthenticated = true;
+
+      // Extract roleTitle/jobTitle from profile for farm users
+      String? roleTitle;
+      if (profile != null && user != null && user['role'] == 'farmInvitedUser') {
+        roleTitle = (profile as Map<String, dynamic>?)?['roleTitle'] as String?;
+      }
 
       // Store all data in secure storage (using camelCase keys)
       if (user != null) {
@@ -316,6 +341,7 @@ class AuthProvider extends ChangeNotifier {
           tokenType: tokenType ?? 'Bearer',
           password: password, // Use the password parameter, not from user data
           profile: profile,
+          roleTitle: roleTitle ?? '',
         );
       }
 
@@ -414,7 +440,16 @@ class AuthProvider extends ChangeNotifier {
 
       // If authenticated, load user data
       if (_isAuthenticated) {
-        _currentUser = await _authRepository.getCurrentUser();
+        // Get stored user data including profile
+        final storedData = await _authRepository.getStoredUserData();
+        
+        if (storedData != null) {
+          _currentUser = storedData['user'] as Map<String, dynamic>?;
+          _currentProfile = storedData['profile'] as Map<String, dynamic>?;
+        } else {
+          // Fallback to getCurrentUser if getStoredUserData fails
+          _currentUser = await _authRepository.getCurrentUser();
+        }
         
         // Load farmer data if user is a farmer
         if (_currentUser?['role'] == 'farmer') {
@@ -426,6 +461,7 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _isAuthenticated = false;
       _currentUser = null;
+      _currentProfile = null;
       _currentFarmer = null;
       notifyListeners();
     }
@@ -470,7 +506,11 @@ class AuthProvider extends ChangeNotifier {
 
       // Update state with stored data
       _currentUser = storedData['user'] as Map<String, dynamic>?;
+      _currentProfile = storedData['profile'] as Map<String, dynamic>?;
       _isAuthenticated = true;
+
+      log('🔐 DEBUG: Loaded profile: $_currentProfile');
+      log('🔐 DEBUG: RoleTitle in profile: ${_currentProfile?['roleTitle']}');
 
       // Load farmer data if user is a farmer
       if (_currentUser?['role'] == 'farmer') {
@@ -525,5 +565,17 @@ class AuthProvider extends ChangeNotifier {
 
   /// Check if current user is a farmer
   bool get isFarmer => userRole == 'farmer';
+
+  /// Check if current user is a farm invited user (farm user)
+  bool get isFarmUser => userRole == 'farmInvitedUser';
+
+  /// Resolve farm user permissions based on current profile.roleTitle
+  FarmUserPermissions? get farmUserPermissions {
+    if (!isFarmUser) return null;
+    final profile = _currentProfile;
+    final roleTitle = profile?['roleTitle'] as String?;
+    if (roleTitle == null || roleTitle.trim().isEmpty) return null;
+    return resolveFarmUserPermissions(roleTitle);
+  }
 }
 

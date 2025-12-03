@@ -199,7 +199,8 @@ class AlertDialogs {
   /// 
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
-  /// [message] - Dialog message (localized)
+  /// [message] - Dialog message (localized) - used if [messageWidget] is null
+  /// [messageWidget] - Optional custom widget for message (supports rich text)
   /// [confirmText] - Confirm button text (localized)
   /// [cancelText] - Cancel button text (localized)
   /// [onConfirm] - Confirm button callback
@@ -210,7 +211,8 @@ class AlertDialogs {
   static Future<T?> showConfirmation<T>({
     required BuildContext context,
     required String title,
-    required String message,
+    String? message,
+    Widget? messageWidget,
     required String confirmText,
     required String cancelText,
     VoidCallback? onConfirm,
@@ -223,6 +225,7 @@ class AlertDialogs {
       builder: (context) => _ConfirmationDialog(
         title: title,
         message: message,
+        messageWidget: messageWidget,
         confirmText: confirmText,
         cancelText: cancelText,
         onConfirm: onConfirm,
@@ -778,7 +781,8 @@ class _NetworkIssuesDialog extends StatelessWidget {
 
 class _ConfirmationDialog extends StatelessWidget {
   final String title;
-  final String message;
+  final String? message;
+  final Widget? messageWidget;
   final String confirmText;
   final String cancelText;
   final VoidCallback? onConfirm;
@@ -786,7 +790,8 @@ class _ConfirmationDialog extends StatelessWidget {
 
   const _ConfirmationDialog({
     required this.title,
-    required this.message,
+    this.message,
+    this.messageWidget,
     required this.confirmText,
     required this.cancelText,
     this.onConfirm,
@@ -844,14 +849,24 @@ class _ConfirmationDialog extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Message
-            Text(
-              message,
-              style: TextStyle(
-                fontSize: Constants.textSize,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+            if (messageWidget != null)
+              DefaultTextStyle(
+                style: TextStyle(
+                  fontSize: Constants.textSize,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
+                child: messageWidget!,
+              )
+            else if (message != null)
+              Text(
+                message!,
+                style: TextStyle(
+                  fontSize: Constants.textSize,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 24),
 
             // Buttons
@@ -883,7 +898,12 @@ class _ConfirmationDialog extends StatelessWidget {
                 // Confirm button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: onConfirm ?? () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      // Dismiss dialog first
+                      Navigator.of(context).pop();
+                      // Then call the callback if provided
+                      onConfirm?.call();
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Constants.primaryColor,
                       foregroundColor: Colors.white,

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/controllers/event_form_control.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 class FarmBulkActionsSheet extends StatelessWidget {
   final Map<String, dynamic> farm;
@@ -82,6 +85,17 @@ class FarmBulkActionsSheet extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
       return;
+    }
+
+    // Check role access before proceeding
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!RoleHelper.checkCanAccessLogType(
+      context,
+      l10n,
+      authProvider,
+      config.logType!,
+    )) {
+      return; // Access denied, toast already shown
     }
 
     final farmUuid = (farm['uuid'] ?? farm['farmUuid'] ?? '').toString();

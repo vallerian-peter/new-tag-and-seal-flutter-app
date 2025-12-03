@@ -49,6 +49,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   final _rfidTagIdController = TextEditingController();
   final _weightController = TextEditingController();
 
+  // Prevent recursive updates when keeping barcode/RFID fields in sync
+  bool _isUpdatingTagFields = false;
+
   // Form field values
   String? _selectedFarmUuid;
   int? _selectedLivestockTypeId;
@@ -66,11 +69,14 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   List<Farm> _farms = [];
   List<LivestockType> _livestockTypes = [];
   List<Specie> _species = [];
+  List<Specie> _filteredSpecies = [];
   List<Breed> _breeds = [];
   List<Breed> _filteredBreeds = [];
   List<LivestockObtainedMethod> _livestockObtainedMethods = [];
   List<Livestock> _eligibleMothers = [];
   List<Livestock> _eligibleFathers = [];
+  // Keep all active livestock so we can filter eligible parents by livestock type
+  List<Livestock> _allLivestock = [];
 
   bool _isLoadingData = true;
   bool _hasLoadedData = false;
@@ -100,10 +106,18 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     FocusScope.of(context).unfocus();
     final result = await showTagScannerBottomSheet(context, mode);
     if (!mounted || result == null) return;
-    setState(() {
-      _barcodeTagIdController.text = result;
-      _rfidTagIdController.text = result;
-    });
+    _updateTagIds(result);
+  }
+
+  void _updateTagIds(String value) {
+    if (_isUpdatingTagFields) return;
+    _isUpdatingTagFields = true;
+    try {
+      _barcodeTagIdController.text = value;
+      _rfidTagIdController.text = value;
+    } finally {
+      _isUpdatingTagFields = false;
+    }
   }
 
   Widget _buildScanSuffixButton({
@@ -181,24 +195,24 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         _species = species;
         _breeds = breeds;
         _livestockObtainedMethods = methods;
-        
-        // Load eligible mothers (active female livestock, excluding current if editing)
-        _eligibleMothers = allLivestock
-            .where((l) => l.gender.toLowerCase() == 'female')
-            .where((l) => isEditMode ? l.uuid != widget.livestock!.uuid : true) // Exclude self
-            .toList();
-        
-        // Load eligible fathers (active male livestock, excluding current if editing)
-        _eligibleFathers = allLivestock
-            .where((l) => l.gender.toLowerCase() == 'male')
-            .where((l) => isEditMode ? l.uuid != widget.livestock!.uuid : true) // Exclude self
-            .toList();
-        
-        // Filter breeds immediately if livestock type is already selected (edit mode)
+        _allLivestock = allLivestock;
+
+        // Filter species & breeds immediately if livestock type is already selected (edit mode)
         if (_selectedLivestockTypeId != null) {
-          _filteredBreeds = breeds.where((breed) => breed.livestockTypeId == _selectedLivestockTypeId).toList();
-          log('✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId');
+          _filteredSpecies = species
+              .where((s) => s.livestockTypeId == _selectedLivestockTypeId)
+            .toList();
+          _filteredBreeds = breeds
+              .where((breed) =>
+                  breed.livestockTypeId == _selectedLivestockTypeId)
+            .toList();
+          if (_filteredSpecies.isEmpty) {
+            _filteredSpecies = species;
+          }
+          _autoSelectSpeciesForLivestockType();
+          log('✅ Filtered ${_filteredBreeds.length} breeds and ${_filteredSpecies.length} species for type $_selectedLivestockTypeId');
         } else {
+          _filteredSpecies = species;
           _filteredBreeds = breeds;
         }
         
@@ -206,8 +220,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       });
 
       log('✅ Data loaded: ${_farms.length} farms, ${_livestockTypes.length} types, ${_species.length} species');
-      log('✅ Eligible mothers: ${_eligibleMothers.length} (all females from all farms)');
-      log('✅ Eligible fathers: ${_eligibleFathers.length} (all males from all farms)');
+      // After loading all livestock, compute eligible parents based on current livestock type
+      _updateEligibleParents();
     } catch (e) {
       log('❌ Error loading data: $e');
       setState(() => _isLoadingData = false);
@@ -232,7 +246,17 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     if (_selectedLivestockTypeId == null) return;
 
     setState(() {
-      _filteredBreeds = _breeds.where((breed) => breed.livestockTypeId == _selectedLivestockTypeId).toList();
+      // Filter species by livestock typeId if present
+      _filteredSpecies = _species
+          .where((s) => s.livestockTypeId == _selectedLivestockTypeId)
+          .toList();
+      if (_filteredSpecies.isEmpty) {
+        _filteredSpecies = _species;
+      }
+
+      _filteredBreeds = _breeds
+          .where((breed) => breed.livestockTypeId == _selectedLivestockTypeId)
+          .toList();
 
       // Reset breed if not valid for current type
       if (_selectedBreedId != null) {
@@ -242,7 +266,88 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         }
       }
     });
-    log('✅ Filtered ${_filteredBreeds.length} breeds for type $_selectedLivestockTypeId');
+    _autoSelectSpeciesForLivestockType();
+    log('✅ Filtered ${_filteredBreeds.length} breeds and ${_filteredSpecies.length} species for type $_selectedLivestockTypeId');
+  }
+
+  /// Recompute eligible mothers and fathers based on current livestock type.
+  void _updateEligibleParents() {
+    if (_allLivestock.isEmpty) return;
+
+    final currentUuid = widget.livestock?.uuid;
+    final typeId = _selectedLivestockTypeId;
+
+    setState(() {
+      Iterable<Livestock> base = _allLivestock;
+
+      // If a livestock type is selected, keep only animals of that type
+      if (typeId != null) {
+        base = base.where((l) => l.livestockTypeId == typeId);
+      }
+
+      _eligibleMothers = base
+          .where((l) => l.gender.toLowerCase() == 'female')
+          .where((l) => currentUuid == null ? true : l.uuid != currentUuid)
+          .toList();
+
+      _eligibleFathers = base
+          .where((l) => l.gender.toLowerCase() == 'male')
+          .where((l) => currentUuid == null ? true : l.uuid != currentUuid)
+          .toList();
+    });
+
+    log('✅ Eligible mothers: ${_eligibleMothers.length}, fathers: ${_eligibleFathers.length} for type $typeId');
+  }
+
+  /// Keep species logically in sync with selected livestock type
+  /// by auto-selecting a species whose name matches the livestock type name.
+  void _autoSelectSpeciesForLivestockType() {
+    if (_selectedLivestockTypeId == null) return;
+
+    // Find the selected livestock type
+    LivestockType? selectedType;
+    for (final type in _livestockTypes) {
+      if (type.id == _selectedLivestockTypeId) {
+        selectedType = type;
+        break;
+      }
+    }
+    if (selectedType == null) return;
+
+    // If species already matches the type name, keep it
+    if (_selectedSpeciesId != null) {
+      final current =
+          _species.firstWhere((s) => s.id == _selectedSpeciesId, orElse: () => _species.first);
+      if (current.name.toLowerCase() == selectedType.name.toLowerCase()) {
+        return;
+      }
+    }
+
+    // Prefer a species explicitly linked to this livestock type
+    Specie? matchingSpecies;
+    for (final specie in _filteredSpecies) {
+      if (specie.livestockTypeId == _selectedLivestockTypeId) {
+        matchingSpecies = specie;
+        break;
+      }
+    }
+
+    // Fallback: try to find a species with the same name as the livestock type
+    if (matchingSpecies == null) {
+      for (final specie in _filteredSpecies) {
+        if (specie.name.toLowerCase() == selectedType.name.toLowerCase()) {
+          matchingSpecies = specie;
+          break;
+        }
+      }
+    }
+
+    if (matchingSpecies != null) {
+      setState(() {
+        _selectedSpeciesId = matchingSpecies!.id;
+      });
+      log('✅ Auto-selected species "${matchingSpecies.name}" for livestock type "${selectedType.name}"');
+    }
   }
 
   @override
@@ -666,6 +771,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _barcodeTagIdController,
           label: l10n.barcodeTagId,
           hintText: l10n.enterBarcodeTagId,
+          onChanged: (value) {
+            // Keep barcode and RFID IDs in sync when typing or deleting
+            _updateTagIds(value);
+          },
           suffixIcon: _buildScanSuffixButton(
             icon: Icons.qr_code_scanner,
             tooltip: l10n.scanOptionBarcode,
@@ -683,6 +792,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _rfidTagIdController,
           label: l10n.rfidTagId,
           hintText: l10n.enterRfidTagId,
+          onChanged: (value) {
+            // Keep RFID and barcode IDs in sync when typing or deleting
+            _updateTagIds(value);
+          },
           suffixIcon: _buildScanSuffixButton(
             icon: Icons.nfc,
             tooltip: l10n.scanOptionRfid,
@@ -727,6 +840,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               _selectedLivestockTypeId = value;
               _filterBreedsByLivestockType();
             });
+            // Also re-filter eligible parents by livestock type
+            _updateEligibleParents();
           },
           validator: (value) {
             if (value == null) {
@@ -737,13 +852,13 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Species (Separate from Livestock Type)
+        // Species (filtered by Livestock Type when available)
         CustomDropdown<int>(
           label: l10n.species,
           hint: l10n.select,
           icon: Icons.pets_outlined,
           value: _selectedSpeciesId,
-          dropdownItems: _species.map((species) {
+          dropdownItems: _filteredSpecies.map((species) {
             return DropdownItem<int>(
               value: species.id,
               label: species.name,

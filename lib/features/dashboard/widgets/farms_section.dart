@@ -26,11 +26,14 @@ class FarmsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        
         // Section Header with farm count
         SectionHeader(
           title: l10n.farms,
           trailing: '${farms.length} ${l10n.farms}',
-          onTrailingTap: () => _showAllFarmsBottomSheet(context),
+          onTrailingTap: farms.length >= 1
+              ? () => _showAllFarmsBottomSheet(context)
+              : null,
         ),
         
         const SizedBox(height: 16),
@@ -273,7 +276,10 @@ class FarmsSection extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FarmDetailsBottomSheet(farm: farm),
+      builder: (context) => FarmDetailsBottomSheet(
+        farm: farm,
+        onRefresh: onRefresh,
+      ),
     );
   }
 }

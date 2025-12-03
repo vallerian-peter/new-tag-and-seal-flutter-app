@@ -5,6 +5,16 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/ev
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/deworming_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feeding_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:provider/provider.dart';
@@ -54,8 +64,11 @@ class ViewEventsScreen extends StatelessWidget {
       );
     }
 
-    final displayTitle =
-        '${title.trim().isNotEmpty ? title.trim() : l10n.recordsText} ${l10n.recordsText}';
+    // Use the title directly (already includes "Calving" or "Farrowing" from livestock details modal)
+    // Add "Records" only if title is empty
+    final displayTitle = title.trim().isNotEmpty 
+        ? title.trim() 
+        : l10n.recordsText;
 
     return FutureBuilder<List<dynamic>>(
       future: _loadLogsWithReferences(context),
@@ -276,6 +289,241 @@ class _EventLogCard extends StatelessWidget {
         }
         createdDate = DateTime.tryParse(deworming.createdAt);
         break;
+      case EventLogTypes.calving:
+      case EventLogTypes.farrowing:
+        final birthEvent = log as BirthEventModel;
+        icon = Icons.child_friendly;
+        // "Calving" or "Farrowing" depending on eventType/species
+        title = birthEvent.getEventName();
+        final startDate = DateTime.tryParse(birthEvent.startDate);
+        if (startDate != null) {
+          addRow(l10n.startDate, dateFormat.format(startDate.toLocal()));
+        }
+        final endDate = birthEvent.endDate != null 
+            ? DateTime.tryParse(birthEvent.endDate!) 
+            : null;
+        if (endDate != null) {
+          addRow(l10n.endDate, dateFormat.format(endDate.toLocal()));
+        }
+        final birthTypeName = _resolveBirthTypeName(birthEvent.birthTypeId);
+        if (birthTypeName != null) {
+          addRow(l10n.birthType, birthTypeName);
+        }
+        final birthProblemName = birthEvent.birthProblemsId != null
+            ? _resolveBirthProblemName(birthEvent.birthProblemsId!)
+            : null;
+        if (birthProblemName != null) {
+          addRow(l10n.birthProblem, birthProblemName);
+        }
+        // Always show reproductive problem if ID exists (even if lookup fails, show ID)
+        if (birthEvent.reproductiveProblemId != null) {
+          final reproductiveProblemName = _resolveReproductiveProblemName(birthEvent.reproductiveProblemId!);
+          // Show the name if found, otherwise show the ID as fallback
+          final displayValue = reproductiveProblemName ?? 'ID: ${birthEvent.reproductiveProblemId}';
+          // Always add the row if ID exists (displayValue will never be empty)
+          addRow(l10n.reproductiveProblem, displayValue);
+        }
+        addRow(l10n.remarks, birthEvent.remarks);
+        addRow(l10n.status, birthEvent.status);
+        createdDate = DateTime.tryParse(birthEvent.createdAt);
+        break;
+      case EventLogTypes.abortedPregnancy:
+        final abortedPregnancy = log as AbortedPregnancyModel;
+        icon = Icons.warning_amber;
+        title = l10n.abortedPregnancy;
+        final abortionDate = DateTime.tryParse(abortedPregnancy.abortionDate);
+        if (abortionDate != null) {
+          addRow(l10n.abortionDate, dateFormat.format(abortionDate.toLocal()));
+        }
+        final reproductiveProblemName = abortedPregnancy.reproductiveProblemId != null
+            ? _resolveReproductiveProblemName(abortedPregnancy.reproductiveProblemId!)
+            : null;
+        if (reproductiveProblemName != null) {
+          addRow(l10n.reproductiveProblem, reproductiveProblemName);
+        }
+        addRow(l10n.remarks, abortedPregnancy.remarks);
+        addRow(l10n.status, abortedPregnancy.status);
+        createdDate = DateTime.tryParse(abortedPregnancy.createdAt);
+        break;
+      case EventLogTypes.medication:
+        final medication = log as MedicationModel;
+        icon = Icons.medical_services_outlined;
+        title = l10n.medication;
+        final medicineName = _resolveMedicineName(medication.medicineId);
+        final diseaseName = _resolveDiseaseName(medication.diseaseId);
+        addRow(l10n.medicine, medicineName);
+        if (diseaseName != null) {
+          addRow(l10n.diseaseId, diseaseName);
+        }
+        addRow(l10n.quantity, medication.quantity);
+        addRow(l10n.withdrawalPeriod, medication.withdrawalPeriod);
+        final medicationDate = DateTime.tryParse(medication.medicationDate ?? '');
+        if (medicationDate != null) {
+          addRow(l10n.medicationDate, dateFormat.format(medicationDate.toLocal()));
+        }
+        addRow(l10n.remarks, medication.remarks);
+        createdDate = DateTime.tryParse(medication.createdAt);
+        break;
+      case EventLogTypes.vaccination:
+        final vaccination = log as VaccinationModel;
+        icon = Icons.vaccines_outlined;
+        title = l10n.vaccination;
+        if (vaccination.vaccinationNo != null && vaccination.vaccinationNo!.trim().isNotEmpty) {
+          addRow(l10n.vaccinationNumber, vaccination.vaccinationNo);
+        }
+        final vaccineName = _resolveVaccineName(vaccination.vaccineId);
+        final diseaseName = _resolveDiseaseName(vaccination.diseaseId);
+        if (vaccineName != null) {
+          addRow(l10n.vaccinesText, vaccineName);
+        }
+        if (diseaseName != null) {
+          addRow(l10n.diseaseId, diseaseName);
+        }
+        if (vaccination.vetId != null && vaccination.vetId!.trim().isNotEmpty) {
+          addRow(l10n.vetLicense, vaccination.vetId);
+        }
+        if (vaccination.extensionOfficerId != null && vaccination.extensionOfficerId!.trim().isNotEmpty) {
+          addRow(l10n.extensionOfficerLicense, vaccination.extensionOfficerId);
+        }
+        addRow(l10n.status, vaccination.status);
+        createdDate = DateTime.tryParse(vaccination.createdAt);
+        break;
+      case EventLogTypes.disposal:
+        final disposal = log as DisposalModel;
+        icon = Icons.delete_sweep_outlined;
+        title = l10n.disposal;
+        final disposalTypeName = _resolveDisposalTypeName(disposal.disposalTypeId);
+        if (disposalTypeName != null) {
+          addRow(l10n.disposalTypeId, disposalTypeName);
+        }
+        addRow(l10n.disposalReasons, disposal.reasons);
+        addRow(l10n.remarks, disposal.remarks);
+        addRow(l10n.status, disposal.status);
+        createdDate = DateTime.tryParse(disposal.createdAt);
+        break;
+      case EventLogTypes.milking:
+        final milking = log as MilkingModel;
+        icon = Icons.water_drop;
+        title = l10n.milking;
+        final milkingMethodName = _resolveMilkingMethodName(milking.milkingMethodId);
+        if (milkingMethodName != null) {
+          addRow(l10n.milkingMethod, milkingMethodName);
+        }
+        addRow(l10n.amount, milking.amount);
+        addRow(l10n.lactometerReading, milking.lactometerReading);
+        addRow(l10n.solids, milking.solid);
+        addRow(l10n.solidNonFat, milking.solidNonFat);
+        addRow(l10n.protein, milking.protein);
+        addRow(l10n.correctedLactometerReading, milking.correctedLactometerReading);
+        addRow(l10n.totalSolids, milking.totalSolids);
+        addRow(l10n.colonyFormingUnits, milking.colonyFormingUnits);
+        if (milking.acidity != null && milking.acidity!.trim().isNotEmpty) {
+          addRow(l10n.acidity, milking.acidity);
+        }
+        addRow(l10n.session, milking.session);
+        addRow(l10n.status, milking.status);
+        createdDate = DateTime.tryParse(milking.createdAt);
+        break;
+      case EventLogTypes.dryoff:
+        final dryoff = log as DryoffModel;
+        icon = Icons.opacity_outlined;
+        title = l10n.dryoff;
+        final startDate = DateTime.tryParse(dryoff.startDate);
+        if (startDate != null) {
+          addRow(l10n.startDate, dateFormat.format(startDate.toLocal()));
+        }
+        final endDate = dryoff.endDate != null ? DateTime.tryParse(dryoff.endDate!) : null;
+        if (endDate != null) {
+          addRow(l10n.endDate, dateFormat.format(endDate.toLocal()));
+        }
+        addRow(l10n.reason, dryoff.reason);
+        addRow(l10n.remarks, dryoff.remarks);
+        createdDate = DateTime.tryParse(dryoff.createdAt);
+        break;
+      case EventLogTypes.insemination:
+        final insemination = log as InseminationModel;
+        icon = Icons.favorite;
+        title = l10n.insemination;
+        final lastHeatDate = insemination.lastHeatDate != null ? DateTime.tryParse(insemination.lastHeatDate!) : null;
+        if (lastHeatDate != null) {
+          addRow(l10n.lastHeatDate, dateFormat.format(lastHeatDate.toLocal()));
+        }
+        final heatTypeName = _resolveHeatTypeName(insemination.currentHeatTypeId);
+        if (heatTypeName != null) {
+          addRow(l10n.heatType, heatTypeName);
+        }
+        final inseminationServiceName = _resolveInseminationServiceName(insemination.inseminationServiceId);
+        if (inseminationServiceName != null) {
+          addRow(l10n.inseminationService, inseminationServiceName);
+        }
+        final semenStrawTypeName = _resolveSemenStrawTypeName(insemination.semenStrawTypeId);
+        if (semenStrawTypeName != null) {
+          addRow(l10n.semenStrawType, semenStrawTypeName);
+        }
+        final inseminationDate = insemination.inseminationDate != null ? DateTime.tryParse(insemination.inseminationDate!) : null;
+        if (inseminationDate != null) {
+          addRow(l10n.inseminationDate, dateFormat.format(inseminationDate.toLocal()));
+        }
+        addRow(l10n.bullCode, insemination.bullCode);
+        addRow(l10n.bullBreed, insemination.bullBreed);
+        final semenProductionDate = insemination.semenProductionDate != null ? DateTime.tryParse(insemination.semenProductionDate!) : null;
+        if (semenProductionDate != null) {
+          addRow(l10n.semenProductionDate, dateFormat.format(semenProductionDate.toLocal()));
+        }
+        addRow(l10n.productionCountry, insemination.productionCountry);
+        addRow(l10n.semenBatchNumber, insemination.semenBatchNumber);
+        addRow(l10n.internationalId, insemination.internationalId);
+        addRow(l10n.aiCode, insemination.aiCode);
+        addRow(l10n.manufacturerName, insemination.manufacturerName);
+        addRow(l10n.semenSupplier, insemination.semenSupplier);
+        createdDate = DateTime.tryParse(insemination.createdAt);
+        break;
+      case EventLogTypes.pregnancy:
+        final pregnancy = log as PregnancyModel;
+        icon = Icons.pregnant_woman;
+        title = l10n.pregnancy;
+        final testResultName = _resolveTestResultName(pregnancy.testResultId);
+        if (testResultName != null) {
+          addRow(l10n.testResult, testResultName);
+        }
+        if (pregnancy.noOfMonths != null && pregnancy.noOfMonths!.trim().isNotEmpty) {
+          addRow(l10n.numberOfMonths, pregnancy.noOfMonths);
+        }
+        final testDate = pregnancy.testDate != null ? DateTime.tryParse(pregnancy.testDate!) : null;
+        if (testDate != null) {
+          addRow(l10n.testDate, dateFormat.format(testDate.toLocal()));
+        }
+        addRow(l10n.status, pregnancy.status);
+        addRow(l10n.remarks, pregnancy.remarks);
+        createdDate = DateTime.tryParse(pregnancy.createdAt);
+        break;
+      case EventLogTypes.transfer:
+        final transfer = log as TransferModel;
+        icon = Icons.swap_horiz;
+        title = l10n.transfer;
+        if (transfer.farmName != null && transfer.farmName!.trim().isNotEmpty) {
+          addRow(l10n.fromFarmLabel, transfer.farmName);
+        }
+        if (transfer.toFarmName != null && transfer.toFarmName!.trim().isNotEmpty) {
+          addRow(l10n.toFarmLabel, transfer.toFarmName);
+        }
+        final transferDate = DateTime.tryParse(transfer.transferDate);
+        if (transferDate != null) {
+          addRow(l10n.transferDateLabel, dateFormat.format(transferDate.toLocal()));
+        }
+        addRow(l10n.reason, transfer.reason);
+        if (transfer.price != null && transfer.price!.trim().isNotEmpty) {
+          addRow(l10n.transferPriceLabel, transfer.price);
+        }
+        if (transfer.transporterId != null) {
+          addRow(l10n.transporterIdLabel, transfer.transporterId.toString());
+        }
+        addRow(l10n.remarks, transfer.remarks);
+        if (transfer.status != null && transfer.status!.trim().isNotEmpty) {
+          addRow(l10n.status, transfer.status);
+        }
+        createdDate = DateTime.tryParse(transfer.createdAt);
+        break;
     }
 
     return _EventLogCardContainer(
@@ -312,6 +560,170 @@ extension _DewormingLookup on _EventLogCard {
     }
 
     return routeId.toString();
+  }
+
+  String? _resolveBirthTypeName(int? birthTypeId) {
+    if (birthTypeId == null) return null;
+    if (references == null) return birthTypeId.toString();
+
+    // Try birth types first
+    for (final type in references!.birthTypes) {
+      if (type.id == birthTypeId) {
+        return type.name;
+      }
+    }
+
+    // Fallback to calving types for backward compatibility
+    for (final type in references!.calvingTypes) {
+      if (type.id == birthTypeId) {
+        return type.name;
+      }
+    }
+
+    return birthTypeId.toString();
+  }
+
+  String? _resolveBirthProblemName(int birthProblemId) {
+    if (references == null) return birthProblemId.toString();
+
+    // Try birth problems first
+    for (final problem in references!.birthProblems) {
+      if (problem.id == birthProblemId) {
+        return problem.name;
+      }
+    }
+
+    // Fallback to calving problems for backward compatibility
+    for (final problem in references!.calvingProblems) {
+      if (problem.id == birthProblemId) {
+        return problem.name;
+      }
+    }
+
+    return birthProblemId.toString();
+  }
+
+  String? _resolveReproductiveProblemName(int reproductiveProblemId) {
+    if (references == null) {
+      // References not loaded, return null so caller can show ID
+      return null;
+    }
+
+    // Check if reproductive problems list is loaded
+    final problems = references!.reproductiveProblems;
+    if (problems.isEmpty) {
+      // List is empty, return null so caller can show ID
+      return null;
+    }
+
+    // Search for the problem by ID
+    for (final problem in problems) {
+      if (problem.id == reproductiveProblemId) {
+        return problem.name;
+      }
+    }
+
+    // Problem not found in list, return null so caller can show ID
+    return null;
+  }
+
+  String? _resolveDiseaseName(int? diseaseId) {
+    if (diseaseId == null) return null;
+    if (references == null) return diseaseId.toString();
+
+    for (final disease in references!.diseases) {
+      if (disease.id == diseaseId) {
+        return disease.name;
+      }
+    }
+
+    return diseaseId.toString();
+  }
+
+  String? _resolveVaccineName(int? vaccineId) {
+    // Vaccines are not in LogAdditionalDataProvider
+    // They would need to be resolved from a separate provider
+    // For now, return the ID as string or null
+    if (vaccineId == null) return null;
+    return 'Vaccine #$vaccineId';
+  }
+
+  String? _resolveDisposalTypeName(int? disposalTypeId) {
+    if (disposalTypeId == null) return null;
+    if (references == null) return disposalTypeId.toString();
+
+    for (final type in references!.disposalTypes) {
+      if (type.id == disposalTypeId) {
+        return type.name;
+      }
+    }
+
+    return disposalTypeId.toString();
+  }
+
+  String? _resolveMilkingMethodName(int? milkingMethodId) {
+    if (milkingMethodId == null) return null;
+    if (references == null) return milkingMethodId.toString();
+
+    for (final method in references!.milkingMethods) {
+      if (method.id == milkingMethodId) {
+        return method.name;
+      }
+    }
+
+    return milkingMethodId.toString();
+  }
+
+  String? _resolveHeatTypeName(int? heatTypeId) {
+    if (heatTypeId == null) return null;
+    if (references == null) return heatTypeId.toString();
+
+    for (final type in references!.heatTypes) {
+      if (type.id == heatTypeId) {
+        return type.name;
+      }
+    }
+
+    return heatTypeId.toString();
+  }
+
+  String? _resolveInseminationServiceName(int? serviceId) {
+    if (serviceId == null) return null;
+    if (references == null) return serviceId.toString();
+
+    for (final service in references!.inseminationServices) {
+      if (service.id == serviceId) {
+        return service.name;
+      }
+    }
+
+    return serviceId.toString();
+  }
+
+  String? _resolveSemenStrawTypeName(int? strawTypeId) {
+    if (strawTypeId == null) return null;
+    if (references == null) return strawTypeId.toString();
+
+    for (final type in references!.semenStrawTypes) {
+      if (type.id == strawTypeId) {
+        return type.name;
+      }
+    }
+
+    return strawTypeId.toString();
+  }
+
+  String? _resolveTestResultName(int? testResultId) {
+    if (testResultId == null) return null;
+    if (references == null) return testResultId.toString();
+
+    for (final result in references!.testResults) {
+      if (result.id == testResultId) {
+        return result.name;
+      }
+    }
+
+    return testResultId.toString();
   }
 }
 

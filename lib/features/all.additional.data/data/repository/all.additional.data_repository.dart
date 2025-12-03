@@ -60,11 +60,15 @@ class AllAdditionalDataRepository {
         'identityCardTypes': referenceData['identityCardTypes'],
         'schoolLevels': referenceData['schoolLevels'],
         'legalStatuses': referenceData['legalStatuses'],
+        'birthTypes': referenceData['birthTypes'],
+        'birthProblems': referenceData['birthProblems'],
+        'reproductiveProblems': referenceData['reproductiveProblems'],
         // Livestock reference data
         'species': livestockReferenceData['species'] ?? data['species'],
         'livestockTypes': livestockReferenceData['livestockTypes'] ?? data['livestockTypes'],
         'livestockObtainedMethods': livestockReferenceData['livestockObtainedMethods'] ?? data['livestockObtainedMethods'],
         'breeds': livestockReferenceData['breeds'] ?? data['breeds'],
+        'vaccineTypes': livestockReferenceData['vaccineTypes'] ?? data['vaccineTypes'],
       };
       
       // Store using the shared logic
@@ -247,6 +251,7 @@ class AllAdditionalDataRepository {
             .map((json) => SpeciesCompanion.insert(
                   id: Value(json['id'] ?? 0),
                   name: json['name'] ?? '',
+                  livestockTypeId: Value(json['livestockTypeId'] as int?),
                 ))
             .toList();
 
@@ -289,6 +294,18 @@ class AllAdditionalDataRepository {
             .toList();
 
         await _database.breedDao.insertBreeds(breedCompanions);
+      }
+
+      // Store vaccine types (UPSERT by ID - replace if exists)
+      if (remoteData['vaccineTypes'] != null && (remoteData['vaccineTypes'] as List).isNotEmpty) {
+        final vaccineTypeCompanions = (remoteData['vaccineTypes'] as List)
+            .map((json) => VaccineTypesCompanion.insert(
+                  id: Value(json['id'] ?? 0),
+                  name: json['name'] ?? '',
+                ))
+            .toList();
+
+        await _database.vaccineTypeDao.upsertVaccineTypes(vaccineTypeCompanions);
       }
 
     } catch (e) {

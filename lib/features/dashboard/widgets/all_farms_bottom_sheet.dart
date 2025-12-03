@@ -562,7 +562,10 @@ class _AllFarmsBottomSheetState extends State<AllFarmsBottomSheet> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FarmDetailsBottomSheet(farm: farm),
+      builder: (context) => FarmDetailsBottomSheet(
+        farm: farm,
+        onRefresh: widget.onRefresh,
+      ),
     );
   }
 }

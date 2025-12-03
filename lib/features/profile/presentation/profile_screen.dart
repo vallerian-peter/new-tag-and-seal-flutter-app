@@ -677,6 +677,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       (logType, count) => addItem(_logLabel(l10n, logType), count),
     );
     addItem(l10n.vaccination, summary.vaccines);
+    addItem(l10n.invitedUsersText, summary.farmUsers);
 
     return items;
   }

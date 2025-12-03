@@ -39,8 +39,14 @@ class CustomStepper extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    // Height reserved at the bottom so content doesn't go under the floating controls
+    const double bottomControlsHeight = 120;
+
+    return Stack(
+      children: [
+        // Header + scrollable content
+        Column(
+          mainAxisSize: MainAxisSize.max,
       children: [
         // Custom Stepper Header
         Container(
@@ -74,7 +80,8 @@ class CustomStepper extends StatelessWidget {
                       background: cardColor,
                       showShadow: shadow.isNotEmpty,
                     ),
-                    if (!isLast) _buildStepConnector(context, isCompleted, primary),
+                        if (!isLast)
+                          _buildStepConnector(context, isCompleted, primary),
                   ],
                 );
               }).toList(),
@@ -82,8 +89,9 @@ class CustomStepper extends StatelessWidget {
           ),
         ),
         
-        // Step Content
-        Padding(
+            // Step Content (scrollable, with extra bottom padding so it can scroll behind the controls)
+            Expanded(
+              child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Container(
             padding: const EdgeInsets.all(24),
@@ -92,13 +100,34 @@ class CustomStepper extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: shadow,
             ),
-            child: steps[currentStep].content,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        steps[currentStep].content,
+                        const SizedBox(height: bottomControlsHeight),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        // Floating controls at the bottom
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: _buildStepControls(
+            context,
+            cardColor,
+            shadow,
+            primary,
+            onPrimary,
           ),
         ),
-        const SizedBox(height: 24),
-        
-        // Step Controls
-        _buildStepControls(context, cardColor, shadow, primary, onPrimary),
       ],
     );
   }

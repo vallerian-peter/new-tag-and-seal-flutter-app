@@ -2084,6 +2084,12 @@ abstract class AppLocalizations {
   /// **'Recover via Phone'**
   String get recoverViaPhone;
 
+  /// No description provided for @user.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get user;
+
   /// No description provided for @noInternetConnectionMessage.
   ///
   /// In en, this message translates to:
@@ -2126,6 +2132,12 @@ abstract class AppLocalizations {
   /// **'Failed to load locations'**
   String get failedToLoadLocations;
 
+  /// No description provided for @editFarmUserText.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Farm User'**
+  String get editFarmUserText;
+
   /// No description provided for @creatingAccount.
   ///
   /// In en, this message translates to:
@@ -2167,6 +2179,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logging you out...'**
   String get loggingOut;
+
+  /// No description provided for @editUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit User'**
+  String get editUser;
 
   /// No description provided for @dashboard.
   ///
@@ -2762,6 +2780,54 @@ abstract class AppLocalizations {
   /// **'Failed to save feeding log. Please try again.'**
   String get feedingLogSaveFailed;
 
+  /// No description provided for @birthEventSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth event saved successfully'**
+  String get birthEventSaved;
+
+  /// No description provided for @birthEventUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth event updated successfully'**
+  String get birthEventUpdated;
+
+  /// No description provided for @birthEventSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save birth event. Please try again.'**
+  String get birthEventSaveFailed;
+
+  /// No description provided for @birthEventUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update birth event. Please try again.'**
+  String get birthEventUpdateFailed;
+
+  /// No description provided for @abortedPregnancySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted pregnancy saved successfully'**
+  String get abortedPregnancySaved;
+
+  /// No description provided for @abortedPregnancyUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted pregnancy updated successfully'**
+  String get abortedPregnancyUpdated;
+
+  /// No description provided for @abortedPregnancySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save aborted pregnancy. Please try again.'**
+  String get abortedPregnancySaveFailed;
+
+  /// No description provided for @abortedPregnancyUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update aborted pregnancy. Please try again.'**
+  String get abortedPregnancyUpdateFailed;
+
   /// No description provided for @feeding.
   ///
   /// In en, this message translates to:
@@ -3139,6 +3205,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Calving'**
   String get calving;
+
+  /// No description provided for @farrowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Farrowing'**
+  String get farrowing;
+
+  /// No description provided for @birthEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Event'**
+  String get birthEvent;
+
+  /// No description provided for @abortedPregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted Pregnancy'**
+  String get abortedPregnancy;
+
+  /// No description provided for @birthType.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Type'**
+  String get birthType;
+
+  /// No description provided for @birthProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Problem'**
+  String get birthProblem;
+
+  /// No description provided for @abortionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Abortion Date'**
+  String get abortionDate;
+
+  /// No description provided for @lessThanAMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Less than a month'**
+  String get lessThanAMonth;
 
   /// No description provided for @vaccination.
   ///
@@ -3848,6 +3956,18 @@ abstract class AppLocalizations {
   /// **'Destination farm UUID'**
   String get toFarmUuidLabel;
 
+  /// No description provided for @fromFarmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source farm'**
+  String get fromFarmLabel;
+
+  /// No description provided for @toFarmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination farm'**
+  String get toFarmLabel;
+
   /// No description provided for @enterToFarmUuid.
   ///
   /// In en, this message translates to:
@@ -4333,6 +4453,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save calving log?'**
   String get confirmSaveCalving;
+
+  /// No description provided for @confirmUpdateFarrowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Update farrowing log?'**
+  String get confirmUpdateFarrowing;
+
+  /// No description provided for @confirmSaveFarrowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Save farrowing log?'**
+  String get confirmSaveFarrowing;
 
   /// No description provided for @calvingLogSaveFailed.
   ///
@@ -4844,6 +4976,18 @@ abstract class AppLocalizations {
   /// **'Syncing pending data before logging out...'**
   String get syncingBeforeLogout;
 
+  /// No description provided for @changeFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Farm'**
+  String get changeFarm;
+
+  /// No description provided for @deleteUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete User'**
+  String get deleteUser;
+
   /// No description provided for @addNotification.
   ///
   /// In en, this message translates to:
@@ -5354,6 +5498,30 @@ abstract class AppLocalizations {
   /// **'Emergency'**
   String get vaccineScheduleEmergency;
 
+  /// No description provided for @farmUserSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm user saved successfully'**
+  String get farmUserSavedSuccessfully;
+
+  /// No description provided for @farmUserSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save farm user. Please try again.'**
+  String get farmUserSaveFailed;
+
+  /// No description provided for @farmUserUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm user updated successfully'**
+  String get farmUserUpdatedSuccessfully;
+
+  /// No description provided for @confirmSaveFarmUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this farm user?'**
+  String get confirmSaveFarmUser;
+
   /// No description provided for @bluetoothNotSupported.
   ///
   /// In en, this message translates to:
@@ -5413,6 +5581,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings.'**
   String get bluetoothLocationRequired;
+
+  /// Error message shown when a non-farmer user tries to access farmer-only features
+  ///
+  /// In en, this message translates to:
+  /// **'Not a farmer. Access denied.'**
+  String get notAFarmer;
+
+  /// Error message shown when a non-farm user tries to access farm user-only features
+  ///
+  /// In en, this message translates to:
+  /// **'Not a farm user. Access denied.'**
+  String get notAFarmUser;
+
+  /// Error message shown when user doesn't have the required role
+  ///
+  /// In en, this message translates to:
+  /// **'Access denied. Required role: {role}.'**
+  String accessDeniedRequiredRole(String role);
+
+  /// Error message shown when a non-farmer/non-farm-manager tries to create livestock
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers and farm managers can create livestock.'**
+  String get notAFarmerOrFarmManager;
+
+  /// Error message shown when a non-farmer/non-farm-manager tries to edit or delete livestock
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers and farm managers can manage livestock.'**
+  String get notAFarmerOrFarmManagerManage;
+
+  /// Error message shown when a non-farmer/non-farm-manager tries to edit livestock
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers and farm managers can edit livestock.'**
+  String get notAFarmerOrFarmManagerEdit;
+
+  /// Error message shown when a non-farmer/non-farm-manager tries to delete livestock
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers and farm managers can delete livestock.'**
+  String get notAFarmerOrFarmManagerDelete;
+
+  /// Error message shown when a user without proper role tries to add vaccines
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers, farm managers, and vaccination users can add vaccines.'**
+  String get notAFarmerFarmManagerOrVaccinationUser;
+
+  /// Error message shown when a user doesn't have permission to access a specific log type
+  ///
+  /// In en, this message translates to:
+  /// **'Only farmers, farm managers, and authorized users can access {logType} logs.'**
+  String logTypeAccessDenied(String logType);
 }
 
 class _AppLocalizationsDelegate

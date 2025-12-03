@@ -19,6 +19,8 @@ mixin _$LogReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $TestResultsTable get testResults => attachedDatabase.testResults;
   $CalvingTypesTable get calvingTypes => attachedDatabase.calvingTypes;
   $CalvingProblemsTable get calvingProblems => attachedDatabase.calvingProblems;
+  $BirthTypesTable get birthTypes => attachedDatabase.birthTypes;
+  $BirthProblemsTable get birthProblems => attachedDatabase.birthProblems;
   $ReproductiveProblemsTable get reproductiveProblems =>
       attachedDatabase.reproductiveProblems;
 }

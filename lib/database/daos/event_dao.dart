@@ -7,6 +7,8 @@ import '../../features/events/data/tables/deworming_table.dart';
 import '../../features/events/data/tables/medication_table.dart';
 import '../../features/events/data/tables/vaccination_table.dart';
 import '../../features/events/data/tables/disposal_table.dart';
+import '../../features/events/data/tables/birth_event_table.dart';
+import '../../features/events/data/tables/aborted_pregnancy_table.dart';
 
 part 'event_dao.g.dart';
 
@@ -17,6 +19,8 @@ part 'event_dao.g.dart';
   Medications,
   Vaccinations,
   Disposals,
+  BirthEvents,
+  AbortedPregnancies,
 ])
 class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
   EventDao(AppDatabase db) : super(db);
@@ -65,6 +69,20 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     });
   }
 
+  Future<void> upsertBirthEvents(List<BirthEventsCompanion> entries) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(birthEvents, entries);
+    });
+  }
+
+  Future<void> upsertAbortedPregnancies(List<AbortedPregnanciesCompanion> entries) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(abortedPregnancies, entries);
+    });
+  }
+
   // ==================== SINGLE UPSERT/INSERT ====================
 
   Future<Feeding> upsertFeeding(FeedingsCompanion entry) {
@@ -91,6 +109,14 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return into(disposals).insertReturning(entry, mode: InsertMode.insertOrReplace);
   }
 
+  Future<BirthEvent> upsertBirthEvent(BirthEventsCompanion entry) {
+    return into(birthEvents).insertReturning(entry, mode: InsertMode.insertOrReplace);
+  }
+
+  Future<AbortedPregnancy> upsertAbortedPregnancy(AbortedPregnanciesCompanion entry) {
+    return into(abortedPregnancies).insertReturning(entry, mode: InsertMode.insertOrReplace);
+  }
+
   // ==================== GETTERS ====================
 
   Future<Feeding?> getFeedingByUuid(String uuid) {
@@ -115,6 +141,14 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
 
   Future<Disposal?> getDisposalByUuid(String uuid) {
     return (select(disposals)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
+  }
+
+  Future<BirthEvent?> getBirthEventByUuid(String uuid) {
+    return (select(birthEvents)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
+  }
+
+  Future<AbortedPregnancy?> getAbortedPregnancyByUuid(String uuid) {
+    return (select(abortedPregnancies)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
   }
 
   Future<List<Feeding>> getFeedings({String? farmUuid, String? livestockUuid}) {
@@ -189,6 +223,30 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return query.get();
   }
 
+  Future<List<BirthEvent>> getBirthEvents({String? farmUuid, String? livestockUuid}) {
+    final query = select(birthEvents);
+    if (farmUuid != null) {
+      query.where((tbl) => tbl.farmUuid.equals(farmUuid));
+    }
+    if (livestockUuid != null) {
+      query.where((tbl) => tbl.livestockUuid.equals(livestockUuid));
+    }
+    query.orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    return query.get();
+  }
+
+  Future<List<AbortedPregnancy>> getAbortedPregnancies({String? farmUuid, String? livestockUuid}) {
+    final query = select(abortedPregnancies);
+    if (farmUuid != null) {
+      query.where((tbl) => tbl.farmUuid.equals(farmUuid));
+    }
+    if (livestockUuid != null) {
+      query.where((tbl) => tbl.livestockUuid.equals(livestockUuid));
+    }
+    query.orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    return query.get();
+  }
+
   Future<List<Feeding>> getUnsyncedFeedings() {
     return (select(feedings)..where((tbl) => tbl.synced.equals(false))).get();
   }
@@ -211,6 +269,14 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
 
   Future<List<Disposal>> getUnsyncedDisposals() {
     return (select(disposals)..where((tbl) => tbl.synced.equals(false))).get();
+  }
+
+  Future<List<BirthEvent>> getUnsyncedBirthEvents() {
+    return (select(birthEvents)..where((tbl) => tbl.synced.equals(false))).get();
+  }
+
+  Future<List<AbortedPregnancy>> getUnsyncedAbortedPregnancies() {
+    return (select(abortedPregnancies)..where((tbl) => tbl.synced.equals(false))).get();
   }
 
   Future<bool> updateFeeding(Feeding entry) {
@@ -259,6 +325,26 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
 
   Future<int> deleteDisposalByUuid(String uuid) {
     return (delete(disposals)..where((tbl) => tbl.uuid.equals(uuid))).go();
+  }
+
+  Future<int> deleteBirthEventByUuid(String uuid) {
+    return (delete(birthEvents)..where((tbl) => tbl.uuid.equals(uuid))).go();
+  }
+
+  Future<int> deleteAbortedPregnancyByUuid(String uuid) {
+    return (delete(abortedPregnancies)..where((tbl) => tbl.uuid.equals(uuid))).go();
+  }
+
+  Future<void> markBirthEventsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    await (update(birthEvents)..where((tbl) => tbl.uuid.isIn(uuids)))
+        .write(const BirthEventsCompanion(synced: Value(true)));
+  }
+
+  Future<void> markAbortedPregnanciesAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    await (update(abortedPregnancies)..where((tbl) => tbl.uuid.isIn(uuids)))
+        .write(const AbortedPregnanciesCompanion(synced: Value(true)));
   }
 
   Future<int> deleteServerFeedingsNotIn(Set<String> uuids) async {
@@ -349,6 +435,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
       batch.deleteWhere(medications, (_) => const Constant(true));
       batch.deleteWhere(vaccinations, (_) => const Constant(true));
       batch.deleteWhere(disposals, (_) => const Constant(true));
+      batch.deleteWhere(birthEvents, (_) => const Constant(true));
+      batch.deleteWhere(abortedPregnancies, (_) => const Constant(true));
     });
   }
 }

@@ -251,9 +251,16 @@ class _EventsScreenState extends State<EventsScreen> {
       ),
       _EventTypeConfig(
         logType: EventLogTypes.calving,
-        title: l10n.calving,
+        // Generic title for both calving and farrowing
+        title: l10n.birthEvent,
         color: Colors.brown,
         icon: Icons.child_friendly,
+      ),
+      _EventTypeConfig(
+        logType: EventLogTypes.abortedPregnancy,
+        title: l10n.abortedPregnancy,
+        color: Colors.red,
+        icon: Icons.warning_amber_outlined,
       ),
       _EventTypeConfig(
         logType: EventLogTypes.dryoff,
@@ -279,12 +286,17 @@ class _EventsScreenState extends State<EventsScreen> {
       case EventLogTypes.insemination:
       case EventLogTypes.pregnancy:
       case EventLogTypes.milking:
-      case EventLogTypes.calving:
       case EventLogTypes.dryoff:
         // These event types are part of the product roadmap but their
         // repositories are not yet implemented. Return empty lists so the UI
         // can still display the cards while data support is added.
         return const [];
+      case EventLogTypes.calving:
+      case EventLogTypes.farrowing:
+        // Both calving and farrowing are stored as birth events
+        return provider.allBirthEvents;
+      case EventLogTypes.abortedPregnancy:
+        return provider.allAbortedPregnancies;
       case EventLogTypes.weightChange:
         return provider.allWeightChanges;
       default:

@@ -14,6 +14,8 @@ import '../../features/all.logs.additional.data/data/local/tables/semen_straw_ty
 import '../../features/all.logs.additional.data/data/local/tables/test_result_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/calving_type_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/calving_problem_table.dart';
+import '../../features/all.logs.additional.data/data/local/tables/birth_type_table.dart';
+import '../../features/all.logs.additional.data/data/local/tables/birth_problem_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/reproductive_problem_table.dart';
 
 part 'log_reference_dao.g.dart';
@@ -32,6 +34,8 @@ part 'log_reference_dao.g.dart';
   TestResults,
   CalvingTypes,
   CalvingProblems,
+  BirthTypes,
+  BirthProblems,
   ReproductiveProblems,
 ])
 class LogReferenceDao extends DatabaseAccessor<AppDatabase>
@@ -132,6 +136,20 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  Future<void> upsertBirthTypes(List<BirthTypesCompanion> entries) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(birthTypes, entries);
+    });
+  }
+
+  Future<void> upsertBirthProblems(List<BirthProblemsCompanion> entries) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(birthProblems, entries);
+    });
+  }
+
   Future<void> upsertReproductiveProblems(
       List<ReproductiveProblemsCompanion> entries) async {
     if (entries.isEmpty) return;
@@ -173,6 +191,10 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
   Future<List<CalvingProblem>> getAllCalvingProblems() =>
       select(calvingProblems).get();
 
+  Future<List<BirthType>> getAllBirthTypes() => select(birthTypes).get();
+
+  Future<List<BirthProblem>> getAllBirthProblems() => select(birthProblems).get();
+
   Future<List<ReproductiveProblem>> getAllReproductiveProblems() =>
       select(reproductiveProblems).get();
 
@@ -191,6 +213,8 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
       batch.deleteWhere(testResults, (_) => const Constant(true));
       batch.deleteWhere(calvingTypes, (_) => const Constant(true));
       batch.deleteWhere(calvingProblems, (_) => const Constant(true));
+      batch.deleteWhere(birthTypes, (_) => const Constant(true));
+      batch.deleteWhere(birthProblems, (_) => const Constant(true));
       batch.deleteWhere(reproductiveProblems, (_) => const Constant(true));
     });
   }

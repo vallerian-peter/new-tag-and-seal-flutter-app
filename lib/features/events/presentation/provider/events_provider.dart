@@ -13,6 +13,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milkin
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/calving_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
@@ -40,6 +42,8 @@ class EventsProvider extends ChangeNotifier {
   List<MedicationModel> _allMedications = const [];
   List<VaccinationModel> _allVaccinations = const [];
   List<DisposalModel> _allDisposals = const [];
+  List<BirthEventModel> _allBirthEvents = const [];
+  List<AbortedPregnancyModel> _allAbortedPregnancies = const [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -55,6 +59,8 @@ class EventsProvider extends ChangeNotifier {
   List<MedicationModel> get allMedications => _allMedications;
   List<VaccinationModel> get allVaccinations => _allVaccinations;
   List<DisposalModel> get allDisposals => _allDisposals;
+  List<BirthEventModel> get allBirthEvents => _allBirthEvents;
+  List<AbortedPregnancyModel> get allAbortedPregnancies => _allAbortedPregnancies;
   
   Future<Map<String, int>> loadLogCounts({
     String? farmUuid,
@@ -122,6 +128,8 @@ class EventsProvider extends ChangeNotifier {
       _allMedications = await _eventsRepository.getAllMedications();
       _allVaccinations = await _eventsRepository.getAllVaccinations();
       _allDisposals = await _eventsRepository.getAllDisposals();
+      _allBirthEvents = await _eventsRepository.getAllBirthEvents();
+      _allAbortedPregnancies = await _eventsRepository.getAllAbortedPregnancies();
       _isLoading = false;
       _error = null;
       notifyListeners();
@@ -657,6 +665,258 @@ class EventsProvider extends ChangeNotifier {
     CalvingModel model,
   ) async {
     return _showComingSoonDialog<CalvingModel?>(context);
+  }
+
+  // ============================================================================
+  // BIRTH EVENTS (replaces calvings)
+  // ============================================================================
+
+  Future<BirthEventModel> addBirthEvent(BirthEventModel model) async {
+    try {
+      log('📝 Creating birth event locally: ${model.uuid}');
+      final created = await _eventsRepository.createBirthEvent(model);
+      log('✅ Birth event created locally: ${created.uuid}');
+      _allBirthEvents = [..._allBirthEvents, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create birth event locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<BirthEventModel> updateBirthEvent(BirthEventModel model) async {
+    try {
+      final updated = await _eventsRepository.updateBirthEventLocally(model);
+      _allBirthEvents = _allBirthEvents
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      log('❌ Failed to update birth event locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<BirthEventModel?> addBirthEventWithDialog(
+    BuildContext context,
+    BirthEventModel model,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+
+    try {
+      final created = await addBirthEvent(model);
+      _error = null;
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: l10n.birthEventSaved,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.birthEventSaveFailed,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<BirthEventModel?> updateBirthEventWithDialog(
+    BuildContext context,
+    BirthEventModel model,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.update,
+      message: '',
+      isDismissible: false,
+    );
+
+    try {
+      final updated = await updateBirthEvent(model);
+      _error = null;
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: l10n.birthEventUpdated,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.birthEventUpdateFailed,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
+  }
+
+  // ============================================================================
+  // ABORTED PREGNANCIES
+  // ============================================================================
+
+  Future<AbortedPregnancyModel> addAbortedPregnancy(AbortedPregnancyModel model) async {
+    try {
+      log('📝 Creating aborted pregnancy locally: ${model.uuid}');
+      final created = await _eventsRepository.createAbortedPregnancy(model);
+      log('✅ Aborted pregnancy created locally: ${created.uuid}');
+      _allAbortedPregnancies = [..._allAbortedPregnancies, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create aborted pregnancy locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<AbortedPregnancyModel> updateAbortedPregnancy(AbortedPregnancyModel model) async {
+    try {
+      final updated = await _eventsRepository.updateAbortedPregnancyLocally(model);
+      _allAbortedPregnancies = _allAbortedPregnancies
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      log('❌ Failed to update aborted pregnancy locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<AbortedPregnancyModel?> addAbortedPregnancyWithDialog(
+    BuildContext context,
+    AbortedPregnancyModel model,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+
+    try {
+      final created = await addAbortedPregnancy(model);
+      _error = null;
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: l10n.abortedPregnancySaved,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.abortedPregnancySaveFailed,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<AbortedPregnancyModel?> updateAbortedPregnancyWithDialog(
+    BuildContext context,
+    AbortedPregnancyModel model,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.update,
+      message: '',
+      isDismissible: false,
+    );
+
+    try {
+      final updated = await updateAbortedPregnancy(model);
+      _error = null;
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: l10n.abortedPregnancyUpdated,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.abortedPregnancyUpdateFailed,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<FeedingModel?> updateFeedingWithDialog(
@@ -1554,6 +1814,29 @@ class EventsProvider extends ChangeNotifier {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
         );
+      case EventLogTypes.calving:
+        // Filter birth events to only show calving events
+        final allBirthEvents = await _eventsRepository.getBirthEvents(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+        return allBirthEvents
+            .where((event) => event.eventType == EventLogTypes.calving)
+            .toList();
+      case EventLogTypes.farrowing:
+        // Filter birth events to only show farrowing events
+        final allBirthEvents = await _eventsRepository.getBirthEvents(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+        return allBirthEvents
+            .where((event) => event.eventType == EventLogTypes.farrowing)
+            .toList();
+      case EventLogTypes.abortedPregnancy:
+        return await _eventsRepository.getAbortedPregnancies(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
       default:
         return [];
     }
@@ -1572,6 +1855,8 @@ class EventsProvider extends ChangeNotifier {
     _allMedications = const [];
     _allVaccinations = const [];
     _allDisposals = const [];
+    _allBirthEvents = const [];
+    _allAbortedPregnancies = const [];
     _error = null;
     notifyListeners();
   }

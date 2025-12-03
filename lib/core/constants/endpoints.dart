@@ -15,18 +15,18 @@ class ApiEndpoints {
   static final String baseUrl = _getBaseUrl();
   
   static String _getBaseUrl() {
-    // if (Platform.isAndroid) {
-    //   // Android emulator uses 10.0.2.2 to access host machine's localhost
-    //   return 'http://10.0.2.2:8000/api';
-    // } else if (Platform.isIOS || Platform.isMacOS) {
-    //   // iOS simulator and macOS can use 127.0.0.1
-    //   return 'http://127.0.0.1:8000/api';
-    // } else {
-    //   // Fallback for other platforms
-    //   return 'http://localhost:8000/api';
-    // }
+    if (Platform.isAndroid) {
+      // Android emulator uses 10.0.2.2 to access host machine's localhost
+      return 'http://10.0.2.2:8000/api';
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      // iOS simulator and macOS can use 127.0.0.1
+      return 'http://127.0.0.1:8000/api';
+    } else {
+      // Fallback for other platforms
+      return 'http://localhost:8000/api';
+    }
     
-    return 'http://45.77.1.62:8000/api';
+    // return 'http://45.77.1.62:8000/api';
   }
 
 
@@ -86,20 +86,22 @@ class ApiEndpoints {
   static String get currentUser => '$baseUrl/v1/user';
 
   // ============================================================================
-  // FARMER ENDPOINTS (Requires Farmer or System User Role)
+  // SYNC ENDPOINTS (Shared - All Authenticated Roles)
   // ============================================================================
 
   // ----------------------------------------------------------------------------
-  // Farmer Sync Endpoints
+  // Sync Endpoints (Protected)
   // ----------------------------------------------------------------------------
   
-  /// Splash sync - Get all data on app startup (GET request, requires auth)
+  /// Splash sync - Get all data on app startup based on user role (GET request, requires auth)
   /// Usage: ${ApiEndpoints.splashSyncAll}/{userId}
-  static String get splashSyncAll => '$farmerBase/sync/splash-sync-all';
+  /// Accessible by: Farmers, Extension Officers, Vets, Farm Invited Users, System Users
+  static String get splashSyncAll => '$baseUrl/v1/sync/splash-sync-all';
   
   /// Full Sync Post Data - Send unsynced data to server (POST request, requires auth)
   /// Usage: ${ApiEndpoints.fullSyncPostData}/{userId}
-  static String get fullSyncPostData => '$farmerBase/sync/full-post-sync';
+  /// Accessible by: Farmers, Extension Officers, Vets, Farm Invited Users, System Users
+  static String get fullSyncPostData => '$baseUrl/v1/sync/full-post-sync';
 
   // ============================================================================
   // LEGACY ENDPOINTS (Deprecated - For Backward Compatibility)

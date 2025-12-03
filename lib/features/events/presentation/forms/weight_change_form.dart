@@ -295,11 +295,12 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
       body: _isLoadingContext
           ? const Center(child: LoadingIndicator())
           : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Form(
-                  key: _formKey,
-                  child: CustomStepper(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CustomStepper(
                     key: _stepperKey,
                     currentStep: _currentStep,
                     onStepContinue: _onStepContinue,
@@ -321,7 +322,9 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
                         content: _buildStepTwo(l10n, theme),
                       ),
                     ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -1,9 +1,7 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/models/vaccine_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/provider/vaccine_provider.dart';
@@ -26,12 +24,12 @@ class _VaccineScreenState extends State<VaccineScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _initialize();
+        _initialize(forceReload: true);
       }
     });
   }
 
-  Future<void> _initialize({bool forceReload = false}) async {
+  Future<void> _initialize({bool forceReload = true}) async {
     try {
       setState(() {
         _isLoading = true;
@@ -78,7 +76,10 @@ class _VaccineScreenState extends State<VaccineScreen> {
     final vaccineProvider = context.watch<VaccineProvider>();
 
     final isBusy = _isLoading || vaccineProvider.isLoading;
-    final vaccines = vaccineProvider.vaccines;
+    // Exclude locally deleted vaccines (syncAction == 'deleted')
+    final vaccines = vaccineProvider.vaccines
+        .where((v) => v.syncAction != 'deleted')
+        .toList();
 
     if (isBusy) {
       return Scaffold(
@@ -89,7 +90,10 @@ class _VaccineScreenState extends State<VaccineScreen> {
 
     if (_error != null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.vaccinesText)),
+        appBar: AppBar(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          title: Text(l10n.vaccinesText)
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -123,7 +127,8 @@ class _VaccineScreenState extends State<VaccineScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.vaccinesText),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        title: Text('${l10n.vaccinesText} (${vaccines.length})'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -188,7 +193,7 @@ class _VaccineCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
     final backgroundColor = isDark
-        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
+        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.1)
         : Colors.white;
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.1)
@@ -236,6 +241,7 @@ class _VaccineCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               Container(
                 width: 40,
                 height: 40,
@@ -248,7 +254,9 @@ class _VaccineCard extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
               ),
+
               const SizedBox(width: 12),
+              
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +280,9 @@ class _VaccineCard extends StatelessWidget {
               ),
             ],
           ),
+          
           const SizedBox(height: 16),
+
           ...rows.map((row) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(

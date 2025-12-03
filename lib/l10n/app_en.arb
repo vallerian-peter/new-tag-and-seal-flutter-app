@@ -534,6 +534,8 @@
   "recoverViaEmail": "Recover via Email",
   "recoverViaPhone": "Recover via Phone",
   "cancel": "Cancel",
+
+  "user": "User",
   
   "noInternetConnection": "No Internet Connection",
   "noInternetConnectionMessage": "Please check your network settings and try again",
@@ -546,6 +548,8 @@
   "loadingLocations": "Loading Locations...",
   "locationsLoadedSuccessfully": "Locations loaded successfully",
   "failedToLoadLocations": "Failed to load locations",
+
+  "editFarmUserText": "Update Farm User",
   
   "creatingAccount": "Creating your account...",
   "registrationSuccessful": "Registration successful! Welcome to Tag & Seal.",
@@ -554,6 +558,8 @@
   "loggingIn": "Logging you in...",
   "loginFailed": "Login Failed",
   "loggingOut": "Logging you out...",
+
+  "editUser": "Edit User",
 
   "dashboard": "Dashboard",
   "start": "Start",
@@ -660,6 +666,14 @@
   "eventsLoadFailed": "Failed to load events. Please try again.",
   "feedingLogSaved": "Feeding log saved successfully",
   "feedingLogSaveFailed": "Failed to save feeding log. Please try again.",
+  "birthEventSaved": "Birth event saved successfully",
+  "birthEventUpdated": "Birth event updated successfully",
+  "birthEventSaveFailed": "Failed to save birth event. Please try again.",
+  "birthEventUpdateFailed": "Failed to update birth event. Please try again.",
+  "abortedPregnancySaved": "Aborted pregnancy saved successfully",
+  "abortedPregnancyUpdated": "Aborted pregnancy updated successfully",
+  "abortedPregnancySaveFailed": "Failed to save aborted pregnancy. Please try again.",
+  "abortedPregnancyUpdateFailed": "Failed to update aborted pregnancy. Please try again.",
   "feeding": "Feeding",
   "addFeeding": "Add Feeding",
   "feedingDetailsSubtitle": "Capture feeding details for accurate records",
@@ -725,6 +739,13 @@
   "weightChange": "Weight Change",
   "disposalTransfer": "Disposal / Transfer",
   "calving": "Calving",
+  "farrowing": "Farrowing",
+  "birthEvent": "Birth Event",
+  "abortedPregnancy": "Aborted Pregnancy",
+  "birthType": "Birth Type",
+  "birthProblem": "Birth Problem",
+  "abortionDate": "Abortion Date",
+  "lessThanAMonth": "Less than a month",
   "vaccination": "Vaccination",
   "dryoff": "Dryoff",
   "medication": "Medication",
@@ -843,6 +864,8 @@
   "transferDetailsSubtitle": "Track livestock movement between farms.",
   "transferContextInfo": "Provide the destination farm and transporter information.",
   "toFarmUuidLabel": "Destination farm UUID",
+  "fromFarmLabel": "Source farm",
+  "toFarmLabel": "Destination farm",
   "enterToFarmUuid": "Enter destination farm UUID",
   "toFarmUuidRequired": "Destination farm UUID is required",
   "transferToFarmUuidWarning": "Ensure the destination farm exists before saving.",
@@ -924,6 +947,8 @@
   "calvingNotesInfo": "Add notes about calves, complications, or support provided.",
   "confirmUpdateCalving": "Update calving log?",
   "confirmSaveCalving": "Save calving log?",
+  "confirmUpdateFarrowing": "Update farrowing log?",
+  "confirmSaveFarrowing": "Save farrowing log?",
   "calvingLogSaveFailed": "Failed to save calving log. Please try again.",
   "noLivestockFound": "No livestock found",
   "total": "Total",
@@ -1044,6 +1069,9 @@
   "syncAndLogout": "Sync & Logout",
   "syncingBeforeLogout": "Syncing pending data before logging out...",
 
+  "changeFarm": "Change Farm",
+  "deleteUser": "Delete User",
+
   "addNotification": "Add notification",
   "noNotifications": "No notifications yet",
   "upcomingToday": "Today",
@@ -1152,6 +1180,10 @@
   "vaccineScheduleBooster": "Booster",
   "vaccineScheduleSeasonal": "Seasonal",
   "vaccineScheduleEmergency": "Emergency",
+  "farmUserSavedSuccessfully": "Farm user saved successfully",
+  "farmUserSaveFailed": "Failed to save farm user. Please try again.",
+  "farmUserUpdatedSuccessfully": "Farm user updated successfully",
+  "confirmSaveFarmUser": "Save this farm user?",
   "bluetoothNotSupported": "Bluetooth is not supported on this device",
   "bluetoothPermissionsRequired": "Bluetooth permissions are required to scan for devices. Please grant permissions when prompted.",
   "bluetoothPermissionsPermanentlyDenied": "Bluetooth permissions were permanently denied. Please enable them in app settings.",
@@ -1162,6 +1194,55 @@
   "makeSureScaleOn": "Make sure your scale is turned on",
   "enableBluetooth": "Enable Bluetooth",
   "retry": "Retry",
-  "bluetoothLocationRequired": "Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings."
+  "bluetoothLocationRequired": "Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings.",
+  
+  "notAFarmer": "Not a farmer. Access denied.",
+  "@notAFarmer": {
+    "description": "Error message shown when a non-farmer user tries to access farmer-only features"
+  },
+  "notAFarmUser": "Not a farm user. Access denied.",
+  "@notAFarmUser": {
+    "description": "Error message shown when a non-farm user tries to access farm user-only features"
+  },
+  "accessDeniedRequiredRole": "Access denied. Required role: {role}.",
+  "@accessDeniedRequiredRole": {
+    "description": "Error message shown when user doesn't have the required role",
+    "placeholders": {
+      "role": {
+        "type": "String",
+        "example": "farmer"
+      }
+    }
+  },
+  "notAFarmerOrFarmManager": "Only farmers and farm managers can create livestock.",
+  "@notAFarmerOrFarmManager": {
+    "description": "Error message shown when a non-farmer/non-farm-manager tries to create livestock"
+  },
+  "notAFarmerOrFarmManagerManage": "Only farmers and farm managers can manage livestock.",
+  "@notAFarmerOrFarmManagerManage": {
+    "description": "Error message shown when a non-farmer/non-farm-manager tries to edit or delete livestock"
+  },
+  "notAFarmerOrFarmManagerEdit": "Only farmers and farm managers can edit livestock.",
+  "@notAFarmerOrFarmManagerEdit": {
+    "description": "Error message shown when a non-farmer/non-farm-manager tries to edit livestock"
+  },
+  "notAFarmerOrFarmManagerDelete": "Only farmers and farm managers can delete livestock.",
+  "@notAFarmerOrFarmManagerDelete": {
+    "description": "Error message shown when a non-farmer/non-farm-manager tries to delete livestock"
+  },
+  "notAFarmerFarmManagerOrVaccinationUser": "Only farmers, farm managers, and vaccination users can add vaccines.",
+  "@notAFarmerFarmManagerOrVaccinationUser": {
+    "description": "Error message shown when a user without proper role tries to add vaccines"
+  },
+  "logTypeAccessDenied": "Only farmers, farm managers, and authorized users can access {logType} logs.",
+  "@logTypeAccessDenied": {
+    "description": "Error message shown when a user doesn't have permission to access a specific log type",
+    "placeholders": {
+      "logType": {
+        "type": "String",
+        "example": "feeding"
+      }
+    }
+  }
 }
 

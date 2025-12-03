@@ -4,6 +4,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_image_helper.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer';
 
@@ -206,9 +207,9 @@ class LivestockCard extends StatelessWidget {
                           fit: BoxFit.contain,
                           scale: 6.0,
                           image: AssetImage(
-                            isMale
-                                ? 'assets/images/placeholders/bull-1.png'
-                                : 'assets/images/placeholders/cow-1.png',
+                            LivestockImageHelper.getPlaceholderForLivestock(
+                              livestock,
+                            ),
                           ),
                         ),
                       ),

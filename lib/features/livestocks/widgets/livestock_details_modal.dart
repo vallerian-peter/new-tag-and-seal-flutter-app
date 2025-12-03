@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/controllers/events_view_control.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/controllers/event_form_control.dart';
@@ -9,6 +11,8 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/repository/livestock_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_image_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_log_visibility_helper.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer';
 
@@ -124,9 +128,7 @@ class LivestockDetailsModal {
               fit: BoxFit.contain,
               scale: 6.0,
               image: AssetImage(
-                livestock.gender.toLowerCase() == 'male'
-                    ? 'assets/images/placeholders/bull-1.png'
-                    : 'assets/images/placeholders/cow-1.png',
+                LivestockImageHelper.getPlaceholderForLivestock(livestock),
               ),
             ),
           ),
@@ -146,7 +148,7 @@ class LivestockDetailsModal {
               ),
               const SizedBox(height: 4),
               Text(
-                '${l10n.age}: ${_calculateAge(livestock.dateOfBirth)}',
+                '${l10n.age}: ${_calculateAge(l10n, livestock.dateOfBirth)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                 ),
@@ -166,7 +168,18 @@ class LivestockDetailsModal {
             borderRadius: BorderRadius.circular(12),
           ),
           onSelected: (value) {
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final l10n = AppLocalizations.of(context)!;
+            
             if (value == 'edit') {
+              if (!RoleHelper.checkCanManageLivestock(
+                context, 
+                l10n, 
+                authProvider,
+                customErrorMessage: l10n.notAFarmerOrFarmManagerEdit,
+              )) {
+                return; // Access denied, toast already shown
+              }
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -175,6 +188,14 @@ class LivestockDetailsModal {
                 ),
               ).then((_) => onRefresh());
             } else if (value == 'delete') {
+              if (!RoleHelper.checkCanManageLivestock(
+                context, 
+                l10n, 
+                authProvider,
+                customErrorMessage: l10n.notAFarmerOrFarmManagerDelete,
+              )) {
+                return; // Access denied, toast already shown
+              }
               Navigator.pop(context);
               _showDeleteConfirmation(context, livestock, onRefresh);
             }
@@ -357,7 +378,15 @@ class LivestockDetailsModal {
 
     final logs = _buildLogConfigs(context, livestock, farmName, l10n, onRefresh);
     final applicableLogs = logs
+        // Filter by gender support
         .where((log) => isFemale ? log.supportsFemale : log.supportsMale)
+        // Filter by livestock type (e.g. calving/milking only for cattle)
+        .where(
+          (log) => LivestockLogVisibilityHelper.supportsLogType(
+            livestock,
+            log.logType,
+          ),
+        )
         .toList();
 
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
@@ -414,6 +443,26 @@ class LivestockDetailsModal {
   ) {
     final farmUuid = livestock.farmUuid;
     final livestockUuid = livestock.uuid;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Helper function to wrap onAdd callback with role check
+    void Function(BuildContext)? wrapWithRoleCheck(
+      String logType,
+      void Function(BuildContext) originalCallback,
+    ) {
+      return (ctx) {
+        if (!RoleHelper.checkCanAccessLogType(ctx, l10n, authProvider, logType)) {
+          return; // Access denied, toast already shown
+        }
+        originalCallback(ctx);
+      };
+    }
+
+    // Choose birth log type/title based on livestock type
+    final isPig = livestock.livestockTypeId == 2;
+    final birthLogType =
+        isPig ? EventLogTypes.farrowing : EventLogTypes.calving;
+    final birthTitle = isPig ? l10n.farrowing : l10n.calving;
 
     return [
       _LogConfig(
@@ -423,13 +472,20 @@ class LivestockDetailsModal {
         color: Colors.green,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: context,
-          logType: EventLogTypes.feeding,
-          title: l10n.feeding,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.feeding,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.feeding,
+            title: l10n.feeding,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: context,
@@ -448,8 +504,30 @@ class LivestockDetailsModal {
         color: Colors.redAccent,
         supportsMale: false,
         supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.insemination),
-        onView: (ctx) => _showComingSoon(ctx, l10n.insemination),
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.insemination,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.insemination,
+            title: l10n.insemination,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.insemination,
+          title: l10n.insemination,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
       ),
       _LogConfig(
         logType: EventLogTypes.pregnancy,
@@ -458,8 +536,30 @@ class LivestockDetailsModal {
         color: Colors.purple,
         supportsMale: false,
         supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.pregnancy),
-        onView: (ctx) => _showComingSoon(ctx, l10n.pregnancy),
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.pregnancy,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.pregnancy,
+            title: l10n.pregnancy,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.pregnancy,
+          title: l10n.pregnancy,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
       ),
       _LogConfig(
         logType: EventLogTypes.deworming,
@@ -468,13 +568,20 @@ class LivestockDetailsModal {
         color: Colors.teal,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: ctx,
-          logType: EventLogTypes.deworming,
-          title: l10n.deworming,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.deworming,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.deworming,
+            title: l10n.deworming,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
@@ -493,14 +600,21 @@ class LivestockDetailsModal {
         color: Colors.orange,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: ctx,
-          logType: EventLogTypes.weightChange,
-          title: l10n.weightChange,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          isBulk: false,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.weightChange,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.weightChange,
+            title: l10n.weightChange,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            isBulk: false,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
@@ -519,13 +633,20 @@ class LivestockDetailsModal {
         color: Colors.purple,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: ctx,
-          logType: EventLogTypes.medication,
-          title: l10n.medication,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.medication,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.medication,
+            title: l10n.medication,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
@@ -544,13 +665,20 @@ class LivestockDetailsModal {
         color: Colors.lightBlue,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: ctx,
-          logType: EventLogTypes.vaccination,
-          title: l10n.vaccination,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.vaccination,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.vaccination,
+            title: l10n.vaccination,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
@@ -569,13 +697,20 @@ class LivestockDetailsModal {
         color: Colors.brown,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: (ctx) => EventFormControl.open(
-          context: ctx,
-          logType: EventLogTypes.disposal,
-          title: l10n.disposal,
-          farmUuid: farmUuid,
-          livestockUuid: livestockUuid,
-          onCompleted: onRefresh,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.disposal,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.disposal,
+            title: l10n.disposal,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
@@ -588,54 +723,69 @@ class LivestockDetailsModal {
         ),
       ),
       _LogConfig(
-        logType: EventLogTypes.milking,
-        title: l10n.milking,
-        icon: Icons.water_drop_outlined,
-        color: Colors.lightBlueAccent,
-        supportsMale: true,
-        supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.milking),
-        onView: (ctx) => _showComingSoon(ctx, l10n.milking),
-      ),
-      _LogConfig(
-        logType: EventLogTypes.calving,
-        title: l10n.calving,
+        logType: birthLogType,
+        title: birthTitle,
         icon: Icons.child_friendly,
-        color: Colors.brown,
+        color: const Color.fromARGB(255, 7, 90, 101),
         supportsMale: false,
         supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.calving),
-        onView: (ctx) => _showComingSoon(ctx, l10n.calving),
+        onAdd: wrapWithRoleCheck(
+          birthLogType,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: birthLogType,
+            title: birthTitle,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: ctx,
+          logType: birthLogType,
+          title: birthTitle,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
       ),
+      
       _LogConfig(
-        logType: EventLogTypes.vaccination,
-        title: l10n.vaccination,
-        icon: Icons.vaccines,
-        color: const Color(0xFF4CAF50),
-        supportsMale: true,
-        supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.vaccination),
-        onView: (ctx) => _showComingSoon(ctx, l10n.vaccination),
-      ),
-      _LogConfig(
-        logType: EventLogTypes.dryoff,
-        title: l10n.dryoff,
-        icon: Icons.opacity_outlined,
-        color: Colors.blueGrey,
+        logType: EventLogTypes.abortedPregnancy,
+        title: l10n.abortedPregnancy,
+        icon: Icons.warning_amber_outlined,
+        color: Colors.redAccent,
         supportsMale: false,
         supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.dryoff),
-        onView: (ctx) => _showComingSoon(ctx, l10n.dryoff),
-      ),
-      _LogConfig(
-        logType: EventLogTypes.medication,
-        title: l10n.medication,
-        icon: Icons.medical_services,
-        color: Colors.indigo,
-        supportsMale: true,
-        supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.medication),
-        onView: (ctx) => _showComingSoon(ctx, l10n.medication),
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.abortedPregnancy,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.abortedPregnancy,
+            title: l10n.abortedPregnancy,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: ctx,
+          logType: EventLogTypes.abortedPregnancy,
+          title: l10n.abortedPregnancy,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
       ),
       _LogConfig(
         logType: EventLogTypes.milking,
@@ -644,8 +794,62 @@ class LivestockDetailsModal {
         color: Colors.lightBlue,
         supportsMale: false,
         supportsFemale: true,
-        onAdd: (ctx) => _showComingSoon(ctx, l10n.milking),
-        onView: (ctx) => _showComingSoon(ctx, l10n.milking),
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.milking,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.milking,
+            title: l10n.milking,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.milking,
+          title: l10n.milking,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.dryoff,
+        title: l10n.dryoff,
+        icon: Icons.opacity_outlined,
+        color: Colors.blueGrey,
+        supportsMale: false,
+        supportsFemale: true,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.dryoff,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.dryoff,
+            title: l10n.dryoff,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              // Close the modal and refresh parent
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.dryoff,
+          title: l10n.dryoff,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: livestock.name,
+        ),
       ),
     ];
   }
@@ -855,7 +1059,7 @@ class LivestockDetailsModal {
     }
   }
 
-  static String _calculateAge(String dateOfBirth) {
+  static String _calculateAge(AppLocalizations l10n, String dateOfBirth) {
     try {
       DateTime birthDate = DateTime.parse(dateOfBirth);
       DateTime now = DateTime.now();
@@ -868,14 +1072,17 @@ class LivestockDetailsModal {
       }
 
       if (years > 0) {
+        final yearLabel = years == 1 ? l10n.year : l10n.years;
+        final monthLabel = months == 1 ? l10n.month : l10n.months;
         if (months == 0) {
-          return '$years ${years == 1 ? "year" : "years"}';
+          return '$years $yearLabel';
         }
-        return '$years ${years == 1 ? "year" : "years"} $months ${months == 1 ? "month" : "months"}';
+        return '$years $yearLabel $months $monthLabel';
       } else if (months > 0) {
-        return '$months ${months == 1 ? "month" : "months"}';
+        final monthLabel = months == 1 ? l10n.month : l10n.months;
+        return '$months $monthLabel';
       } else {
-        return 'Less than a month';
+        return l10n.lessThanAMonth;
       }
     } catch (e) {
       log('Error calculating age: $e');
@@ -905,9 +1112,55 @@ class LivestockDetailsModal {
 
   static void _showComingSoon(BuildContext context, String title) {
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$title - ${l10n.comingSoon}')),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Lightweight toast-style notification at the bottom instead of SnackBar
+    final entry = OverlayEntry(
+      builder: (ctx) {
+        return Positioned(
+          left: 16,
+          right: 16,
+          bottom: 32,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.grey.shade800.withOpacity(0.95)
+                    : Colors.black.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '$title - ${l10n.comingSoon}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
     );
+      },
+    );
+
+    Overlay.of(context).insert(entry);
+    Future.delayed(const Duration(seconds: 2), entry.remove);
   }
 }
 

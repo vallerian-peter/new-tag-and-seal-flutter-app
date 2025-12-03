@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:new_tag_and_seal_flutter_app/core/global-sync/endpoints.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/endpoints.dart';
 
 /// Auth Service
 /// 

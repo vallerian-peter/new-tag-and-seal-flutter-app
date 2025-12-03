@@ -1041,6 +1041,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoverViaPhone => 'Recover via Phone';
 
   @override
+  String get user => 'User';
+
+  @override
   String get noInternetConnectionMessage =>
       'Please check your network settings and try again';
 
@@ -1064,6 +1067,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToLoadLocations => 'Failed to load locations';
 
   @override
+  String get editFarmUserText => 'Update Farm User';
+
+  @override
   String get creatingAccount => 'Creating your account...';
 
   @override
@@ -1084,6 +1090,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loggingOut => 'Logging you out...';
+
+  @override
+  String get editUser => 'Edit User';
 
   @override
   String get dashboard => 'Dashboard';
@@ -1393,6 +1402,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to save feeding log. Please try again.';
 
   @override
+  String get birthEventSaved => 'Birth event saved successfully';
+
+  @override
+  String get birthEventUpdated => 'Birth event updated successfully';
+
+  @override
+  String get birthEventSaveFailed =>
+      'Failed to save birth event. Please try again.';
+
+  @override
+  String get birthEventUpdateFailed =>
+      'Failed to update birth event. Please try again.';
+
+  @override
+  String get abortedPregnancySaved => 'Aborted pregnancy saved successfully';
+
+  @override
+  String get abortedPregnancyUpdated =>
+      'Aborted pregnancy updated successfully';
+
+  @override
+  String get abortedPregnancySaveFailed =>
+      'Failed to save aborted pregnancy. Please try again.';
+
+  @override
+  String get abortedPregnancyUpdateFailed =>
+      'Failed to update aborted pregnancy. Please try again.';
+
+  @override
   String get feeding => 'Feeding';
 
   @override
@@ -1590,6 +1628,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calving => 'Calving';
+
+  @override
+  String get farrowing => 'Farrowing';
+
+  @override
+  String get birthEvent => 'Birth Event';
+
+  @override
+  String get abortedPregnancy => 'Aborted Pregnancy';
+
+  @override
+  String get birthType => 'Birth Type';
+
+  @override
+  String get birthProblem => 'Birth Problem';
+
+  @override
+  String get abortionDate => 'Abortion Date';
+
+  @override
+  String get lessThanAMonth => 'Less than a month';
 
   @override
   String get vaccination => 'Vaccination';
@@ -1976,6 +2035,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toFarmUuidLabel => 'Destination farm UUID';
 
   @override
+  String get fromFarmLabel => 'Source farm';
+
+  @override
+  String get toFarmLabel => 'Destination farm';
+
+  @override
   String get enterToFarmUuid => 'Enter destination farm UUID';
 
   @override
@@ -2235,6 +2300,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmSaveCalving => 'Save calving log?';
+
+  @override
+  String get confirmUpdateFarrowing => 'Update farrowing log?';
+
+  @override
+  String get confirmSaveFarrowing => 'Save farrowing log?';
 
   @override
   String get calvingLogSaveFailed =>
@@ -2507,6 +2578,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Syncing pending data before logging out...';
 
   @override
+  String get changeFarm => 'Change Farm';
+
+  @override
+  String get deleteUser => 'Delete User';
+
+  @override
   String get addNotification => 'Add notification';
 
   @override
@@ -2773,6 +2850,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vaccineScheduleEmergency => 'Emergency';
 
   @override
+  String get farmUserSavedSuccessfully => 'Farm user saved successfully';
+
+  @override
+  String get farmUserSaveFailed =>
+      'Failed to save farm user. Please try again.';
+
+  @override
+  String get farmUserUpdatedSuccessfully => 'Farm user updated successfully';
+
+  @override
+  String get confirmSaveFarmUser => 'Save this farm user?';
+
+  @override
   String get bluetoothNotSupported =>
       'Bluetooth is not supported on this device';
 
@@ -2808,4 +2898,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bluetoothLocationRequired =>
       'Location services are required for Bluetooth scanning on Android. Please enable location services in your device settings.';
+
+  @override
+  String get notAFarmer => 'Not a farmer. Access denied.';
+
+  @override
+  String get notAFarmUser => 'Not a farm user. Access denied.';
+
+  @override
+  String accessDeniedRequiredRole(String role) {
+    return 'Access denied. Required role: $role.';
+  }
+
+  @override
+  String get notAFarmerOrFarmManager =>
+      'Only farmers and farm managers can create livestock.';
+
+  @override
+  String get notAFarmerOrFarmManagerManage =>
+      'Only farmers and farm managers can manage livestock.';
+
+  @override
+  String get notAFarmerOrFarmManagerEdit =>
+      'Only farmers and farm managers can edit livestock.';
+
+  @override
+  String get notAFarmerOrFarmManagerDelete =>
+      'Only farmers and farm managers can delete livestock.';
+
+  @override
+  String get notAFarmerFarmManagerOrVaccinationUser =>
+      'Only farmers, farm managers, and vaccination users can add vaccines.';
+
+  @override
+  String logTypeAccessDenied(String logType) {
+    return 'Only farmers, farm managers, and authorized users can access $logType logs.';
+  }
 }

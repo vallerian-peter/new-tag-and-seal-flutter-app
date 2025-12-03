@@ -1,3 +1,4 @@
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/feeding_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/administration_route.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/medicine_type.dart';
@@ -11,11 +12,14 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/test_result.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/calving_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/calving_problem.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart';
 
 abstract class LogAdditionalDataRepositoryInterface {
   Future<Map<String, dynamic>> fetchRemoteLogAdditionalData();
   Future<void> storeLogAdditionalData(Map<String, dynamic> data);
+  Future<void> syncFromRemote(AppDatabase database);
 
   Future<List<FeedingType>> getFeedingTypes();
   Future<List<AdministrationRoute>> getAdministrationRoutes();
@@ -30,6 +34,8 @@ abstract class LogAdditionalDataRepositoryInterface {
   Future<List<TestResult>> getTestResults();
   Future<List<CalvingType>> getCalvingTypes();
   Future<List<CalvingProblem>> getCalvingProblems();
+  Future<List<BirthType>> getBirthTypes();
+  Future<List<BirthProblem>> getBirthProblems();
   Future<List<ReproductiveProblem>> getReproductiveProblems();
 
   Future<void> clearLogAdditionalData();

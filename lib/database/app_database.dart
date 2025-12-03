@@ -40,9 +40,14 @@ import '../features/all.logs.additional.data/data/local/tables/semen_straw_type_
 import '../features/all.logs.additional.data/data/local/tables/test_result_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/calving_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/calving_problem_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/birth_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/birth_problem_table.dart';
+import '../features/events/data/tables/birth_event_table.dart';
+import '../features/events/data/tables/aborted_pregnancy_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/reproductive_problem_table.dart';
 import '../features/vaccines/data/tables/vaccine_type_table.dart';
 import '../features/notifications/data/tables/notification_table.dart';
+import '../features/farmUser/data/tables/farm_user_table.dart';
 
 // Import DAOs
 import 'daos/location_dao.dart';
@@ -59,6 +64,7 @@ import 'daos/log_reference_dao.dart';
 import 'daos/vaccine_dao.dart';
 import 'daos/vaccine_type_dao.dart';
 import '../features/notifications/data/dao/notification_dao.dart';
+import 'daos/farm_user_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -94,6 +100,10 @@ part 'app_database.g.dart';
     TestResults,
     CalvingTypes,
     CalvingProblems,
+    BirthTypes,
+    BirthProblems,
+    BirthEvents,
+    AbortedPregnancies,
     ReproductiveProblems,
     VaccineTypes,
     Feedings,
@@ -103,6 +113,7 @@ part 'app_database.g.dart';
     Vaccinations,
     Disposals,
     Vaccines,
+    FarmUsers,
     NotificationEntries,
   ],
   daos: [
@@ -114,13 +125,14 @@ part 'app_database.g.dart';
     VaccineDao,
     VaccineTypeDao,
     NotificationDao,
+    FarmUserDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 14; // v14 adds repeatDaily alarms
+  int get schemaVersion => 17; // v17 adds farm users table
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -211,6 +223,23 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 14) {
         await m.addColumn(notificationEntries, notificationEntries.repeatDaily);
+      }
+      if (from < 15) {
+        // Version 15: Multi-livestock support - migrate from calvings to birth events
+        await _migrateToBirthEvents(m);
+      }
+      if (from < 16) {
+        // Version 16: Add livestockTypeId to species (if not already present)
+        final speciesInfo =
+            await customSelect('PRAGMA table_info(species)').get();
+        final hasLivestockTypeId =
+            speciesInfo.any((row) => row.data['name'] == 'livestockTypeId');
+        if (!hasLivestockTypeId) {
+          await m.addColumn(species, species.livestockTypeId);
+        }
+      }
+      if (from < 17) {
+        await _createTableIfMissing(m, farmUsers);
       }
     },
     beforeOpen: (details) async {
@@ -344,6 +373,124 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE $table RENAME COLUMN $oldColumn TO $newColumn',
       );
     }
+  }
+
+  /// Migration to version 15: Multi-livestock support
+  /// - Creates birth_events table (replaces calvings)
+  /// - Migrates data from calvings to birth_events with eventType
+  /// - Renames calving_types to birth_types
+  /// - Renames calving_problems to birth_problems
+  /// - Adds livestockTypeId to birth_types and birth_problems
+  /// - Creates aborted_pregnancies table
+  Future<void> _migrateToBirthEvents(Migrator m) async {
+    // Step 1: Check if calvings table exists
+    final calvingsExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('calvings'),
+      ],
+    ).get();
+
+    if (calvingsExists.isNotEmpty) {
+      // Step 2: Create new birth_events table
+      await m.createTable(birthEvents);
+
+      // Step 3: Migrate data from calvings to birth_events
+      // Determine eventType based on livestock species
+      await customStatement('''
+        INSERT INTO birth_events (
+          id, uuid, farmUuid, livestockUuid, eventType, startDate, endDate,
+          birthTypeId, birthProblemsId, reproductiveProblemId, remarks, status,
+          synced, syncAction, createdAt, updatedAt
+        )
+        SELECT 
+          c.id,
+          c.uuid,
+          c.farmUuid,
+          c.livestockUuid,
+          CASE 
+            WHEN EXISTS (
+              SELECT 1 FROM livestocks l 
+              JOIN species s ON l.speciesId = s.id 
+              WHERE l.uuid = c.livestockUuid 
+              AND LOWER(s.name) = 'pig'
+            ) THEN 'farrowing'
+            ELSE 'calving'
+          END as eventType,
+          c.startDate,
+          c.endDate,
+          c.calvingTypeId as birthTypeId,
+          c.calvingProblemsId as birthProblemsId,
+          c.reproductiveProblemId,
+          c.remarks,
+          c.status,
+          c.synced,
+          c.syncAction,
+          c.createdAt,
+          c.updatedAt
+        FROM calvings c
+      ''');
+
+      // Step 4: Drop old calvings table
+      await m.deleteTable('calvings');
+    } else {
+      // If calvings table doesn't exist, just create the new tables
+      await m.createTable(birthEvents);
+    }
+
+    // Step 5: Check if calving_types table exists and rename to birth_types
+    final calvingTypesExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('calving_types'),
+      ],
+    ).get();
+
+    if (calvingTypesExists.isNotEmpty) {
+      // Rename calving_types to birth_types
+      await customStatement('ALTER TABLE calving_types RENAME TO birth_types');
+      
+      // Add livestockTypeId column if it doesn't exist
+      final birthTypesInfo = await customSelect('PRAGMA table_info(birth_types)').get();
+      final hasLivestockTypeId = birthTypesInfo.any((row) => row.data['name'] == 'livestockTypeId');
+      
+      if (!hasLivestockTypeId) {
+        await m.addColumn(birthTypes, birthTypes.livestockTypeId);
+      }
+    } else {
+      // If calving_types doesn't exist, create birth_types table
+      await m.createTable(birthTypes);
+    }
+
+    // Step 6: Check if calving_problems table exists and rename to birth_problems
+    final calvingProblemsExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('calving_problems'),
+      ],
+    ).get();
+
+    if (calvingProblemsExists.isNotEmpty) {
+      // Rename calving_problems to birth_problems
+      await customStatement('ALTER TABLE calving_problems RENAME TO birth_problems');
+      
+      // Add livestockTypeId column if it doesn't exist
+      final birthProblemsInfo = await customSelect('PRAGMA table_info(birth_problems)').get();
+      final hasLivestockTypeId = birthProblemsInfo.any((row) => row.data['name'] == 'livestockTypeId');
+      
+      if (!hasLivestockTypeId) {
+        await m.addColumn(birthProblems, birthProblems.livestockTypeId);
+      }
+    } else {
+      // If calving_problems doesn't exist, create birth_problems table
+      await m.createTable(birthProblems);
+    }
+
+    // Step 7: Create aborted_pregnancies table
+    await m.createTable(abortedPregnancies);
   }
 }
 

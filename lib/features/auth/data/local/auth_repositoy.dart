@@ -278,6 +278,7 @@ class AuthRepository implements AuthRepositoryInterface {
       final accessToken = await _secureStorage.read(key: 'accessToken');
       final tokenType = await _secureStorage.read(key: 'tokenType');
       final profileJson = await _secureStorage.read(key: 'profile');
+      final roleTitle = await _secureStorage.read(key: 'roleTitle');
 
       // Check if essential data exists
       if (userId == null || username == null || accessToken == null) {
@@ -289,8 +290,20 @@ class AuthRepository implements AuthRepositoryInterface {
       if (profileJson != null && profileJson.isNotEmpty) {
         try {
           profile = jsonDecode(profileJson) as Map<String, dynamic>;
+          // Ensure roleTitle is included in profile for farm users
+          if (role == 'farmInvitedUser' && roleTitle != null && roleTitle.isNotEmpty) {
+            profile['roleTitle'] = roleTitle;
+          }
         } catch (e) {
-          // Profile parsing failed, continue without it
+          // Profile parsing failed, create empty profile if roleTitle exists
+          if (role == 'farmInvitedUser' && roleTitle != null && roleTitle.isNotEmpty) {
+            profile = {'roleTitle': roleTitle};
+          }
+        }
+      } else {
+        // If no profile JSON exists but roleTitle exists, create profile with roleTitle
+        if (role == 'farmInvitedUser' && roleTitle != null && roleTitle.isNotEmpty) {
+          profile = {'roleTitle': roleTitle};
         }
       }
 
@@ -401,6 +414,7 @@ class AuthRepository implements AuthRepositoryInterface {
     required String tokenType,
     required String password,
     dynamic profile,
+    String roleTitle = '',
   }) async {
     try {
       await _initPrefs();
@@ -411,6 +425,12 @@ class AuthRepository implements AuthRepositoryInterface {
       await _secureStorage.write(key: 'email', value: email);
       await _secureStorage.write(key: 'role', value: role);
       await _secureStorage.write(key: 'roleId', value: roleId);
+      
+      // Store roleTitle/jobTitle for farm users
+      if (roleTitle.isNotEmpty) {
+        await _secureStorage.write(key: 'roleTitle', value: roleTitle);
+      }
+      
       await _secureStorage.write(key: 'firstname', value: firstname);
       await _secureStorage.write(key: 'surname', value: surname);
       await _secureStorage.write(key: 'phone1', value: phone1);
@@ -466,6 +486,7 @@ class AuthRepository implements AuthRepositoryInterface {
       await _secureStorage.delete(key: 'accessToken');
       await _secureStorage.delete(key: 'tokenType');
       await _secureStorage.delete(key: 'profile');
+      await _secureStorage.delete(key: 'roleTitle');
 
 
       

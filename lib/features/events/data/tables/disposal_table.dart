@@ -3,7 +3,8 @@ import 'package:drift/drift.dart';
 class Disposals extends Table {
   IntColumn get id => integer().nullable()();
 
-  TextColumn get uuid => text().unique()();
+  // Primary key (see primaryKey override below) - no extra UNIQUE needed
+  TextColumn get uuid => text()();
 
   TextColumn get farmUuid => text()();
 

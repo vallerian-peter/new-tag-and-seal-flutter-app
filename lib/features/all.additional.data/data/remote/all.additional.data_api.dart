@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:new_tag_and_seal_flutter_app/core/global-sync/endpoints.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/endpoints.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/country_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/identity_card_type_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/domain/models/region_model.dart';
@@ -36,6 +36,10 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/calving_type.dart'
     as log;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/calving_problem.dart'
+    as log;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart'
+    as log;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart'
     as log;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart'
     as log;
@@ -208,7 +212,7 @@ class AllAdditionalDataService {
       
       // Parse and transform each location/reference type
       final locations = data['locations'] ?? {};
-      final referenceData = data;
+      final referenceData = data['referenceData'] ?? {}; // Fix: Get referenceData section from response
       final livestockRef = data['livestockReferenceData'] ?? {};
 
       return {
@@ -222,10 +226,10 @@ class AllAdditionalDataService {
         'identityCardTypes': _parseIdentityCardTypes(referenceData['identityCardTypes']),
         'schoolLevels': _parseSchoolLevels(referenceData['schoolLevels']),
         // Livestock reference data (optional on this endpoint)
-        'species': _parseSpecies(livestockRef['species'] ?? referenceData['species']),
-        'livestockTypes': _parseLivestockTypes(livestockRef['livestockTypes'] ?? referenceData['livestockTypes']),
-        'livestockObtainedMethods': _parseLivestockObtainedMethods(livestockRef['livestockObtainedMethods'] ?? referenceData['livestockObtainedMethods']),
-        'breeds': _parseBreeds(livestockRef['breeds'] ?? referenceData['breeds']),
+        'species': _parseSpecies(livestockRef['species'] ?? data['species']),
+        'livestockTypes': _parseLivestockTypes(livestockRef['livestockTypes'] ?? data['livestockTypes']),
+        'livestockObtainedMethods': _parseLivestockObtainedMethods(livestockRef['livestockObtainedMethods'] ?? data['livestockObtainedMethods']),
+        'breeds': _parseBreeds(livestockRef['breeds'] ?? data['breeds']),
         'feedingTypes': _parseFeedingTypes(referenceData['feedingTypes']),
         'administrationRoutes': _parseAdministrationRoutes(referenceData['administrationRoutes']),
         'medicineTypes': _parseMedicineTypes(referenceData['medicineTypes']),
@@ -239,6 +243,9 @@ class AllAdditionalDataService {
         'testResults': _parseTestResults(referenceData['testResults']),
         'calvingTypes': _parseCalvingTypes(referenceData['calvingTypes']),
         'calvingProblems': _parseCalvingProblems(referenceData['calvingProblems']),
+        // NEW: Support birth types and problems (backend now uses these)
+        'birthTypes': _parseBirthTypes(referenceData['birthTypes'] ?? referenceData['calvingTypes']),
+        'birthProblems': _parseBirthProblems(referenceData['birthProblems'] ?? referenceData['calvingProblems']),
         'reproductiveProblems': _parseReproductiveProblems(referenceData['reproductiveProblems']),
       };
     } catch (e) {
@@ -444,6 +451,22 @@ class AllAdditionalDataService {
     if (json == null) return [];
     return (json as List<dynamic>)
         .map((item) => log.CalvingProblem.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Parse birth types from JSON array (NEW - replaces calving types)
+  static List<log.BirthType> _parseBirthTypes(dynamic json) {
+    if (json == null) return [];
+    return (json as List<dynamic>)
+        .map((item) => log.BirthType.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Parse birth problems from JSON array (NEW - replaces calving problems)
+  static List<log.BirthProblem> _parseBirthProblems(dynamic json) {
+    if (json == null) return [];
+    return (json as List<dynamic>)
+        .map((item) => log.BirthProblem.fromJson(item as Map<String, dynamic>))
         .toList();
   }
 

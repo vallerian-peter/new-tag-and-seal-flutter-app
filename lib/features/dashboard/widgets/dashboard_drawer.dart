@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm_user_list_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_screen.dart';
@@ -9,12 +10,14 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vacc
 class DashboardDrawer extends StatelessWidget {
   final String userName;
   final String userEmail;
+  final String? roleTitle;
   final VoidCallback? onLogout;
 
   const DashboardDrawer({
     super.key,
     required this.userName,
     required this.userEmail,
+    this.roleTitle,
     this.onLogout,
   });
 
@@ -90,7 +93,7 @@ class DashboardDrawer extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            l10n.farmer,
+                            roleTitle ?? l10n.farmer,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.white.withValues(alpha: 0.8),
@@ -140,7 +143,11 @@ class DashboardDrawer extends StatelessWidget {
                   title: l10n.invitedUsersText,
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigate to invited users
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const FarmUserListScreen(),
+                      ),
+                    );
                   },
                 ),
                 

@@ -14,6 +14,10 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/provider/vaccine_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/farm_user_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/provider/farm_user_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/data/repository/notification_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +40,8 @@ void main() async {
   final livestockRepo = LivestockRepository(database);
   final logAdditionalDataRepo = LogAdditionalDataRepository(database);
   final eventsRepo = EventsRepository(database);
+  final vaccinesRepo = VaccinesRepository(database);
+  final farmUserRepo = FarmUserRepository(database);
   final notificationRepo = NotificationRepository(database);
   
   // Initialize providers with SharedPreferences
@@ -50,6 +56,8 @@ void main() async {
   final logAdditionalDataProvider =
       LogAdditionalDataProvider(repository: logAdditionalDataRepo);
   final eventsProvider = EventsProvider(eventsRepository: eventsRepo);
+  final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
+  final farmUserProvider = FarmUserProvider(repository: farmUserRepo);
   final alarmManager = AppAlarmManager(
     navigatorKey: appNavigatorKey,
     repository: notificationRepo,
@@ -73,6 +81,8 @@ void main() async {
         ChangeNotifierProvider.value(value: livestockProvider),
         ChangeNotifierProvider.value(value: logAdditionalDataProvider),
         ChangeNotifierProvider.value(value: eventsProvider),
+        ChangeNotifierProvider.value(value: vaccineProvider),
+        ChangeNotifierProvider.value(value: farmUserProvider),
         Provider<AppAlarmManager>.value(value: alarmManager),
         ChangeNotifierProvider.value(value: notificationProvider),
       ],

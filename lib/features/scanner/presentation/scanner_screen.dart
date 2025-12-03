@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_details_modal.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 enum TagScanMode { qr, barcode, rfid }
 
@@ -23,8 +25,9 @@ Future<String?> showTagScannerBottomSheet(
   final config = configs.firstWhere((c) => c.mode == mode);
 
   if (!_isScanSupported(mode)) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.scanUnsupportedDevice)),
+    ToastAlerts.showError(
+      context,
+      message: l10n.scanUnsupportedDevice,
     );
     return null;
   }
@@ -56,8 +59,9 @@ Future<String?> showTagScannerBottomSheet(
   } on MissingPluginException {
     controller?.dispose();
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.scanUnsupportedDevice)),
+      ToastAlerts.showError(
+        context,
+        message: l10n.scanUnsupportedDevice,
       );
     }
     return null;
@@ -121,8 +125,9 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
   }
 
   if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.scanPermissionDenied)),
+    ToastAlerts.showError(
+      context,
+      message: l10n.scanPermissionDenied,
     );
   }
   return false;
@@ -132,29 +137,15 @@ Future<bool?> _showPermissionRationaleDialog(
   BuildContext context,
   AppLocalizations l10n,
 ) {
-  return showDialog<bool>(
+  // Use our custom dialog styling and return a bool based on user choice
+  return AlertDialogs.showConfirmation<bool>(
     context: context,
-    builder: (context) {
-      final theme = Theme.of(context);
-      return AlertDialog.adaptive(
-        title: Text(l10n.scanPermissionRationaleTitle),
-        content: Text(l10n.scanPermissionRationaleMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.scanPermissionNotNow),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-            ),
-            child: Text(l10n.scanPermissionAllow),
-          ),
-        ],
-      );
-    },
+    title: l10n.scanPermissionRationaleTitle,
+    message: l10n.scanPermissionRationaleMessage,
+    confirmText: l10n.scanPermissionAllow,
+    cancelText: l10n.scanPermissionNotNow,
+    onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
+    onCancel: () => Navigator.of(context, rootNavigator: true).pop(false),
   );
 }
 
@@ -162,29 +153,15 @@ Future<bool?> _showPermissionSettingsDialog(
   BuildContext context,
   AppLocalizations l10n,
 ) {
-  return showDialog<bool>(
+  // Use our custom dialog styling for "Go to settings"
+  return AlertDialogs.showConfirmation<bool>(
     context: context,
-    builder: (context) {
-      final theme = Theme.of(context);
-      return AlertDialog.adaptive(
-        title: Text(l10n.scanPermissionSettingsTitle),
-        content: Text(l10n.scanPermissionSettingsMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.scanPermissionNotNow),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-            ),
-            child: Text(l10n.scanPermissionGoToSettings),
-          ),
-        ],
-      );
-    },
+    title: l10n.scanPermissionSettingsTitle,
+    message: l10n.scanPermissionSettingsMessage,
+    confirmText: l10n.scanPermissionGoToSettings,
+    cancelText: l10n.scanPermissionNotNow,
+    onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
+    onCancel: () => Navigator.of(context, rootNavigator: true).pop(false),
   );
 }
 
@@ -241,14 +218,30 @@ class ScannerScreen extends StatefulWidget {
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserver {
   TagScanMode _selectedMode = TagScanMode.qr;
   bool _cameraPermissionGranted = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _refreshCameraPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Refresh permission when app resumes (e.g., returning from settings)
+    if (state == AppLifecycleState.resumed) {
+      _refreshCameraPermission();
+    }
   }
 
   Future<void> _refreshCameraPermission() async {
@@ -273,11 +266,70 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Future<void> _requestCameraPermission() async {
-    final granted = await _ensureCameraPermission(context);
+    if (kIsWeb) {
+      setState(() {
+        _cameraPermissionGranted = true;
+      });
+      return;
+    }
+
+    // Check if already granted
+    var status = await Permission.camera.status;
+    if (status.isGranted) {
     if (!mounted) return;
     setState(() {
-      _cameraPermissionGranted = granted;
-    });
+        _cameraPermissionGranted = true;
+      });
+      return;
+    }
+
+    // If permanently denied, show settings dialog
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      final goToSettings = await _showPermissionSettingsDialog(context, l10n);
+      if (goToSettings == true) {
+        await openAppSettings();
+        // Refresh permission status after returning from settings
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _refreshCameraPermission();
+      }
+      return;
+    }
+
+    // Directly request permission (card already shows rationale)
+    status = await Permission.camera.request();
+    
+    if (!mounted) return;
+    
+    // Refresh permission status to ensure UI is updated
+    await _refreshCameraPermission();
+    
+    if (!mounted) return;
+    
+    // Check the status after request
+    if (status.isGranted) {
+      // Permission granted - UI already updated by _refreshCameraPermission
+      return;
+    } else if (status.isPermanentlyDenied || status.isRestricted) {
+      final l10n = AppLocalizations.of(context)!;
+      final goToSettings = await _showPermissionSettingsDialog(context, l10n);
+      if (goToSettings == true) {
+        await openAppSettings();
+        // Refresh permission status after returning from settings
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _refreshCameraPermission();
+      }
+    } else {
+      // Permission denied (but not permanently)
+      final l10n = AppLocalizations.of(context)!;
+      if (mounted) {
+        ToastAlerts.showError(
+          context,
+          message: l10n.scanPermissionDenied,
+        );
+      }
+    }
   }
 
   @override
@@ -367,8 +419,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
     if (!_isScanSupported(config.mode)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.scanUnsupportedDevice)),
+      ToastAlerts.showError(
+        context,
+        message: l10n.scanUnsupportedDevice,
       );
       return;
     }
@@ -408,8 +461,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
     } on MissingPluginException {
       controller?.dispose();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.scanUnsupportedDevice)),
+      ToastAlerts.showError(
+        context,
+        message: l10n.scanUnsupportedDevice,
       );
       return;
     }
@@ -432,8 +486,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
     if (!mounted) return;
 
     if (match == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.scanResultNotFound(value))),
+      ToastAlerts.showError(
+        context,
+        message: l10n.scanResultNotFound(value),
       );
       return;
     }

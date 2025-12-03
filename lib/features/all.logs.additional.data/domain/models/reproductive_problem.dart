@@ -2,7 +2,10 @@ class ReproductiveProblem {
   final int id;
   final String name;
 
-  const ReproductiveProblem({required this.id, required this.name});
+  const ReproductiveProblem({
+    required this.id,
+    required this.name,
+  });
 
   factory ReproductiveProblem.fromJson(Map<String, dynamic> json) {
     return ReproductiveProblem(
@@ -12,6 +15,9 @@ class ReproductiveProblem {
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name};
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }

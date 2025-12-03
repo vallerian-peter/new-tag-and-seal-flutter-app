@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/provider/sync-provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -17,10 +18,12 @@ import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/section_
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/stat_card.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/farm_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm_user_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/notification_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,6 +33,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  static const String _syncPromptStorageKey = 'dashboard_sync_prompt_shown';
   bool _isSyncing = false;
   final _secureStorage = const FlutterSecureStorage();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -40,7 +44,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   
   String _userName = '';
   String _userEmail = '';
-
+  String? _roleTitle;
+  
   
   @override
   void initState() {
@@ -55,6 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final firstname = await _secureStorage.read(key: 'firstname') ?? '';
     final surname = await _secureStorage.read(key: 'surname') ?? '';
     final email = await _secureStorage.read(key: 'email') ?? '';
+    final roleTitle = await _secureStorage.read(key: 'roleTitle');
     
     if (mounted) {
       setState(() {
@@ -63,6 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _userName = 'User';
         }
         _userEmail = email;
+        _roleTitle = roleTitle;
       });
     }
   }
@@ -87,17 +94,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final syncProvider = Provider.of<SyncProvider>(context, listen: false);
     await syncProvider.splashSyncWithDialog(context);
     
+    // After successful sync (and user taps OK on the dialog), refresh dashboard data
+    if (!mounted) return;
+    await getALlFarmsWithThereLivestocks();
+    await _loadEventSummary();
+
+    if (!mounted) return;
     setState(() {
       _isSyncing = false;
     });
   }
 
-  void _showSyncToast() {
+  Future<void> _showSyncToast() async {
     if (_syncPromptShown || !mounted) return;
-    Future.delayed(const Duration(seconds: 2), () {
-      if (_syncPromptShown || !mounted) return;
+
+    // Check persistent flag in shared preferences so we don't show this prompt repeatedly
+    final prefs = await SharedPreferences.getInstance();
+    final storedFlag = prefs.getBool(_syncPromptStorageKey) ?? false;
+    if (storedFlag) {
       _syncPromptShown = true;
-      final l10n = AppLocalizations.of(context)!;
+      return;
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (_syncPromptShown || !mounted) return;
+
+    _syncPromptShown = true;
+    await prefs.setBool(_syncPromptStorageKey, true);
+
+    final l10n = AppLocalizations.of(context)!;
+    // Use dialogContext for Navigator to avoid using a disposed context
+    
+    if (!mounted) return;
       showDialog<void>(
         context: context,
         builder: (dialogContext) {
@@ -105,7 +133,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final isDark = theme.brightness == Brightness.dark;
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
             title: Text(l10n.sync),
             content: Text(
               l10n.dashboardSyncPrompt,
@@ -127,7 +156,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         },
       );
-    });
   }
   
   /// Calculate total livestock count from all farms
@@ -178,7 +206,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+    final authProvider = context.read<AuthProvider>();
+    final isFarmer = authProvider.isFarmer;
+
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         await _onLogoutPressed();
@@ -187,11 +218,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        drawer: DashboardDrawer(
-          userName: _userName,
-          userEmail: _userEmail,
-          onLogout: _onLogoutPressed,
-        ),
+        drawer: isFarmer ? Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            // Only show drawer if user is a farmer
+            if (!authProvider.isFarmer) {
+              return const SizedBox.shrink(); // Hide drawer for non-farmers
+            }
+            return DashboardDrawer(
+              userName: _userName,
+              userEmail: _userEmail,
+              roleTitle: _roleTitle,
+              onLogout: _onLogoutPressed,
+            );
+          },
+        ) : null,
         floatingActionButton: FloatingActionButton(
           heroTag: 'dashboard_sync_fab',
           onPressed: () => _syncData(),
@@ -200,44 +240,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
               : const Icon(Iconsax.refresh_outline, color: Colors.white,),
         ),
         appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '${l10n.welcome},',
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: FontWeight.normal,
+        centerTitle: isFarmer,
+        automaticallyImplyLeading: false,
+        leadingWidth: isFarmer ? null : 0,
+        titleSpacing: isFarmer ? null : 0,
+        toolbarHeight: kToolbarHeight,
+        title: isFarmer
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${l10n.welcome},',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Text(
+                    _userName,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              )
+            : Transform.translate(
+                offset: const Offset(0, 0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${l10n.welcome},',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      Text(
+                        _userName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            Text(
-              _userName,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
         
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leading: Align(
-          alignment: Alignment.bottomRight,
-          child: IconButton(
-            icon: Icon(
-              FontAwesome.bars_solid,
-              size: 20,
-              color: theme.colorScheme.onSurface,
-            ),
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-          ),
-        ),
+        leading: isFarmer
+            ? Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(
+                  icon: Icon(
+                    FontAwesome.bars_solid,
+                    size: 20,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  onPressed: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                ),
+              )
+            : null,
         actions: [
           Stack(
             children: [
@@ -318,6 +398,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
                 onTap: () async {
+                  // Check if user is a farmer
+                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                    return;
+                  }
+                  
                   // Navigate to create farm
                   final result = await Navigator.push(
                     context,
@@ -345,7 +430,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
                 onTap: () {
-                  // Navigate to invite user
+                  // Check if user is a farmer
+                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                    return;
+                  }
+                  
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const FarmUserFormScreen(),
+                    ),
+                  );
                 },
               ),
               
@@ -363,6 +457,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
                 onTap: () {
+                  // Check if user is a farmer
+                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                    return;
+                  }
+                  
                   // Navigate to add officer
                 },
               ),
@@ -531,6 +630,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _syncPromptShown = false;
     });
 
+    // Clear sync prompt flag so it's shown again next time user logs in
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_syncPromptStorageKey);
+
     ScaffoldMessenger.of(context).clearSnackBars();
 
     Navigator.of(context).pushAndRemoveUntil(
@@ -585,6 +688,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       (logType, count) => addItem(_logLabel(l10n, logType), count),
     );
     addItem(l10n.vaccination, summary.vaccines);
+    addItem(l10n.invitedUsersText, summary.farmUsers);
 
     return items;
   }
@@ -617,5 +721,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return key;
     }
   }
+
 }
 

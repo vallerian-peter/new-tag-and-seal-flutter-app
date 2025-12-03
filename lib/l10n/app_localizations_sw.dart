@@ -1047,6 +1047,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get recoverViaPhone => 'Rejesha kwa Simu';
 
   @override
+  String get user => 'Mhusika';
+
+  @override
   String get noInternetConnectionMessage =>
       'Tafadhali kagua mipangilio ya mtandao wako na ujaribu tena';
 
@@ -1070,6 +1073,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get failedToLoadLocations => 'Imeshindwa kupakia maeneo';
 
   @override
+  String get editFarmUserText => 'Hariri Mfanyakazi';
+
+  @override
   String get creatingAccount => 'Inaunda akaunti yako...';
 
   @override
@@ -1090,6 +1096,9 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get loggingOut => 'Inakutoa...';
+
+  @override
+  String get editUser => 'Hariri Mfanyakazi';
 
   @override
   String get dashboard => 'Dashibodi';
@@ -1137,7 +1146,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get vaccinesText => 'Chanjo';
 
   @override
-  String get invitedUsersText => 'Watumiaji Walioalikwa';
+  String get invitedUsersText => 'Wafanyakazi Walioalikwa';
 
   @override
   String get invitedOfficersText => 'Maofisa Walioalikwa';
@@ -1402,6 +1411,35 @@ class AppLocalizationsSw extends AppLocalizations {
       'Imeshindikana kuhifadhi tukio la kulisha. Tafadhali jaribu tena.';
 
   @override
+  String get birthEventSaved => 'Birth event saved successfully';
+
+  @override
+  String get birthEventUpdated => 'Birth event updated successfully';
+
+  @override
+  String get birthEventSaveFailed =>
+      'Failed to save birth event. Please try again.';
+
+  @override
+  String get birthEventUpdateFailed =>
+      'Failed to update birth event. Please try again.';
+
+  @override
+  String get abortedPregnancySaved => 'Aborted pregnancy saved successfully';
+
+  @override
+  String get abortedPregnancyUpdated =>
+      'Aborted pregnancy updated successfully';
+
+  @override
+  String get abortedPregnancySaveFailed =>
+      'Failed to save aborted pregnancy. Please try again.';
+
+  @override
+  String get abortedPregnancyUpdateFailed =>
+      'Failed to update aborted pregnancy. Please try again.';
+
+  @override
   String get feeding => 'Malisho';
 
   @override
@@ -1599,6 +1637,27 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get calving => 'Kuzaa';
+
+  @override
+  String get farrowing => 'Kuzalisha nguruwe';
+
+  @override
+  String get birthEvent => 'Tukio la kuzaliwa';
+
+  @override
+  String get abortedPregnancy => 'Mimba iliyokatika';
+
+  @override
+  String get birthType => 'Aina ya kuzaliwa';
+
+  @override
+  String get birthProblem => 'Tatizo la kuzaliwa';
+
+  @override
+  String get abortionDate => 'Tarehe ya mimba kukatika';
+
+  @override
+  String get lessThanAMonth => 'Chini ya mwezi';
 
   @override
   String get vaccination => 'Chanjo';
@@ -1986,6 +2045,12 @@ class AppLocalizationsSw extends AppLocalizations {
   String get toFarmUuidLabel => 'UUID ya shamba lengwa';
 
   @override
+  String get fromFarmLabel => 'Shamba la asili';
+
+  @override
+  String get toFarmLabel => 'Shamba lengwa';
+
+  @override
   String get enterToFarmUuid => 'Ingiza UUID ya shamba lengwa';
 
   @override
@@ -2247,6 +2312,12 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get confirmSaveCalving => 'Hifadhi rekodi ya kuzaa?';
+
+  @override
+  String get confirmUpdateFarrowing => 'Sasisha rekodi ya kuzalisha nguruwe?';
+
+  @override
+  String get confirmSaveFarrowing => 'Hifadhi rekodi ya kuzalisha nguruwe?';
 
   @override
   String get calvingLogSaveFailed =>
@@ -2518,6 +2589,12 @@ class AppLocalizationsSw extends AppLocalizations {
   String get syncingBeforeLogout => 'Kusawazisha data kabla ya kutoka...';
 
   @override
+  String get changeFarm => 'Badili Shamba';
+
+  @override
+  String get deleteUser => 'Futa Mtumiaji';
+
+  @override
   String get addNotification => 'Ongeza taarifa';
 
   @override
@@ -2784,6 +2861,21 @@ class AppLocalizationsSw extends AppLocalizations {
   String get vaccineScheduleEmergency => 'Ratiba ya dharura';
 
   @override
+  String get farmUserSavedSuccessfully =>
+      'Mtumiaji wa shamba amehifadhiwa kikamilifu';
+
+  @override
+  String get farmUserSaveFailed =>
+      'Imeshindwa kuhifadhi mtumiaji wa shamba. Jaribu tena.';
+
+  @override
+  String get farmUserUpdatedSuccessfully =>
+      'Mtumiaji wa shamba amesasishwa kikamilifu';
+
+  @override
+  String get confirmSaveFarmUser => 'Hifadhi mtumiaji huyu wa shamba?';
+
+  @override
   String get bluetoothNotSupported => 'Bluetooth haitumiki kwenye kifaa hiki';
 
   @override
@@ -2818,4 +2910,40 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get bluetoothLocationRequired =>
       'Huduma za eneo zinahitajika kwa kuchunguza Bluetooth kwenye Android. Tafadhali washa huduma za eneo katika mipangilio ya kifaa chako.';
+
+  @override
+  String get notAFarmer => 'Sio mkulima. Ufikiaji umekataliwa.';
+
+  @override
+  String get notAFarmUser => 'Sio mtumiaji wa shamba. Ufikiaji umekataliwa.';
+
+  @override
+  String accessDeniedRequiredRole(String role) {
+    return 'Ufikiaji umekataliwa. Jukumu linalohitajika: $role.';
+  }
+
+  @override
+  String get notAFarmerOrFarmManager =>
+      'Wakulima na wasimamizi wa shamba tu wanaweza kuunda mifugo.';
+
+  @override
+  String get notAFarmerOrFarmManagerManage =>
+      'Wakulima na wasimamizi wa shamba tu wanaweza kusimamia mifugo.';
+
+  @override
+  String get notAFarmerOrFarmManagerEdit =>
+      'Wakulima na wasimamizi wa shamba tu wanaweza kuhariri mifugo.';
+
+  @override
+  String get notAFarmerOrFarmManagerDelete =>
+      'Wakulima na wasimamizi wa shamba tu wanaweza kufuta mifugo.';
+
+  @override
+  String get notAFarmerFarmManagerOrVaccinationUser =>
+      'Wakulima, wasimamizi wa shamba, na watumiaji wa chanjo tu wanaweza kuongeza chanjo.';
+
+  @override
+  String logTypeAccessDenied(String logType) {
+    return 'Wakulima, wasimamizi wa shamba, na watumiaji walioidhinishwa tu wanaweza kufikia nakala za $logType.';
+  }
 }

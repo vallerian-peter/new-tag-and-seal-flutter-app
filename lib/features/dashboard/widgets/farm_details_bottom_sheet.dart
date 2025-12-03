@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_image_helper.dart';
 
 class FarmDetailsBottomSheet extends StatelessWidget {
   final Map<String, dynamic> farm;
+  final VoidCallback? onRefresh;
 
   const FarmDetailsBottomSheet({
     super.key,
     required this.farm,
+    this.onRefresh,
   });
 
   @override
@@ -113,25 +120,23 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     Icons.more_vert,
                     color: theme.colorScheme.onSurface,
                   ),
+                  color: theme.scaffoldBackgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   onSelected: (action) {
                     switch (action) {
                       case _FarmAction.bulkActions:
-                        Navigator.pop(context);
-                        // TODO: Navigate to bulk actions flow once implemented.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.comingSoon),
-                          ),
-                        );
+                        Navigator.pop(context); // Close the current bottom sheet
+                        _showBulkActionsSheet(context, farm);
                         break;
                       case _FarmAction.addVaccine:
-                        Navigator.pop(context);
-                        // TODO: Navigate to vaccine form when available.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.comingSoon),
-                          ),
-                        );
+                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                        if (!RoleHelper.checkCanAddVaccine(context, l10n, authProvider)) {
+                          return; // Access denied, toast already shown
+                        }
+                        Navigator.pop(context); // Close the current bottom sheet
+                        _navigateToVaccineForm(context);
                         break;
                     }
                   },
@@ -217,9 +222,14 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 ),
                 const Spacer(),
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    if (!RoleHelper.checkCanCreateLivestock(context, l10n, authProvider)) {
+                      return; // Access denied, toast already shown
+                    }
+                    
                     Navigator.pop(context); // Close bottom sheet
-                    Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => LivestockFormScreen(
@@ -227,6 +237,11 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ),
                       ),
                     );
+                    
+                    // Refresh dashboard if livestock was successfully registered
+                    if (result == true && onRefresh != null) {
+                      onRefresh!();
+                    }
                   },
                   icon: const Icon(
                     Icons.add,
@@ -439,11 +454,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 fit: BoxFit.contain,
                 scale: 6.0,
                 image: AssetImage(
-                  animalGender != 'female'
-                  ? 'assets/images/placeholders/bull-1.png'
-                  : 'assets/images/placeholders/cow-1.png',
-                )
-              )
+                  LivestockImageHelper.getPlaceholderForLivestock(animal),
+                ),
+              ),
             ),
           ),
           
@@ -619,6 +632,34 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       print('Error fetching breed: $e');
       return '---';
     }
+  }
+
+  // Helper method to show bulk actions sheet
+  void _showBulkActionsSheet(BuildContext context, Map<String, dynamic> farm) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FarmBulkActionsSheet(farm: farm),
+    );
+  }
+
+  // Helper method to navigate to vaccine form
+  void _navigateToVaccineForm(BuildContext context) {
+    final farmUuid = farm['uuid'] as String?;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VaccineFormScreen(
+          farmUuid: farmUuid,
+        ),
+      ),
+    ).then((_) {
+      // Refresh the dashboard if vaccine was successfully created
+      if (onRefresh != null) {
+        onRefresh!();
+      }
+    });
   }
 }
 

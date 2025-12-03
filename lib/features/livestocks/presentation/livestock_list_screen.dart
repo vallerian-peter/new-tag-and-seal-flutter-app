@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_stat_card.dart';
@@ -310,11 +312,14 @@ class _LivestockListScreenState extends State<LivestockListScreen>
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'livestock_list_fab',
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const LivestockFormScreen()),
-          ).then((_) => _fetchData());
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          if (RoleHelper.checkCanCreateLivestock(context, l10n, authProvider)) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const LivestockFormScreen()),
+            ).then((_) => _fetchData());
+          }
         },
         backgroundColor: Constants.primaryColor,
         icon: const Icon(Icons.add, color: Colors.white),

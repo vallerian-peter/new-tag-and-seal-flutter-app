@@ -10,6 +10,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
@@ -35,10 +37,13 @@ class EventsRepository implements EventsRepositoryInterface {
     final medicationsCount = (logs['medications'] as List?)?.length ?? 0;
     final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
     final disposalsCount = (logs['disposals'] as List?)?.length ?? 0;
+    final birthEventsCount = (logs['birthEvents'] as List?)?.length ?? 0;
+    final abortedPregnanciesCount = (logs['abortedPregnancies'] as List?)?.length ?? 0;
     log(
       '🔄 Syncing event logs (feedings: $feedingsCount, weightChanges: $weightChangesCount, '
       'dewormings: $dewormingsCount, medications: $medicationsCount, '
-      'vaccinations: $vaccinationsCount, disposals: $disposalsCount)...',
+      'vaccinations: $vaccinationsCount, disposals: $disposalsCount, '
+      'birthEvents: $birthEventsCount, abortedPregnancies: $abortedPregnanciesCount)...',
     );
 
     await _syncFeedings(logs['feedings']);
@@ -47,6 +52,8 @@ class EventsRepository implements EventsRepositoryInterface {
     await _syncMedications(logs['medications']);
     await _syncVaccinations(logs['vaccinations']);
     await _syncDisposals(logs['disposals']);
+    await _syncBirthEvents(logs['birthEvents']);
+    await _syncAbortedPregnancies(logs['abortedPregnancies']);
   }
 
   Future<void> _syncFeedings(dynamic payload) async {
@@ -239,6 +246,72 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     await _eventDao.deleteServerDisposalsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncBirthEvents(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = BirthEventModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getBirthEventByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertBirthEvent(_toBirthEventCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertBirthEvent(_toBirthEventCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing birth event: $e');
+      }
+    }
+
+    // Note: We don't delete server birth events not in remoteUuids to avoid data loss
+    // The backend handles this through proper sync mechanisms
+  }
+
+  Future<void> _syncAbortedPregnancies(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = AbortedPregnancyModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getAbortedPregnancyByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing aborted pregnancy: $e');
+      }
+    }
+
+    // Note: We don't delete server aborted pregnancies not in remoteUuids to avoid data loss
+    // The backend handles this through proper sync mechanisms
   }
 
   // ===========================================================================
@@ -521,6 +594,18 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
+    final birthEvents = await getBirthEvents(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final abortedPregnancies = await getAbortedPregnancies(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+
+    // Count calving and farrowing separately
+    final calvingCount = birthEvents.where((e) => e.eventType == EventLogTypes.calving).length;
+    final farrowingCount = birthEvents.where((e) => e.eventType == EventLogTypes.farrowing).length;
 
     return {
       EventLogTypes.feeding: feedings.length,
@@ -529,6 +614,9 @@ class EventsRepository implements EventsRepositoryInterface {
       EventLogTypes.medication: medications.length,
       EventLogTypes.vaccination: vaccinations.length,
       EventLogTypes.disposal: disposals.length,
+      EventLogTypes.calving: calvingCount,
+      EventLogTypes.farrowing: farrowingCount,
+      EventLogTypes.abortedPregnancy: abortedPregnancies.length,
     };
   }
   
@@ -803,6 +891,20 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.getDisposals(livestockUuid: livestockUuid);
     for (final log in disposals) {
       await markDisposalAsDeleted(log.uuid);
+    }
+
+    // Birth events (calving / farrowing)
+    final birthEvents =
+        await _eventDao.getBirthEvents(livestockUuid: livestockUuid);
+    for (final log in birthEvents) {
+      await markBirthEventAsDeleted(log.uuid);
+    }
+
+    // Aborted pregnancies
+    final abortedPregnancies =
+        await _eventDao.getAbortedPregnancies(livestockUuid: livestockUuid);
+    for (final log in abortedPregnancies) {
+      await markAbortedPregnancyAsDeleted(log.uuid);
     }
   }
 
@@ -1150,6 +1252,356 @@ class EventsRepository implements EventsRepositoryInterface {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
+  }
+
+  // ===========================================================================
+  // BIRTH EVENTS (replaces calvings)
+  // ===========================================================================
+
+  @override
+  Future<BirthEventModel> createBirthEvent(BirthEventModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating birth event locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertBirthEvent(_toBirthEventCompanion(localModel));
+    return _mapBirthEventEntity(inserted);
+  }
+
+  @override
+  Future<BirthEventModel> updateBirthEventLocally(BirthEventModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Updating birth event locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertBirthEvent(_toBirthEventCompanion(localModel));
+    log('✅ Birth event updated locally: ${updated.uuid}');
+    return _mapBirthEventEntity(updated);
+  }
+
+  @override
+  Future<List<BirthEventModel>> getBirthEvents({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getBirthEvents(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapBirthEventEntity).toList();
+  }
+
+  @override
+  Future<List<BirthEventModel>> getAllBirthEvents() => getBirthEvents();
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedBirthEventsForApi() async {
+    final events = await _eventDao.getUnsyncedBirthEvents();
+    return events.map((e) => _mapBirthEventEntity(e).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markBirthEventsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getBirthEventByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Birth event not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteBirthEventByUuid(uuid);
+        log('🗑️ Removed birth event after synced delete: $uuid');
+      } else {
+        final model = _mapBirthEventEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertBirthEvent(_toBirthEventCompanion(model));
+        log('✅ Marked birth event as synced: $uuid');
+      }
+    }
+  }
+
+  @override
+  Future<bool> markBirthEventAsDeleted(String uuid) async {
+    final event = await _eventDao.getBirthEventByUuid(uuid);
+    if (event == null) return false;
+
+    final now = DateTime.now().toIso8601String();
+    final deleted = _mapBirthEventEntity(event).copyWith(
+      synced: false,
+      syncAction: 'deleted',
+      updatedAt: now,
+    );
+    await _eventDao.upsertBirthEvent(_toBirthEventCompanion(deleted));
+    return true;
+  }
+
+  BirthEventsCompanion _toBirthEventCompanion(BirthEventModel model) {
+    return BirthEventsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      eventType: Value(model.eventType),
+      startDate: Value(model.startDate),
+      endDate: model.endDate != null ? Value(model.endDate!) : const Value.absent(),
+      birthTypeId: Value(model.birthTypeId),
+      birthProblemsId: model.birthProblemsId != null ? Value(model.birthProblemsId!) : const Value.absent(),
+      reproductiveProblemId: model.reproductiveProblemId != null ? Value(model.reproductiveProblemId!) : const Value.absent(),
+      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      status: Value(model.status),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  BirthEventModel _mapBirthEventEntity(BirthEvent entity) {
+    return BirthEventModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventType: entity.eventType,
+      startDate: entity.startDate,
+      endDate: entity.endDate,
+      birthTypeId: entity.birthTypeId,
+      birthProblemsId: entity.birthProblemsId,
+      reproductiveProblemId: entity.reproductiveProblemId,
+      remarks: entity.remarks,
+      status: entity.status,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  // ===========================================================================
+  // ABORTED PREGNANCIES
+  // ===========================================================================
+
+  @override
+  Future<AbortedPregnancyModel> createAbortedPregnancy(AbortedPregnancyModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating aborted pregnancy locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(localModel));
+    return _mapAbortedPregnancyEntity(inserted);
+  }
+
+  @override
+  Future<AbortedPregnancyModel> updateAbortedPregnancyLocally(AbortedPregnancyModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Updating aborted pregnancy locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(localModel));
+    log('✅ Aborted pregnancy updated locally: ${updated.uuid}');
+    return _mapAbortedPregnancyEntity(updated);
+  }
+
+  @override
+  Future<List<AbortedPregnancyModel>> getAbortedPregnancies({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getAbortedPregnancies(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapAbortedPregnancyEntity).toList();
+  }
+
+  @override
+  Future<List<AbortedPregnancyModel>> getAllAbortedPregnancies() => getAbortedPregnancies();
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedAbortedPregnanciesForApi() async {
+    final pregnancies = await _eventDao.getUnsyncedAbortedPregnancies();
+    return pregnancies.map((p) => _mapAbortedPregnancyEntity(p).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markAbortedPregnanciesAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getAbortedPregnancyByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Aborted pregnancy not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteAbortedPregnancyByUuid(uuid);
+        log('🗑️ Removed aborted pregnancy after synced delete: $uuid');
+      } else {
+        final model = _mapAbortedPregnancyEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(model));
+        log('✅ Marked aborted pregnancy as synced: $uuid');
+      }
+    }
+  }
+
+  @override
+  Future<bool> markAbortedPregnancyAsDeleted(String uuid) async {
+    final pregnancy = await _eventDao.getAbortedPregnancyByUuid(uuid);
+    if (pregnancy == null) return false;
+
+    final now = DateTime.now().toIso8601String();
+    final deleted = _mapAbortedPregnancyEntity(pregnancy).copyWith(
+      synced: false,
+      syncAction: 'deleted',
+      updatedAt: now,
+    );
+    await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(deleted));
+    return true;
+  }
+
+  AbortedPregnanciesCompanion _toAbortedPregnancyCompanion(AbortedPregnancyModel model) {
+    return AbortedPregnanciesCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      abortionDate: Value(model.abortionDate),
+      reproductiveProblemId: model.reproductiveProblemId != null ? Value(model.reproductiveProblemId!) : const Value.absent(),
+      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      status: Value(model.status),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  AbortedPregnancyModel _mapAbortedPregnancyEntity(AbortedPregnancy entity) {
+    return AbortedPregnancyModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      abortionDate: entity.abortionDate,
+      reproductiveProblemId: entity.reproductiveProblemId,
+      remarks: entity.remarks,
+      status: entity.status,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  // ============================================================================
+  // MILKING (Placeholder - requires EventDao implementation)
+  // ============================================================================
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedMilkingsForApi() async {
+    // TODO: Implement once EventDao has getUnsyncedMilkings() method
+    // For now, return empty array
+    log('⚠️ getUnsyncedMilkingsForApi() not yet implemented - requires EventDao updates');
+    return [];
+  }
+
+  @override
+  Future<void> markMilkingsAsSynced(List<String> uuids) async {
+    // TODO: Implement once EventDao has milking methods
+    log('⚠️ markMilkingsAsSynced() not yet implemented - requires EventDao updates');
+  }
+
+  // ============================================================================
+  // PREGNANCY (Placeholder - requires EventDao implementation)
+  // ============================================================================
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedPregnanciesForApi() async {
+    // TODO: Implement once EventDao has getUnsyncedPregnancies() method
+    // For now, return empty array
+    log('⚠️ getUnsyncedPregnanciesForApi() not yet implemented - requires EventDao updates');
+    return [];
+  }
+
+  @override
+  Future<void> markPregnanciesAsSynced(List<String> uuids) async {
+    // TODO: Implement once EventDao has pregnancy methods
+    log('⚠️ markPregnanciesAsSynced() not yet implemented - requires EventDao updates');
+  }
+
+  // ============================================================================
+  // INSEMINATION (Placeholder - requires EventDao implementation)
+  // ============================================================================
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedInseminationsForApi() async {
+    // TODO: Implement once EventDao has getUnsyncedInseminations() method
+    // For now, return empty array
+    log('⚠️ getUnsyncedInseminationsForApi() not yet implemented - requires EventDao updates');
+    return [];
+  }
+
+  @override
+  Future<void> markInseminationsAsSynced(List<String> uuids) async {
+    // TODO: Implement once EventDao has insemination methods
+    log('⚠️ markInseminationsAsSynced() not yet implemented - requires EventDao updates');
+  }
+
+  // ============================================================================
+  // DRYOFF (Placeholder - requires EventDao implementation)
+  // ============================================================================
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedDryoffsForApi() async {
+    // TODO: Implement once EventDao has getUnsyncedDryoffs() method
+    // For now, return empty array
+    log('⚠️ getUnsyncedDryoffsForApi() not yet implemented - requires EventDao updates');
+    return [];
+  }
+
+  @override
+  Future<void> markDryoffsAsSynced(List<String> uuids) async {
+    // TODO: Implement once EventDao has dryoff methods
+    log('⚠️ markDryoffsAsSynced() not yet implemented - requires EventDao updates');
+  }
+
+  // ============================================================================
+  // TRANSFER (Placeholder - requires EventDao implementation)
+  // ============================================================================
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedTransfersForApi() async {
+    // TODO: Implement once EventDao has getUnsyncedTransfers() method
+    // For now, return empty array
+    log('⚠️ getUnsyncedTransfersForApi() not yet implemented - requires EventDao updates');
+    return [];
+  }
+
+  @override
+  Future<void> markTransfersAsSynced(List<String> uuids) async {
+    // TODO: Implement once EventDao has transfer methods
+    log('⚠️ markTransfersAsSynced() not yet implemented - requires EventDao updates');
   }
 }
 

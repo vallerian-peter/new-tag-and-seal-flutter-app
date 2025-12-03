@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/database/daos/log_reference_dao.dart';
-import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/data/remote/all.additional.data_api.dart';
+import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/administration_route.dart'
     as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/feeding_type.dart'
@@ -29,6 +29,10 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
     as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/calving_problem.dart'
     as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart'
+    as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart'
+    as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart'
     as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/repo/log_additional_data_repo.dart';
@@ -43,23 +47,24 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
 
   @override
   Future<Map<String, dynamic>> fetchRemoteLogAdditionalData() async {
-    final data = await AllAdditionalDataService.fetchAllAdditionalData();
-    return {
-      'feedingTypes': data['feedingTypes'] ?? [],
-      'administrationRoutes': data['administrationRoutes'] ?? [],
-      'medicineTypes': data['medicineTypes'] ?? [],
-      'medicines': data['medicines'] ?? [],
-      'diseases': data['diseases'] ?? [],
-      'disposalTypes': data['disposalTypes'] ?? [],
-      'milkingMethods': data['milkingMethods'] ?? [],
-      'heatTypes': data['heatTypes'] ?? [],
-      'inseminationServices': data['inseminationServices'] ?? [],
-      'semenStrawTypes': data['semenStrawTypes'] ?? [],
-      'testResults': data['testResults'] ?? [],
-      'calvingTypes': data['calvingTypes'] ?? [],
-      'calvingProblems': data['calvingProblems'] ?? [],
-      'reproductiveProblems': data['reproductiveProblems'] ?? [],
-    };
+    // Repository should not handle API calls - that's done by Sync service
+    // This method is deprecated and returns empty data.
+    // Use syncFromRemote() instead, which handles fetching and storing
+    // log additional data via Sync.splashSync()
+    log('⚠️ fetchRemoteLogAdditionalData() is deprecated. Use syncFromRemote() instead.');
+    return {};
+  }
+
+  @override
+  Future<void> syncFromRemote(AppDatabase database) async {
+    try {
+      // Repository handles sync by calling Sync service
+      // Sync service will fetch data and call storeLogAdditionalData() internally
+      await Sync.splashSync(database);
+    } catch (e) {
+      log('❌ Error syncing log additional data from remote: $e');
+      throw Exception('Repository: Failed to sync log additional data from remote - $e');
+    }
   }
 
   @override
@@ -199,6 +204,28 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
               .toList() ??
           const <CalvingProblemsCompanion>[];
 
+      final birthTypes = (data['birthTypes'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(logModels.BirthType.fromJson)
+              .map((model) => BirthTypesCompanion(
+                    id: Value(model.id),
+                    name: Value(model.name),
+                    livestockTypeId: model.livestockTypeId != null ? Value(model.livestockTypeId!) : const Value.absent(),
+                  ))
+              .toList() ??
+          const <BirthTypesCompanion>[];
+
+      final birthProblems = (data['birthProblems'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(logModels.BirthProblem.fromJson)
+              .map((model) => BirthProblemsCompanion(
+                    id: Value(model.id),
+                    name: Value(model.name),
+                    livestockTypeId: model.livestockTypeId != null ? Value(model.livestockTypeId!) : const Value.absent(),
+                  ))
+              .toList() ??
+          const <BirthProblemsCompanion>[];
+
       final reproductiveProblems = (data['reproductiveProblems'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.ReproductiveProblem.fromJson)
@@ -222,10 +249,12 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
       await _dao.upsertTestResults(testResults);
       await _dao.upsertCalvingTypes(calvingTypes);
       await _dao.upsertCalvingProblems(calvingProblems);
+      await _dao.upsertBirthTypes(birthTypes);
+      await _dao.upsertBirthProblems(birthProblems);
       await _dao.upsertReproductiveProblems(reproductiveProblems);
     } catch (e) {
       log('❌ Error storing log additional data: $e');
-      rethrow;
+      throw Exception('Repository: Failed to store log additional data locally - $e');
     }
   }
 
@@ -345,11 +374,41 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   }
 
   @override
+  Future<List<logModels.BirthType>> getBirthTypes() async {
+    final entities = await _dao.getAllBirthTypes();
+    return entities
+        .map(
+          (entity) => logModels.BirthType(
+            id: entity.id,
+            name: entity.name,
+            livestockTypeId: entity.livestockTypeId,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<logModels.BirthProblem>> getBirthProblems() async {
+    final entities = await _dao.getAllBirthProblems();
+    return entities
+        .map(
+          (entity) => logModels.BirthProblem(
+            id: entity.id,
+            name: entity.name,
+            livestockTypeId: entity.livestockTypeId,
+          ),
+        )
+        .toList();
+  }
+
+  @override
   Future<List<logModels.ReproductiveProblem>> getReproductiveProblems() async {
     final entities = await _dao.getAllReproductiveProblems();
     return entities
-        .map((entity) =>
-            logModels.ReproductiveProblem(id: entity.id, name: entity.name))
+        .map((entity) => logModels.ReproductiveProblem(
+              id: entity.id,
+              name: entity.name,
+            ))
         .toList();
   }
 

@@ -87,6 +87,10 @@ class SyncProvider extends ChangeNotifier {
   }
 
   /// Perform the actual sync operation
+  /// 
+  /// This sync includes:
+  /// - Farms, livestock, events, vaccines, and farm users
+  /// - Farm users: When synced, invitation emails are automatically sent by the backend
   Future<void> _performSync(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     
@@ -95,11 +99,14 @@ class SyncProvider extends ChangeNotifier {
       _updateProgress(l10n.syncStarting, 2);
       
       // Step 2: Call the existing Sync.splashSync method
+      // Note: This sync will send unsynced farm users to backend, which triggers email sending
       _updateProgress('Syncing data...', 3);
       await Sync.splashSync(_database);
       
       // Step 3: Sync completed
       _updateProgress(l10n.syncCompleted, 4);
+      
+      log('✅ Sync completed - farm user invitation emails have been sent if any were synced');
       
     } catch (e) {
       log('❌ Sync failed: $e');

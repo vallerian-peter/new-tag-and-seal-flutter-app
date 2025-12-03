@@ -4,6 +4,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
 /// Contract for all event (logs) repository operations.
@@ -140,6 +142,106 @@ abstract class EventsRepositoryInterface {
 
   /// Mark every log associated with a livestock UUID as deleted.
   Future<void> markAllLogsForLivestockAsDeleted(String livestockUuid);
+
+  // ============================================================================
+  // BIRTH EVENTS (replaces calvings)
+  // ============================================================================
+
+  /// Store a birth event locally (unsynced, marked for create).
+  Future<BirthEventModel> createBirthEvent(BirthEventModel model);
+
+  /// Update a birth event locally (unsynced, marked for update).
+  Future<BirthEventModel> updateBirthEventLocally(BirthEventModel model);
+
+  /// Retrieve birth events optionally filtered by farm/livestock.
+  Future<List<BirthEventModel>> getBirthEvents({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local birth events.
+  Future<List<BirthEventModel>> getAllBirthEvents();
+
+  /// Get unsynced birth events formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedBirthEventsForApi();
+
+  /// Mark birth events as synced or delete them if marked for deletion.
+  Future<void> markBirthEventsAsSynced(List<String> uuids);
+
+  /// Flag a birth event log for deletion during next sync.
+  Future<bool> markBirthEventAsDeleted(String uuid);
+
+  // ============================================================================
+  // ABORTED PREGNANCIES
+  // ============================================================================
+
+  /// Store an aborted pregnancy event locally (unsynced, marked for create).
+  Future<AbortedPregnancyModel> createAbortedPregnancy(AbortedPregnancyModel model);
+
+  /// Update an aborted pregnancy event locally (unsynced, marked for update).
+  Future<AbortedPregnancyModel> updateAbortedPregnancyLocally(AbortedPregnancyModel model);
+
+  /// Retrieve aborted pregnancies optionally filtered by farm/livestock.
+  Future<List<AbortedPregnancyModel>> getAbortedPregnancies({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local aborted pregnancies.
+  Future<List<AbortedPregnancyModel>> getAllAbortedPregnancies();
+
+  /// Get unsynced aborted pregnancies formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedAbortedPregnanciesForApi();
+
+  /// Mark aborted pregnancies as synced or delete them if marked for deletion.
+  Future<void> markAbortedPregnanciesAsSynced(List<String> uuids);
+
+  /// Flag an aborted pregnancy log for deletion during next sync.
+  Future<bool> markAbortedPregnancyAsDeleted(String uuid);
+
+  // ============================================================================
+  // MILKING
+  // ============================================================================
+
+  /// Get unsynced milking logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedMilkingsForApi();
+
+  /// Mark milking logs as synced or delete them if marked for deletion.
+  Future<void> markMilkingsAsSynced(List<String> uuids);
+
+  // ============================================================================
+  // PREGNANCY
+  // ============================================================================
+
+  /// Get unsynced pregnancy logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedPregnanciesForApi();
+
+  /// Mark pregnancy logs as synced or delete them if marked for deletion.
+  Future<void> markPregnanciesAsSynced(List<String> uuids);
+
+  // ============================================================================
+  // INSEMINATION
+  // ============================================================================
+
+  /// Get unsynced insemination logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedInseminationsForApi();
+
+  /// Mark insemination logs as synced or delete them if marked for deletion.
+  Future<void> markInseminationsAsSynced(List<String> uuids);
+
+  // ============================================================================
+  // DRYOFF
+  // ============================================================================
+
+  /// Get unsynced dryoff logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedDryoffsForApi();
+
+  /// Mark dryoff logs as synced or delete them if marked for deletion.
+  Future<void> markDryoffsAsSynced(List<String> uuids);
+
+  // ============================================================================
+  // TRANSFER
+  // ============================================================================
+
+  /// Get unsynced transfer logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedTransfersForApi();
+
+  /// Mark transfer logs as synced or delete them if marked for deletion.
+  Future<void> markTransfersAsSynced(List<String> uuids);
 }
 
 

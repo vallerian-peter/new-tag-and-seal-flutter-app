@@ -8,6 +8,10 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/events
 import 'package:new_tag_and_seal_flutter_app/features/profile/presentation/profile_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/scanner/presentation/scanner_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,25 +22,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-
-  // List of screens for navigation
-  final List<Widget> _screens = [
-    const DashboardScreen(),      // Index 0
-    const LivestockListScreen(),  // Index 1
-    const EventsScreen(),         // Index 3
-    const ProfileScreen(),        // Index 4
-  ];
+  Key _dashboardKey = UniqueKey();
+  Key _profileKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+
+    // Screens for navigation (Dashboard uses a key so we can force a refresh)
+    final screens = [
+      DashboardScreen(key: _dashboardKey),   // Index 0
+      const LivestockListScreen(),           // Index 1
+      const EventsScreen(),                  // Index 3
+      ProfileScreen(key: _profileKey),       // Index 4
+    ];
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: IndexedStack(
         index: _selectedIndex > 2 ? _selectedIndex - 1 : _selectedIndex, // Skip scanner index
-        children: _screens,
+        children: screens,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -148,8 +154,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 // For regular screens, use the index directly
                 setState(() {
+                  // If navigating to Dashboard, force a fresh instance so it reloads farms
+                  if (index == 0) {
+                    _dashboardKey = UniqueKey();
+                  } else if (index == 4) {
+                    // Force a fresh ProfileScreen so it reloads stats
+                    _profileKey = UniqueKey();
+                  }
                   _selectedIndex = index;
                 });
+
+                // Auto-refresh data when entering specific tabs
+                if (index == 1) {
+                  // Livestock tab
+                  _refreshLivestockTab();
+                } else if (index == 3) {
+                  // Events tab
+                  _refreshEventsTab();
+                }
               },
             ),
           ),
@@ -173,6 +195,39 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     });
+  }
+
+  /// Refresh data when entering the Livestock tab
+  void _refreshLivestockTab() {
+    try {
+      final livestockProvider = context.read<LivestockProvider>();
+      final database = context.read<AppDatabase>();
+
+      // Refresh livestock list
+      livestockProvider.fetchAllLivestock();
+
+      // Refresh farm names used by livestock cards
+      database.farmDao.getAllActiveFarms().then((farms) {
+        final farmNamesMap = <String, String>{};
+        for (final farm in farms) {
+          farmNamesMap[farm.uuid] = farm.name;
+        }
+        livestockProvider.setFarmNames(farmNamesMap);
+      });
+    } catch (_) {
+      // If providers are not available in this context, safely ignore
+    }
+  }
+
+  /// Refresh data when entering the Events tab
+  void _refreshEventsTab() {
+    try {
+      final eventsProvider = context.read<EventsProvider>();
+      // Refresh events list; EventsScreen will handle its own additional state
+      eventsProvider.loadAllEvents();
+    } catch (_) {
+      // If provider is not available, safely ignore
+    }
   }
 }
 
