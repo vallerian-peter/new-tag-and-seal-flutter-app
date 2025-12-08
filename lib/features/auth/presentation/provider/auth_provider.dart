@@ -108,6 +108,18 @@ class AuthProvider extends ChangeNotifier {
 
       log('🔐 DEBUG: Farmer registered: $farmer');
       
+      // Load user data from storage (repository stores it after auto-login)
+      // This is critical for role-based access control
+      final storedData = await _authRepository.getStoredUserData();
+      
+      if (storedData != null) {
+        _currentUser = storedData['user'] as Map<String, dynamic>?;
+        _currentProfile = storedData['profile'] as Map<String, dynamic>?;
+        log('🔐 DEBUG: Loaded user data after registration - Role: ${_currentUser?['role']}');
+      } else {
+        log('⚠️ WARNING: No stored user data found after registration');
+      }
+      
       // Update state
       _currentFarmer = farmer;
       _isAuthenticated = true;

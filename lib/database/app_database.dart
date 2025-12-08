@@ -26,6 +26,11 @@ import '../features/events/data/tables/deworming_table.dart';
 import '../features/events/data/tables/medication_table.dart';
 import '../features/events/data/tables/vaccination_table.dart';
 import '../features/events/data/tables/disposal_table.dart';
+import '../features/events/data/tables/milking_table.dart';
+import '../features/events/data/tables/pregnancy_table.dart';
+import '../features/events/data/tables/insemination_table.dart';
+import '../features/events/data/tables/dryoff_table.dart';
+import '../features/events/data/tables/transfer_table.dart';
 import '../features/vaccines/data/tables/vaccine_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/feeding_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/administration_route_table.dart';
@@ -106,12 +111,19 @@ part 'app_database.g.dart';
     AbortedPregnancies,
     ReproductiveProblems,
     VaccineTypes,
+    // Event log tables
     Feedings,
     WeightChanges,
     Dewormings,
     Medications,
     Vaccinations,
     Disposals,
+    Milkings,
+    Pregnancies,
+    Inseminations,
+    Dryoffs,
+    Transfers,
+    // Other feature tables
     Vaccines,
     FarmUsers,
     NotificationEntries,
@@ -132,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 17; // v17 adds farm users table
+  int get schemaVersion => 18; // v18 adds milking, pregnancy, insemination, dryoff, transfer tables
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -240,6 +252,14 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 17) {
         await _createTableIfMissing(m, farmUsers);
+      }
+      if (from < 18) {
+        // Version 18: Add the 5 new event log tables (milking, pregnancy, insemination, dryoff, transfer)
+        await _createTableIfMissing(m, milkings);
+        await _createTableIfMissing(m, pregnancies);
+        await _createTableIfMissing(m, inseminations);
+        await _createTableIfMissing(m, dryoffs);
+        await _createTableIfMissing(m, transfers);
       }
     },
     beforeOpen: (details) async {

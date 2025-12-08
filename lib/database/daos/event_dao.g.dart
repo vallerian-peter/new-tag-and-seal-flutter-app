@@ -13,4 +13,9 @@ mixin _$EventDaoMixin on DatabaseAccessor<AppDatabase> {
   $BirthEventsTable get birthEvents => attachedDatabase.birthEvents;
   $AbortedPregnanciesTable get abortedPregnancies =>
       attachedDatabase.abortedPregnancies;
+  $MilkingsTable get milkings => attachedDatabase.milkings;
+  $PregnanciesTable get pregnancies => attachedDatabase.pregnancies;
+  $InseminationsTable get inseminations => attachedDatabase.inseminations;
+  $DryoffsTable get dryoffs => attachedDatabase.dryoffs;
+  $TransfersTable get transfers => attachedDatabase.transfers;
 }

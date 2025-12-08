@@ -65,6 +65,11 @@ class EventsViewControl {
       case EventLogTypes.calving:
       case EventLogTypes.farrowing:
       case EventLogTypes.abortedPregnancy:
+      case EventLogTypes.milking:
+      case EventLogTypes.pregnancy:
+      case EventLogTypes.insemination:
+      case EventLogTypes.dryoff:
+      case EventLogTypes.transfer:
         final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
         await Navigator.of(context).push(
           MaterialPageRoute(

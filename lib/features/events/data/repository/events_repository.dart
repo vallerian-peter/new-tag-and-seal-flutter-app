@@ -12,6 +12,11 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccin
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
@@ -39,11 +44,19 @@ class EventsRepository implements EventsRepositoryInterface {
     final disposalsCount = (logs['disposals'] as List?)?.length ?? 0;
     final birthEventsCount = (logs['birthEvents'] as List?)?.length ?? 0;
     final abortedPregnanciesCount = (logs['abortedPregnancies'] as List?)?.length ?? 0;
+    final milkingsCount = (logs['milkings'] as List?)?.length ?? 0;
+    final pregnanciesCount = (logs['pregnancies'] as List?)?.length ?? 0;
+    final inseminationsCount = (logs['inseminations'] as List?)?.length ?? 0;
+    final dryoffsCount = (logs['dryoffs'] as List?)?.length ?? 0;
+    final transfersCount = (logs['transfers'] as List?)?.length ?? 0;
+    
     log(
       '🔄 Syncing event logs (feedings: $feedingsCount, weightChanges: $weightChangesCount, '
       'dewormings: $dewormingsCount, medications: $medicationsCount, '
       'vaccinations: $vaccinationsCount, disposals: $disposalsCount, '
-      'birthEvents: $birthEventsCount, abortedPregnancies: $abortedPregnanciesCount)...',
+      'birthEvents: $birthEventsCount, abortedPregnancies: $abortedPregnanciesCount, '
+      'milkings: $milkingsCount, pregnancies: $pregnanciesCount, '
+      'inseminations: $inseminationsCount, dryoffs: $dryoffsCount, transfers: $transfersCount)...',
     );
 
     await _syncFeedings(logs['feedings']);
@@ -54,6 +67,11 @@ class EventsRepository implements EventsRepositoryInterface {
     await _syncDisposals(logs['disposals']);
     await _syncBirthEvents(logs['birthEvents']);
     await _syncAbortedPregnancies(logs['abortedPregnancies']);
+    await _syncMilkings(logs['milkings']);
+    await _syncPregnancies(logs['pregnancies']);
+    await _syncInseminations(logs['inseminations']);
+    await _syncDryoffs(logs['dryoffs']);
+    await _syncTransfers(logs['transfers']);
   }
 
   Future<void> _syncFeedings(dynamic payload) async {
@@ -314,6 +332,166 @@ class EventsRepository implements EventsRepositoryInterface {
     // The backend handles this through proper sync mechanisms
   }
 
+  Future<void> _syncMilkings(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = MilkingModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getMilkingByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertMilking(_toMilkingCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertMilking(_toMilkingCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing milking log: $e');
+      }
+    }
+
+    await _eventDao.deleteServerMilkingsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncPregnancies(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = PregnancyModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getPregnancyByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertPregnancy(_toPregnancyCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertPregnancy(_toPregnancyCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing pregnancy log: $e');
+      }
+    }
+
+    await _eventDao.deleteServerPregnanciesNotIn(remoteUuids);
+  }
+
+  Future<void> _syncInseminations(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = InseminationModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getInseminationByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertInsemination(_toInseminationCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertInsemination(_toInseminationCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing insemination log: $e');
+      }
+    }
+
+    await _eventDao.deleteServerInseminationsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncDryoffs(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = DryoffModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getDryoffByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertDryoff(_toDryoffCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertDryoff(_toDryoffCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing dryoff log: $e');
+      }
+    }
+
+    await _eventDao.deleteServerDryoffsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncTransfers(dynamic payload) async {
+    if (payload is! List) return;
+
+    final remoteUuids = <String>{};
+
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = TransferModel.fromJson(raw).copyWith(
+          synced: true,
+          syncAction: 'server-create',
+        );
+        remoteUuids.add(remote.uuid);
+
+        final existing = await _eventDao.getTransferByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertTransfer(_toTransferCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            await _eventDao.upsertTransfer(_toTransferCompanion(updated));
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing transfer log: $e');
+      }
+    }
+
+    await _eventDao.deleteServerTransfersNotIn(remoteUuids);
+  }
+
   // ===========================================================================
   // Local creation (unsynced defaults)
   // ===========================================================================
@@ -510,6 +688,166 @@ class EventsRepository implements EventsRepositoryInterface {
     return _mapDisposalEntity(updated);
   }
 
+  @override
+  Future<MilkingModel> createMilking(MilkingModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating milking log locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertMilking(_toMilkingCompanion(localModel));
+    return _mapMilkingEntity(inserted);
+  }
+
+  @override
+  Future<MilkingModel> updateMilkingLocally(MilkingModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertMilking(_toMilkingCompanion(localModel));
+    return _mapMilkingEntity(updated);
+  }
+
+  @override
+  Future<PregnancyModel> createPregnancy(PregnancyModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating pregnancy log locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertPregnancy(_toPregnancyCompanion(localModel));
+    return _mapPregnancyEntity(inserted);
+  }
+
+  @override
+  Future<PregnancyModel> updatePregnancyLocally(PregnancyModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertPregnancy(_toPregnancyCompanion(localModel));
+    return _mapPregnancyEntity(updated);
+  }
+
+  @override
+  Future<InseminationModel> createInsemination(InseminationModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating insemination log locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertInsemination(_toInseminationCompanion(localModel));
+    return _mapInseminationEntity(inserted);
+  }
+
+  @override
+  Future<InseminationModel> updateInseminationLocally(InseminationModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertInsemination(_toInseminationCompanion(localModel));
+    return _mapInseminationEntity(updated);
+  }
+
+  @override
+  Future<DryoffModel> createDryoff(DryoffModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating dryoff log locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertDryoff(_toDryoffCompanion(localModel));
+    return _mapDryoffEntity(inserted);
+  }
+
+  @override
+  Future<DryoffModel> updateDryoffLocally(DryoffModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertDryoff(_toDryoffCompanion(localModel));
+    return _mapDryoffEntity(updated);
+  }
+
+  @override
+  Future<TransferModel> createTransfer(TransferModel model) async {
+    final now = DateTime.now().toIso8601String();
+    log('📝 Creating transfer log locally: ${model.uuid}');
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+
+    final inserted = await _eventDao.upsertTransfer(_toTransferCompanion(localModel));
+    return _mapTransferEntity(inserted);
+  }
+
+  @override
+  Future<TransferModel> updateTransferLocally(TransferModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+
+    final updated = await _eventDao.upsertTransfer(_toTransferCompanion(localModel));
+    return _mapTransferEntity(updated);
+  }
+
   // ===========================================================================
   // Queries
   // ===========================================================================
@@ -551,6 +889,36 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
+  Future<List<MilkingModel>> getMilkings({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getMilkings(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapMilkingEntity).toList();
+  }
+
+  @override
+  Future<List<PregnancyModel>> getPregnancies({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getPregnancies(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapPregnancyEntity).toList();
+  }
+
+  @override
+  Future<List<InseminationModel>> getInseminations({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getInseminations(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapInseminationEntity).toList();
+  }
+
+  @override
+  Future<List<DryoffModel>> getDryoffs({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getDryoffs(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapDryoffEntity).toList();
+  }
+
+  @override
+  Future<List<TransferModel>> getTransfers({String? farmUuid, String? livestockUuid}) async {
+    final rows = await _eventDao.getTransfers(farmUuid: farmUuid, livestockUuid: livestockUuid);
+    return rows.map(_mapTransferEntity).toList();
+  }
+
+  @override
   Future<List<FeedingModel>> getAllFeedings() => getFeedings();
 
   @override
@@ -564,6 +932,21 @@ class EventsRepository implements EventsRepositoryInterface {
   Future<List<VaccinationModel>> getAllVaccinations() => getVaccinations();
   @override
   Future<List<DisposalModel>> getAllDisposals() => getDisposals();
+
+  @override
+  Future<List<MilkingModel>> getAllMilkings() => getMilkings();
+
+  @override
+  Future<List<PregnancyModel>> getAllPregnancies() => getPregnancies();
+
+  @override
+  Future<List<InseminationModel>> getAllInseminations() => getInseminations();
+
+  @override
+  Future<List<DryoffModel>> getAllDryoffs() => getDryoffs();
+
+  @override
+  Future<List<TransferModel>> getAllTransfers() => getTransfers();
 
   @override
   Future<Map<String, int>> getLogCounts({
@@ -905,6 +1288,66 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.getAbortedPregnancies(livestockUuid: livestockUuid);
     for (final log in abortedPregnancies) {
       await markAbortedPregnancyAsDeleted(log.uuid);
+    }
+
+    // Milking logs
+    final milkings = await _eventDao.getMilkings(livestockUuid: livestockUuid);
+    for (final log in milkings) {
+      final now = DateTime.now().toIso8601String();
+      final model = _mapMilkingEntity(log).copyWith(
+        synced: false,
+        syncAction: 'deleted',
+        updatedAt: now,
+      );
+      await _eventDao.upsertMilking(_toMilkingCompanion(model));
+    }
+
+    // Pregnancy logs
+    final pregnancies = await _eventDao.getPregnancies(livestockUuid: livestockUuid);
+    for (final log in pregnancies) {
+      final now = DateTime.now().toIso8601String();
+      final model = _mapPregnancyEntity(log).copyWith(
+        synced: false,
+        syncAction: 'deleted',
+        updatedAt: now,
+      );
+      await _eventDao.upsertPregnancy(_toPregnancyCompanion(model));
+    }
+
+    // Insemination logs
+    final inseminations = await _eventDao.getInseminations(livestockUuid: livestockUuid);
+    for (final log in inseminations) {
+      final now = DateTime.now().toIso8601String();
+      final model = _mapInseminationEntity(log).copyWith(
+        synced: false,
+        syncAction: 'deleted',
+        updatedAt: now,
+      );
+      await _eventDao.upsertInsemination(_toInseminationCompanion(model));
+    }
+
+    // Dryoff logs
+    final dryoffs = await _eventDao.getDryoffs(livestockUuid: livestockUuid);
+    for (final log in dryoffs) {
+      final now = DateTime.now().toIso8601String();
+      final model = _mapDryoffEntity(log).copyWith(
+        synced: false,
+        syncAction: 'deleted',
+        updatedAt: now,
+      );
+      await _eventDao.upsertDryoff(_toDryoffCompanion(model));
+    }
+
+    // Transfer logs
+    final transfers = await _eventDao.getTransfers(livestockUuid: livestockUuid);
+    for (final log in transfers) {
+      final now = DateTime.now().toIso8601String();
+      final model = _mapTransferEntity(log).copyWith(
+        synced: false,
+        syncAction: 'deleted',
+        updatedAt: now,
+      );
+      await _eventDao.upsertTransfer(_toTransferCompanion(model));
     }
   }
 
@@ -1514,94 +1957,418 @@ class EventsRepository implements EventsRepositoryInterface {
     );
   }
 
+  MilkingModel _mapMilkingEntity(Milking entity) {
+    return MilkingModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      milkingMethodId: entity.milkingMethodId,
+      amount: entity.amount,
+      lactometerReading: entity.lactometerReading,
+      solid: entity.solid,
+      solidNonFat: entity.solidNonFat,
+      protein: entity.protein,
+      correctedLactometerReading: entity.correctedLactometerReading,
+      totalSolids: entity.totalSolids,
+      colonyFormingUnits: entity.colonyFormingUnits,
+      acidity: entity.acidity,
+      session: entity.session,
+      status: entity.status,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  MilkingsCompanion _toMilkingCompanion(MilkingModel model) {
+    return MilkingsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: model.farmUuid != null ? Value(model.farmUuid!) : const Value.absent(),
+      livestockUuid: Value(model.livestockUuid),
+      milkingMethodId: model.milkingMethodId != null ? Value(model.milkingMethodId!) : const Value.absent(),
+      amount: Value(model.amount),
+      lactometerReading: Value(model.lactometerReading),
+      solid: Value(model.solid),
+      solidNonFat: Value(model.solidNonFat),
+      protein: Value(model.protein),
+      correctedLactometerReading: Value(model.correctedLactometerReading),
+      totalSolids: Value(model.totalSolids),
+      colonyFormingUnits: Value(model.colonyFormingUnits),
+      acidity: model.acidity != null ? Value(model.acidity!) : const Value.absent(),
+      session: Value(model.session),
+      status: Value(model.status),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  PregnancyModel _mapPregnancyEntity(Pregnancy entity) {
+    return PregnancyModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      testResultId: entity.testResultId,
+      noOfMonths: entity.noOfMonths,
+      testDate: entity.testDate,
+      status: entity.status,
+      remarks: entity.remarks,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  PregnanciesCompanion _toPregnancyCompanion(PregnancyModel model) {
+    return PregnanciesCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      testResultId: Value(model.testResultId),
+      noOfMonths: model.noOfMonths != null ? Value(model.noOfMonths!) : const Value.absent(),
+      testDate: model.testDate != null ? Value(model.testDate!) : const Value.absent(),
+      status: Value(model.status),
+      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  InseminationModel _mapInseminationEntity(Insemination entity) {
+    return InseminationModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      lastHeatDate: entity.lastHeatDate,
+      currentHeatTypeId: entity.currentHeatTypeId,
+      inseminationServiceId: entity.inseminationServiceId,
+      semenStrawTypeId: entity.semenStrawTypeId,
+      inseminationDate: entity.inseminationDate,
+      bullCode: entity.bullCode,
+      bullBreed: entity.bullBreed,
+      semenProductionDate: entity.semenProductionDate,
+      productionCountry: entity.productionCountry,
+      semenBatchNumber: entity.semenBatchNumber,
+      internationalId: entity.internationalId,
+      aiCode: entity.aiCode,
+      manufacturerName: entity.manufacturerName,
+      semenSupplier: entity.semenSupplier,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  InseminationsCompanion _toInseminationCompanion(InseminationModel model) {
+    return InseminationsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: model.farmUuid != null ? Value(model.farmUuid!) : const Value.absent(),
+      livestockUuid: Value(model.livestockUuid),
+      lastHeatDate: model.lastHeatDate != null ? Value(model.lastHeatDate!) : const Value.absent(),
+      currentHeatTypeId: Value(model.currentHeatTypeId),
+      inseminationServiceId: Value(model.inseminationServiceId),
+      semenStrawTypeId: Value(model.semenStrawTypeId),
+      inseminationDate: model.inseminationDate != null ? Value(model.inseminationDate!) : const Value.absent(),
+      bullCode: model.bullCode != null ? Value(model.bullCode!) : const Value.absent(),
+      bullBreed: model.bullBreed != null ? Value(model.bullBreed!) : const Value.absent(),
+      semenProductionDate: model.semenProductionDate != null ? Value(model.semenProductionDate!) : const Value.absent(),
+      productionCountry: model.productionCountry != null ? Value(model.productionCountry!) : const Value.absent(),
+      semenBatchNumber: model.semenBatchNumber != null ? Value(model.semenBatchNumber!) : const Value.absent(),
+      internationalId: model.internationalId != null ? Value(model.internationalId!) : const Value.absent(),
+      aiCode: model.aiCode != null ? Value(model.aiCode!) : const Value.absent(),
+      manufacturerName: model.manufacturerName != null ? Value(model.manufacturerName!) : const Value.absent(),
+      semenSupplier: model.semenSupplier != null ? Value(model.semenSupplier!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  DryoffModel _mapDryoffEntity(Dryoff entity) {
+    return DryoffModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      startDate: entity.startDate,
+      endDate: entity.endDate,
+      reason: entity.reason,
+      remarks: entity.remarks,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  DryoffsCompanion _toDryoffCompanion(DryoffModel model) {
+    return DryoffsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      startDate: Value(model.startDate),
+      endDate: model.endDate != null ? Value(model.endDate!) : const Value.absent(),
+      reason: model.reason != null ? Value(model.reason!) : const Value.absent(),
+      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  TransferModel _mapTransferEntity(Transfer entity) {
+    return TransferModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      toFarmUuid: entity.toFarmUuid,
+      transporterId: entity.transporterId,
+      reason: entity.reason,
+      price: entity.price,
+      transferDate: entity.transferDate,
+      remarks: entity.remarks,
+      status: entity.status,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  TransfersCompanion _toTransferCompanion(TransferModel model) {
+    return TransfersCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      toFarmUuid: model.toFarmUuid != null ? Value(model.toFarmUuid!) : const Value.absent(),
+      transporterId: model.transporterId != null ? Value(model.transporterId!) : const Value.absent(),
+      reason: model.reason != null ? Value(model.reason!) : const Value.absent(),
+      price: model.price != null ? Value(model.price!) : const Value.absent(),
+      transferDate: Value(model.transferDate),
+      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      status: model.status != null ? Value(model.status!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
   // ============================================================================
-  // MILKING (Placeholder - requires EventDao implementation)
+  // MILKING
   // ============================================================================
 
   @override
   Future<List<Map<String, dynamic>>> getUnsyncedMilkingsForApi() async {
-    // TODO: Implement once EventDao has getUnsyncedMilkings() method
-    // For now, return empty array
-    log('⚠️ getUnsyncedMilkingsForApi() not yet implemented - requires EventDao updates');
-    return [];
+    final rows = await _eventDao.getUnsyncedMilkings();
+    if (rows.isEmpty) {
+      log('✅ No unsynced milking logs found');
+      return [];
+    }
+
+    log('📤 Preparing ${rows.length} milking logs for sync');
+    return rows.map((row) => _mapMilkingEntity(row).toApiJson()).toList();
   }
 
   @override
   Future<void> markMilkingsAsSynced(List<String> uuids) async {
-    // TODO: Implement once EventDao has milking methods
-    log('⚠️ markMilkingsAsSynced() not yet implemented - requires EventDao updates');
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getMilkingByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Milking log not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteMilkingByUuid(uuid);
+        log('🗑️ Removed milking log after synced delete: $uuid');
+      } else {
+        final model = _mapMilkingEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertMilking(_toMilkingCompanion(model));
+        log('✅ Marked milking log as synced: $uuid');
+      }
+    }
   }
 
   // ============================================================================
-  // PREGNANCY (Placeholder - requires EventDao implementation)
+  // PREGNANCY
   // ============================================================================
 
   @override
   Future<List<Map<String, dynamic>>> getUnsyncedPregnanciesForApi() async {
-    // TODO: Implement once EventDao has getUnsyncedPregnancies() method
-    // For now, return empty array
-    log('⚠️ getUnsyncedPregnanciesForApi() not yet implemented - requires EventDao updates');
-    return [];
+    final rows = await _eventDao.getUnsyncedPregnancies();
+    if (rows.isEmpty) {
+      log('✅ No unsynced pregnancy logs found');
+      return [];
+    }
+
+    log('📤 Preparing ${rows.length} pregnancy logs for sync');
+    return rows.map((row) => _mapPregnancyEntity(row).toApiJson()).toList();
   }
 
   @override
   Future<void> markPregnanciesAsSynced(List<String> uuids) async {
-    // TODO: Implement once EventDao has pregnancy methods
-    log('⚠️ markPregnanciesAsSynced() not yet implemented - requires EventDao updates');
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getPregnancyByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Pregnancy log not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deletePregnancyByUuid(uuid);
+        log('🗑️ Removed pregnancy log after synced delete: $uuid');
+      } else {
+        final model = _mapPregnancyEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertPregnancy(_toPregnancyCompanion(model));
+        log('✅ Marked pregnancy log as synced: $uuid');
+      }
+    }
   }
 
   // ============================================================================
-  // INSEMINATION (Placeholder - requires EventDao implementation)
+  // INSEMINATION
   // ============================================================================
 
   @override
   Future<List<Map<String, dynamic>>> getUnsyncedInseminationsForApi() async {
-    // TODO: Implement once EventDao has getUnsyncedInseminations() method
-    // For now, return empty array
-    log('⚠️ getUnsyncedInseminationsForApi() not yet implemented - requires EventDao updates');
-    return [];
+    final rows = await _eventDao.getUnsyncedInseminations();
+    if (rows.isEmpty) {
+      log('✅ No unsynced insemination logs found');
+      return [];
+    }
+
+    log('📤 Preparing ${rows.length} insemination logs for sync');
+    return rows.map((row) => _mapInseminationEntity(row).toApiJson()).toList();
   }
 
   @override
   Future<void> markInseminationsAsSynced(List<String> uuids) async {
-    // TODO: Implement once EventDao has insemination methods
-    log('⚠️ markInseminationsAsSynced() not yet implemented - requires EventDao updates');
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getInseminationByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Insemination log not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteInseminationByUuid(uuid);
+        log('🗑️ Removed insemination log after synced delete: $uuid');
+      } else {
+        final model = _mapInseminationEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertInsemination(_toInseminationCompanion(model));
+        log('✅ Marked insemination log as synced: $uuid');
+      }
+    }
   }
 
   // ============================================================================
-  // DRYOFF (Placeholder - requires EventDao implementation)
+  // DRYOFF
   // ============================================================================
 
   @override
   Future<List<Map<String, dynamic>>> getUnsyncedDryoffsForApi() async {
-    // TODO: Implement once EventDao has getUnsyncedDryoffs() method
-    // For now, return empty array
-    log('⚠️ getUnsyncedDryoffsForApi() not yet implemented - requires EventDao updates');
-    return [];
+    final rows = await _eventDao.getUnsyncedDryoffs();
+    if (rows.isEmpty) {
+      log('✅ No unsynced dryoff logs found');
+      return [];
+    }
+
+    log('📤 Preparing ${rows.length} dryoff logs for sync');
+    return rows.map((row) => _mapDryoffEntity(row).toApiJson()).toList();
   }
 
   @override
   Future<void> markDryoffsAsSynced(List<String> uuids) async {
-    // TODO: Implement once EventDao has dryoff methods
-    log('⚠️ markDryoffsAsSynced() not yet implemented - requires EventDao updates');
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getDryoffByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Dryoff log not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteDryoffByUuid(uuid);
+        log('🗑️ Removed dryoff log after synced delete: $uuid');
+      } else {
+        final model = _mapDryoffEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertDryoff(_toDryoffCompanion(model));
+        log('✅ Marked dryoff log as synced: $uuid');
+      }
+    }
   }
 
   // ============================================================================
-  // TRANSFER (Placeholder - requires EventDao implementation)
+  // TRANSFER
   // ============================================================================
 
   @override
   Future<List<Map<String, dynamic>>> getUnsyncedTransfersForApi() async {
-    // TODO: Implement once EventDao has getUnsyncedTransfers() method
-    // For now, return empty array
-    log('⚠️ getUnsyncedTransfersForApi() not yet implemented - requires EventDao updates');
-    return [];
+    final rows = await _eventDao.getUnsyncedTransfers();
+    if (rows.isEmpty) {
+      log('✅ No unsynced transfer logs found');
+      return [];
+    }
+
+    log('📤 Preparing ${rows.length} transfer logs for sync');
+    return rows.map((row) => _mapTransferEntity(row).toApiJson()).toList();
   }
 
   @override
   Future<void> markTransfersAsSynced(List<String> uuids) async {
-    // TODO: Implement once EventDao has transfer methods
-    log('⚠️ markTransfersAsSynced() not yet implemented - requires EventDao updates');
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getTransferByUuid(uuid);
+      if (existing == null) {
+        log('⚠️ Transfer log not found while marking as synced: $uuid');
+        continue;
+      }
+
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteTransferByUuid(uuid);
+        log('🗑️ Removed transfer log after synced delete: $uuid');
+      } else {
+        final model = _mapTransferEntity(existing).copyWith(
+          synced: true,
+          syncAction: existing.syncAction,
+        );
+        await _eventDao.upsertTransfer(_toTransferCompanion(model));
+        log('✅ Marked transfer log as synced: $uuid');
+      }
+    }
   }
 }
 

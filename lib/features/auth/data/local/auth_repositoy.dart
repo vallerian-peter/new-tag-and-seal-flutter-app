@@ -53,8 +53,12 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<FarmerModel> registerFarmer(Map<String, dynamic> farmerData) async {
     try {
       // 1. Extract credentials for login after registration
-      final username = farmerData['username'] as String;
-      final password = farmerData['password'] ?? farmerData['email'] as String;
+      // Use email explicitly (email is used as username for login)
+      final email = farmerData['email'] as String;
+      // Password fallback: if password is not provided, use email
+      final password = farmerData['password'] ?? email;
+      
+      log('🔐 DEBUG: Registration credentials - email: $email, password: ${password.isNotEmpty ? '***' : 'empty'}');
       
       // 2. Add role to registration data
       farmerData['role'] = 'farmer';
@@ -70,9 +74,11 @@ class AuthRepository implements AuthRepositoryInterface {
       }
 
       // 5. Registration successful, now login to get full data
+      // Login with email as username and password (password ?? email)
+      log('🔐 DEBUG: Auto-login after registration with email: $email');
       final loginResponse = await AuthService.login(
-        username: username,
-        password: password,
+        username: email, // Use email as username for login
+        password: password, // Use password (or email if password not provided)
       );
 
       // 6. Check if login was successful
@@ -92,7 +98,17 @@ class AuthRepository implements AuthRepositoryInterface {
       // 8. Create FarmerModel from profile
       final farmer = FarmerModel.fromJson(data['profile'] as Map<String, dynamic>);
 
-      // 9. Store all data in secure storage (using camelCase keys)
+      // 9. Persist authentication like a normal login
+      // 9.1 Save token under 'auth_token' so sync can use it
+      await saveToken(accessToken);
+      
+      // 9.2 Save credentials for auto-login
+      await saveCredentials(
+        username: email,
+        password: password,
+      );
+
+      // 9.3 Store all user data in secure storage (using camelCase keys)
       await storeUserData(
         userId: user['id']?.toString() ?? '',
         username: user['username'] ?? '',
@@ -113,6 +129,8 @@ class AuthRepository implements AuthRepositoryInterface {
 
       // 10. Set logged in status
       await _setLoggedInStatus(true);
+
+      log('🔐 DEBUG: Registration and auto-login completed successfully');
 
       // 11. Return the registered farmer
       return farmer;

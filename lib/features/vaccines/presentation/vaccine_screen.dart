@@ -140,7 +140,8 @@ class _VaccineScreenState extends State<VaccineScreen> {
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: vaccines.isEmpty
-            ? ListView(
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(

@@ -248,12 +248,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness:
-              Brightness.dark, // Dark icons for light background
-          statusBarBrightness: Brightness.light, // iOS: light status bar
-        ),
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         leading: CustomBackButton(
           isEnabledBgColor: false,
           iconColor: Theme.of(context).colorScheme.tertiary,

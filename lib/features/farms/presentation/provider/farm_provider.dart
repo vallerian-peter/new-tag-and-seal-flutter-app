@@ -45,7 +45,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.farmsLoadedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -63,7 +62,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.farmsLoadFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -98,7 +96,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.farmLoadedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -116,7 +113,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.farmLoadFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -151,7 +147,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.farmWithLivestockLoadedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -169,7 +164,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.farmWithLivestockLoadFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -230,14 +224,14 @@ class FarmProvider extends ChangeNotifier {
         Navigator.of(context).pop();
       }
       
-      // Show success dialog
+      // Show success dialog and wait for it to be dismissed
+      // Dialog will return true when OK is pressed (default behavior)
       if (context.mounted) {
-        await AlertDialogs.showSuccess(
+        await AlertDialogs.showSuccess<bool>(
           context: context,
           title: l10n.success,
           message: l10n.farmRegisteredSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       
@@ -258,7 +252,6 @@ class FarmProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.farmRegistrationFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
       }
       

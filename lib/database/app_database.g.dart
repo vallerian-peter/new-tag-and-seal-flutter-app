@@ -15492,6 +15492,4744 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
   }
 }
 
+class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MilkingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _livestockUuidMeta = const VerificationMeta(
+    'livestockUuid',
+  );
+  @override
+  late final GeneratedColumn<String> livestockUuid = GeneratedColumn<String>(
+    'livestock_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _milkingMethodIdMeta = const VerificationMeta(
+    'milkingMethodId',
+  );
+  @override
+  late final GeneratedColumn<int> milkingMethodId = GeneratedColumn<int>(
+    'milking_method_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<String> amount = GeneratedColumn<String>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lactometerReadingMeta = const VerificationMeta(
+    'lactometerReading',
+  );
+  @override
+  late final GeneratedColumn<String> lactometerReading =
+      GeneratedColumn<String>(
+        'lactometer_reading',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _solidMeta = const VerificationMeta('solid');
+  @override
+  late final GeneratedColumn<String> solid = GeneratedColumn<String>(
+    'solid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _solidNonFatMeta = const VerificationMeta(
+    'solidNonFat',
+  );
+  @override
+  late final GeneratedColumn<String> solidNonFat = GeneratedColumn<String>(
+    'solid_non_fat',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proteinMeta = const VerificationMeta(
+    'protein',
+  );
+  @override
+  late final GeneratedColumn<String> protein = GeneratedColumn<String>(
+    'protein',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _correctedLactometerReadingMeta =
+      const VerificationMeta('correctedLactometerReading');
+  @override
+  late final GeneratedColumn<String> correctedLactometerReading =
+      GeneratedColumn<String>(
+        'corrected_lactometer_reading',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _totalSolidsMeta = const VerificationMeta(
+    'totalSolids',
+  );
+  @override
+  late final GeneratedColumn<String> totalSolids = GeneratedColumn<String>(
+    'total_solids',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colonyFormingUnitsMeta =
+      const VerificationMeta('colonyFormingUnits');
+  @override
+  late final GeneratedColumn<String> colonyFormingUnits =
+      GeneratedColumn<String>(
+        'colony_forming_units',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _acidityMeta = const VerificationMeta(
+    'acidity',
+  );
+  @override
+  late final GeneratedColumn<String> acidity = GeneratedColumn<String>(
+    'acidity',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sessionMeta = const VerificationMeta(
+    'session',
+  );
+  @override
+  late final GeneratedColumn<String> session = GeneratedColumn<String>(
+    'session',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('morning'),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    milkingMethodId,
+    amount,
+    lactometerReading,
+    solid,
+    solidNonFat,
+    protein,
+    correctedLactometerReading,
+    totalSolids,
+    colonyFormingUnits,
+    acidity,
+    session,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'milkings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Milking> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    }
+    if (data.containsKey('livestock_uuid')) {
+      context.handle(
+        _livestockUuidMeta,
+        livestockUuid.isAcceptableOrUnknown(
+          data['livestock_uuid']!,
+          _livestockUuidMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_livestockUuidMeta);
+    }
+    if (data.containsKey('milking_method_id')) {
+      context.handle(
+        _milkingMethodIdMeta,
+        milkingMethodId.isAcceptableOrUnknown(
+          data['milking_method_id']!,
+          _milkingMethodIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('lactometer_reading')) {
+      context.handle(
+        _lactometerReadingMeta,
+        lactometerReading.isAcceptableOrUnknown(
+          data['lactometer_reading']!,
+          _lactometerReadingMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lactometerReadingMeta);
+    }
+    if (data.containsKey('solid')) {
+      context.handle(
+        _solidMeta,
+        solid.isAcceptableOrUnknown(data['solid']!, _solidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_solidMeta);
+    }
+    if (data.containsKey('solid_non_fat')) {
+      context.handle(
+        _solidNonFatMeta,
+        solidNonFat.isAcceptableOrUnknown(
+          data['solid_non_fat']!,
+          _solidNonFatMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_solidNonFatMeta);
+    }
+    if (data.containsKey('protein')) {
+      context.handle(
+        _proteinMeta,
+        protein.isAcceptableOrUnknown(data['protein']!, _proteinMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_proteinMeta);
+    }
+    if (data.containsKey('corrected_lactometer_reading')) {
+      context.handle(
+        _correctedLactometerReadingMeta,
+        correctedLactometerReading.isAcceptableOrUnknown(
+          data['corrected_lactometer_reading']!,
+          _correctedLactometerReadingMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_correctedLactometerReadingMeta);
+    }
+    if (data.containsKey('total_solids')) {
+      context.handle(
+        _totalSolidsMeta,
+        totalSolids.isAcceptableOrUnknown(
+          data['total_solids']!,
+          _totalSolidsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_totalSolidsMeta);
+    }
+    if (data.containsKey('colony_forming_units')) {
+      context.handle(
+        _colonyFormingUnitsMeta,
+        colonyFormingUnits.isAcceptableOrUnknown(
+          data['colony_forming_units']!,
+          _colonyFormingUnitsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_colonyFormingUnitsMeta);
+    }
+    if (data.containsKey('acidity')) {
+      context.handle(
+        _acidityMeta,
+        acidity.isAcceptableOrUnknown(data['acidity']!, _acidityMeta),
+      );
+    }
+    if (data.containsKey('session')) {
+      context.handle(
+        _sessionMeta,
+        session.isAcceptableOrUnknown(data['session']!, _sessionMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Milking map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Milking(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      ),
+      livestockUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}livestock_uuid'],
+      )!,
+      milkingMethodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}milking_method_id'],
+      ),
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}amount'],
+      )!,
+      lactometerReading: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lactometer_reading'],
+      )!,
+      solid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}solid'],
+      )!,
+      solidNonFat: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}solid_non_fat'],
+      )!,
+      protein: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protein'],
+      )!,
+      correctedLactometerReading: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}corrected_lactometer_reading'],
+      )!,
+      totalSolids: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}total_solids'],
+      )!,
+      colonyFormingUnits: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}colony_forming_units'],
+      )!,
+      acidity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}acidity'],
+      ),
+      session: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MilkingsTable createAlias(String alias) {
+    return $MilkingsTable(attachedDatabase, alias);
+  }
+}
+
+class Milking extends DataClass implements Insertable<Milking> {
+  final int? id;
+  final String uuid;
+  final String? farmUuid;
+  final String livestockUuid;
+  final int? milkingMethodId;
+  final String amount;
+  final String lactometerReading;
+  final String solid;
+  final String solidNonFat;
+  final String protein;
+  final String correctedLactometerReading;
+  final String totalSolids;
+  final String colonyFormingUnits;
+  final String? acidity;
+  final String session;
+  final String status;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Milking({
+    this.id,
+    required this.uuid,
+    this.farmUuid,
+    required this.livestockUuid,
+    this.milkingMethodId,
+    required this.amount,
+    required this.lactometerReading,
+    required this.solid,
+    required this.solidNonFat,
+    required this.protein,
+    required this.correctedLactometerReading,
+    required this.totalSolids,
+    required this.colonyFormingUnits,
+    this.acidity,
+    required this.session,
+    required this.status,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || farmUuid != null) {
+      map['farm_uuid'] = Variable<String>(farmUuid);
+    }
+    map['livestock_uuid'] = Variable<String>(livestockUuid);
+    if (!nullToAbsent || milkingMethodId != null) {
+      map['milking_method_id'] = Variable<int>(milkingMethodId);
+    }
+    map['amount'] = Variable<String>(amount);
+    map['lactometer_reading'] = Variable<String>(lactometerReading);
+    map['solid'] = Variable<String>(solid);
+    map['solid_non_fat'] = Variable<String>(solidNonFat);
+    map['protein'] = Variable<String>(protein);
+    map['corrected_lactometer_reading'] = Variable<String>(
+      correctedLactometerReading,
+    );
+    map['total_solids'] = Variable<String>(totalSolids);
+    map['colony_forming_units'] = Variable<String>(colonyFormingUnits);
+    if (!nullToAbsent || acidity != null) {
+      map['acidity'] = Variable<String>(acidity);
+    }
+    map['session'] = Variable<String>(session);
+    map['status'] = Variable<String>(status);
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  MilkingsCompanion toCompanion(bool nullToAbsent) {
+    return MilkingsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      farmUuid: farmUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmUuid),
+      livestockUuid: Value(livestockUuid),
+      milkingMethodId: milkingMethodId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(milkingMethodId),
+      amount: Value(amount),
+      lactometerReading: Value(lactometerReading),
+      solid: Value(solid),
+      solidNonFat: Value(solidNonFat),
+      protein: Value(protein),
+      correctedLactometerReading: Value(correctedLactometerReading),
+      totalSolids: Value(totalSolids),
+      colonyFormingUnits: Value(colonyFormingUnits),
+      acidity: acidity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(acidity),
+      session: Value(session),
+      status: Value(status),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Milking.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Milking(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      farmUuid: serializer.fromJson<String?>(json['farmUuid']),
+      livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
+      milkingMethodId: serializer.fromJson<int?>(json['milkingMethodId']),
+      amount: serializer.fromJson<String>(json['amount']),
+      lactometerReading: serializer.fromJson<String>(json['lactometerReading']),
+      solid: serializer.fromJson<String>(json['solid']),
+      solidNonFat: serializer.fromJson<String>(json['solidNonFat']),
+      protein: serializer.fromJson<String>(json['protein']),
+      correctedLactometerReading: serializer.fromJson<String>(
+        json['correctedLactometerReading'],
+      ),
+      totalSolids: serializer.fromJson<String>(json['totalSolids']),
+      colonyFormingUnits: serializer.fromJson<String>(
+        json['colonyFormingUnits'],
+      ),
+      acidity: serializer.fromJson<String?>(json['acidity']),
+      session: serializer.fromJson<String>(json['session']),
+      status: serializer.fromJson<String>(json['status']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'farmUuid': serializer.toJson<String?>(farmUuid),
+      'livestockUuid': serializer.toJson<String>(livestockUuid),
+      'milkingMethodId': serializer.toJson<int?>(milkingMethodId),
+      'amount': serializer.toJson<String>(amount),
+      'lactometerReading': serializer.toJson<String>(lactometerReading),
+      'solid': serializer.toJson<String>(solid),
+      'solidNonFat': serializer.toJson<String>(solidNonFat),
+      'protein': serializer.toJson<String>(protein),
+      'correctedLactometerReading': serializer.toJson<String>(
+        correctedLactometerReading,
+      ),
+      'totalSolids': serializer.toJson<String>(totalSolids),
+      'colonyFormingUnits': serializer.toJson<String>(colonyFormingUnits),
+      'acidity': serializer.toJson<String?>(acidity),
+      'session': serializer.toJson<String>(session),
+      'status': serializer.toJson<String>(status),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Milking copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    Value<String?> farmUuid = const Value.absent(),
+    String? livestockUuid,
+    Value<int?> milkingMethodId = const Value.absent(),
+    String? amount,
+    String? lactometerReading,
+    String? solid,
+    String? solidNonFat,
+    String? protein,
+    String? correctedLactometerReading,
+    String? totalSolids,
+    String? colonyFormingUnits,
+    Value<String?> acidity = const Value.absent(),
+    String? session,
+    String? status,
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Milking(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
+    livestockUuid: livestockUuid ?? this.livestockUuid,
+    milkingMethodId: milkingMethodId.present
+        ? milkingMethodId.value
+        : this.milkingMethodId,
+    amount: amount ?? this.amount,
+    lactometerReading: lactometerReading ?? this.lactometerReading,
+    solid: solid ?? this.solid,
+    solidNonFat: solidNonFat ?? this.solidNonFat,
+    protein: protein ?? this.protein,
+    correctedLactometerReading:
+        correctedLactometerReading ?? this.correctedLactometerReading,
+    totalSolids: totalSolids ?? this.totalSolids,
+    colonyFormingUnits: colonyFormingUnits ?? this.colonyFormingUnits,
+    acidity: acidity.present ? acidity.value : this.acidity,
+    session: session ?? this.session,
+    status: status ?? this.status,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Milking copyWithCompanion(MilkingsCompanion data) {
+    return Milking(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      livestockUuid: data.livestockUuid.present
+          ? data.livestockUuid.value
+          : this.livestockUuid,
+      milkingMethodId: data.milkingMethodId.present
+          ? data.milkingMethodId.value
+          : this.milkingMethodId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      lactometerReading: data.lactometerReading.present
+          ? data.lactometerReading.value
+          : this.lactometerReading,
+      solid: data.solid.present ? data.solid.value : this.solid,
+      solidNonFat: data.solidNonFat.present
+          ? data.solidNonFat.value
+          : this.solidNonFat,
+      protein: data.protein.present ? data.protein.value : this.protein,
+      correctedLactometerReading: data.correctedLactometerReading.present
+          ? data.correctedLactometerReading.value
+          : this.correctedLactometerReading,
+      totalSolids: data.totalSolids.present
+          ? data.totalSolids.value
+          : this.totalSolids,
+      colonyFormingUnits: data.colonyFormingUnits.present
+          ? data.colonyFormingUnits.value
+          : this.colonyFormingUnits,
+      acidity: data.acidity.present ? data.acidity.value : this.acidity,
+      session: data.session.present ? data.session.value : this.session,
+      status: data.status.present ? data.status.value : this.status,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Milking(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('milkingMethodId: $milkingMethodId, ')
+          ..write('amount: $amount, ')
+          ..write('lactometerReading: $lactometerReading, ')
+          ..write('solid: $solid, ')
+          ..write('solidNonFat: $solidNonFat, ')
+          ..write('protein: $protein, ')
+          ..write('correctedLactometerReading: $correctedLactometerReading, ')
+          ..write('totalSolids: $totalSolids, ')
+          ..write('colonyFormingUnits: $colonyFormingUnits, ')
+          ..write('acidity: $acidity, ')
+          ..write('session: $session, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    milkingMethodId,
+    amount,
+    lactometerReading,
+    solid,
+    solidNonFat,
+    protein,
+    correctedLactometerReading,
+    totalSolids,
+    colonyFormingUnits,
+    acidity,
+    session,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Milking &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.farmUuid == this.farmUuid &&
+          other.livestockUuid == this.livestockUuid &&
+          other.milkingMethodId == this.milkingMethodId &&
+          other.amount == this.amount &&
+          other.lactometerReading == this.lactometerReading &&
+          other.solid == this.solid &&
+          other.solidNonFat == this.solidNonFat &&
+          other.protein == this.protein &&
+          other.correctedLactometerReading == this.correctedLactometerReading &&
+          other.totalSolids == this.totalSolids &&
+          other.colonyFormingUnits == this.colonyFormingUnits &&
+          other.acidity == this.acidity &&
+          other.session == this.session &&
+          other.status == this.status &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MilkingsCompanion extends UpdateCompanion<Milking> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String?> farmUuid;
+  final Value<String> livestockUuid;
+  final Value<int?> milkingMethodId;
+  final Value<String> amount;
+  final Value<String> lactometerReading;
+  final Value<String> solid;
+  final Value<String> solidNonFat;
+  final Value<String> protein;
+  final Value<String> correctedLactometerReading;
+  final Value<String> totalSolids;
+  final Value<String> colonyFormingUnits;
+  final Value<String?> acidity;
+  final Value<String> session;
+  final Value<String> status;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const MilkingsCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.livestockUuid = const Value.absent(),
+    this.milkingMethodId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.lactometerReading = const Value.absent(),
+    this.solid = const Value.absent(),
+    this.solidNonFat = const Value.absent(),
+    this.protein = const Value.absent(),
+    this.correctedLactometerReading = const Value.absent(),
+    this.totalSolids = const Value.absent(),
+    this.colonyFormingUnits = const Value.absent(),
+    this.acidity = const Value.absent(),
+    this.session = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MilkingsCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    this.farmUuid = const Value.absent(),
+    required String livestockUuid,
+    this.milkingMethodId = const Value.absent(),
+    required String amount,
+    required String lactometerReading,
+    required String solid,
+    required String solidNonFat,
+    required String protein,
+    required String correctedLactometerReading,
+    required String totalSolids,
+    required String colonyFormingUnits,
+    this.acidity = const Value.absent(),
+    this.session = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       livestockUuid = Value(livestockUuid),
+       amount = Value(amount),
+       lactometerReading = Value(lactometerReading),
+       solid = Value(solid),
+       solidNonFat = Value(solidNonFat),
+       protein = Value(protein),
+       correctedLactometerReading = Value(correctedLactometerReading),
+       totalSolids = Value(totalSolids),
+       colonyFormingUnits = Value(colonyFormingUnits),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Milking> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? farmUuid,
+    Expression<String>? livestockUuid,
+    Expression<int>? milkingMethodId,
+    Expression<String>? amount,
+    Expression<String>? lactometerReading,
+    Expression<String>? solid,
+    Expression<String>? solidNonFat,
+    Expression<String>? protein,
+    Expression<String>? correctedLactometerReading,
+    Expression<String>? totalSolids,
+    Expression<String>? colonyFormingUnits,
+    Expression<String>? acidity,
+    Expression<String>? session,
+    Expression<String>? status,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (livestockUuid != null) 'livestock_uuid': livestockUuid,
+      if (milkingMethodId != null) 'milking_method_id': milkingMethodId,
+      if (amount != null) 'amount': amount,
+      if (lactometerReading != null) 'lactometer_reading': lactometerReading,
+      if (solid != null) 'solid': solid,
+      if (solidNonFat != null) 'solid_non_fat': solidNonFat,
+      if (protein != null) 'protein': protein,
+      if (correctedLactometerReading != null)
+        'corrected_lactometer_reading': correctedLactometerReading,
+      if (totalSolids != null) 'total_solids': totalSolids,
+      if (colonyFormingUnits != null)
+        'colony_forming_units': colonyFormingUnits,
+      if (acidity != null) 'acidity': acidity,
+      if (session != null) 'session': session,
+      if (status != null) 'status': status,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MilkingsCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String?>? farmUuid,
+    Value<String>? livestockUuid,
+    Value<int?>? milkingMethodId,
+    Value<String>? amount,
+    Value<String>? lactometerReading,
+    Value<String>? solid,
+    Value<String>? solidNonFat,
+    Value<String>? protein,
+    Value<String>? correctedLactometerReading,
+    Value<String>? totalSolids,
+    Value<String>? colonyFormingUnits,
+    Value<String?>? acidity,
+    Value<String>? session,
+    Value<String>? status,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return MilkingsCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      livestockUuid: livestockUuid ?? this.livestockUuid,
+      milkingMethodId: milkingMethodId ?? this.milkingMethodId,
+      amount: amount ?? this.amount,
+      lactometerReading: lactometerReading ?? this.lactometerReading,
+      solid: solid ?? this.solid,
+      solidNonFat: solidNonFat ?? this.solidNonFat,
+      protein: protein ?? this.protein,
+      correctedLactometerReading:
+          correctedLactometerReading ?? this.correctedLactometerReading,
+      totalSolids: totalSolids ?? this.totalSolids,
+      colonyFormingUnits: colonyFormingUnits ?? this.colonyFormingUnits,
+      acidity: acidity ?? this.acidity,
+      session: session ?? this.session,
+      status: status ?? this.status,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (livestockUuid.present) {
+      map['livestock_uuid'] = Variable<String>(livestockUuid.value);
+    }
+    if (milkingMethodId.present) {
+      map['milking_method_id'] = Variable<int>(milkingMethodId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<String>(amount.value);
+    }
+    if (lactometerReading.present) {
+      map['lactometer_reading'] = Variable<String>(lactometerReading.value);
+    }
+    if (solid.present) {
+      map['solid'] = Variable<String>(solid.value);
+    }
+    if (solidNonFat.present) {
+      map['solid_non_fat'] = Variable<String>(solidNonFat.value);
+    }
+    if (protein.present) {
+      map['protein'] = Variable<String>(protein.value);
+    }
+    if (correctedLactometerReading.present) {
+      map['corrected_lactometer_reading'] = Variable<String>(
+        correctedLactometerReading.value,
+      );
+    }
+    if (totalSolids.present) {
+      map['total_solids'] = Variable<String>(totalSolids.value);
+    }
+    if (colonyFormingUnits.present) {
+      map['colony_forming_units'] = Variable<String>(colonyFormingUnits.value);
+    }
+    if (acidity.present) {
+      map['acidity'] = Variable<String>(acidity.value);
+    }
+    if (session.present) {
+      map['session'] = Variable<String>(session.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MilkingsCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('milkingMethodId: $milkingMethodId, ')
+          ..write('amount: $amount, ')
+          ..write('lactometerReading: $lactometerReading, ')
+          ..write('solid: $solid, ')
+          ..write('solidNonFat: $solidNonFat, ')
+          ..write('protein: $protein, ')
+          ..write('correctedLactometerReading: $correctedLactometerReading, ')
+          ..write('totalSolids: $totalSolids, ')
+          ..write('colonyFormingUnits: $colonyFormingUnits, ')
+          ..write('acidity: $acidity, ')
+          ..write('session: $session, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PregnanciesTable extends Pregnancies
+    with TableInfo<$PregnanciesTable, Pregnancy> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PregnanciesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _livestockUuidMeta = const VerificationMeta(
+    'livestockUuid',
+  );
+  @override
+  late final GeneratedColumn<String> livestockUuid = GeneratedColumn<String>(
+    'livestock_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _testResultIdMeta = const VerificationMeta(
+    'testResultId',
+  );
+  @override
+  late final GeneratedColumn<int> testResultId = GeneratedColumn<int>(
+    'test_result_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noOfMonthsMeta = const VerificationMeta(
+    'noOfMonths',
+  );
+  @override
+  late final GeneratedColumn<String> noOfMonths = GeneratedColumn<String>(
+    'no_of_months',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _testDateMeta = const VerificationMeta(
+    'testDate',
+  );
+  @override
+  late final GeneratedColumn<String> testDate = GeneratedColumn<String>(
+    'test_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
+  static const VerificationMeta _remarksMeta = const VerificationMeta(
+    'remarks',
+  );
+  @override
+  late final GeneratedColumn<String> remarks = GeneratedColumn<String>(
+    'remarks',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    testResultId,
+    noOfMonths,
+    testDate,
+    status,
+    remarks,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pregnancies';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Pregnancy> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_farmUuidMeta);
+    }
+    if (data.containsKey('livestock_uuid')) {
+      context.handle(
+        _livestockUuidMeta,
+        livestockUuid.isAcceptableOrUnknown(
+          data['livestock_uuid']!,
+          _livestockUuidMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_livestockUuidMeta);
+    }
+    if (data.containsKey('test_result_id')) {
+      context.handle(
+        _testResultIdMeta,
+        testResultId.isAcceptableOrUnknown(
+          data['test_result_id']!,
+          _testResultIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_testResultIdMeta);
+    }
+    if (data.containsKey('no_of_months')) {
+      context.handle(
+        _noOfMonthsMeta,
+        noOfMonths.isAcceptableOrUnknown(
+          data['no_of_months']!,
+          _noOfMonthsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('test_date')) {
+      context.handle(
+        _testDateMeta,
+        testDate.isAcceptableOrUnknown(data['test_date']!, _testDateMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('remarks')) {
+      context.handle(
+        _remarksMeta,
+        remarks.isAcceptableOrUnknown(data['remarks']!, _remarksMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Pregnancy map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Pregnancy(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      )!,
+      livestockUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}livestock_uuid'],
+      )!,
+      testResultId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}test_result_id'],
+      )!,
+      noOfMonths: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}no_of_months'],
+      ),
+      testDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}test_date'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      remarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remarks'],
+      ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PregnanciesTable createAlias(String alias) {
+    return $PregnanciesTable(attachedDatabase, alias);
+  }
+}
+
+class Pregnancy extends DataClass implements Insertable<Pregnancy> {
+  final int? id;
+  final String uuid;
+  final String farmUuid;
+  final String livestockUuid;
+  final int testResultId;
+  final String? noOfMonths;
+  final String? testDate;
+  final String status;
+  final String? remarks;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Pregnancy({
+    this.id,
+    required this.uuid,
+    required this.farmUuid,
+    required this.livestockUuid,
+    required this.testResultId,
+    this.noOfMonths,
+    this.testDate,
+    required this.status,
+    this.remarks,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    map['farm_uuid'] = Variable<String>(farmUuid);
+    map['livestock_uuid'] = Variable<String>(livestockUuid);
+    map['test_result_id'] = Variable<int>(testResultId);
+    if (!nullToAbsent || noOfMonths != null) {
+      map['no_of_months'] = Variable<String>(noOfMonths);
+    }
+    if (!nullToAbsent || testDate != null) {
+      map['test_date'] = Variable<String>(testDate);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || remarks != null) {
+      map['remarks'] = Variable<String>(remarks);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  PregnanciesCompanion toCompanion(bool nullToAbsent) {
+    return PregnanciesCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      farmUuid: Value(farmUuid),
+      livestockUuid: Value(livestockUuid),
+      testResultId: Value(testResultId),
+      noOfMonths: noOfMonths == null && nullToAbsent
+          ? const Value.absent()
+          : Value(noOfMonths),
+      testDate: testDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(testDate),
+      status: Value(status),
+      remarks: remarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remarks),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Pregnancy.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Pregnancy(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      farmUuid: serializer.fromJson<String>(json['farmUuid']),
+      livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
+      testResultId: serializer.fromJson<int>(json['testResultId']),
+      noOfMonths: serializer.fromJson<String?>(json['noOfMonths']),
+      testDate: serializer.fromJson<String?>(json['testDate']),
+      status: serializer.fromJson<String>(json['status']),
+      remarks: serializer.fromJson<String?>(json['remarks']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'farmUuid': serializer.toJson<String>(farmUuid),
+      'livestockUuid': serializer.toJson<String>(livestockUuid),
+      'testResultId': serializer.toJson<int>(testResultId),
+      'noOfMonths': serializer.toJson<String?>(noOfMonths),
+      'testDate': serializer.toJson<String?>(testDate),
+      'status': serializer.toJson<String>(status),
+      'remarks': serializer.toJson<String?>(remarks),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Pregnancy copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    String? farmUuid,
+    String? livestockUuid,
+    int? testResultId,
+    Value<String?> noOfMonths = const Value.absent(),
+    Value<String?> testDate = const Value.absent(),
+    String? status,
+    Value<String?> remarks = const Value.absent(),
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Pregnancy(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    farmUuid: farmUuid ?? this.farmUuid,
+    livestockUuid: livestockUuid ?? this.livestockUuid,
+    testResultId: testResultId ?? this.testResultId,
+    noOfMonths: noOfMonths.present ? noOfMonths.value : this.noOfMonths,
+    testDate: testDate.present ? testDate.value : this.testDate,
+    status: status ?? this.status,
+    remarks: remarks.present ? remarks.value : this.remarks,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Pregnancy copyWithCompanion(PregnanciesCompanion data) {
+    return Pregnancy(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      livestockUuid: data.livestockUuid.present
+          ? data.livestockUuid.value
+          : this.livestockUuid,
+      testResultId: data.testResultId.present
+          ? data.testResultId.value
+          : this.testResultId,
+      noOfMonths: data.noOfMonths.present
+          ? data.noOfMonths.value
+          : this.noOfMonths,
+      testDate: data.testDate.present ? data.testDate.value : this.testDate,
+      status: data.status.present ? data.status.value : this.status,
+      remarks: data.remarks.present ? data.remarks.value : this.remarks,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Pregnancy(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('testResultId: $testResultId, ')
+          ..write('noOfMonths: $noOfMonths, ')
+          ..write('testDate: $testDate, ')
+          ..write('status: $status, ')
+          ..write('remarks: $remarks, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    testResultId,
+    noOfMonths,
+    testDate,
+    status,
+    remarks,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Pregnancy &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.farmUuid == this.farmUuid &&
+          other.livestockUuid == this.livestockUuid &&
+          other.testResultId == this.testResultId &&
+          other.noOfMonths == this.noOfMonths &&
+          other.testDate == this.testDate &&
+          other.status == this.status &&
+          other.remarks == this.remarks &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String> farmUuid;
+  final Value<String> livestockUuid;
+  final Value<int> testResultId;
+  final Value<String?> noOfMonths;
+  final Value<String?> testDate;
+  final Value<String> status;
+  final Value<String?> remarks;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const PregnanciesCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.livestockUuid = const Value.absent(),
+    this.testResultId = const Value.absent(),
+    this.noOfMonths = const Value.absent(),
+    this.testDate = const Value.absent(),
+    this.status = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PregnanciesCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required String farmUuid,
+    required String livestockUuid,
+    required int testResultId,
+    this.noOfMonths = const Value.absent(),
+    this.testDate = const Value.absent(),
+    this.status = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       farmUuid = Value(farmUuid),
+       livestockUuid = Value(livestockUuid),
+       testResultId = Value(testResultId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Pregnancy> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? farmUuid,
+    Expression<String>? livestockUuid,
+    Expression<int>? testResultId,
+    Expression<String>? noOfMonths,
+    Expression<String>? testDate,
+    Expression<String>? status,
+    Expression<String>? remarks,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (livestockUuid != null) 'livestock_uuid': livestockUuid,
+      if (testResultId != null) 'test_result_id': testResultId,
+      if (noOfMonths != null) 'no_of_months': noOfMonths,
+      if (testDate != null) 'test_date': testDate,
+      if (status != null) 'status': status,
+      if (remarks != null) 'remarks': remarks,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PregnanciesCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String>? farmUuid,
+    Value<String>? livestockUuid,
+    Value<int>? testResultId,
+    Value<String?>? noOfMonths,
+    Value<String?>? testDate,
+    Value<String>? status,
+    Value<String?>? remarks,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PregnanciesCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      livestockUuid: livestockUuid ?? this.livestockUuid,
+      testResultId: testResultId ?? this.testResultId,
+      noOfMonths: noOfMonths ?? this.noOfMonths,
+      testDate: testDate ?? this.testDate,
+      status: status ?? this.status,
+      remarks: remarks ?? this.remarks,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (livestockUuid.present) {
+      map['livestock_uuid'] = Variable<String>(livestockUuid.value);
+    }
+    if (testResultId.present) {
+      map['test_result_id'] = Variable<int>(testResultId.value);
+    }
+    if (noOfMonths.present) {
+      map['no_of_months'] = Variable<String>(noOfMonths.value);
+    }
+    if (testDate.present) {
+      map['test_date'] = Variable<String>(testDate.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (remarks.present) {
+      map['remarks'] = Variable<String>(remarks.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PregnanciesCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('testResultId: $testResultId, ')
+          ..write('noOfMonths: $noOfMonths, ')
+          ..write('testDate: $testDate, ')
+          ..write('status: $status, ')
+          ..write('remarks: $remarks, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $InseminationsTable extends Inseminations
+    with TableInfo<$InseminationsTable, Insemination> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InseminationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _livestockUuidMeta = const VerificationMeta(
+    'livestockUuid',
+  );
+  @override
+  late final GeneratedColumn<String> livestockUuid = GeneratedColumn<String>(
+    'livestock_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastHeatDateMeta = const VerificationMeta(
+    'lastHeatDate',
+  );
+  @override
+  late final GeneratedColumn<String> lastHeatDate = GeneratedColumn<String>(
+    'last_heat_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _currentHeatTypeIdMeta = const VerificationMeta(
+    'currentHeatTypeId',
+  );
+  @override
+  late final GeneratedColumn<int> currentHeatTypeId = GeneratedColumn<int>(
+    'current_heat_type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inseminationServiceIdMeta =
+      const VerificationMeta('inseminationServiceId');
+  @override
+  late final GeneratedColumn<int> inseminationServiceId = GeneratedColumn<int>(
+    'insemination_service_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _semenStrawTypeIdMeta = const VerificationMeta(
+    'semenStrawTypeId',
+  );
+  @override
+  late final GeneratedColumn<int> semenStrawTypeId = GeneratedColumn<int>(
+    'semen_straw_type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inseminationDateMeta = const VerificationMeta(
+    'inseminationDate',
+  );
+  @override
+  late final GeneratedColumn<String> inseminationDate = GeneratedColumn<String>(
+    'insemination_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bullCodeMeta = const VerificationMeta(
+    'bullCode',
+  );
+  @override
+  late final GeneratedColumn<String> bullCode = GeneratedColumn<String>(
+    'bull_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bullBreedMeta = const VerificationMeta(
+    'bullBreed',
+  );
+  @override
+  late final GeneratedColumn<String> bullBreed = GeneratedColumn<String>(
+    'bull_breed',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _semenProductionDateMeta =
+      const VerificationMeta('semenProductionDate');
+  @override
+  late final GeneratedColumn<String> semenProductionDate =
+      GeneratedColumn<String>(
+        'semen_production_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _productionCountryMeta = const VerificationMeta(
+    'productionCountry',
+  );
+  @override
+  late final GeneratedColumn<String> productionCountry =
+      GeneratedColumn<String>(
+        'production_country',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _semenBatchNumberMeta = const VerificationMeta(
+    'semenBatchNumber',
+  );
+  @override
+  late final GeneratedColumn<String> semenBatchNumber = GeneratedColumn<String>(
+    'semen_batch_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _internationalIdMeta = const VerificationMeta(
+    'internationalId',
+  );
+  @override
+  late final GeneratedColumn<String> internationalId = GeneratedColumn<String>(
+    'international_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _aiCodeMeta = const VerificationMeta('aiCode');
+  @override
+  late final GeneratedColumn<String> aiCode = GeneratedColumn<String>(
+    'ai_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manufacturerNameMeta = const VerificationMeta(
+    'manufacturerName',
+  );
+  @override
+  late final GeneratedColumn<String> manufacturerName = GeneratedColumn<String>(
+    'manufacturer_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _semenSupplierMeta = const VerificationMeta(
+    'semenSupplier',
+  );
+  @override
+  late final GeneratedColumn<String> semenSupplier = GeneratedColumn<String>(
+    'semen_supplier',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    lastHeatDate,
+    currentHeatTypeId,
+    inseminationServiceId,
+    semenStrawTypeId,
+    inseminationDate,
+    bullCode,
+    bullBreed,
+    semenProductionDate,
+    productionCountry,
+    semenBatchNumber,
+    internationalId,
+    aiCode,
+    manufacturerName,
+    semenSupplier,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'inseminations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Insemination> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    }
+    if (data.containsKey('livestock_uuid')) {
+      context.handle(
+        _livestockUuidMeta,
+        livestockUuid.isAcceptableOrUnknown(
+          data['livestock_uuid']!,
+          _livestockUuidMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_livestockUuidMeta);
+    }
+    if (data.containsKey('last_heat_date')) {
+      context.handle(
+        _lastHeatDateMeta,
+        lastHeatDate.isAcceptableOrUnknown(
+          data['last_heat_date']!,
+          _lastHeatDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('current_heat_type_id')) {
+      context.handle(
+        _currentHeatTypeIdMeta,
+        currentHeatTypeId.isAcceptableOrUnknown(
+          data['current_heat_type_id']!,
+          _currentHeatTypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currentHeatTypeIdMeta);
+    }
+    if (data.containsKey('insemination_service_id')) {
+      context.handle(
+        _inseminationServiceIdMeta,
+        inseminationServiceId.isAcceptableOrUnknown(
+          data['insemination_service_id']!,
+          _inseminationServiceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_inseminationServiceIdMeta);
+    }
+    if (data.containsKey('semen_straw_type_id')) {
+      context.handle(
+        _semenStrawTypeIdMeta,
+        semenStrawTypeId.isAcceptableOrUnknown(
+          data['semen_straw_type_id']!,
+          _semenStrawTypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_semenStrawTypeIdMeta);
+    }
+    if (data.containsKey('insemination_date')) {
+      context.handle(
+        _inseminationDateMeta,
+        inseminationDate.isAcceptableOrUnknown(
+          data['insemination_date']!,
+          _inseminationDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bull_code')) {
+      context.handle(
+        _bullCodeMeta,
+        bullCode.isAcceptableOrUnknown(data['bull_code']!, _bullCodeMeta),
+      );
+    }
+    if (data.containsKey('bull_breed')) {
+      context.handle(
+        _bullBreedMeta,
+        bullBreed.isAcceptableOrUnknown(data['bull_breed']!, _bullBreedMeta),
+      );
+    }
+    if (data.containsKey('semen_production_date')) {
+      context.handle(
+        _semenProductionDateMeta,
+        semenProductionDate.isAcceptableOrUnknown(
+          data['semen_production_date']!,
+          _semenProductionDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('production_country')) {
+      context.handle(
+        _productionCountryMeta,
+        productionCountry.isAcceptableOrUnknown(
+          data['production_country']!,
+          _productionCountryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('semen_batch_number')) {
+      context.handle(
+        _semenBatchNumberMeta,
+        semenBatchNumber.isAcceptableOrUnknown(
+          data['semen_batch_number']!,
+          _semenBatchNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('international_id')) {
+      context.handle(
+        _internationalIdMeta,
+        internationalId.isAcceptableOrUnknown(
+          data['international_id']!,
+          _internationalIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ai_code')) {
+      context.handle(
+        _aiCodeMeta,
+        aiCode.isAcceptableOrUnknown(data['ai_code']!, _aiCodeMeta),
+      );
+    }
+    if (data.containsKey('manufacturer_name')) {
+      context.handle(
+        _manufacturerNameMeta,
+        manufacturerName.isAcceptableOrUnknown(
+          data['manufacturer_name']!,
+          _manufacturerNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('semen_supplier')) {
+      context.handle(
+        _semenSupplierMeta,
+        semenSupplier.isAcceptableOrUnknown(
+          data['semen_supplier']!,
+          _semenSupplierMeta,
+        ),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Insemination map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Insemination(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      ),
+      livestockUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}livestock_uuid'],
+      )!,
+      lastHeatDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_heat_date'],
+      ),
+      currentHeatTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_heat_type_id'],
+      )!,
+      inseminationServiceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}insemination_service_id'],
+      )!,
+      semenStrawTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}semen_straw_type_id'],
+      )!,
+      inseminationDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}insemination_date'],
+      ),
+      bullCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bull_code'],
+      ),
+      bullBreed: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bull_breed'],
+      ),
+      semenProductionDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}semen_production_date'],
+      ),
+      productionCountry: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}production_country'],
+      ),
+      semenBatchNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}semen_batch_number'],
+      ),
+      internationalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}international_id'],
+      ),
+      aiCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ai_code'],
+      ),
+      manufacturerName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manufacturer_name'],
+      ),
+      semenSupplier: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}semen_supplier'],
+      ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $InseminationsTable createAlias(String alias) {
+    return $InseminationsTable(attachedDatabase, alias);
+  }
+}
+
+class Insemination extends DataClass implements Insertable<Insemination> {
+  final int? id;
+  final String uuid;
+  final String? farmUuid;
+  final String livestockUuid;
+  final String? lastHeatDate;
+  final int currentHeatTypeId;
+  final int inseminationServiceId;
+  final int semenStrawTypeId;
+  final String? inseminationDate;
+  final String? bullCode;
+  final String? bullBreed;
+  final String? semenProductionDate;
+  final String? productionCountry;
+  final String? semenBatchNumber;
+  final String? internationalId;
+  final String? aiCode;
+  final String? manufacturerName;
+  final String? semenSupplier;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Insemination({
+    this.id,
+    required this.uuid,
+    this.farmUuid,
+    required this.livestockUuid,
+    this.lastHeatDate,
+    required this.currentHeatTypeId,
+    required this.inseminationServiceId,
+    required this.semenStrawTypeId,
+    this.inseminationDate,
+    this.bullCode,
+    this.bullBreed,
+    this.semenProductionDate,
+    this.productionCountry,
+    this.semenBatchNumber,
+    this.internationalId,
+    this.aiCode,
+    this.manufacturerName,
+    this.semenSupplier,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || farmUuid != null) {
+      map['farm_uuid'] = Variable<String>(farmUuid);
+    }
+    map['livestock_uuid'] = Variable<String>(livestockUuid);
+    if (!nullToAbsent || lastHeatDate != null) {
+      map['last_heat_date'] = Variable<String>(lastHeatDate);
+    }
+    map['current_heat_type_id'] = Variable<int>(currentHeatTypeId);
+    map['insemination_service_id'] = Variable<int>(inseminationServiceId);
+    map['semen_straw_type_id'] = Variable<int>(semenStrawTypeId);
+    if (!nullToAbsent || inseminationDate != null) {
+      map['insemination_date'] = Variable<String>(inseminationDate);
+    }
+    if (!nullToAbsent || bullCode != null) {
+      map['bull_code'] = Variable<String>(bullCode);
+    }
+    if (!nullToAbsent || bullBreed != null) {
+      map['bull_breed'] = Variable<String>(bullBreed);
+    }
+    if (!nullToAbsent || semenProductionDate != null) {
+      map['semen_production_date'] = Variable<String>(semenProductionDate);
+    }
+    if (!nullToAbsent || productionCountry != null) {
+      map['production_country'] = Variable<String>(productionCountry);
+    }
+    if (!nullToAbsent || semenBatchNumber != null) {
+      map['semen_batch_number'] = Variable<String>(semenBatchNumber);
+    }
+    if (!nullToAbsent || internationalId != null) {
+      map['international_id'] = Variable<String>(internationalId);
+    }
+    if (!nullToAbsent || aiCode != null) {
+      map['ai_code'] = Variable<String>(aiCode);
+    }
+    if (!nullToAbsent || manufacturerName != null) {
+      map['manufacturer_name'] = Variable<String>(manufacturerName);
+    }
+    if (!nullToAbsent || semenSupplier != null) {
+      map['semen_supplier'] = Variable<String>(semenSupplier);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  InseminationsCompanion toCompanion(bool nullToAbsent) {
+    return InseminationsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      farmUuid: farmUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmUuid),
+      livestockUuid: Value(livestockUuid),
+      lastHeatDate: lastHeatDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastHeatDate),
+      currentHeatTypeId: Value(currentHeatTypeId),
+      inseminationServiceId: Value(inseminationServiceId),
+      semenStrawTypeId: Value(semenStrawTypeId),
+      inseminationDate: inseminationDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inseminationDate),
+      bullCode: bullCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bullCode),
+      bullBreed: bullBreed == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bullBreed),
+      semenProductionDate: semenProductionDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(semenProductionDate),
+      productionCountry: productionCountry == null && nullToAbsent
+          ? const Value.absent()
+          : Value(productionCountry),
+      semenBatchNumber: semenBatchNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(semenBatchNumber),
+      internationalId: internationalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(internationalId),
+      aiCode: aiCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aiCode),
+      manufacturerName: manufacturerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manufacturerName),
+      semenSupplier: semenSupplier == null && nullToAbsent
+          ? const Value.absent()
+          : Value(semenSupplier),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Insemination.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Insemination(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      farmUuid: serializer.fromJson<String?>(json['farmUuid']),
+      livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
+      lastHeatDate: serializer.fromJson<String?>(json['lastHeatDate']),
+      currentHeatTypeId: serializer.fromJson<int>(json['currentHeatTypeId']),
+      inseminationServiceId: serializer.fromJson<int>(
+        json['inseminationServiceId'],
+      ),
+      semenStrawTypeId: serializer.fromJson<int>(json['semenStrawTypeId']),
+      inseminationDate: serializer.fromJson<String?>(json['inseminationDate']),
+      bullCode: serializer.fromJson<String?>(json['bullCode']),
+      bullBreed: serializer.fromJson<String?>(json['bullBreed']),
+      semenProductionDate: serializer.fromJson<String?>(
+        json['semenProductionDate'],
+      ),
+      productionCountry: serializer.fromJson<String?>(
+        json['productionCountry'],
+      ),
+      semenBatchNumber: serializer.fromJson<String?>(json['semenBatchNumber']),
+      internationalId: serializer.fromJson<String?>(json['internationalId']),
+      aiCode: serializer.fromJson<String?>(json['aiCode']),
+      manufacturerName: serializer.fromJson<String?>(json['manufacturerName']),
+      semenSupplier: serializer.fromJson<String?>(json['semenSupplier']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'farmUuid': serializer.toJson<String?>(farmUuid),
+      'livestockUuid': serializer.toJson<String>(livestockUuid),
+      'lastHeatDate': serializer.toJson<String?>(lastHeatDate),
+      'currentHeatTypeId': serializer.toJson<int>(currentHeatTypeId),
+      'inseminationServiceId': serializer.toJson<int>(inseminationServiceId),
+      'semenStrawTypeId': serializer.toJson<int>(semenStrawTypeId),
+      'inseminationDate': serializer.toJson<String?>(inseminationDate),
+      'bullCode': serializer.toJson<String?>(bullCode),
+      'bullBreed': serializer.toJson<String?>(bullBreed),
+      'semenProductionDate': serializer.toJson<String?>(semenProductionDate),
+      'productionCountry': serializer.toJson<String?>(productionCountry),
+      'semenBatchNumber': serializer.toJson<String?>(semenBatchNumber),
+      'internationalId': serializer.toJson<String?>(internationalId),
+      'aiCode': serializer.toJson<String?>(aiCode),
+      'manufacturerName': serializer.toJson<String?>(manufacturerName),
+      'semenSupplier': serializer.toJson<String?>(semenSupplier),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Insemination copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    Value<String?> farmUuid = const Value.absent(),
+    String? livestockUuid,
+    Value<String?> lastHeatDate = const Value.absent(),
+    int? currentHeatTypeId,
+    int? inseminationServiceId,
+    int? semenStrawTypeId,
+    Value<String?> inseminationDate = const Value.absent(),
+    Value<String?> bullCode = const Value.absent(),
+    Value<String?> bullBreed = const Value.absent(),
+    Value<String?> semenProductionDate = const Value.absent(),
+    Value<String?> productionCountry = const Value.absent(),
+    Value<String?> semenBatchNumber = const Value.absent(),
+    Value<String?> internationalId = const Value.absent(),
+    Value<String?> aiCode = const Value.absent(),
+    Value<String?> manufacturerName = const Value.absent(),
+    Value<String?> semenSupplier = const Value.absent(),
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Insemination(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
+    livestockUuid: livestockUuid ?? this.livestockUuid,
+    lastHeatDate: lastHeatDate.present ? lastHeatDate.value : this.lastHeatDate,
+    currentHeatTypeId: currentHeatTypeId ?? this.currentHeatTypeId,
+    inseminationServiceId: inseminationServiceId ?? this.inseminationServiceId,
+    semenStrawTypeId: semenStrawTypeId ?? this.semenStrawTypeId,
+    inseminationDate: inseminationDate.present
+        ? inseminationDate.value
+        : this.inseminationDate,
+    bullCode: bullCode.present ? bullCode.value : this.bullCode,
+    bullBreed: bullBreed.present ? bullBreed.value : this.bullBreed,
+    semenProductionDate: semenProductionDate.present
+        ? semenProductionDate.value
+        : this.semenProductionDate,
+    productionCountry: productionCountry.present
+        ? productionCountry.value
+        : this.productionCountry,
+    semenBatchNumber: semenBatchNumber.present
+        ? semenBatchNumber.value
+        : this.semenBatchNumber,
+    internationalId: internationalId.present
+        ? internationalId.value
+        : this.internationalId,
+    aiCode: aiCode.present ? aiCode.value : this.aiCode,
+    manufacturerName: manufacturerName.present
+        ? manufacturerName.value
+        : this.manufacturerName,
+    semenSupplier: semenSupplier.present
+        ? semenSupplier.value
+        : this.semenSupplier,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Insemination copyWithCompanion(InseminationsCompanion data) {
+    return Insemination(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      livestockUuid: data.livestockUuid.present
+          ? data.livestockUuid.value
+          : this.livestockUuid,
+      lastHeatDate: data.lastHeatDate.present
+          ? data.lastHeatDate.value
+          : this.lastHeatDate,
+      currentHeatTypeId: data.currentHeatTypeId.present
+          ? data.currentHeatTypeId.value
+          : this.currentHeatTypeId,
+      inseminationServiceId: data.inseminationServiceId.present
+          ? data.inseminationServiceId.value
+          : this.inseminationServiceId,
+      semenStrawTypeId: data.semenStrawTypeId.present
+          ? data.semenStrawTypeId.value
+          : this.semenStrawTypeId,
+      inseminationDate: data.inseminationDate.present
+          ? data.inseminationDate.value
+          : this.inseminationDate,
+      bullCode: data.bullCode.present ? data.bullCode.value : this.bullCode,
+      bullBreed: data.bullBreed.present ? data.bullBreed.value : this.bullBreed,
+      semenProductionDate: data.semenProductionDate.present
+          ? data.semenProductionDate.value
+          : this.semenProductionDate,
+      productionCountry: data.productionCountry.present
+          ? data.productionCountry.value
+          : this.productionCountry,
+      semenBatchNumber: data.semenBatchNumber.present
+          ? data.semenBatchNumber.value
+          : this.semenBatchNumber,
+      internationalId: data.internationalId.present
+          ? data.internationalId.value
+          : this.internationalId,
+      aiCode: data.aiCode.present ? data.aiCode.value : this.aiCode,
+      manufacturerName: data.manufacturerName.present
+          ? data.manufacturerName.value
+          : this.manufacturerName,
+      semenSupplier: data.semenSupplier.present
+          ? data.semenSupplier.value
+          : this.semenSupplier,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Insemination(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('lastHeatDate: $lastHeatDate, ')
+          ..write('currentHeatTypeId: $currentHeatTypeId, ')
+          ..write('inseminationServiceId: $inseminationServiceId, ')
+          ..write('semenStrawTypeId: $semenStrawTypeId, ')
+          ..write('inseminationDate: $inseminationDate, ')
+          ..write('bullCode: $bullCode, ')
+          ..write('bullBreed: $bullBreed, ')
+          ..write('semenProductionDate: $semenProductionDate, ')
+          ..write('productionCountry: $productionCountry, ')
+          ..write('semenBatchNumber: $semenBatchNumber, ')
+          ..write('internationalId: $internationalId, ')
+          ..write('aiCode: $aiCode, ')
+          ..write('manufacturerName: $manufacturerName, ')
+          ..write('semenSupplier: $semenSupplier, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    lastHeatDate,
+    currentHeatTypeId,
+    inseminationServiceId,
+    semenStrawTypeId,
+    inseminationDate,
+    bullCode,
+    bullBreed,
+    semenProductionDate,
+    productionCountry,
+    semenBatchNumber,
+    internationalId,
+    aiCode,
+    manufacturerName,
+    semenSupplier,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Insemination &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.farmUuid == this.farmUuid &&
+          other.livestockUuid == this.livestockUuid &&
+          other.lastHeatDate == this.lastHeatDate &&
+          other.currentHeatTypeId == this.currentHeatTypeId &&
+          other.inseminationServiceId == this.inseminationServiceId &&
+          other.semenStrawTypeId == this.semenStrawTypeId &&
+          other.inseminationDate == this.inseminationDate &&
+          other.bullCode == this.bullCode &&
+          other.bullBreed == this.bullBreed &&
+          other.semenProductionDate == this.semenProductionDate &&
+          other.productionCountry == this.productionCountry &&
+          other.semenBatchNumber == this.semenBatchNumber &&
+          other.internationalId == this.internationalId &&
+          other.aiCode == this.aiCode &&
+          other.manufacturerName == this.manufacturerName &&
+          other.semenSupplier == this.semenSupplier &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class InseminationsCompanion extends UpdateCompanion<Insemination> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String?> farmUuid;
+  final Value<String> livestockUuid;
+  final Value<String?> lastHeatDate;
+  final Value<int> currentHeatTypeId;
+  final Value<int> inseminationServiceId;
+  final Value<int> semenStrawTypeId;
+  final Value<String?> inseminationDate;
+  final Value<String?> bullCode;
+  final Value<String?> bullBreed;
+  final Value<String?> semenProductionDate;
+  final Value<String?> productionCountry;
+  final Value<String?> semenBatchNumber;
+  final Value<String?> internationalId;
+  final Value<String?> aiCode;
+  final Value<String?> manufacturerName;
+  final Value<String?> semenSupplier;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const InseminationsCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.livestockUuid = const Value.absent(),
+    this.lastHeatDate = const Value.absent(),
+    this.currentHeatTypeId = const Value.absent(),
+    this.inseminationServiceId = const Value.absent(),
+    this.semenStrawTypeId = const Value.absent(),
+    this.inseminationDate = const Value.absent(),
+    this.bullCode = const Value.absent(),
+    this.bullBreed = const Value.absent(),
+    this.semenProductionDate = const Value.absent(),
+    this.productionCountry = const Value.absent(),
+    this.semenBatchNumber = const Value.absent(),
+    this.internationalId = const Value.absent(),
+    this.aiCode = const Value.absent(),
+    this.manufacturerName = const Value.absent(),
+    this.semenSupplier = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  InseminationsCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    this.farmUuid = const Value.absent(),
+    required String livestockUuid,
+    this.lastHeatDate = const Value.absent(),
+    required int currentHeatTypeId,
+    required int inseminationServiceId,
+    required int semenStrawTypeId,
+    this.inseminationDate = const Value.absent(),
+    this.bullCode = const Value.absent(),
+    this.bullBreed = const Value.absent(),
+    this.semenProductionDate = const Value.absent(),
+    this.productionCountry = const Value.absent(),
+    this.semenBatchNumber = const Value.absent(),
+    this.internationalId = const Value.absent(),
+    this.aiCode = const Value.absent(),
+    this.manufacturerName = const Value.absent(),
+    this.semenSupplier = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       livestockUuid = Value(livestockUuid),
+       currentHeatTypeId = Value(currentHeatTypeId),
+       inseminationServiceId = Value(inseminationServiceId),
+       semenStrawTypeId = Value(semenStrawTypeId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Insemination> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? farmUuid,
+    Expression<String>? livestockUuid,
+    Expression<String>? lastHeatDate,
+    Expression<int>? currentHeatTypeId,
+    Expression<int>? inseminationServiceId,
+    Expression<int>? semenStrawTypeId,
+    Expression<String>? inseminationDate,
+    Expression<String>? bullCode,
+    Expression<String>? bullBreed,
+    Expression<String>? semenProductionDate,
+    Expression<String>? productionCountry,
+    Expression<String>? semenBatchNumber,
+    Expression<String>? internationalId,
+    Expression<String>? aiCode,
+    Expression<String>? manufacturerName,
+    Expression<String>? semenSupplier,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (livestockUuid != null) 'livestock_uuid': livestockUuid,
+      if (lastHeatDate != null) 'last_heat_date': lastHeatDate,
+      if (currentHeatTypeId != null) 'current_heat_type_id': currentHeatTypeId,
+      if (inseminationServiceId != null)
+        'insemination_service_id': inseminationServiceId,
+      if (semenStrawTypeId != null) 'semen_straw_type_id': semenStrawTypeId,
+      if (inseminationDate != null) 'insemination_date': inseminationDate,
+      if (bullCode != null) 'bull_code': bullCode,
+      if (bullBreed != null) 'bull_breed': bullBreed,
+      if (semenProductionDate != null)
+        'semen_production_date': semenProductionDate,
+      if (productionCountry != null) 'production_country': productionCountry,
+      if (semenBatchNumber != null) 'semen_batch_number': semenBatchNumber,
+      if (internationalId != null) 'international_id': internationalId,
+      if (aiCode != null) 'ai_code': aiCode,
+      if (manufacturerName != null) 'manufacturer_name': manufacturerName,
+      if (semenSupplier != null) 'semen_supplier': semenSupplier,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  InseminationsCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String?>? farmUuid,
+    Value<String>? livestockUuid,
+    Value<String?>? lastHeatDate,
+    Value<int>? currentHeatTypeId,
+    Value<int>? inseminationServiceId,
+    Value<int>? semenStrawTypeId,
+    Value<String?>? inseminationDate,
+    Value<String?>? bullCode,
+    Value<String?>? bullBreed,
+    Value<String?>? semenProductionDate,
+    Value<String?>? productionCountry,
+    Value<String?>? semenBatchNumber,
+    Value<String?>? internationalId,
+    Value<String?>? aiCode,
+    Value<String?>? manufacturerName,
+    Value<String?>? semenSupplier,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return InseminationsCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      livestockUuid: livestockUuid ?? this.livestockUuid,
+      lastHeatDate: lastHeatDate ?? this.lastHeatDate,
+      currentHeatTypeId: currentHeatTypeId ?? this.currentHeatTypeId,
+      inseminationServiceId:
+          inseminationServiceId ?? this.inseminationServiceId,
+      semenStrawTypeId: semenStrawTypeId ?? this.semenStrawTypeId,
+      inseminationDate: inseminationDate ?? this.inseminationDate,
+      bullCode: bullCode ?? this.bullCode,
+      bullBreed: bullBreed ?? this.bullBreed,
+      semenProductionDate: semenProductionDate ?? this.semenProductionDate,
+      productionCountry: productionCountry ?? this.productionCountry,
+      semenBatchNumber: semenBatchNumber ?? this.semenBatchNumber,
+      internationalId: internationalId ?? this.internationalId,
+      aiCode: aiCode ?? this.aiCode,
+      manufacturerName: manufacturerName ?? this.manufacturerName,
+      semenSupplier: semenSupplier ?? this.semenSupplier,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (livestockUuid.present) {
+      map['livestock_uuid'] = Variable<String>(livestockUuid.value);
+    }
+    if (lastHeatDate.present) {
+      map['last_heat_date'] = Variable<String>(lastHeatDate.value);
+    }
+    if (currentHeatTypeId.present) {
+      map['current_heat_type_id'] = Variable<int>(currentHeatTypeId.value);
+    }
+    if (inseminationServiceId.present) {
+      map['insemination_service_id'] = Variable<int>(
+        inseminationServiceId.value,
+      );
+    }
+    if (semenStrawTypeId.present) {
+      map['semen_straw_type_id'] = Variable<int>(semenStrawTypeId.value);
+    }
+    if (inseminationDate.present) {
+      map['insemination_date'] = Variable<String>(inseminationDate.value);
+    }
+    if (bullCode.present) {
+      map['bull_code'] = Variable<String>(bullCode.value);
+    }
+    if (bullBreed.present) {
+      map['bull_breed'] = Variable<String>(bullBreed.value);
+    }
+    if (semenProductionDate.present) {
+      map['semen_production_date'] = Variable<String>(
+        semenProductionDate.value,
+      );
+    }
+    if (productionCountry.present) {
+      map['production_country'] = Variable<String>(productionCountry.value);
+    }
+    if (semenBatchNumber.present) {
+      map['semen_batch_number'] = Variable<String>(semenBatchNumber.value);
+    }
+    if (internationalId.present) {
+      map['international_id'] = Variable<String>(internationalId.value);
+    }
+    if (aiCode.present) {
+      map['ai_code'] = Variable<String>(aiCode.value);
+    }
+    if (manufacturerName.present) {
+      map['manufacturer_name'] = Variable<String>(manufacturerName.value);
+    }
+    if (semenSupplier.present) {
+      map['semen_supplier'] = Variable<String>(semenSupplier.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InseminationsCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('lastHeatDate: $lastHeatDate, ')
+          ..write('currentHeatTypeId: $currentHeatTypeId, ')
+          ..write('inseminationServiceId: $inseminationServiceId, ')
+          ..write('semenStrawTypeId: $semenStrawTypeId, ')
+          ..write('inseminationDate: $inseminationDate, ')
+          ..write('bullCode: $bullCode, ')
+          ..write('bullBreed: $bullBreed, ')
+          ..write('semenProductionDate: $semenProductionDate, ')
+          ..write('productionCountry: $productionCountry, ')
+          ..write('semenBatchNumber: $semenBatchNumber, ')
+          ..write('internationalId: $internationalId, ')
+          ..write('aiCode: $aiCode, ')
+          ..write('manufacturerName: $manufacturerName, ')
+          ..write('semenSupplier: $semenSupplier, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DryoffsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _livestockUuidMeta = const VerificationMeta(
+    'livestockUuid',
+  );
+  @override
+  late final GeneratedColumn<String> livestockUuid = GeneratedColumn<String>(
+    'livestock_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<String> startDate = GeneratedColumn<String>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<String> endDate = GeneratedColumn<String>(
+    'end_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remarksMeta = const VerificationMeta(
+    'remarks',
+  );
+  @override
+  late final GeneratedColumn<String> remarks = GeneratedColumn<String>(
+    'remarks',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    startDate,
+    endDate,
+    reason,
+    remarks,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dryoffs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Dryoff> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_farmUuidMeta);
+    }
+    if (data.containsKey('livestock_uuid')) {
+      context.handle(
+        _livestockUuidMeta,
+        livestockUuid.isAcceptableOrUnknown(
+          data['livestock_uuid']!,
+          _livestockUuidMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_livestockUuidMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('remarks')) {
+      context.handle(
+        _remarksMeta,
+        remarks.isAcceptableOrUnknown(data['remarks']!, _remarksMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Dryoff map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Dryoff(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      )!,
+      livestockUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}livestock_uuid'],
+      )!,
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_date'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      remarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remarks'],
+      ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DryoffsTable createAlias(String alias) {
+    return $DryoffsTable(attachedDatabase, alias);
+  }
+}
+
+class Dryoff extends DataClass implements Insertable<Dryoff> {
+  final int? id;
+  final String uuid;
+  final String farmUuid;
+  final String livestockUuid;
+  final String startDate;
+  final String? endDate;
+  final String? reason;
+  final String? remarks;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Dryoff({
+    this.id,
+    required this.uuid,
+    required this.farmUuid,
+    required this.livestockUuid,
+    required this.startDate,
+    this.endDate,
+    this.reason,
+    this.remarks,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    map['farm_uuid'] = Variable<String>(farmUuid);
+    map['livestock_uuid'] = Variable<String>(livestockUuid);
+    map['start_date'] = Variable<String>(startDate);
+    if (!nullToAbsent || endDate != null) {
+      map['end_date'] = Variable<String>(endDate);
+    }
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    if (!nullToAbsent || remarks != null) {
+      map['remarks'] = Variable<String>(remarks);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  DryoffsCompanion toCompanion(bool nullToAbsent) {
+    return DryoffsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      farmUuid: Value(farmUuid),
+      livestockUuid: Value(livestockUuid),
+      startDate: Value(startDate),
+      endDate: endDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endDate),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      remarks: remarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remarks),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Dryoff.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Dryoff(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      farmUuid: serializer.fromJson<String>(json['farmUuid']),
+      livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
+      startDate: serializer.fromJson<String>(json['startDate']),
+      endDate: serializer.fromJson<String?>(json['endDate']),
+      reason: serializer.fromJson<String?>(json['reason']),
+      remarks: serializer.fromJson<String?>(json['remarks']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'farmUuid': serializer.toJson<String>(farmUuid),
+      'livestockUuid': serializer.toJson<String>(livestockUuid),
+      'startDate': serializer.toJson<String>(startDate),
+      'endDate': serializer.toJson<String?>(endDate),
+      'reason': serializer.toJson<String?>(reason),
+      'remarks': serializer.toJson<String?>(remarks),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Dryoff copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    String? farmUuid,
+    String? livestockUuid,
+    String? startDate,
+    Value<String?> endDate = const Value.absent(),
+    Value<String?> reason = const Value.absent(),
+    Value<String?> remarks = const Value.absent(),
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Dryoff(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    farmUuid: farmUuid ?? this.farmUuid,
+    livestockUuid: livestockUuid ?? this.livestockUuid,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate.present ? endDate.value : this.endDate,
+    reason: reason.present ? reason.value : this.reason,
+    remarks: remarks.present ? remarks.value : this.remarks,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Dryoff copyWithCompanion(DryoffsCompanion data) {
+    return Dryoff(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      livestockUuid: data.livestockUuid.present
+          ? data.livestockUuid.value
+          : this.livestockUuid,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      remarks: data.remarks.present ? data.remarks.value : this.remarks,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Dryoff(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('reason: $reason, ')
+          ..write('remarks: $remarks, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    startDate,
+    endDate,
+    reason,
+    remarks,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Dryoff &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.farmUuid == this.farmUuid &&
+          other.livestockUuid == this.livestockUuid &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.reason == this.reason &&
+          other.remarks == this.remarks &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DryoffsCompanion extends UpdateCompanion<Dryoff> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String> farmUuid;
+  final Value<String> livestockUuid;
+  final Value<String> startDate;
+  final Value<String?> endDate;
+  final Value<String?> reason;
+  final Value<String?> remarks;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const DryoffsCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.livestockUuid = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DryoffsCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required String farmUuid,
+    required String livestockUuid,
+    required String startDate,
+    this.endDate = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       farmUuid = Value(farmUuid),
+       livestockUuid = Value(livestockUuid),
+       startDate = Value(startDate),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Dryoff> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? farmUuid,
+    Expression<String>? livestockUuid,
+    Expression<String>? startDate,
+    Expression<String>? endDate,
+    Expression<String>? reason,
+    Expression<String>? remarks,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (livestockUuid != null) 'livestock_uuid': livestockUuid,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (reason != null) 'reason': reason,
+      if (remarks != null) 'remarks': remarks,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DryoffsCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String>? farmUuid,
+    Value<String>? livestockUuid,
+    Value<String>? startDate,
+    Value<String?>? endDate,
+    Value<String?>? reason,
+    Value<String?>? remarks,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return DryoffsCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      livestockUuid: livestockUuid ?? this.livestockUuid,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      reason: reason ?? this.reason,
+      remarks: remarks ?? this.remarks,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (livestockUuid.present) {
+      map['livestock_uuid'] = Variable<String>(livestockUuid.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<String>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<String>(endDate.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (remarks.present) {
+      map['remarks'] = Variable<String>(remarks.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DryoffsCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('reason: $reason, ')
+          ..write('remarks: $remarks, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TransfersTable extends Transfers
+    with TableInfo<$TransfersTable, Transfer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TransfersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _livestockUuidMeta = const VerificationMeta(
+    'livestockUuid',
+  );
+  @override
+  late final GeneratedColumn<String> livestockUuid = GeneratedColumn<String>(
+    'livestock_uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _toFarmUuidMeta = const VerificationMeta(
+    'toFarmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> toFarmUuid = GeneratedColumn<String>(
+    'to_farm_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _transporterIdMeta = const VerificationMeta(
+    'transporterId',
+  );
+  @override
+  late final GeneratedColumn<int> transporterId = GeneratedColumn<int>(
+    'transporter_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<String> price = GeneratedColumn<String>(
+    'price',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _transferDateMeta = const VerificationMeta(
+    'transferDate',
+  );
+  @override
+  late final GeneratedColumn<String> transferDate = GeneratedColumn<String>(
+    'transfer_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remarksMeta = const VerificationMeta(
+    'remarks',
+  );
+  @override
+  late final GeneratedColumn<String> remarks = GeneratedColumn<String>(
+    'remarks',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant<bool>(true),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('server-create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    toFarmUuid,
+    transporterId,
+    reason,
+    price,
+    transferDate,
+    remarks,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transfers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Transfer> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_farmUuidMeta);
+    }
+    if (data.containsKey('livestock_uuid')) {
+      context.handle(
+        _livestockUuidMeta,
+        livestockUuid.isAcceptableOrUnknown(
+          data['livestock_uuid']!,
+          _livestockUuidMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_livestockUuidMeta);
+    }
+    if (data.containsKey('to_farm_uuid')) {
+      context.handle(
+        _toFarmUuidMeta,
+        toFarmUuid.isAcceptableOrUnknown(
+          data['to_farm_uuid']!,
+          _toFarmUuidMeta,
+        ),
+      );
+    }
+    if (data.containsKey('transporter_id')) {
+      context.handle(
+        _transporterIdMeta,
+        transporterId.isAcceptableOrUnknown(
+          data['transporter_id']!,
+          _transporterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('price')) {
+      context.handle(
+        _priceMeta,
+        price.isAcceptableOrUnknown(data['price']!, _priceMeta),
+      );
+    }
+    if (data.containsKey('transfer_date')) {
+      context.handle(
+        _transferDateMeta,
+        transferDate.isAcceptableOrUnknown(
+          data['transfer_date']!,
+          _transferDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_transferDateMeta);
+    }
+    if (data.containsKey('remarks')) {
+      context.handle(
+        _remarksMeta,
+        remarks.isAcceptableOrUnknown(data['remarks']!, _remarksMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Transfer map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Transfer(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      )!,
+      livestockUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}livestock_uuid'],
+      )!,
+      toFarmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_farm_uuid'],
+      ),
+      transporterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}transporter_id'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      price: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}price'],
+      ),
+      transferDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transfer_date'],
+      )!,
+      remarks: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remarks'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TransfersTable createAlias(String alias) {
+    return $TransfersTable(attachedDatabase, alias);
+  }
+}
+
+class Transfer extends DataClass implements Insertable<Transfer> {
+  final int? id;
+  final String uuid;
+  final String farmUuid;
+  final String livestockUuid;
+  final String? toFarmUuid;
+  final int? transporterId;
+  final String? reason;
+  final String? price;
+  final String transferDate;
+  final String? remarks;
+  final String? status;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Transfer({
+    this.id,
+    required this.uuid,
+    required this.farmUuid,
+    required this.livestockUuid,
+    this.toFarmUuid,
+    this.transporterId,
+    this.reason,
+    this.price,
+    required this.transferDate,
+    this.remarks,
+    this.status,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    map['farm_uuid'] = Variable<String>(farmUuid);
+    map['livestock_uuid'] = Variable<String>(livestockUuid);
+    if (!nullToAbsent || toFarmUuid != null) {
+      map['to_farm_uuid'] = Variable<String>(toFarmUuid);
+    }
+    if (!nullToAbsent || transporterId != null) {
+      map['transporter_id'] = Variable<int>(transporterId);
+    }
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    if (!nullToAbsent || price != null) {
+      map['price'] = Variable<String>(price);
+    }
+    map['transfer_date'] = Variable<String>(transferDate);
+    if (!nullToAbsent || remarks != null) {
+      map['remarks'] = Variable<String>(remarks);
+    }
+    if (!nullToAbsent || status != null) {
+      map['status'] = Variable<String>(status);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  TransfersCompanion toCompanion(bool nullToAbsent) {
+    return TransfersCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      farmUuid: Value(farmUuid),
+      livestockUuid: Value(livestockUuid),
+      toFarmUuid: toFarmUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toFarmUuid),
+      transporterId: transporterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transporterId),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      price: price == null && nullToAbsent
+          ? const Value.absent()
+          : Value(price),
+      transferDate: Value(transferDate),
+      remarks: remarks == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remarks),
+      status: status == null && nullToAbsent
+          ? const Value.absent()
+          : Value(status),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Transfer.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Transfer(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      farmUuid: serializer.fromJson<String>(json['farmUuid']),
+      livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
+      toFarmUuid: serializer.fromJson<String?>(json['toFarmUuid']),
+      transporterId: serializer.fromJson<int?>(json['transporterId']),
+      reason: serializer.fromJson<String?>(json['reason']),
+      price: serializer.fromJson<String?>(json['price']),
+      transferDate: serializer.fromJson<String>(json['transferDate']),
+      remarks: serializer.fromJson<String?>(json['remarks']),
+      status: serializer.fromJson<String?>(json['status']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'farmUuid': serializer.toJson<String>(farmUuid),
+      'livestockUuid': serializer.toJson<String>(livestockUuid),
+      'toFarmUuid': serializer.toJson<String?>(toFarmUuid),
+      'transporterId': serializer.toJson<int?>(transporterId),
+      'reason': serializer.toJson<String?>(reason),
+      'price': serializer.toJson<String?>(price),
+      'transferDate': serializer.toJson<String>(transferDate),
+      'remarks': serializer.toJson<String?>(remarks),
+      'status': serializer.toJson<String?>(status),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Transfer copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    String? farmUuid,
+    String? livestockUuid,
+    Value<String?> toFarmUuid = const Value.absent(),
+    Value<int?> transporterId = const Value.absent(),
+    Value<String?> reason = const Value.absent(),
+    Value<String?> price = const Value.absent(),
+    String? transferDate,
+    Value<String?> remarks = const Value.absent(),
+    Value<String?> status = const Value.absent(),
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Transfer(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    farmUuid: farmUuid ?? this.farmUuid,
+    livestockUuid: livestockUuid ?? this.livestockUuid,
+    toFarmUuid: toFarmUuid.present ? toFarmUuid.value : this.toFarmUuid,
+    transporterId: transporterId.present
+        ? transporterId.value
+        : this.transporterId,
+    reason: reason.present ? reason.value : this.reason,
+    price: price.present ? price.value : this.price,
+    transferDate: transferDate ?? this.transferDate,
+    remarks: remarks.present ? remarks.value : this.remarks,
+    status: status.present ? status.value : this.status,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Transfer copyWithCompanion(TransfersCompanion data) {
+    return Transfer(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      livestockUuid: data.livestockUuid.present
+          ? data.livestockUuid.value
+          : this.livestockUuid,
+      toFarmUuid: data.toFarmUuid.present
+          ? data.toFarmUuid.value
+          : this.toFarmUuid,
+      transporterId: data.transporterId.present
+          ? data.transporterId.value
+          : this.transporterId,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      price: data.price.present ? data.price.value : this.price,
+      transferDate: data.transferDate.present
+          ? data.transferDate.value
+          : this.transferDate,
+      remarks: data.remarks.present ? data.remarks.value : this.remarks,
+      status: data.status.present ? data.status.value : this.status,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Transfer(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('toFarmUuid: $toFarmUuid, ')
+          ..write('transporterId: $transporterId, ')
+          ..write('reason: $reason, ')
+          ..write('price: $price, ')
+          ..write('transferDate: $transferDate, ')
+          ..write('remarks: $remarks, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    farmUuid,
+    livestockUuid,
+    toFarmUuid,
+    transporterId,
+    reason,
+    price,
+    transferDate,
+    remarks,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Transfer &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.farmUuid == this.farmUuid &&
+          other.livestockUuid == this.livestockUuid &&
+          other.toFarmUuid == this.toFarmUuid &&
+          other.transporterId == this.transporterId &&
+          other.reason == this.reason &&
+          other.price == this.price &&
+          other.transferDate == this.transferDate &&
+          other.remarks == this.remarks &&
+          other.status == this.status &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TransfersCompanion extends UpdateCompanion<Transfer> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String> farmUuid;
+  final Value<String> livestockUuid;
+  final Value<String?> toFarmUuid;
+  final Value<int?> transporterId;
+  final Value<String?> reason;
+  final Value<String?> price;
+  final Value<String> transferDate;
+  final Value<String?> remarks;
+  final Value<String?> status;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const TransfersCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.livestockUuid = const Value.absent(),
+    this.toFarmUuid = const Value.absent(),
+    this.transporterId = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.price = const Value.absent(),
+    this.transferDate = const Value.absent(),
+    this.remarks = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TransfersCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required String farmUuid,
+    required String livestockUuid,
+    this.toFarmUuid = const Value.absent(),
+    this.transporterId = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.price = const Value.absent(),
+    required String transferDate,
+    this.remarks = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       farmUuid = Value(farmUuid),
+       livestockUuid = Value(livestockUuid),
+       transferDate = Value(transferDate),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Transfer> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? farmUuid,
+    Expression<String>? livestockUuid,
+    Expression<String>? toFarmUuid,
+    Expression<int>? transporterId,
+    Expression<String>? reason,
+    Expression<String>? price,
+    Expression<String>? transferDate,
+    Expression<String>? remarks,
+    Expression<String>? status,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (livestockUuid != null) 'livestock_uuid': livestockUuid,
+      if (toFarmUuid != null) 'to_farm_uuid': toFarmUuid,
+      if (transporterId != null) 'transporter_id': transporterId,
+      if (reason != null) 'reason': reason,
+      if (price != null) 'price': price,
+      if (transferDate != null) 'transfer_date': transferDate,
+      if (remarks != null) 'remarks': remarks,
+      if (status != null) 'status': status,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TransfersCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String>? farmUuid,
+    Value<String>? livestockUuid,
+    Value<String?>? toFarmUuid,
+    Value<int?>? transporterId,
+    Value<String?>? reason,
+    Value<String?>? price,
+    Value<String>? transferDate,
+    Value<String?>? remarks,
+    Value<String?>? status,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return TransfersCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      livestockUuid: livestockUuid ?? this.livestockUuid,
+      toFarmUuid: toFarmUuid ?? this.toFarmUuid,
+      transporterId: transporterId ?? this.transporterId,
+      reason: reason ?? this.reason,
+      price: price ?? this.price,
+      transferDate: transferDate ?? this.transferDate,
+      remarks: remarks ?? this.remarks,
+      status: status ?? this.status,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (livestockUuid.present) {
+      map['livestock_uuid'] = Variable<String>(livestockUuid.value);
+    }
+    if (toFarmUuid.present) {
+      map['to_farm_uuid'] = Variable<String>(toFarmUuid.value);
+    }
+    if (transporterId.present) {
+      map['transporter_id'] = Variable<int>(transporterId.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (price.present) {
+      map['price'] = Variable<String>(price.value);
+    }
+    if (transferDate.present) {
+      map['transfer_date'] = Variable<String>(transferDate.value);
+    }
+    if (remarks.present) {
+      map['remarks'] = Variable<String>(remarks.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransfersCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('livestockUuid: $livestockUuid, ')
+          ..write('toFarmUuid: $toFarmUuid, ')
+          ..write('transporterId: $transporterId, ')
+          ..write('reason: $reason, ')
+          ..write('price: $price, ')
+          ..write('transferDate: $transferDate, ')
+          ..write('remarks: $remarks, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $VaccinesTable extends Vaccines with TableInfo<$VaccinesTable, Vaccine> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -18214,6 +22952,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MedicationsTable medications = $MedicationsTable(this);
   late final $VaccinationsTable vaccinations = $VaccinationsTable(this);
   late final $DisposalsTable disposals = $DisposalsTable(this);
+  late final $MilkingsTable milkings = $MilkingsTable(this);
+  late final $PregnanciesTable pregnancies = $PregnanciesTable(this);
+  late final $InseminationsTable inseminations = $InseminationsTable(this);
+  late final $DryoffsTable dryoffs = $DryoffsTable(this);
+  late final $TransfersTable transfers = $TransfersTable(this);
   late final $VaccinesTable vaccines = $VaccinesTable(this);
   late final $FarmUsersTable farmUsers = $FarmUsersTable(this);
   late final $NotificationEntriesTable notificationEntries =
@@ -18282,6 +23025,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medications,
     vaccinations,
     disposals,
+    milkings,
+    pregnancies,
+    inseminations,
+    dryoffs,
+    transfers,
     vaccines,
     farmUsers,
     notificationEntries,
@@ -28887,6 +33635,2132 @@ typedef $$DisposalsTableProcessedTableManager =
       Disposal,
       PrefetchHooks Function()
     >;
+typedef $$MilkingsTableCreateCompanionBuilder =
+    MilkingsCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      Value<String?> farmUuid,
+      required String livestockUuid,
+      Value<int?> milkingMethodId,
+      required String amount,
+      required String lactometerReading,
+      required String solid,
+      required String solidNonFat,
+      required String protein,
+      required String correctedLactometerReading,
+      required String totalSolids,
+      required String colonyFormingUnits,
+      Value<String?> acidity,
+      Value<String> session,
+      Value<String> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$MilkingsTableUpdateCompanionBuilder =
+    MilkingsCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String?> farmUuid,
+      Value<String> livestockUuid,
+      Value<int?> milkingMethodId,
+      Value<String> amount,
+      Value<String> lactometerReading,
+      Value<String> solid,
+      Value<String> solidNonFat,
+      Value<String> protein,
+      Value<String> correctedLactometerReading,
+      Value<String> totalSolids,
+      Value<String> colonyFormingUnits,
+      Value<String?> acidity,
+      Value<String> session,
+      Value<String> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$MilkingsTableFilterComposer
+    extends Composer<_$AppDatabase, $MilkingsTable> {
+  $$MilkingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get milkingMethodId => $composableBuilder(
+    column: $table.milkingMethodId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lactometerReading => $composableBuilder(
+    column: $table.lactometerReading,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get solid => $composableBuilder(
+    column: $table.solid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get solidNonFat => $composableBuilder(
+    column: $table.solidNonFat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get protein => $composableBuilder(
+    column: $table.protein,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get correctedLactometerReading => $composableBuilder(
+    column: $table.correctedLactometerReading,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get totalSolids => $composableBuilder(
+    column: $table.totalSolids,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colonyFormingUnits => $composableBuilder(
+    column: $table.colonyFormingUnits,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get acidity => $composableBuilder(
+    column: $table.acidity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get session => $composableBuilder(
+    column: $table.session,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MilkingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MilkingsTable> {
+  $$MilkingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get milkingMethodId => $composableBuilder(
+    column: $table.milkingMethodId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lactometerReading => $composableBuilder(
+    column: $table.lactometerReading,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get solid => $composableBuilder(
+    column: $table.solid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get solidNonFat => $composableBuilder(
+    column: $table.solidNonFat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get protein => $composableBuilder(
+    column: $table.protein,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get correctedLactometerReading => $composableBuilder(
+    column: $table.correctedLactometerReading,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get totalSolids => $composableBuilder(
+    column: $table.totalSolids,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colonyFormingUnits => $composableBuilder(
+    column: $table.colonyFormingUnits,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get acidity => $composableBuilder(
+    column: $table.acidity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get session => $composableBuilder(
+    column: $table.session,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MilkingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MilkingsTable> {
+  $$MilkingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get milkingMethodId => $composableBuilder(
+    column: $table.milkingMethodId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get lactometerReading => $composableBuilder(
+    column: $table.lactometerReading,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get solid =>
+      $composableBuilder(column: $table.solid, builder: (column) => column);
+
+  GeneratedColumn<String> get solidNonFat => $composableBuilder(
+    column: $table.solidNonFat,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get protein =>
+      $composableBuilder(column: $table.protein, builder: (column) => column);
+
+  GeneratedColumn<String> get correctedLactometerReading => $composableBuilder(
+    column: $table.correctedLactometerReading,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get totalSolids => $composableBuilder(
+    column: $table.totalSolids,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get colonyFormingUnits => $composableBuilder(
+    column: $table.colonyFormingUnits,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get acidity =>
+      $composableBuilder(column: $table.acidity, builder: (column) => column);
+
+  GeneratedColumn<String> get session =>
+      $composableBuilder(column: $table.session, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MilkingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MilkingsTable,
+          Milking,
+          $$MilkingsTableFilterComposer,
+          $$MilkingsTableOrderingComposer,
+          $$MilkingsTableAnnotationComposer,
+          $$MilkingsTableCreateCompanionBuilder,
+          $$MilkingsTableUpdateCompanionBuilder,
+          (Milking, BaseReferences<_$AppDatabase, $MilkingsTable, Milking>),
+          Milking,
+          PrefetchHooks Function()
+        > {
+  $$MilkingsTableTableManager(_$AppDatabase db, $MilkingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MilkingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MilkingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MilkingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<String> livestockUuid = const Value.absent(),
+                Value<int?> milkingMethodId = const Value.absent(),
+                Value<String> amount = const Value.absent(),
+                Value<String> lactometerReading = const Value.absent(),
+                Value<String> solid = const Value.absent(),
+                Value<String> solidNonFat = const Value.absent(),
+                Value<String> protein = const Value.absent(),
+                Value<String> correctedLactometerReading = const Value.absent(),
+                Value<String> totalSolids = const Value.absent(),
+                Value<String> colonyFormingUnits = const Value.absent(),
+                Value<String?> acidity = const Value.absent(),
+                Value<String> session = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MilkingsCompanion(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                milkingMethodId: milkingMethodId,
+                amount: amount,
+                lactometerReading: lactometerReading,
+                solid: solid,
+                solidNonFat: solidNonFat,
+                protein: protein,
+                correctedLactometerReading: correctedLactometerReading,
+                totalSolids: totalSolids,
+                colonyFormingUnits: colonyFormingUnits,
+                acidity: acidity,
+                session: session,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                Value<String?> farmUuid = const Value.absent(),
+                required String livestockUuid,
+                Value<int?> milkingMethodId = const Value.absent(),
+                required String amount,
+                required String lactometerReading,
+                required String solid,
+                required String solidNonFat,
+                required String protein,
+                required String correctedLactometerReading,
+                required String totalSolids,
+                required String colonyFormingUnits,
+                Value<String?> acidity = const Value.absent(),
+                Value<String> session = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MilkingsCompanion.insert(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                milkingMethodId: milkingMethodId,
+                amount: amount,
+                lactometerReading: lactometerReading,
+                solid: solid,
+                solidNonFat: solidNonFat,
+                protein: protein,
+                correctedLactometerReading: correctedLactometerReading,
+                totalSolids: totalSolids,
+                colonyFormingUnits: colonyFormingUnits,
+                acidity: acidity,
+                session: session,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MilkingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MilkingsTable,
+      Milking,
+      $$MilkingsTableFilterComposer,
+      $$MilkingsTableOrderingComposer,
+      $$MilkingsTableAnnotationComposer,
+      $$MilkingsTableCreateCompanionBuilder,
+      $$MilkingsTableUpdateCompanionBuilder,
+      (Milking, BaseReferences<_$AppDatabase, $MilkingsTable, Milking>),
+      Milking,
+      PrefetchHooks Function()
+    >;
+typedef $$PregnanciesTableCreateCompanionBuilder =
+    PregnanciesCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      required String farmUuid,
+      required String livestockUuid,
+      required int testResultId,
+      Value<String?> noOfMonths,
+      Value<String?> testDate,
+      Value<String> status,
+      Value<String?> remarks,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PregnanciesTableUpdateCompanionBuilder =
+    PregnanciesCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String> farmUuid,
+      Value<String> livestockUuid,
+      Value<int> testResultId,
+      Value<String?> noOfMonths,
+      Value<String?> testDate,
+      Value<String> status,
+      Value<String?> remarks,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$PregnanciesTableFilterComposer
+    extends Composer<_$AppDatabase, $PregnanciesTable> {
+  $$PregnanciesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get testResultId => $composableBuilder(
+    column: $table.testResultId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get noOfMonths => $composableBuilder(
+    column: $table.noOfMonths,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get testDate => $composableBuilder(
+    column: $table.testDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PregnanciesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PregnanciesTable> {
+  $$PregnanciesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get testResultId => $composableBuilder(
+    column: $table.testResultId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get noOfMonths => $composableBuilder(
+    column: $table.noOfMonths,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get testDate => $composableBuilder(
+    column: $table.testDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PregnanciesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PregnanciesTable> {
+  $$PregnanciesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get testResultId => $composableBuilder(
+    column: $table.testResultId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get noOfMonths => $composableBuilder(
+    column: $table.noOfMonths,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get testDate =>
+      $composableBuilder(column: $table.testDate, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get remarks =>
+      $composableBuilder(column: $table.remarks, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PregnanciesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PregnanciesTable,
+          Pregnancy,
+          $$PregnanciesTableFilterComposer,
+          $$PregnanciesTableOrderingComposer,
+          $$PregnanciesTableAnnotationComposer,
+          $$PregnanciesTableCreateCompanionBuilder,
+          $$PregnanciesTableUpdateCompanionBuilder,
+          (
+            Pregnancy,
+            BaseReferences<_$AppDatabase, $PregnanciesTable, Pregnancy>,
+          ),
+          Pregnancy,
+          PrefetchHooks Function()
+        > {
+  $$PregnanciesTableTableManager(_$AppDatabase db, $PregnanciesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PregnanciesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PregnanciesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PregnanciesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String> farmUuid = const Value.absent(),
+                Value<String> livestockUuid = const Value.absent(),
+                Value<int> testResultId = const Value.absent(),
+                Value<String?> noOfMonths = const Value.absent(),
+                Value<String?> testDate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PregnanciesCompanion(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                testResultId: testResultId,
+                noOfMonths: noOfMonths,
+                testDate: testDate,
+                status: status,
+                remarks: remarks,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                required String farmUuid,
+                required String livestockUuid,
+                required int testResultId,
+                Value<String?> noOfMonths = const Value.absent(),
+                Value<String?> testDate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PregnanciesCompanion.insert(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                testResultId: testResultId,
+                noOfMonths: noOfMonths,
+                testDate: testDate,
+                status: status,
+                remarks: remarks,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PregnanciesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PregnanciesTable,
+      Pregnancy,
+      $$PregnanciesTableFilterComposer,
+      $$PregnanciesTableOrderingComposer,
+      $$PregnanciesTableAnnotationComposer,
+      $$PregnanciesTableCreateCompanionBuilder,
+      $$PregnanciesTableUpdateCompanionBuilder,
+      (Pregnancy, BaseReferences<_$AppDatabase, $PregnanciesTable, Pregnancy>),
+      Pregnancy,
+      PrefetchHooks Function()
+    >;
+typedef $$InseminationsTableCreateCompanionBuilder =
+    InseminationsCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      Value<String?> farmUuid,
+      required String livestockUuid,
+      Value<String?> lastHeatDate,
+      required int currentHeatTypeId,
+      required int inseminationServiceId,
+      required int semenStrawTypeId,
+      Value<String?> inseminationDate,
+      Value<String?> bullCode,
+      Value<String?> bullBreed,
+      Value<String?> semenProductionDate,
+      Value<String?> productionCountry,
+      Value<String?> semenBatchNumber,
+      Value<String?> internationalId,
+      Value<String?> aiCode,
+      Value<String?> manufacturerName,
+      Value<String?> semenSupplier,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$InseminationsTableUpdateCompanionBuilder =
+    InseminationsCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String?> farmUuid,
+      Value<String> livestockUuid,
+      Value<String?> lastHeatDate,
+      Value<int> currentHeatTypeId,
+      Value<int> inseminationServiceId,
+      Value<int> semenStrawTypeId,
+      Value<String?> inseminationDate,
+      Value<String?> bullCode,
+      Value<String?> bullBreed,
+      Value<String?> semenProductionDate,
+      Value<String?> productionCountry,
+      Value<String?> semenBatchNumber,
+      Value<String?> internationalId,
+      Value<String?> aiCode,
+      Value<String?> manufacturerName,
+      Value<String?> semenSupplier,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$InseminationsTableFilterComposer
+    extends Composer<_$AppDatabase, $InseminationsTable> {
+  $$InseminationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastHeatDate => $composableBuilder(
+    column: $table.lastHeatDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentHeatTypeId => $composableBuilder(
+    column: $table.currentHeatTypeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get inseminationServiceId => $composableBuilder(
+    column: $table.inseminationServiceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get semenStrawTypeId => $composableBuilder(
+    column: $table.semenStrawTypeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get inseminationDate => $composableBuilder(
+    column: $table.inseminationDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bullCode => $composableBuilder(
+    column: $table.bullCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bullBreed => $composableBuilder(
+    column: $table.bullBreed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get semenProductionDate => $composableBuilder(
+    column: $table.semenProductionDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productionCountry => $composableBuilder(
+    column: $table.productionCountry,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get semenBatchNumber => $composableBuilder(
+    column: $table.semenBatchNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get internationalId => $composableBuilder(
+    column: $table.internationalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aiCode => $composableBuilder(
+    column: $table.aiCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manufacturerName => $composableBuilder(
+    column: $table.manufacturerName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get semenSupplier => $composableBuilder(
+    column: $table.semenSupplier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InseminationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $InseminationsTable> {
+  $$InseminationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastHeatDate => $composableBuilder(
+    column: $table.lastHeatDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentHeatTypeId => $composableBuilder(
+    column: $table.currentHeatTypeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get inseminationServiceId => $composableBuilder(
+    column: $table.inseminationServiceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get semenStrawTypeId => $composableBuilder(
+    column: $table.semenStrawTypeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inseminationDate => $composableBuilder(
+    column: $table.inseminationDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bullCode => $composableBuilder(
+    column: $table.bullCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bullBreed => $composableBuilder(
+    column: $table.bullBreed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get semenProductionDate => $composableBuilder(
+    column: $table.semenProductionDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productionCountry => $composableBuilder(
+    column: $table.productionCountry,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get semenBatchNumber => $composableBuilder(
+    column: $table.semenBatchNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get internationalId => $composableBuilder(
+    column: $table.internationalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aiCode => $composableBuilder(
+    column: $table.aiCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manufacturerName => $composableBuilder(
+    column: $table.manufacturerName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get semenSupplier => $composableBuilder(
+    column: $table.semenSupplier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InseminationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InseminationsTable> {
+  $$InseminationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastHeatDate => $composableBuilder(
+    column: $table.lastHeatDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get currentHeatTypeId => $composableBuilder(
+    column: $table.currentHeatTypeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get inseminationServiceId => $composableBuilder(
+    column: $table.inseminationServiceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get semenStrawTypeId => $composableBuilder(
+    column: $table.semenStrawTypeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get inseminationDate => $composableBuilder(
+    column: $table.inseminationDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bullCode =>
+      $composableBuilder(column: $table.bullCode, builder: (column) => column);
+
+  GeneratedColumn<String> get bullBreed =>
+      $composableBuilder(column: $table.bullBreed, builder: (column) => column);
+
+  GeneratedColumn<String> get semenProductionDate => $composableBuilder(
+    column: $table.semenProductionDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get productionCountry => $composableBuilder(
+    column: $table.productionCountry,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get semenBatchNumber => $composableBuilder(
+    column: $table.semenBatchNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get internationalId => $composableBuilder(
+    column: $table.internationalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aiCode =>
+      $composableBuilder(column: $table.aiCode, builder: (column) => column);
+
+  GeneratedColumn<String> get manufacturerName => $composableBuilder(
+    column: $table.manufacturerName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get semenSupplier => $composableBuilder(
+    column: $table.semenSupplier,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$InseminationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InseminationsTable,
+          Insemination,
+          $$InseminationsTableFilterComposer,
+          $$InseminationsTableOrderingComposer,
+          $$InseminationsTableAnnotationComposer,
+          $$InseminationsTableCreateCompanionBuilder,
+          $$InseminationsTableUpdateCompanionBuilder,
+          (
+            Insemination,
+            BaseReferences<_$AppDatabase, $InseminationsTable, Insemination>,
+          ),
+          Insemination,
+          PrefetchHooks Function()
+        > {
+  $$InseminationsTableTableManager(_$AppDatabase db, $InseminationsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InseminationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InseminationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InseminationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<String> livestockUuid = const Value.absent(),
+                Value<String?> lastHeatDate = const Value.absent(),
+                Value<int> currentHeatTypeId = const Value.absent(),
+                Value<int> inseminationServiceId = const Value.absent(),
+                Value<int> semenStrawTypeId = const Value.absent(),
+                Value<String?> inseminationDate = const Value.absent(),
+                Value<String?> bullCode = const Value.absent(),
+                Value<String?> bullBreed = const Value.absent(),
+                Value<String?> semenProductionDate = const Value.absent(),
+                Value<String?> productionCountry = const Value.absent(),
+                Value<String?> semenBatchNumber = const Value.absent(),
+                Value<String?> internationalId = const Value.absent(),
+                Value<String?> aiCode = const Value.absent(),
+                Value<String?> manufacturerName = const Value.absent(),
+                Value<String?> semenSupplier = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InseminationsCompanion(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                lastHeatDate: lastHeatDate,
+                currentHeatTypeId: currentHeatTypeId,
+                inseminationServiceId: inseminationServiceId,
+                semenStrawTypeId: semenStrawTypeId,
+                inseminationDate: inseminationDate,
+                bullCode: bullCode,
+                bullBreed: bullBreed,
+                semenProductionDate: semenProductionDate,
+                productionCountry: productionCountry,
+                semenBatchNumber: semenBatchNumber,
+                internationalId: internationalId,
+                aiCode: aiCode,
+                manufacturerName: manufacturerName,
+                semenSupplier: semenSupplier,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                Value<String?> farmUuid = const Value.absent(),
+                required String livestockUuid,
+                Value<String?> lastHeatDate = const Value.absent(),
+                required int currentHeatTypeId,
+                required int inseminationServiceId,
+                required int semenStrawTypeId,
+                Value<String?> inseminationDate = const Value.absent(),
+                Value<String?> bullCode = const Value.absent(),
+                Value<String?> bullBreed = const Value.absent(),
+                Value<String?> semenProductionDate = const Value.absent(),
+                Value<String?> productionCountry = const Value.absent(),
+                Value<String?> semenBatchNumber = const Value.absent(),
+                Value<String?> internationalId = const Value.absent(),
+                Value<String?> aiCode = const Value.absent(),
+                Value<String?> manufacturerName = const Value.absent(),
+                Value<String?> semenSupplier = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => InseminationsCompanion.insert(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                lastHeatDate: lastHeatDate,
+                currentHeatTypeId: currentHeatTypeId,
+                inseminationServiceId: inseminationServiceId,
+                semenStrawTypeId: semenStrawTypeId,
+                inseminationDate: inseminationDate,
+                bullCode: bullCode,
+                bullBreed: bullBreed,
+                semenProductionDate: semenProductionDate,
+                productionCountry: productionCountry,
+                semenBatchNumber: semenBatchNumber,
+                internationalId: internationalId,
+                aiCode: aiCode,
+                manufacturerName: manufacturerName,
+                semenSupplier: semenSupplier,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InseminationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InseminationsTable,
+      Insemination,
+      $$InseminationsTableFilterComposer,
+      $$InseminationsTableOrderingComposer,
+      $$InseminationsTableAnnotationComposer,
+      $$InseminationsTableCreateCompanionBuilder,
+      $$InseminationsTableUpdateCompanionBuilder,
+      (
+        Insemination,
+        BaseReferences<_$AppDatabase, $InseminationsTable, Insemination>,
+      ),
+      Insemination,
+      PrefetchHooks Function()
+    >;
+typedef $$DryoffsTableCreateCompanionBuilder =
+    DryoffsCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      required String farmUuid,
+      required String livestockUuid,
+      required String startDate,
+      Value<String?> endDate,
+      Value<String?> reason,
+      Value<String?> remarks,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$DryoffsTableUpdateCompanionBuilder =
+    DryoffsCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String> farmUuid,
+      Value<String> livestockUuid,
+      Value<String> startDate,
+      Value<String?> endDate,
+      Value<String?> reason,
+      Value<String?> remarks,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$DryoffsTableFilterComposer
+    extends Composer<_$AppDatabase, $DryoffsTable> {
+  $$DryoffsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DryoffsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DryoffsTable> {
+  $$DryoffsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DryoffsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DryoffsTable> {
+  $$DryoffsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<String> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get remarks =>
+      $composableBuilder(column: $table.remarks, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DryoffsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DryoffsTable,
+          Dryoff,
+          $$DryoffsTableFilterComposer,
+          $$DryoffsTableOrderingComposer,
+          $$DryoffsTableAnnotationComposer,
+          $$DryoffsTableCreateCompanionBuilder,
+          $$DryoffsTableUpdateCompanionBuilder,
+          (Dryoff, BaseReferences<_$AppDatabase, $DryoffsTable, Dryoff>),
+          Dryoff,
+          PrefetchHooks Function()
+        > {
+  $$DryoffsTableTableManager(_$AppDatabase db, $DryoffsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DryoffsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DryoffsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DryoffsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String> farmUuid = const Value.absent(),
+                Value<String> livestockUuid = const Value.absent(),
+                Value<String> startDate = const Value.absent(),
+                Value<String?> endDate = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DryoffsCompanion(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                startDate: startDate,
+                endDate: endDate,
+                reason: reason,
+                remarks: remarks,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                required String farmUuid,
+                required String livestockUuid,
+                required String startDate,
+                Value<String?> endDate = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DryoffsCompanion.insert(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                startDate: startDate,
+                endDate: endDate,
+                reason: reason,
+                remarks: remarks,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DryoffsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DryoffsTable,
+      Dryoff,
+      $$DryoffsTableFilterComposer,
+      $$DryoffsTableOrderingComposer,
+      $$DryoffsTableAnnotationComposer,
+      $$DryoffsTableCreateCompanionBuilder,
+      $$DryoffsTableUpdateCompanionBuilder,
+      (Dryoff, BaseReferences<_$AppDatabase, $DryoffsTable, Dryoff>),
+      Dryoff,
+      PrefetchHooks Function()
+    >;
+typedef $$TransfersTableCreateCompanionBuilder =
+    TransfersCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      required String farmUuid,
+      required String livestockUuid,
+      Value<String?> toFarmUuid,
+      Value<int?> transporterId,
+      Value<String?> reason,
+      Value<String?> price,
+      required String transferDate,
+      Value<String?> remarks,
+      Value<String?> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$TransfersTableUpdateCompanionBuilder =
+    TransfersCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String> farmUuid,
+      Value<String> livestockUuid,
+      Value<String?> toFarmUuid,
+      Value<int?> transporterId,
+      Value<String?> reason,
+      Value<String?> price,
+      Value<String> transferDate,
+      Value<String?> remarks,
+      Value<String?> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$TransfersTableFilterComposer
+    extends Composer<_$AppDatabase, $TransfersTable> {
+  $$TransfersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toFarmUuid => $composableBuilder(
+    column: $table.toFarmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get transporterId => $composableBuilder(
+    column: $table.transporterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transferDate => $composableBuilder(
+    column: $table.transferDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TransfersTableOrderingComposer
+    extends Composer<_$AppDatabase, $TransfersTable> {
+  $$TransfersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toFarmUuid => $composableBuilder(
+    column: $table.toFarmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get transporterId => $composableBuilder(
+    column: $table.transporterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transferDate => $composableBuilder(
+    column: $table.transferDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remarks => $composableBuilder(
+    column: $table.remarks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TransfersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TransfersTable> {
+  $$TransfersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<String> get livestockUuid => $composableBuilder(
+    column: $table.livestockUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get toFarmUuid => $composableBuilder(
+    column: $table.toFarmUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get transporterId => $composableBuilder(
+    column: $table.transporterId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => column);
+
+  GeneratedColumn<String> get transferDate => $composableBuilder(
+    column: $table.transferDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remarks =>
+      $composableBuilder(column: $table.remarks, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TransfersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TransfersTable,
+          Transfer,
+          $$TransfersTableFilterComposer,
+          $$TransfersTableOrderingComposer,
+          $$TransfersTableAnnotationComposer,
+          $$TransfersTableCreateCompanionBuilder,
+          $$TransfersTableUpdateCompanionBuilder,
+          (Transfer, BaseReferences<_$AppDatabase, $TransfersTable, Transfer>),
+          Transfer,
+          PrefetchHooks Function()
+        > {
+  $$TransfersTableTableManager(_$AppDatabase db, $TransfersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TransfersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TransfersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TransfersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String> farmUuid = const Value.absent(),
+                Value<String> livestockUuid = const Value.absent(),
+                Value<String?> toFarmUuid = const Value.absent(),
+                Value<int?> transporterId = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> price = const Value.absent(),
+                Value<String> transferDate = const Value.absent(),
+                Value<String?> remarks = const Value.absent(),
+                Value<String?> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TransfersCompanion(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                toFarmUuid: toFarmUuid,
+                transporterId: transporterId,
+                reason: reason,
+                price: price,
+                transferDate: transferDate,
+                remarks: remarks,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                required String farmUuid,
+                required String livestockUuid,
+                Value<String?> toFarmUuid = const Value.absent(),
+                Value<int?> transporterId = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> price = const Value.absent(),
+                required String transferDate,
+                Value<String?> remarks = const Value.absent(),
+                Value<String?> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TransfersCompanion.insert(
+                id: id,
+                uuid: uuid,
+                farmUuid: farmUuid,
+                livestockUuid: livestockUuid,
+                toFarmUuid: toFarmUuid,
+                transporterId: transporterId,
+                reason: reason,
+                price: price,
+                transferDate: transferDate,
+                remarks: remarks,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TransfersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TransfersTable,
+      Transfer,
+      $$TransfersTableFilterComposer,
+      $$TransfersTableOrderingComposer,
+      $$TransfersTableAnnotationComposer,
+      $$TransfersTableCreateCompanionBuilder,
+      $$TransfersTableUpdateCompanionBuilder,
+      (Transfer, BaseReferences<_$AppDatabase, $TransfersTable, Transfer>),
+      Transfer,
+      PrefetchHooks Function()
+    >;
 typedef $$VaccinesTableCreateCompanionBuilder =
     VaccinesCompanion Function({
       Value<int?> id,
@@ -30208,6 +37082,16 @@ class $AppDatabaseManager {
       $$VaccinationsTableTableManager(_db, _db.vaccinations);
   $$DisposalsTableTableManager get disposals =>
       $$DisposalsTableTableManager(_db, _db.disposals);
+  $$MilkingsTableTableManager get milkings =>
+      $$MilkingsTableTableManager(_db, _db.milkings);
+  $$PregnanciesTableTableManager get pregnancies =>
+      $$PregnanciesTableTableManager(_db, _db.pregnancies);
+  $$InseminationsTableTableManager get inseminations =>
+      $$InseminationsTableTableManager(_db, _db.inseminations);
+  $$DryoffsTableTableManager get dryoffs =>
+      $$DryoffsTableTableManager(_db, _db.dryoffs);
+  $$TransfersTableTableManager get transfers =>
+      $$TransfersTableTableManager(_db, _db.transfers);
   $$VaccinesTableTableManager get vaccines =>
       $$VaccinesTableTableManager(_db, _db.vaccines);
   $$FarmUsersTableTableManager get farmUsers =>

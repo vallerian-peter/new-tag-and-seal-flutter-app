@@ -44,6 +44,16 @@ class EventsProvider extends ChangeNotifier {
   List<DisposalModel> _allDisposals = const [];
   List<BirthEventModel> _allBirthEvents = const [];
   List<AbortedPregnancyModel> _allAbortedPregnancies = const [];
+  List<MilkingModel> _milkings = const [];
+  List<PregnancyModel> _pregnancies = const [];
+  List<InseminationModel> _inseminations = const [];
+  List<DryoffModel> _dryoffs = const [];
+  List<TransferModel> _transfers = const [];
+  List<MilkingModel> _allMilkings = const [];
+  List<PregnancyModel> _allPregnancies = const [];
+  List<InseminationModel> _allInseminations = const [];
+  List<DryoffModel> _allDryoffs = const [];
+  List<TransferModel> _allTransfers = const [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -61,6 +71,16 @@ class EventsProvider extends ChangeNotifier {
   List<DisposalModel> get allDisposals => _allDisposals;
   List<BirthEventModel> get allBirthEvents => _allBirthEvents;
   List<AbortedPregnancyModel> get allAbortedPregnancies => _allAbortedPregnancies;
+  List<MilkingModel> get milkings => _milkings;
+  List<PregnancyModel> get pregnancies => _pregnancies;
+  List<InseminationModel> get inseminations => _inseminations;
+  List<DryoffModel> get dryoffs => _dryoffs;
+  List<TransferModel> get transfers => _transfers;
+  List<MilkingModel> get allMilkings => _allMilkings;
+  List<PregnancyModel> get allPregnancies => _allPregnancies;
+  List<InseminationModel> get allInseminations => _allInseminations;
+  List<DryoffModel> get allDryoffs => _allDryoffs;
+  List<TransferModel> get allTransfers => _allTransfers;
   
   Future<Map<String, int>> loadLogCounts({
     String? farmUuid,
@@ -106,6 +126,26 @@ class EventsProvider extends ChangeNotifier {
         farmUuid: farmUuid,
         livestockUuid: livestockUuid,
       );
+      _milkings = await _eventsRepository.getMilkings(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid,
+      );
+      _pregnancies = await _eventsRepository.getPregnancies(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid,
+      );
+      _inseminations = await _eventsRepository.getInseminations(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid,
+      );
+      _dryoffs = await _eventsRepository.getDryoffs(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid,
+      );
+      _transfers = await _eventsRepository.getTransfers(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid,
+      );
       _error = null;
       _isLoading = false;
       notifyListeners();
@@ -130,6 +170,11 @@ class EventsProvider extends ChangeNotifier {
       _allDisposals = await _eventsRepository.getAllDisposals();
       _allBirthEvents = await _eventsRepository.getAllBirthEvents();
       _allAbortedPregnancies = await _eventsRepository.getAllAbortedPregnancies();
+      _allMilkings = await _eventsRepository.getAllMilkings();
+      _allPregnancies = await _eventsRepository.getAllPregnancies();
+      _allInseminations = await _eventsRepository.getAllInseminations();
+      _allDryoffs = await _eventsRepository.getAllDryoffs();
+      _allTransfers = await _eventsRepository.getAllTransfers();
       _isLoading = false;
       _error = null;
       notifyListeners();
@@ -546,18 +591,121 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
+  Future<MilkingModel> addMilking(MilkingModel model) async {
+    try {
+      log('📝 Creating milking log locally: ${model.uuid}');
+      final created = await _eventsRepository.createMilking(model);
+      log('✅ Milking log created locally: ${created.uuid}');
+      _milkings = [..._milkings, created];
+      _allMilkings = [..._allMilkings, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create milking log locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<MilkingModel> updateMilking(MilkingModel model) async {
+    try {
+      final updated = await _eventsRepository.updateMilkingLocally(model);
+      _milkings = _milkings
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      _allMilkings = _allMilkings
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<MilkingModel?> addMilkingWithDialog(
     BuildContext context,
     MilkingModel model,
   ) async {
-    return _showComingSoonDialog<MilkingModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final created = await addMilking(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Milking log saved successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save milking log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<MilkingModel?> updateMilkingWithDialog(
     BuildContext context,
     MilkingModel model,
   ) async {
-    return _showComingSoonDialog<MilkingModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final updated = await updateMilking(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Milking log updated successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update milking log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<List<MilkingModel>> addMilkingBatchWithDialog({
@@ -581,46 +729,355 @@ class EventsProvider extends ChangeNotifier {
     return const [];
   }
 
+  Future<DryoffModel> addDryoff(DryoffModel model) async {
+    try {
+      log('📝 Creating dryoff log locally: ${model.uuid}');
+      final created = await _eventsRepository.createDryoff(model);
+      log('✅ Dryoff log created locally: ${created.uuid}');
+      _dryoffs = [..._dryoffs, created];
+      _allDryoffs = [..._allDryoffs, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create dryoff log locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<DryoffModel> updateDryoff(DryoffModel model) async {
+    try {
+      final updated = await _eventsRepository.updateDryoffLocally(model);
+      _dryoffs = _dryoffs
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      _allDryoffs = _allDryoffs
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<DryoffModel?> addDryoffWithDialog(
     BuildContext context,
     DryoffModel model,
   ) async {
-    return _showComingSoonDialog<DryoffModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final created = await addDryoff(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Dryoff log saved successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save dryoff log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<DryoffModel?> updateDryoffWithDialog(
     BuildContext context,
     DryoffModel model,
   ) async {
-    return _showComingSoonDialog<DryoffModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final updated = await updateDryoff(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Dryoff log updated successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update dryoff log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<PregnancyModel> addPregnancy(PregnancyModel model) async {
+    try {
+      log('📝 Creating pregnancy log locally: ${model.uuid}');
+      final created = await _eventsRepository.createPregnancy(model);
+      log('✅ Pregnancy log created locally: ${created.uuid}');
+      _pregnancies = [..._pregnancies, created];
+      _allPregnancies = [..._allPregnancies, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create pregnancy log locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<PregnancyModel> updatePregnancy(PregnancyModel model) async {
+    try {
+      final updated = await _eventsRepository.updatePregnancyLocally(model);
+      _pregnancies = _pregnancies
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      _allPregnancies = _allPregnancies
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<PregnancyModel?> addPregnancyWithDialog(
     BuildContext context,
     PregnancyModel model,
   ) async {
-    return _showComingSoonDialog<PregnancyModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final created = await addPregnancy(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Pregnancy log saved successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save pregnancy log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<PregnancyModel?> updatePregnancyWithDialog(
     BuildContext context,
     PregnancyModel model,
   ) async {
-    return _showComingSoonDialog<PregnancyModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final updated = await updatePregnancy(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Pregnancy log updated successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update pregnancy log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<TransferModel> addTransfer(TransferModel model) async {
+    try {
+      log('📝 Creating transfer log locally: ${model.uuid}');
+      final created = await _eventsRepository.createTransfer(model);
+      log('✅ Transfer log created locally: ${created.uuid}');
+      _transfers = [..._transfers, created];
+      _allTransfers = [..._allTransfers, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create transfer log locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<TransferModel> updateTransfer(TransferModel model) async {
+    try {
+      final updated = await _eventsRepository.updateTransferLocally(model);
+      _transfers = _transfers
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      _allTransfers = _allTransfers
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<TransferModel?> addTransferWithDialog(
     BuildContext context,
     TransferModel model,
   ) async {
-    return _showComingSoonDialog<TransferModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final created = await addTransfer(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Transfer log saved successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save transfer log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<TransferModel?> updateTransferWithDialog(
     BuildContext context,
     TransferModel model,
   ) async {
-    return _showComingSoonDialog<TransferModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final updated = await updateTransfer(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Transfer log updated successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update transfer log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<List<TransferModel>> addTransferBatchWithDialog({
@@ -639,18 +1096,121 @@ class EventsProvider extends ChangeNotifier {
     return const [];
   }
 
+  Future<InseminationModel> addInsemination(InseminationModel model) async {
+    try {
+      log('📝 Creating insemination log locally: ${model.uuid}');
+      final created = await _eventsRepository.createInsemination(model);
+      log('✅ Insemination log created locally: ${created.uuid}');
+      _inseminations = [..._inseminations, created];
+      _allInseminations = [..._allInseminations, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ Failed to create insemination log locally: $e');
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<InseminationModel> updateInsemination(InseminationModel model) async {
+    try {
+      final updated = await _eventsRepository.updateInseminationLocally(model);
+      _inseminations = _inseminations
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      _allInseminations = _allInseminations
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<InseminationModel?> addInseminationWithDialog(
     BuildContext context,
     InseminationModel model,
   ) async {
-    return _showComingSoonDialog<InseminationModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final created = await addInsemination(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Insemination log saved successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save insemination log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<InseminationModel?> updateInseminationWithDialog(
     BuildContext context,
     InseminationModel model,
   ) async {
-    return _showComingSoonDialog<InseminationModel?>(context);
+    final l10n = AppLocalizations.of(context)!;
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: '',
+      isDismissible: false,
+    );
+    try {
+      final updated = await updateInsemination(model);
+      _error = null;
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Insemination log updated successfully',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update insemination log',
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      }
+      return null;
+    }
   }
 
   Future<CalvingModel?> addCalvingWithDialog(
@@ -1857,6 +2417,16 @@ class EventsProvider extends ChangeNotifier {
     _allDisposals = const [];
     _allBirthEvents = const [];
     _allAbortedPregnancies = const [];
+    _milkings = const [];
+    _pregnancies = const [];
+    _inseminations = const [];
+    _dryoffs = const [];
+    _transfers = const [];
+    _allMilkings = const [];
+    _allPregnancies = const [];
+    _allInseminations = const [];
+    _allDryoffs = const [];
+    _allTransfers = const [];
     _error = null;
     notifyListeners();
   }

@@ -6,6 +6,11 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccin
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
 /// Contract for all event (logs) repository operations.
@@ -197,6 +202,18 @@ abstract class EventsRepositoryInterface {
   // MILKING
   // ============================================================================
 
+  /// Store a milking event locally (unsynced, marked for create).
+  Future<MilkingModel> createMilking(MilkingModel model);
+
+  /// Update a milking event locally (unsynced, marked for update).
+  Future<MilkingModel> updateMilkingLocally(MilkingModel model);
+
+  /// Retrieve milking logs optionally filtered by farm/livestock.
+  Future<List<MilkingModel>> getMilkings({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local milking logs.
+  Future<List<MilkingModel>> getAllMilkings();
+
   /// Get unsynced milking logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedMilkingsForApi();
 
@@ -206,6 +223,18 @@ abstract class EventsRepositoryInterface {
   // ============================================================================
   // PREGNANCY
   // ============================================================================
+
+  /// Store a pregnancy event locally (unsynced, marked for create).
+  Future<PregnancyModel> createPregnancy(PregnancyModel model);
+
+  /// Update a pregnancy event locally (unsynced, marked for update).
+  Future<PregnancyModel> updatePregnancyLocally(PregnancyModel model);
+
+  /// Retrieve pregnancy logs optionally filtered by farm/livestock.
+  Future<List<PregnancyModel>> getPregnancies({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local pregnancy logs.
+  Future<List<PregnancyModel>> getAllPregnancies();
 
   /// Get unsynced pregnancy logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedPregnanciesForApi();
@@ -217,6 +246,18 @@ abstract class EventsRepositoryInterface {
   // INSEMINATION
   // ============================================================================
 
+  /// Store an insemination event locally (unsynced, marked for create).
+  Future<InseminationModel> createInsemination(InseminationModel model);
+
+  /// Update an insemination event locally (unsynced, marked for update).
+  Future<InseminationModel> updateInseminationLocally(InseminationModel model);
+
+  /// Retrieve insemination logs optionally filtered by farm/livestock.
+  Future<List<InseminationModel>> getInseminations({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local insemination logs.
+  Future<List<InseminationModel>> getAllInseminations();
+
   /// Get unsynced insemination logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedInseminationsForApi();
 
@@ -227,6 +268,18 @@ abstract class EventsRepositoryInterface {
   // DRYOFF
   // ============================================================================
 
+  /// Store a dryoff event locally (unsynced, marked for create).
+  Future<DryoffModel> createDryoff(DryoffModel model);
+
+  /// Update a dryoff event locally (unsynced, marked for update).
+  Future<DryoffModel> updateDryoffLocally(DryoffModel model);
+
+  /// Retrieve dryoff logs optionally filtered by farm/livestock.
+  Future<List<DryoffModel>> getDryoffs({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local dryoff logs.
+  Future<List<DryoffModel>> getAllDryoffs();
+
   /// Get unsynced dryoff logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedDryoffsForApi();
 
@@ -236,6 +289,18 @@ abstract class EventsRepositoryInterface {
   // ============================================================================
   // TRANSFER
   // ============================================================================
+
+  /// Store a transfer event locally (unsynced, marked for create).
+  Future<TransferModel> createTransfer(TransferModel model);
+
+  /// Update a transfer event locally (unsynced, marked for update).
+  Future<TransferModel> updateTransferLocally(TransferModel model);
+
+  /// Retrieve transfer logs optionally filtered by farm/livestock.
+  Future<List<TransferModel>> getTransfers({String? farmUuid, String? livestockUuid});
+
+  /// Retrieve all local transfer logs.
+  Future<List<TransferModel>> getAllTransfers();
 
   /// Get unsynced transfer logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedTransfersForApi();

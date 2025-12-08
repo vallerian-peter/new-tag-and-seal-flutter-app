@@ -398,7 +398,7 @@ class _SuccessDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: onPressed ?? () => Navigator.of(context).pop(),
+                onPressed: onPressed ?? () => Navigator.of(context).pop(true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.successColor,
                   foregroundColor: Colors.white,
