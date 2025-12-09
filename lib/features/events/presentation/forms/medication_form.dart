@@ -202,10 +202,14 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
         context,
         listen: false,
       );
+      
+      log('🔄 Medication form: Ensuring reference data is loaded...');
       await provider.ensureLoaded();
+      log('✅ Medication form: Reference data loading completed');
 
+      // Load medicines
       final medicines = provider.medicines;
-      log('💊 Loaded ${medicines.length} medicines for medication form');
+      log('💊 Medication form: Loaded ${medicines.length} medicines');
       if (!mounted) return;
       setState(() {
         _medicineItems = medicines
@@ -225,13 +229,17 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
         setState(() => _selectedMedicineId = null);
       }
 
-      final diseaseItems = provider.diseases
+      // Load diseases
+      final diseases = provider.diseases;
+      log('🦠 Medication form: Loaded ${diseases.length} diseases');
+      final diseaseItems = diseases
           .map(
             (disease) =>
                 DropdownItem<int>(value: disease.id, label: disease.name),
           )
           .toList();
 
+      if (!mounted) return;
       setState(() {
         _diseaseItems = diseaseItems;
         if (_selectedDiseaseId != null &&
@@ -239,11 +247,20 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           _selectedDiseaseId = null;
         }
       });
+      
+      log('✅ Medication form: Reference data loaded - Medicines: ${_medicineItems.length}, Diseases: ${_diseaseItems.length}');
     } catch (e, stackTrace) {
       log(
-        '❌ Failed to load medicines for medication form: $e',
+        '❌ Failed to load reference data for medication form: $e',
         stackTrace: stackTrace,
       );
+      // Ensure we still set empty lists on error
+      if (mounted) {
+        setState(() {
+          _medicineItems = const [];
+          _diseaseItems = const [];
+        });
+      }
     }
   }
 

@@ -849,10 +849,13 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
             title: l10n.success,
             message: l10n.farmUpdatedSuccessfully,
             buttonText: l10n.ok,
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
           );
 
-          // Navigate back after success dialog is dismissed
+          // Navigate back after success dialog is dismissed to trigger dashboard refresh
+          // The dashboard will refresh when it receives result: true
           if (mounted) {
             Navigator.pop(context, true);
           }
@@ -874,6 +877,7 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         );
 
         // Success/error dialogs are already shown by the provider
+        // The dialog is awaited, so it will be dismissed before we navigate back
         if (createdFarm != null) {
           debugPrint(
             '✅ Farm saved locally: ${createdFarm.name} (ID: ${createdFarm.id})',
@@ -881,11 +885,18 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
           debugPrint(
             'Farm details: uuid: ${createdFarm.uuid}, size: ${createdFarm.size}, status: ${createdFarm.status}',
           );
+          debugPrint('🔄 Navigating back to dashboard with result: true');
 
           // Navigate back after success dialog is dismissed
+          // This will trigger dashboard refresh (dashboard checks for result == true)
           if (mounted) {
             Navigator.pop(context, true);
+            debugPrint('🔄 Navigated back to dashboard with result: true');
           }
+        } else {
+          // Farm creation failed - error dialog was already shown by provider
+          // Don't navigate back, let user see the error
+          debugPrint('❌ Farm creation failed - not navigating back');
         }
       }
     } catch (e) {

@@ -409,7 +409,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.eventsLoadedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
     } catch (e) {
@@ -421,7 +421,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.eventsLoadFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
     }
@@ -448,7 +448,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.allEventsLoadedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
     } catch (e) {
@@ -460,7 +460,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.eventsLoadFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
     }
@@ -501,7 +501,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.feedingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -515,7 +515,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.feedingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -570,7 +570,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.feedingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -584,7 +584,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.feedingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -647,7 +647,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Milking log saved successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -660,7 +660,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to save milking log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -688,7 +688,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Milking log updated successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -701,7 +701,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to update milking log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -785,7 +785,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Dryoff log saved successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -798,7 +798,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to save dryoff log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -826,7 +826,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Dryoff log updated successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -839,7 +839,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to update dryoff log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -902,7 +902,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Pregnancy log saved successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -915,7 +915,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to save pregnancy log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -943,7 +943,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Pregnancy log updated successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -956,7 +956,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to update pregnancy log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1019,7 +1019,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Transfer log saved successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -1032,7 +1032,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to save transfer log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1060,7 +1060,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Transfer log updated successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -1073,7 +1073,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to update transfer log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1152,7 +1152,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Insemination log saved successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -1165,7 +1165,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to save insemination log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1193,7 +1193,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: 'Insemination log updated successfully',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -1206,7 +1206,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: 'Failed to update insemination log',
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1287,7 +1287,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.birthEventSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1301,7 +1301,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.birthEventSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1332,7 +1332,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.birthEventUpdated,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1346,7 +1346,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.birthEventUpdateFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1413,7 +1413,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.abortedPregnancySaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1427,7 +1427,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.abortedPregnancySaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1458,7 +1458,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.abortedPregnancyUpdated,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1472,7 +1472,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.abortedPregnancyUpdateFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1503,7 +1503,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.feedingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1518,7 +1518,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.feedingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1550,7 +1550,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.weightLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1564,7 +1564,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.weightLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1595,7 +1595,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.weightLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1609,7 +1609,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.weightLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1662,7 +1662,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.weightLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1676,7 +1676,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.weightLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -1707,7 +1707,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.dewormingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1721,7 +1721,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.dewormingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1752,7 +1752,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.dewormingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1766,7 +1766,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.dewormingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1827,7 +1827,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.dewormingLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1841,7 +1841,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.dewormingLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -1870,7 +1870,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.medicationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -1883,7 +1883,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.medicationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1912,7 +1912,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.medicationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -1925,7 +1925,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.medicationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -1984,7 +1984,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.medicationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -1998,7 +1998,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.medicationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -2027,12 +2027,13 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.vaccinationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _error = e.toString();
+      log('❌ Failed to save vaccination log in provider: $e', stackTrace: stackTrace);
       if (context.mounted) {
         Navigator.of(context).pop();
         await AlertDialogs.showError(
@@ -2040,7 +2041,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.vaccinationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -2069,7 +2070,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.vaccinationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -2082,7 +2083,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.vaccinationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -2094,7 +2095,7 @@ class EventsProvider extends ChangeNotifier {
     required String farmUuid,
     required List<String> livestockUuids,
     String? vaccinationNo,
-    int? vaccineId,
+    String? vaccineUuid,
     int? diseaseId,
     String? vetId,
     String? extensionOfficerId,
@@ -2121,7 +2122,7 @@ class EventsProvider extends ChangeNotifier {
           vaccinationNo: vaccinationNo,
           farmUuid: farmUuid,
           livestockUuid: animalUuid,
-          vaccineId: vaccineId,
+          vaccineUuid: vaccineUuid,
           diseaseId: diseaseId,
           vetId: vetId,
           extensionOfficerId: extensionOfficerId,
@@ -2141,7 +2142,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.vaccinationLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -2155,7 +2156,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.vaccinationLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -2184,7 +2185,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return created;
@@ -2197,7 +2198,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.disposalLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -2226,7 +2227,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return updated;
@@ -2239,7 +2240,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.disposalLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return null;
@@ -2294,7 +2295,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
 
@@ -2308,7 +2309,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.error,
           message: l10n.disposalLogSaveFailed,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog already pops itself, no need for onPressed
         );
       }
       return const [];
@@ -2394,6 +2395,31 @@ class EventsProvider extends ChangeNotifier {
             .toList();
       case EventLogTypes.abortedPregnancy:
         return await _eventsRepository.getAbortedPregnancies(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.insemination:
+        return await _eventsRepository.getInseminations(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.milking:
+        return await _eventsRepository.getMilkings(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.pregnancy:
+        return await _eventsRepository.getPregnancies(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.dryoff:
+        return await _eventsRepository.getDryoffs(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.transfer:
+        return await _eventsRepository.getTransfers(
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
         );

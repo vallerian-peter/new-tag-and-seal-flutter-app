@@ -14022,15 +14022,15 @@ class $VaccinationsTable extends Vaccinations
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _vaccineIdMeta = const VerificationMeta(
-    'vaccineId',
+  static const VerificationMeta _vaccineUuidMeta = const VerificationMeta(
+    'vaccineUuid',
   );
   @override
-  late final GeneratedColumn<int> vaccineId = GeneratedColumn<int>(
-    'vaccine_id',
+  late final GeneratedColumn<String> vaccineUuid = GeneratedColumn<String>(
+    'vaccine_uuid',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _diseaseIdMeta = const VerificationMeta(
@@ -14128,7 +14128,7 @@ class $VaccinationsTable extends Vaccinations
     vaccinationNo,
     farmUuid,
     livestockUuid,
-    vaccineId,
+    vaccineUuid,
     diseaseId,
     vetId,
     extensionOfficerId,
@@ -14189,10 +14189,13 @@ class $VaccinationsTable extends Vaccinations
     } else if (isInserting) {
       context.missing(_livestockUuidMeta);
     }
-    if (data.containsKey('vaccine_id')) {
+    if (data.containsKey('vaccine_uuid')) {
       context.handle(
-        _vaccineIdMeta,
-        vaccineId.isAcceptableOrUnknown(data['vaccine_id']!, _vaccineIdMeta),
+        _vaccineUuidMeta,
+        vaccineUuid.isAcceptableOrUnknown(
+          data['vaccine_uuid']!,
+          _vaccineUuidMeta,
+        ),
       );
     }
     if (data.containsKey('disease_id')) {
@@ -14279,9 +14282,9 @@ class $VaccinationsTable extends Vaccinations
         DriftSqlType.string,
         data['${effectivePrefix}livestock_uuid'],
       )!,
-      vaccineId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}vaccine_id'],
+      vaccineUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}vaccine_uuid'],
       ),
       diseaseId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -14330,7 +14333,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
   final String? vaccinationNo;
   final String farmUuid;
   final String livestockUuid;
-  final int? vaccineId;
+  final String? vaccineUuid;
   final int? diseaseId;
   final String? vetId;
   final String? extensionOfficerId;
@@ -14345,7 +14348,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     this.vaccinationNo,
     required this.farmUuid,
     required this.livestockUuid,
-    this.vaccineId,
+    this.vaccineUuid,
     this.diseaseId,
     this.vetId,
     this.extensionOfficerId,
@@ -14367,8 +14370,8 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
-    if (!nullToAbsent || vaccineId != null) {
-      map['vaccine_id'] = Variable<int>(vaccineId);
+    if (!nullToAbsent || vaccineUuid != null) {
+      map['vaccine_uuid'] = Variable<String>(vaccineUuid);
     }
     if (!nullToAbsent || diseaseId != null) {
       map['disease_id'] = Variable<int>(diseaseId);
@@ -14396,9 +14399,9 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
           : Value(vaccinationNo),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
-      vaccineId: vaccineId == null && nullToAbsent
+      vaccineUuid: vaccineUuid == null && nullToAbsent
           ? const Value.absent()
-          : Value(vaccineId),
+          : Value(vaccineUuid),
       diseaseId: diseaseId == null && nullToAbsent
           ? const Value.absent()
           : Value(diseaseId),
@@ -14427,7 +14430,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
       vaccinationNo: serializer.fromJson<String?>(json['vaccinationNo']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
-      vaccineId: serializer.fromJson<int?>(json['vaccineId']),
+      vaccineUuid: serializer.fromJson<String?>(json['vaccineUuid']),
       diseaseId: serializer.fromJson<int?>(json['diseaseId']),
       vetId: serializer.fromJson<String?>(json['vetId']),
       extensionOfficerId: serializer.fromJson<String?>(
@@ -14449,7 +14452,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
       'vaccinationNo': serializer.toJson<String?>(vaccinationNo),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
-      'vaccineId': serializer.toJson<int?>(vaccineId),
+      'vaccineUuid': serializer.toJson<String?>(vaccineUuid),
       'diseaseId': serializer.toJson<int?>(diseaseId),
       'vetId': serializer.toJson<String?>(vetId),
       'extensionOfficerId': serializer.toJson<String?>(extensionOfficerId),
@@ -14467,7 +14470,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     Value<String?> vaccinationNo = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
-    Value<int?> vaccineId = const Value.absent(),
+    Value<String?> vaccineUuid = const Value.absent(),
     Value<int?> diseaseId = const Value.absent(),
     Value<String?> vetId = const Value.absent(),
     Value<String?> extensionOfficerId = const Value.absent(),
@@ -14484,7 +14487,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
         : this.vaccinationNo,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
-    vaccineId: vaccineId.present ? vaccineId.value : this.vaccineId,
+    vaccineUuid: vaccineUuid.present ? vaccineUuid.value : this.vaccineUuid,
     diseaseId: diseaseId.present ? diseaseId.value : this.diseaseId,
     vetId: vetId.present ? vetId.value : this.vetId,
     extensionOfficerId: extensionOfficerId.present
@@ -14507,7 +14510,9 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
           : this.livestockUuid,
-      vaccineId: data.vaccineId.present ? data.vaccineId.value : this.vaccineId,
+      vaccineUuid: data.vaccineUuid.present
+          ? data.vaccineUuid.value
+          : this.vaccineUuid,
       diseaseId: data.diseaseId.present ? data.diseaseId.value : this.diseaseId,
       vetId: data.vetId.present ? data.vetId.value : this.vetId,
       extensionOfficerId: data.extensionOfficerId.present
@@ -14531,7 +14536,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
           ..write('vaccinationNo: $vaccinationNo, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
-          ..write('vaccineId: $vaccineId, ')
+          ..write('vaccineUuid: $vaccineUuid, ')
           ..write('diseaseId: $diseaseId, ')
           ..write('vetId: $vetId, ')
           ..write('extensionOfficerId: $extensionOfficerId, ')
@@ -14551,7 +14556,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     vaccinationNo,
     farmUuid,
     livestockUuid,
-    vaccineId,
+    vaccineUuid,
     diseaseId,
     vetId,
     extensionOfficerId,
@@ -14570,7 +14575,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
           other.vaccinationNo == this.vaccinationNo &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
-          other.vaccineId == this.vaccineId &&
+          other.vaccineUuid == this.vaccineUuid &&
           other.diseaseId == this.diseaseId &&
           other.vetId == this.vetId &&
           other.extensionOfficerId == this.extensionOfficerId &&
@@ -14587,7 +14592,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   final Value<String?> vaccinationNo;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
-  final Value<int?> vaccineId;
+  final Value<String?> vaccineUuid;
   final Value<int?> diseaseId;
   final Value<String?> vetId;
   final Value<String?> extensionOfficerId;
@@ -14603,7 +14608,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     this.vaccinationNo = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
-    this.vaccineId = const Value.absent(),
+    this.vaccineUuid = const Value.absent(),
     this.diseaseId = const Value.absent(),
     this.vetId = const Value.absent(),
     this.extensionOfficerId = const Value.absent(),
@@ -14620,7 +14625,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     this.vaccinationNo = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
-    this.vaccineId = const Value.absent(),
+    this.vaccineUuid = const Value.absent(),
     this.diseaseId = const Value.absent(),
     this.vetId = const Value.absent(),
     this.extensionOfficerId = const Value.absent(),
@@ -14641,7 +14646,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     Expression<String>? vaccinationNo,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
-    Expression<int>? vaccineId,
+    Expression<String>? vaccineUuid,
     Expression<int>? diseaseId,
     Expression<String>? vetId,
     Expression<String>? extensionOfficerId,
@@ -14658,7 +14663,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
       if (vaccinationNo != null) 'vaccination_no': vaccinationNo,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
-      if (vaccineId != null) 'vaccine_id': vaccineId,
+      if (vaccineUuid != null) 'vaccine_uuid': vaccineUuid,
       if (diseaseId != null) 'disease_id': diseaseId,
       if (vetId != null) 'vet_id': vetId,
       if (extensionOfficerId != null)
@@ -14678,7 +14683,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     Value<String?>? vaccinationNo,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
-    Value<int?>? vaccineId,
+    Value<String?>? vaccineUuid,
     Value<int?>? diseaseId,
     Value<String?>? vetId,
     Value<String?>? extensionOfficerId,
@@ -14695,7 +14700,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
       vaccinationNo: vaccinationNo ?? this.vaccinationNo,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
-      vaccineId: vaccineId ?? this.vaccineId,
+      vaccineUuid: vaccineUuid ?? this.vaccineUuid,
       diseaseId: diseaseId ?? this.diseaseId,
       vetId: vetId ?? this.vetId,
       extensionOfficerId: extensionOfficerId ?? this.extensionOfficerId,
@@ -14726,8 +14731,8 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     if (livestockUuid.present) {
       map['livestock_uuid'] = Variable<String>(livestockUuid.value);
     }
-    if (vaccineId.present) {
-      map['vaccine_id'] = Variable<int>(vaccineId.value);
+    if (vaccineUuid.present) {
+      map['vaccine_uuid'] = Variable<String>(vaccineUuid.value);
     }
     if (diseaseId.present) {
       map['disease_id'] = Variable<int>(diseaseId.value);
@@ -14767,7 +14772,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
           ..write('vaccinationNo: $vaccinationNo, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
-          ..write('vaccineId: $vaccineId, ')
+          ..write('vaccineUuid: $vaccineUuid, ')
           ..write('diseaseId: $diseaseId, ')
           ..write('vetId: $vetId, ')
           ..write('extensionOfficerId: $extensionOfficerId, ')
@@ -32930,7 +32935,7 @@ typedef $$VaccinationsTableCreateCompanionBuilder =
       Value<String?> vaccinationNo,
       required String farmUuid,
       required String livestockUuid,
-      Value<int?> vaccineId,
+      Value<String?> vaccineUuid,
       Value<int?> diseaseId,
       Value<String?> vetId,
       Value<String?> extensionOfficerId,
@@ -32948,7 +32953,7 @@ typedef $$VaccinationsTableUpdateCompanionBuilder =
       Value<String?> vaccinationNo,
       Value<String> farmUuid,
       Value<String> livestockUuid,
-      Value<int?> vaccineId,
+      Value<String?> vaccineUuid,
       Value<int?> diseaseId,
       Value<String?> vetId,
       Value<String?> extensionOfficerId,
@@ -32994,8 +32999,8 @@ class $$VaccinationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get vaccineId => $composableBuilder(
-    column: $table.vaccineId,
+  ColumnFilters<String> get vaccineUuid => $composableBuilder(
+    column: $table.vaccineUuid,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -33074,8 +33079,8 @@ class $$VaccinationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get vaccineId => $composableBuilder(
-    column: $table.vaccineId,
+  ColumnOrderings<String> get vaccineUuid => $composableBuilder(
+    column: $table.vaccineUuid,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -33148,8 +33153,10 @@ class $$VaccinationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get vaccineId =>
-      $composableBuilder(column: $table.vaccineId, builder: (column) => column);
+  GeneratedColumn<String> get vaccineUuid => $composableBuilder(
+    column: $table.vaccineUuid,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get diseaseId =>
       $composableBuilder(column: $table.diseaseId, builder: (column) => column);
@@ -33216,7 +33223,7 @@ class $$VaccinationsTableTableManager
                 Value<String?> vaccinationNo = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
-                Value<int?> vaccineId = const Value.absent(),
+                Value<String?> vaccineUuid = const Value.absent(),
                 Value<int?> diseaseId = const Value.absent(),
                 Value<String?> vetId = const Value.absent(),
                 Value<String?> extensionOfficerId = const Value.absent(),
@@ -33232,7 +33239,7 @@ class $$VaccinationsTableTableManager
                 vaccinationNo: vaccinationNo,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
-                vaccineId: vaccineId,
+                vaccineUuid: vaccineUuid,
                 diseaseId: diseaseId,
                 vetId: vetId,
                 extensionOfficerId: extensionOfficerId,
@@ -33250,7 +33257,7 @@ class $$VaccinationsTableTableManager
                 Value<String?> vaccinationNo = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
-                Value<int?> vaccineId = const Value.absent(),
+                Value<String?> vaccineUuid = const Value.absent(),
                 Value<int?> diseaseId = const Value.absent(),
                 Value<String?> vetId = const Value.absent(),
                 Value<String?> extensionOfficerId = const Value.absent(),
@@ -33266,7 +33273,7 @@ class $$VaccinationsTableTableManager
                 vaccinationNo: vaccinationNo,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
-                vaccineId: vaccineId,
+                vaccineUuid: vaccineUuid,
                 diseaseId: diseaseId,
                 vetId: vetId,
                 extensionOfficerId: extensionOfficerId,

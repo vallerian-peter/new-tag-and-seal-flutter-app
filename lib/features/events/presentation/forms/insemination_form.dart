@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_dropdown.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/searchable_dropdown.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
@@ -43,7 +44,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
   final _bullCodeController = TextEditingController();
   final _bullBreedController = TextEditingController();
   final _semenProductionDateController = TextEditingController();
-  final _productionCountryController = TextEditingController();
+  final _productionCountryOtherController = TextEditingController();
   final _semenBatchNumberController = TextEditingController();
   final _internationalIdController = TextEditingController();
   final _aiCodeController = TextEditingController();
@@ -69,10 +70,12 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
   int? _selectedHeatTypeId;
   int? _selectedInseminationServiceId;
   int? _selectedSemenStrawTypeId;
+  String? _selectedProductionCountry;
 
   List<DropdownItem<int>> _heatTypeItems = const [];
   List<DropdownItem<int>> _inseminationServiceItems = const [];
   List<DropdownItem<int>> _semenStrawTypeItems = const [];
+  List<DropdownItem<String>> _productionCountryItems = const [];
 
   @override
   void initState() {
@@ -98,7 +101,16 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
 
     _bullCodeController.text = insemination.bullCode ?? '';
     _bullBreedController.text = insemination.bullBreed ?? '';
-    _productionCountryController.text = insemination.productionCountry ?? '';
+    final productionCountry = insemination.productionCountry ?? '';
+    // Check if the saved country is in our list
+    final countryList = _getProductionCountries().map((item) => item.value).toList();
+    if (countryList.contains(productionCountry)) {
+      _selectedProductionCountry = productionCountry;
+    } else if (productionCountry.isNotEmpty) {
+      // It's a custom "Other" value
+      _selectedProductionCountry = 'Other';
+      _productionCountryOtherController.text = productionCountry;
+    }
     _semenBatchNumberController.text = insemination.semenBatchNumber ?? '';
     _internationalIdController.text = insemination.internationalId ?? '';
     _aiCodeController.text = insemination.aiCode ?? '';
@@ -137,6 +149,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     try {
       await _loadReferenceData();
       await _loadContextData();
+      _buildProductionCountryItems();
     } finally {
       if (mounted) {
         setState(() => _isLoadingData = false);
@@ -144,28 +157,122 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     }
   }
 
-  Future<void> _loadReferenceData() async {
-    final provider = Provider.of<LogAdditionalDataProvider>(
-      context,
-      listen: false,
-    );
-    await provider.ensureLoaded();
-
-    if (!mounted) return;
+  void _buildProductionCountryItems() {
+    final countries = _getProductionCountries();
     setState(() {
-      _heatTypeItems = provider.heatTypes
-          .map((type) => DropdownItem<int>(value: type.id, label: type.name))
-          .toList();
-      _inseminationServiceItems = provider.inseminationServices
-          .map(
-            (service) =>
-                DropdownItem<int>(value: service.id, label: service.name),
-          )
-          .toList();
-      _semenStrawTypeItems = provider.semenStrawTypes
-          .map((type) => DropdownItem<int>(value: type.id, label: type.name))
-          .toList();
+      _productionCountryItems = countries;
     });
+  }
+
+  List<DropdownItem<String>> _getProductionCountries() {
+    const countryList = [
+      'Tanzania',
+      'Kenya',
+      'Uganda',
+      'Rwanda',
+      'Burundi',
+      'Ethiopia',
+      'South Sudan',
+      'Somalia',
+      'Djibouti',
+      'Eritrea',
+      'Sudan',
+      'Egypt',
+      'Libya',
+      'Tunisia',
+      'Algeria',
+      'Morocco',
+      'South Africa',
+      'Zimbabwe',
+      'Zambia',
+      'Malawi',
+      'Mozambique',
+      'Botswana',
+      'Namibia',
+      'Angola',
+      'Ghana',
+      'Nigeria',
+      'Senegal',
+      'Ivory Coast',
+      'Cameroon',
+      'Democratic Republic of the Congo',
+      'United States',
+      'Canada',
+      'Brazil',
+      'Argentina',
+      'United Kingdom',
+      'France',
+      'Germany',
+      'Italy',
+      'Spain',
+      'Netherlands',
+      'Belgium',
+      'Denmark',
+      'Sweden',
+      'Norway',
+      'Australia',
+      'New Zealand',
+      'India',
+      'China',
+      'Japan',
+      'Other',
+    ];
+
+    return countryList
+        .map((country) => DropdownItem<String>(
+              value: country,
+              label: country,
+            ))
+        .toList();
+  }
+
+  Future<void> _loadReferenceData() async {
+    try {
+      final provider = Provider.of<LogAdditionalDataProvider>(
+        context,
+        listen: false,
+      );
+      
+      // Ensure data is loaded from local database
+      await provider.ensureLoaded();
+      
+      final heatTypesCount = provider.heatTypes.length;
+      final inseminationServicesCount = provider.inseminationServices.length;
+      final semenStrawTypesCount = provider.semenStrawTypes.length;
+      
+      log('📊 Insemination form: Reference data loaded - HeatTypes: $heatTypesCount, InseminationServices: $inseminationServicesCount, SemenStrawTypes: $semenStrawTypesCount');
+
+      if (heatTypesCount == 0 || inseminationServicesCount == 0 || semenStrawTypesCount == 0) {
+        log('⚠️ Insemination form: Some reference data is missing. Please sync to get the latest data from the server.');
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _heatTypeItems = provider.heatTypes
+            .map((type) => DropdownItem<int>(value: type.id, label: type.name))
+            .toList();
+        _inseminationServiceItems = provider.inseminationServices
+            .map(
+              (service) =>
+                  DropdownItem<int>(value: service.id, label: service.name),
+            )
+            .toList();
+        _semenStrawTypeItems = provider.semenStrawTypes
+            .map((type) => DropdownItem<int>(value: type.id, label: type.name))
+            .toList();
+      });
+      
+      log('✅ Insemination form: Reference data items created - HeatTypes: ${_heatTypeItems.length}, InseminationServices: ${_inseminationServiceItems.length}, SemenStrawTypes: ${_semenStrawTypeItems.length}');
+    } catch (e, stackTrace) {
+      log('❌ Insemination form: Error loading reference data: $e', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      // Set empty lists on error to prevent crashes
+      setState(() {
+        _heatTypeItems = const [];
+        _inseminationServiceItems = const [];
+        _semenStrawTypeItems = const [];
+      });
+    }
   }
 
   Future<void> _loadContextData() async {
@@ -272,7 +379,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     _bullCodeController.dispose();
     _bullBreedController.dispose();
     _semenProductionDateController.dispose();
-    _productionCountryController.dispose();
+    _productionCountryOtherController.dispose();
     _semenBatchNumberController.dispose();
     _internationalIdController.dispose();
     _aiCodeController.dispose();
@@ -522,11 +629,33 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           onTap: () => _pickDate(DateField.semenProduction),
         ),
         const SizedBox(height: 16),
-        _buildOptionalTextField(
-          controller: _productionCountryController,
+        SearchableDropdown<String>(
           label: l10n.productionCountry,
+          hint: l10n.productionCountry,
           icon: Icons.public_outlined,
+          value: _selectedProductionCountry,
+          dropdownItems: _productionCountryItems,
+          isRequired: false,
+          onChanged: (value) {
+            setState(() {
+              _selectedProductionCountry = value;
+              // Clear other text field if not "Other"
+              if (value != 'Other') {
+                _productionCountryOtherController.clear();
+              }
+            });
+          },
         ),
+        if (_selectedProductionCountry == 'Other') ...[
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: _productionCountryOtherController,
+            label: l10n.productionCountry,
+            hintText: l10n.productionCountry,
+            prefixIcon: Icons.public_outlined,
+          ),
+        ],
+        const SizedBox(height: 16),
         _buildOptionalTextField(
           controller: _semenBatchNumberController,
           label: l10n.semenBatchNumber,
@@ -803,9 +932,11 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
               : _bullBreedController.text.trim(),
           semenProductionDate:
               semenProductionDateIso ?? existing.semenProductionDate,
-          productionCountry: _productionCountryController.text.trim().isEmpty
-              ? null
-              : _productionCountryController.text.trim(),
+          productionCountry: _selectedProductionCountry == 'Other'
+              ? (_productionCountryOtherController.text.trim().isEmpty
+                  ? null
+                  : _productionCountryOtherController.text.trim())
+              : _selectedProductionCountry,
           semenBatchNumber: _semenBatchNumberController.text.trim().isEmpty
               ? null
               : _semenBatchNumberController.text.trim(),
@@ -851,9 +982,11 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
               ? null
               : _bullBreedController.text.trim(),
           semenProductionDate: semenProductionDateIso,
-          productionCountry: _productionCountryController.text.trim().isEmpty
-              ? null
-              : _productionCountryController.text.trim(),
+          productionCountry: _selectedProductionCountry == 'Other'
+              ? (_productionCountryOtherController.text.trim().isEmpty
+                  ? null
+                  : _productionCountryOtherController.text.trim())
+              : _selectedProductionCountry,
           semenBatchNumber: _semenBatchNumberController.text.trim().isEmpty
               ? null
               : _semenBatchNumberController.text.trim(),

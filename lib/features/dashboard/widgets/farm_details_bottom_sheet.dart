@@ -172,6 +172,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
+
                 Expanded(
                   child: _buildStatCard(
                     context: context,
@@ -181,7 +182,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     color: Constants.primaryColor,
                   ),
                 ),
+
                 const SizedBox(width: 16),
+                
                 Expanded(
                   child: _buildStatCardWithUnicode(
                     context: context,
@@ -191,7 +194,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     color: Colors.blue,
                   ),
                 ),
+
                 const SizedBox(width: 16),
+                
                 Expanded(
                   child: _buildStatCardWithUnicode(
                     context: context,
@@ -201,6 +206,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     color: Colors.pink,
                   ),
                 ),
+                
               ],
             ),
           ),
@@ -212,6 +218,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
+
                 Text(
                   '${l10n.allLivestocksText} (${livestock.length})',
                   style: TextStyle(
@@ -220,7 +227,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
+
                 const Spacer(),
+                
                 TextButton.icon(
                   onPressed: () async {
                     final authProvider = Provider.of<AuthProvider>(context, listen: false);

@@ -538,10 +538,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           title: l10n.success,
           message: l10n.livestockUpdatedSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog will close itself, no need to pop in callback
         );
 
-        // Navigate back
+        // Navigate back after success dialog is dismissed to trigger refresh
         if (mounted) {
           Navigator.pop(context, true);
         }
@@ -582,10 +582,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           title: l10n.success,
           message: l10n.livestockRegisteredSuccessfully,
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
+          // Dialog will close itself, no need to pop in callback
         );
 
-        // Navigate back
+        // Navigate back after success dialog is dismissed to trigger refresh
         if (mounted) {
           Navigator.pop(context, true);
         }
@@ -600,7 +600,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         title: l10n.error,
         message: '${l10n.failedToSaveLivestock}: ${e.toString()}',
         buttonText: l10n.ok,
-        onPressed: () => Navigator.of(context).pop(),
+        // Dialog will close itself, no need to pop in callback
       );
     }
   }

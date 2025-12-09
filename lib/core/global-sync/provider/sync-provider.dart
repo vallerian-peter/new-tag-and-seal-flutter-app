@@ -134,8 +134,7 @@ class SyncProvider extends ChangeNotifier {
       message: l10n.syncSuccessfulMessage,
       buttonText: l10n.ok,
       onPressed: () {
-        Navigator.of(context).pop();
-        // Trigger refresh/rebuild of the app
+        // Dialog already pops itself, just trigger refresh
         _triggerRefresh();
       },
     );
@@ -150,7 +149,7 @@ class SyncProvider extends ChangeNotifier {
       title: l10n.noInternetConnection,
       message: l10n.checkInternetConnection,
       buttonText: l10n.ok,
-      onPressed: () => Navigator.of(context).pop(),
+      // Dialog already pops itself, no need for onPressed
     );
   }
 
@@ -166,7 +165,7 @@ class SyncProvider extends ChangeNotifier {
       title: l10n.syncFailed,
       message: '${l10n.syncFailedMessage}\n\n$userFriendlyMessage',
       buttonText: l10n.ok,
-      onPressed: () => Navigator.of(context).pop(),
+      // Dialog already pops itself, no need for onPressed
     );
   }
 

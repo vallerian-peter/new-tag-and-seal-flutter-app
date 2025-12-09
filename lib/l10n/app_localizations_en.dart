@@ -1851,6 +1851,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Vaccines not available. Sync vaccine reference data first.';
 
   @override
+  String get vaccineRequired => 'Vaccine is required';
+
+  @override
   String get addDisposal => 'Add disposal log';
 
   @override

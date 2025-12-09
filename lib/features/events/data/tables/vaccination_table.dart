@@ -11,7 +11,7 @@ class Vaccinations extends Table {
 
   TextColumn get livestockUuid => text()();
 
-  IntColumn get vaccineId => integer().nullable()();
+  TextColumn get vaccineUuid => text().nullable()();
 
   IntColumn get diseaseId => integer().nullable()();
 

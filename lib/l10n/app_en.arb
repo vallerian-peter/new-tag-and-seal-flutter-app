@@ -808,6 +808,7 @@
   "vaccinationLogSaved": "Vaccination log saved successfully",
   "vaccinationLogSaveFailed": "Failed to save vaccination log. Please try again.",
   "vaccineOptionsMissing": "Vaccines not available. Sync vaccine reference data first.",
+  "vaccineRequired": "Vaccine is required",
   "addDisposal": "Add disposal log",
   "disposalDetails": "Disposal details",
   "disposalDetailsSubtitle": "Capture why and how the livestock was disposed.",

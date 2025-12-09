@@ -4,7 +4,7 @@ class VaccinationModel {
   final String? vaccinationNo;
   final String farmUuid;
   final String livestockUuid;
-  final int? vaccineId;
+  final String? vaccineUuid;
   final int? diseaseId;
   final String? vetId;
   final String? extensionOfficerId;
@@ -20,7 +20,7 @@ class VaccinationModel {
     this.vaccinationNo,
     required this.farmUuid,
     required this.livestockUuid,
-    this.vaccineId,
+    this.vaccineUuid,
     this.diseaseId,
     this.vetId,
     this.extensionOfficerId,
@@ -36,7 +36,7 @@ class VaccinationModel {
     String? vaccinationNo,
     String? farmUuid,
     String? livestockUuid,
-    int? vaccineId,
+    String? vaccineUuid,
     int? diseaseId,
     String? vetId,
     String? extensionOfficerId,
@@ -52,7 +52,7 @@ class VaccinationModel {
       vaccinationNo: vaccinationNo ?? this.vaccinationNo,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
-      vaccineId: vaccineId ?? this.vaccineId,
+      vaccineUuid: vaccineUuid ?? this.vaccineUuid,
       diseaseId: diseaseId ?? this.diseaseId,
       vetId: vetId ?? this.vetId,
       extensionOfficerId: extensionOfficerId ?? this.extensionOfficerId,
@@ -71,7 +71,7 @@ class VaccinationModel {
       'vaccinationNo': vaccinationNo,
       'farmUuid': farmUuid,
       'livestockUuid': livestockUuid,
-      'vaccineId': vaccineId,
+      'vaccineUuid': vaccineUuid,
       'diseaseId': diseaseId,
       'vetId': vetId,
       'extensionOfficerId': extensionOfficerId,
@@ -90,7 +90,7 @@ class VaccinationModel {
       vaccinationNo: json['vaccinationNo'] as String?,
       farmUuid: json['farmUuid'] as String,
       livestockUuid: json['livestockUuid'] as String,
-      vaccineId: json['vaccineId'] as int?,
+      vaccineUuid: json['vaccineUuid'] as String?,
       diseaseId: json['diseaseId'] as int?,
       vetId: json['vetId'] as String?,
       extensionOfficerId: json['extensionOfficerId'] as String?,
@@ -108,7 +108,7 @@ class VaccinationModel {
       'vaccinationNo': vaccinationNo,
       'farmUuid': farmUuid,
       'livestockUuid': livestockUuid,
-      'vaccineId': vaccineId,
+      'vaccineUuid': vaccineUuid,
       'diseaseId': diseaseId,
       'vetId': vetId,
       'extensionOfficerId': extensionOfficerId,

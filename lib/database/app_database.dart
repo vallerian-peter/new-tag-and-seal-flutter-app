@@ -144,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 18; // v18 adds milking, pregnancy, insemination, dryoff, transfer tables
+  int get schemaVersion => 19; // v19 changes vaccinations.vaccineId to vaccineUuid
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -261,10 +261,38 @@ class AppDatabase extends _$AppDatabase {
         await _createTableIfMissing(m, dryoffs);
         await _createTableIfMissing(m, transfers);
       }
+      if (from < 19) {
+        // Version 19: Change vaccinations.vaccineId (integer) to vaccineUuid (text)
+        await _migrateVaccinationsToVaccineUuid(m);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
       await customStatement('PRAGMA foreign_keys = ON');
+      
+      // Safety check: Ensure vaccine_uuid column exists in vaccinations table
+      // This handles cases where migration might not have run or failed
+      try {
+        final vaccinationsExists = await customSelect(
+          'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+          variables: [
+            const Variable<String>('table'),
+            const Variable<String>('vaccinations'),
+          ],
+        ).get();
+        
+        if (vaccinationsExists.isNotEmpty) {
+          final tableInfo = await customSelect('PRAGMA table_info(vaccinations)').get();
+          final hasVaccineUuid = tableInfo.any((row) => row.data['name'] == 'vaccine_uuid');
+          
+          if (!hasVaccineUuid) {
+            // Column missing - add it
+            await customStatement('ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT');
+          }
+        }
+      } catch (e) {
+        // Ignore errors - migration will handle it
+      }
     },
   );
 
@@ -511,6 +539,56 @@ class AppDatabase extends _$AppDatabase {
 
     // Step 7: Create aborted_pregnancies table
     await m.createTable(abortedPregnancies);
+  }
+
+  /// Migration to version 19: Add vaccineUuid column to vaccinations table
+  Future<void> _migrateVaccinationsToVaccineUuid(Migrator m) async {
+    try {
+      // Check if vaccinations table exists
+      final vaccinationsExists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('vaccinations'),
+        ],
+      ).get();
+
+      if (vaccinationsExists.isEmpty) {
+        // Table doesn't exist yet, just create it with new schema
+        await m.createTable(vaccinations);
+        return;
+      }
+
+      // Check if vaccine_uuid column already exists (Drift uses snake_case in SQLite)
+      final tableInfo = await customSelect('PRAGMA table_info(vaccinations)').get();
+      final hasVaccineUuid = tableInfo.any((row) => row.data['name'] == 'vaccine_uuid');
+      
+      if (hasVaccineUuid) {
+        // Migration already done
+        return;
+      }
+
+      // Add vaccine_uuid column (Drift converts camelCase to snake_case)
+      await customStatement('ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT');
+
+      // If vaccine_id exists, copy its values to vaccine_uuid by looking up UUIDs
+      final hasVaccineId = tableInfo.any((row) => row.data['name'] == 'vaccine_id');
+      if (hasVaccineId) {
+        await customStatement('''
+          UPDATE vaccinations 
+          SET vaccine_uuid = (
+            SELECT vac.uuid 
+            FROM vaccines vac 
+            WHERE vac.id = vaccinations.vaccine_id 
+            LIMIT 1
+          )
+          WHERE vaccine_id IS NOT NULL
+        ''');
+      }
+    } catch (e) {
+      // Re-throw with context
+      throw Exception('Failed to migrate vaccinations table: $e');
+    }
   }
 }
 

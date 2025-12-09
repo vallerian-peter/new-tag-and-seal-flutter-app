@@ -77,7 +77,9 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _medicineTypes = await _repository.getMedicineTypes();
       _medicines = await _repository.getMedicines();
       _diseases = await _repository.getDiseases();
+      debugPrint('🦠 LogAdditionalDataProvider: Loaded ${_diseases.length} diseases from local DB');
       _disposalTypes = await _repository.getDisposalTypes();
+      debugPrint('🗑️ LogAdditionalDataProvider: Loaded ${_disposalTypes.length} disposal types from local DB');
       _milkingMethods = await _repository.getMilkingMethods();
       _heatTypes = await _repository.getHeatTypes();
       _inseminationServices = await _repository.getInseminationServices();
@@ -89,6 +91,9 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _birthProblems = await _repository.getBirthProblems();
       _reproductiveProblems = await _repository.getReproductiveProblems();
 
+      // Log for debugging
+      debugPrint('📊 LogAdditionalDataProvider: Loaded from local DB - HeatTypes: ${_heatTypes.length}, InseminationServices: ${_inseminationServices.length}, SemenStrawTypes: ${_semenStrawTypes.length}');
+
       _isLoading = false;
       _initialized = true;
       _initializationFuture = null;
@@ -97,6 +102,7 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _isLoading = false;
       _error = e.toString();
       _initializationFuture = null;
+      debugPrint('❌ LogAdditionalDataProvider: Error loading from local DB: $e');
       notifyListeners();
     }
   }

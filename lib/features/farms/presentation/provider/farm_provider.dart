@@ -225,18 +225,22 @@ class FarmProvider extends ChangeNotifier {
       }
       
       // Show success dialog and wait for it to be dismissed
-      // Dialog will return true when OK is pressed (default behavior)
+      // The dialog will return true when OK is pressed, signaling success
       if (context.mounted) {
-        await AlertDialogs.showSuccess<bool>(
+        final dialogResult = await AlertDialogs.showSuccess<bool>(
           context: context,
           title: l10n.success,
           message: l10n.farmRegisteredSuccessfully,
           buttonText: l10n.ok,
+          onPressed: () {
+            // Dialog is already closed by the widget
+            // Trigger refresh/rebuild by notifying listeners
+            notifyListeners();
+          },
         );
+        // Dialog dismissed - result will be true if OK was pressed
+        debugPrint('✅ Success dialog dismissed with result: $dialogResult');
       }
-      
-      // Notify listeners
-      notifyListeners();
       
       return farm;
     } catch (e) {
@@ -277,7 +281,10 @@ class FarmProvider extends ChangeNotifier {
   /// Returns the updated Farm on success, null on failure.
   Future<Farm?> updateFarmWithoutDialog(int farmId, Map<String, dynamic> farmData, {String? syncAction, bool? synced}) async {
     try {
-      return await _farmRepository.updateFarm(farmId, farmData, syncAction: syncAction, synced: synced);
+      final farm = await _farmRepository.updateFarm(farmId, farmData, syncAction: syncAction, synced: synced);
+      // Notify listeners to trigger refresh
+      notifyListeners();
+      return farm;
     } catch (e) {
       return null;
     }

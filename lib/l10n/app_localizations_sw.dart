@@ -1861,6 +1861,9 @@ class AppLocalizationsSw extends AppLocalizations {
       'Hakuna chanjo. Sawazisha data ya chanjo kwanza.';
 
   @override
+  String get vaccineRequired => 'Chanjo inahitajika';
+
+  @override
   String get addDisposal => 'Ongeza rekodi ya uondoaji';
 
   @override

@@ -313,6 +313,12 @@ class Sync {
     
     log('📤 Fetching unsynced vaccinations for API...');
     final unsyncedVaccinations = await eventsRepository.getUnsyncedVaccinationsForApi();
+    if (unsyncedVaccinations.isNotEmpty) {
+      log('💉 Found ${unsyncedVaccinations.length} unsynced vaccination(s)');
+      for (final v in unsyncedVaccinations.take(3)) {
+        log('  💉 Vaccination: uuid=${v['uuid']}, vaccineUuid=${v['vaccineUuid']}, farmUuid=${v['farmUuid']}, livestockUuid=${v['livestockUuid']}');
+      }
+    }
     
     log('📤 Fetching unsynced disposals for API...');
     final unsyncedDisposals = await eventsRepository.getUnsyncedDisposalsForApi();
@@ -839,9 +845,12 @@ class Sync {
       Map<String, dynamic> logs = const {};
       if (rawLogs is Map<String, dynamic>) {
         logs = rawLogs;
+        final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
+        log('  💉 Found $vaccinationsCount vaccination(s) in sync response');
       } else if (rawLogs == null ||
           (rawLogs is List && rawLogs.isEmpty)) {
         logs = const {};
+        log('  ⚠️ No logs data in sync response (null or empty)');
       } else {
         log('⚠️ Unexpected logs payload type: ${rawLogs.runtimeType}, defaulting to empty map');
         logs = const {};
@@ -915,9 +924,12 @@ class Sync {
         final rawLogs = userSpecificData['logs'];
         if (rawLogs is Map<String, dynamic>) {
           logs = rawLogs;
+          final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
+          log('  💉 Found $vaccinationsCount vaccination(s) in sync response');
         } else if (rawLogs == null ||
             (rawLogs is List && rawLogs.isEmpty)) {
           logs = const {};
+          log('  ⚠️ No logs data in sync response (null or empty)');
         } else {
           log('⚠️ Unexpected logs payload type: ${rawLogs.runtimeType}, defaulting to empty map');
           logs = const {};

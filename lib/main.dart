@@ -47,7 +47,9 @@ void main() async {
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
   await themeProvider.initialize();
+
   final additionalDataProvider = AdditionalDataProvider(additionalDataRepository: additionalDataRepo);
+  
   final authRepo = AuthRepository();
   final authProvider = AuthProvider(authRepository: authRepo, repository: authRepo);
   final syncProvider = SyncProvider(database: database);

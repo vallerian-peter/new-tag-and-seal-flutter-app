@@ -165,6 +165,13 @@ class CustomDropdown<T> extends StatelessWidget {
                   width: 2,
                 ),
               ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.1),
+                  width: 1.5,
+                ),
+              ),
             ),
             style: TextStyle(
               fontSize: Constants.textSize,

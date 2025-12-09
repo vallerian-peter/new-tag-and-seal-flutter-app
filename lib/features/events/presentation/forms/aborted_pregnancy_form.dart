@@ -10,6 +10,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
@@ -53,8 +54,6 @@ class _AbortedPregnancyFormScreenState
   List<Livestock> _farmLivestock = const [];
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
-  Livestock? _selectedLivestock;
-  Specie? _selectedSpecies;
 
   int? _selectedReproductiveProblemId;
   String _selectedStatus = 'active';
@@ -104,49 +103,6 @@ class _AbortedPregnancyFormScreenState
     }
   }
 
-  Future<void> _loadLivestockSpecies() async {
-    if (_selectedLivestockUuid == null) return;
-
-    try {
-      final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await database.livestockDao
-          .getLivestockByUuid(_selectedLivestockUuid!);
-
-      if (livestock == null) return;
-
-      final species =
-          await database.specieDao.getSpecieById(livestock.speciesId);
-
-      if (!mounted) return;
-      setState(() {
-        _selectedLivestock = livestock;
-        _selectedSpecies = species;
-      });
-    } catch (e) {
-      log('❌ Failed to load livestock species: $e');
-    }
-  }
-
-  void _validateLivestockSpecies() {
-    if (_selectedSpecies != null) {
-      final speciesName = _selectedSpecies!.name.toLowerCase();
-      if (speciesName != 'pig') {
-        // Show warning that aborted pregnancy is only for pigs
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Warning: Aborted pregnancy is typically recorded for pigs only.',
-                ),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        });
-      }
-    }
-  }
 
   Future<void> _loadReferenceData() async {
     final provider = Provider.of<LogAdditionalDataProvider>(
@@ -204,12 +160,6 @@ class _AbortedPregnancyFormScreenState
         _selectedFarmUuid = farmUuid;
         _selectedLivestockUuid = livestockUuid;
       });
-
-      // Load species after livestock is selected
-      if (livestockUuid != null) {
-        await _loadLivestockSpecies();
-        _validateLivestockSpecies();
-      }
     } catch (e) {
       log('❌ Failed to load context data: $e');
     }
@@ -220,8 +170,6 @@ class _AbortedPregnancyFormScreenState
       _selectedFarmUuid = value;
       if (widget.livestockUuid == null) {
         _selectedLivestockUuid = null;
-        _selectedLivestock = null;
-        _selectedSpecies = null;
       }
       _isLoadingLivestock = true;
     });
@@ -238,14 +186,6 @@ class _AbortedPregnancyFormScreenState
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
-
-      // Load species for selected livestock
-      if (_selectedLivestockUuid != null) {
-        await _loadLivestockSpecies();
-        _validateLivestockSpecies();
-        // Reload reference data to filter by livestock type
-        await _loadReferenceData();
-      }
     } catch (e) {
       log('❌ Failed to load livestock: $e');
     } finally {
@@ -259,15 +199,7 @@ class _AbortedPregnancyFormScreenState
     if (value == null) return;
     setState(() {
       _selectedLivestockUuid = value;
-      _selectedLivestock = null;
-      _selectedSpecies = null;
     });
-
-    // Load species for selected livestock
-    await _loadLivestockSpecies();
-    _validateLivestockSpecies();
-    // Reload reference data to filter by livestock type
-    await _loadReferenceData();
   }
 
   List<DropdownItem<String>> _buildFarmDropdownItems() {
@@ -438,9 +370,6 @@ class _AbortedPregnancyFormScreenState
         ],
         _buildSectionTitle(l10n.abortedPregnancy),
         const SizedBox(height: 20),
-        if (_selectedSpecies != null &&
-            _selectedSpecies!.name.toLowerCase() != 'pig')
-          _buildSpeciesWarning(theme),
         CustomTextField(
           controller: _abortionDateController,
           label: l10n.abortionDate,
@@ -600,33 +529,6 @@ class _AbortedPregnancyFormScreenState
     );
   }
 
-  Widget _buildSpeciesWarning(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.withOpacity(0.4), width: 1),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Note: Aborted pregnancy is typically recorded for pigs only.',
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> _pickAbortionDate() async {
     final theme = Theme.of(context);
@@ -720,16 +622,18 @@ class _AbortedPregnancyFormScreenState
         selectedLivestockUuid == null ||
         selectedLivestockUuid.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
+      ToastAlerts.showError(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
+        message: l10n.logContextMissing,
+      );
       return;
     }
 
     if (_abortionDate == null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.startDateRequired)),
+      ToastAlerts.showError(
+        context,
+        message: l10n.startDateRequired,
       );
       return;
     }

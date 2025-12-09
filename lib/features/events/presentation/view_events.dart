@@ -19,6 +19,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provid
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
+import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
 
 class ViewEventsScreen extends StatelessWidget {
   final String title;
@@ -70,13 +72,9 @@ class ViewEventsScreen extends StatelessWidget {
         ? title.trim() 
         : l10n.recordsText;
 
-    return FutureBuilder<List<dynamic>>(
+    return FutureBuilder<Map<String, dynamic>>(
       future: _loadLogsWithReferences(context),
       builder: (context, snapshot) {
-        final logs = snapshot.data ?? [];
-        final totalLogs =
-            snapshot.connectionState == ConnectionState.waiting ? null : logs.length;
-
         PreferredSizeWidget buildAppBar(int? total) {
           return AppBar(
             title: Text(displayTitle),
@@ -110,7 +108,7 @@ class ViewEventsScreen extends StatelessWidget {
           );
         }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             appBar: buildAppBar(null),
             body: const Center(
@@ -130,6 +128,11 @@ class ViewEventsScreen extends StatelessWidget {
             ),
           );
         }
+
+        final data = snapshot.data!;
+        final logs = data['logs'] as List<dynamic>;
+        final vaccineNamesMap = data['vaccineNames'] as Map<String, String>;
+        final totalLogs = logs.length;
 
         if (logs.isEmpty) {
           return Scaffold(
@@ -161,6 +164,7 @@ class ViewEventsScreen extends StatelessWidget {
                   logType: logType,
                   log: log,
                   references: logReferences,
+                  vaccineNames: vaccineNamesMap,
                 ),
               );
             },
@@ -170,24 +174,39 @@ class ViewEventsScreen extends StatelessWidget {
     );
   }
 
-  Future<List<dynamic>> _loadLogsWithReferences(BuildContext context) async {
+  Future<Map<String, dynamic>> _loadLogsWithReferences(BuildContext context) async {
     final logReferences =
         Provider.of<LogAdditionalDataProvider>(context, listen: false);
     await logReferences.ensureLoaded();
 
+    // Load vaccines for name resolution
+    final database = Provider.of<AppDatabase>(context, listen: false);
+    final vaccinesRepo = VaccinesRepository(database);
+    final vaccines = await vaccinesRepo.getVaccines();
+    final vaccineNamesMap = <String, String>{};
+    for (final vaccine in vaccines) {
+      if (vaccine.uuid.isNotEmpty) {
+        vaccineNamesMap[vaccine.uuid] = vaccine.name;
+      }
+    }
+
+    List<dynamic> logs;
     if (initialLogs != null) {
-      return initialLogs!;
+      logs = initialLogs!;
+    } else if (livestockUuid == null || livestockUuid!.isEmpty) {
+      logs = const [];
+    } else {
+      logs = await eventsProvider.loadLogsForType(
+        farmUuid: farmUuid,
+        livestockUuid: livestockUuid!,
+        logType: logType,
+      );
     }
 
-    if (livestockUuid == null || livestockUuid!.isEmpty) {
-      return const [];
-    }
-
-    return eventsProvider.loadLogsForType(
-      farmUuid: farmUuid,
-      livestockUuid: livestockUuid!,
-      logType: logType,
-    );
+    return {
+      'logs': logs,
+      'vaccineNames': vaccineNamesMap,
+    };
   }
 
 }
@@ -197,11 +216,13 @@ class _EventLogCard extends StatelessWidget {
   final String logType;
   final dynamic log;
   final LogAdditionalDataProvider? references;
+  final Map<String, String>? vaccineNames; // Cache of vaccine UUID -> name
 
   const _EventLogCard({
     required this.logType,
     required this.log,
     this.references,
+    this.vaccineNames,
   });
 
   @override
@@ -371,7 +392,7 @@ class _EventLogCard extends StatelessWidget {
         if (vaccination.vaccinationNo != null && vaccination.vaccinationNo!.trim().isNotEmpty) {
           addRow(l10n.vaccinationNumber, vaccination.vaccinationNo);
         }
-        final vaccineName = _resolveVaccineName(vaccination.vaccineId);
+        final vaccineName = _resolveVaccineName(vaccination.vaccineUuid);
         final diseaseName = _resolveDiseaseName(vaccination.diseaseId);
         if (vaccineName != null) {
           addRow(l10n.vaccinesText, vaccineName);
@@ -640,12 +661,14 @@ extension _DewormingLookup on _EventLogCard {
     return diseaseId.toString();
   }
 
-  String? _resolveVaccineName(int? vaccineId) {
-    // Vaccines are not in LogAdditionalDataProvider
-    // They would need to be resolved from a separate provider
-    // For now, return the ID as string or null
-    if (vaccineId == null) return null;
-    return 'Vaccine #$vaccineId';
+  String? _resolveVaccineName(String? vaccineUuid) {
+    if (vaccineUuid == null || vaccineUuid.isEmpty) return null;
+    // Look up vaccine name from cache if available
+    if (vaccineNames != null && vaccineNames!.containsKey(vaccineUuid)) {
+      return vaccineNames![vaccineUuid];
+    }
+    // Fallback: return null (will be hidden in UI)
+    return null;
   }
 
   String? _resolveDisposalTypeName(int? disposalTypeId) {

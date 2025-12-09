@@ -325,6 +325,7 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   @override
   Future<List<logModels.HeatType>> getHeatTypes() async {
     final entities = await _dao.getAllHeatTypes();
+    log('📊 Repository: Fetched ${entities.length} heat types from local DB');
     return entities
         .map((entity) => logModels.HeatType(id: entity.id, name: entity.name))
         .toList();
@@ -333,6 +334,7 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   @override
   Future<List<logModels.InseminationService>> getInseminationServices() async {
     final entities = await _dao.getAllInseminationServices();
+    log('📊 Repository: Fetched ${entities.length} insemination services from local DB');
     return entities
         .map((entity) =>
             logModels.InseminationService(id: entity.id, name: entity.name))
@@ -342,6 +344,7 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   @override
   Future<List<logModels.SemenStrawType>> getSemenStrawTypes() async {
     final entities = await _dao.getAllSemenStrawTypes();
+    log('📊 Repository: Fetched ${entities.length} semen straw types from local DB');
     return entities
         .map((entity) => logModels.SemenStrawType(id: entity.id, name: entity.name))
         .toList();

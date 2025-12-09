@@ -180,6 +180,8 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           .map((type) => DropdownItem<int>(value: type.id, label: type.name))
           .toList();
 
+      log('🗑️ Disposal form: Loaded ${items.length} disposal types');
+
       if (!mounted) return;
       setState(() {
         _disposalTypeItems = items;

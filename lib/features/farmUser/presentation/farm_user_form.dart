@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:math' hide log;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';

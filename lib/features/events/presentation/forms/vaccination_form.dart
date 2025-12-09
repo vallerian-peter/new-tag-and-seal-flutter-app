@@ -9,6 +9,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
@@ -46,8 +47,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   static const String _vaccinationNumberPrefix = 'VAC-';
   final _formKey = GlobalKey<FormState>();
   final _vaccinationNoController = TextEditingController();
-  final _vetIdController = TextEditingController();
-  final _extensionOfficerController = TextEditingController();
+  final _medicalLicenseController = TextEditingController();
 
   int _currentStep = 0;
   bool _isLoadingContext = true;
@@ -58,14 +58,15 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   List<Farm> _farms = const [];
   List<Livestock> _farmLivestock = const [];
   List<VaccineModel> _allVaccines = const [];
-  List<DropdownItem<int>> _vaccineItems = const [];
+  List<DropdownItem<String>> _vaccineItems = const [];
   List<DropdownItem<int>> _diseaseItems = const [];
 
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
   List<Livestock> _selectedBulkLivestock = [];
-  int? _selectedVaccineId;
+  String? _selectedVaccineUuid;
   int? _selectedDiseaseId;
+  _TreatmentProviderType _selectedProviderType = _TreatmentProviderType.none;
   String _selectedStatus = 'completed';
 
   bool get _isBulk => widget.isBulk;
@@ -100,11 +101,15 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       _vaccinationNoController.clear();
     }
     _selectedDiseaseId = vaccination.diseaseId;
-    _vetIdController.text = vaccination.vetId ?? '';
-    _extensionOfficerController.text = vaccination.extensionOfficerId ?? '';
-    if (vaccination.vaccineId != null) {
-      _selectedVaccineId = vaccination.vaccineId;
+    if (vaccination.vetId != null && vaccination.vetId!.trim().isNotEmpty) {
+      _selectedProviderType = _TreatmentProviderType.vet;
+      _medicalLicenseController.text = vaccination.vetId!;
+    } else if (vaccination.extensionOfficerId != null &&
+        vaccination.extensionOfficerId!.trim().isNotEmpty) {
+      _selectedProviderType = _TreatmentProviderType.extensionOfficer;
+      _medicalLicenseController.text = vaccination.extensionOfficerId!;
     }
+    _selectedVaccineUuid = vaccination.vaccineUuid;
     if (vaccination.status.isNotEmpty) {
       _selectedStatus = vaccination.status;
     }
@@ -195,12 +200,26 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   }
 
   Future<void> _loadVaccines(AppDatabase database) async {
+    log('💉 Loading vaccines from database...');
     final vaccines = await database.vaccineDao.getVaccines();
-    log('💉 Loaded ${vaccines.length} vaccines for vaccination form');
+    log('💉 Loaded ${vaccines.length} vaccines from database for vaccination form');
+    
+    // Filter out deleted vaccines (same as vaccine_screen.dart)
+    final activeVaccines = vaccines
+        .where((v) => v.syncAction != 'deleted')
+        .toList();
+    
+    log('💉 Active vaccines (excluding deleted): ${activeVaccines.length}');
+    
+    if (activeVaccines.isEmpty) {
+      log('⚠️ No active vaccines found in database - vaccines may need to be created first');
+    } else {
+      log('💉 Vaccine details: ${activeVaccines.map((v) => '${v.name} (farm: ${v.farmUuid}, id: ${v.id})').join(', ')}');
+    }
 
     if (!mounted) return;
     setState(() {
-      _allVaccines = vaccines
+      _allVaccines = activeVaccines
           .map(
             (entity) => VaccineModel(
               id: entity.id,
@@ -228,34 +247,59 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   void _rebuildVaccineItems(String? farmUuid) {
     if (!mounted) return;
 
+    // Filter vaccines by farmUuid (allow vaccines without id - they're local and not yet synced)
     final filtered = _allVaccines.where((vaccine) {
-      if (vaccine.id == null) return false;
+      // Don't filter out vaccines without id - they're local and valid
+      // if (vaccine.id == null) return false; // REMOVED: Allow vaccines without id
+      
+      // Filter by farmUuid
       if (farmUuid == null || farmUuid.isEmpty) {
         return vaccine.farmUuid == null || vaccine.farmUuid!.isEmpty;
       }
       return vaccine.farmUuid == farmUuid;
     }).toList();
+    
+    log('💉 Filtered vaccines for farm $farmUuid: ${filtered.length} (from ${_allVaccines.length} total)');
 
     filtered.sort((a, b) => (b.updatedAt).compareTo(a.updatedAt));
 
+    // Create dropdown items using UUID as value
     final items = filtered
         .map(
-          (vaccine) =>
-              DropdownItem<int>(value: vaccine.id!, label: vaccine.name),
+          (vaccine) => DropdownItem<String>(
+            value: vaccine.uuid,
+            label: vaccine.name,
+          ),
         )
         .toList();
 
-    int? selected = _selectedVaccineId;
-    if (selected != null && items.every((item) => item.value != selected)) {
-      selected = null;
+    // Find the selected vaccine by UUID
+    String? selectedUuid = _selectedVaccineUuid;
+    
+    if (selectedUuid != null) {
+      final matchingVaccine = filtered.firstWhere(
+        (v) => v.uuid == selectedUuid,
+        orElse: () => const VaccineModel(
+          id: null,
+          uuid: '',
+          name: '',
+          createdAt: '',
+          updatedAt: '',
+        ),
+      );
+      
+      if (matchingVaccine.uuid.isEmpty) {
+        selectedUuid = null;
     }
-    if (selected == null && items.isNotEmpty) {
-      selected = items.first.value;
+    }
+    
+    if (selectedUuid == null && items.isNotEmpty) {
+      selectedUuid = filtered.first.uuid;
     }
 
     setState(() {
       _vaccineItems = items;
-      _selectedVaccineId = selected;
+      _selectedVaccineUuid = selectedUuid;
     });
   }
 
@@ -291,6 +335,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       );
     }
   }
+
 
   Future<void> _onFarmSelected(String value) async {
     setState(() {
@@ -337,8 +382,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ToastAlerts.showError(context, message: l10n.farmRequired);
       return;
     }
 
@@ -360,16 +404,28 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+        ToastAlerts.showError(context, message: l10n.livestockRequired);
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ToastAlerts.showError(context, message: l10n.livestockRequired);
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _hasValidVaccineSelection(AppLocalizations l10n) {
+    if (_vaccineItems.isEmpty) {
+      ToastAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
+      return false;
+    }
+
+    if (_selectedVaccineUuid == null || _selectedVaccineUuid!.isEmpty) {
+      ToastAlerts.showError(context, message: l10n.vaccineRequired);
       return false;
     }
 
@@ -379,8 +435,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   @override
   void dispose() {
     _vaccinationNoController.dispose();
-    _vetIdController.dispose();
-    _extensionOfficerController.dispose();
+    _medicalLicenseController.dispose();
     super.dispose();
   }
 
@@ -562,13 +617,23 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             tone: InfoBannerTone.warning,
           )
         else
-          CustomDropdown<int>(
+          CustomDropdown<String>(
             label: l10n.selectVaccine,
             hint: l10n.selectVaccine,
             icon: Icons.vaccines_outlined,
-            value: _selectedVaccineId,
+            value: _selectedVaccineUuid,
             dropdownItems: _vaccineItems,
-            onChanged: (value) => setState(() => _selectedVaccineId = value),
+            onChanged: (value) {
+              setState(() {
+                _selectedVaccineUuid = value;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return l10n.vaccineRequired;
+              }
+              return null;
+            },
           ),
         const SizedBox(height: 16),
         if (_isLoadingDiseases)
@@ -621,19 +686,53 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       children: [
         _buildSectionTitle(l10n.vaccinationPersonnelDetails, theme),
         const SizedBox(height: 16),
-        CustomTextField(
-          controller: _vetIdController,
-          label: l10n.vetLicense,
-          hintText: l10n.enterVetLicenseOptional,
-          prefixIcon: Icons.badge_outlined,
+        CustomDropdown<_TreatmentProviderType>(
+          label: l10n.treatmentProvider,
+          hint: l10n.selectTreatmentProvider,
+          icon: Icons.person_search_outlined,
+          value: _selectedProviderType,
+          dropdownItems: [
+            DropdownItem(
+              value: _TreatmentProviderType.none,
+              label: l10n.treatmentProviderNone,
+            ),
+            DropdownItem(
+              value: _TreatmentProviderType.vet,
+              label: l10n.treatmentProviderVet,
+            ),
+            DropdownItem(
+              value: _TreatmentProviderType.extensionOfficer,
+              label: l10n.treatmentProviderExtensionOfficer,
+            ),
+          ],
+          onChanged: (value) {
+            setState(() {
+              _selectedProviderType = value ?? _TreatmentProviderType.none;
+              if (_selectedProviderType == _TreatmentProviderType.none) {
+                _medicalLicenseController.clear();
+              }
+            });
+          },
+          isRequired: false,
         ),
+        if (_selectedProviderType != _TreatmentProviderType.none) ...[
         const SizedBox(height: 16),
         CustomTextField(
-          controller: _extensionOfficerController,
-          label: l10n.extensionOfficerLicense,
-          hintText: l10n.enterExtensionOfficerLicenseOptional,
-          prefixIcon: Icons.person_search_outlined,
+            controller: _medicalLicenseController,
+            label: l10n.medicalLicenseNumber,
+            hintText: l10n.enterMedicalLicenseNumber,
+            prefixIcon: Icons.badge_outlined,
+            validator: (value) {
+              if (_selectedProviderType == _TreatmentProviderType.none) {
+                return null;
+              }
+              if (value == null || value.trim().isEmpty) {
+                return l10n.medicalLicenseNumberRequired;
+              }
+              return null;
+            },
         ),
+        ],
         const SizedBox(height: 24),
         _buildInfoBanner(
           l10n.vaccinationNotesInfo,
@@ -648,7 +747,8 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (_currentStep == 0) {
       if (_formKey.currentState!.validate() &&
-          _hasValidLivestockSelection(l10n)) {
+          _hasValidLivestockSelection(l10n) &&
+          _hasValidVaccineSelection(l10n)) {
         setState(() => _currentStep = 1);
       }
       return;
@@ -656,6 +756,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
     if (!_formKey.currentState!.validate()) return;
     if (!_hasValidLivestockSelection(l10n)) return;
+    if (!_hasValidVaccineSelection(l10n)) return;
 
     await AlertDialogs.showConfirmation(
       context: context,
@@ -696,13 +797,21 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ToastAlerts.showError(context, message: l10n.farmRequired);
       return;
     }
     if (livestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ToastAlerts.showError(context, message: l10n.livestockRequired);
+      return;
+    }
+
+    if (_vaccineItems.isEmpty) {
+      ToastAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
+      return;
+    }
+
+    if (_selectedVaccineUuid == null || _selectedVaccineUuid!.isEmpty) {
+      ToastAlerts.showError(context, message: l10n.vaccineRequired);
       return;
     }
 
@@ -712,20 +821,26 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           ? null
           : '$_vaccinationNumberPrefix$vaccinationNumberSuffix';
 
+      // Determine vetId and extensionOfficerId based on treatment provider type
+      String? vetId;
+      String? extensionOfficerId;
+      final licenseText = _medicalLicenseController.text.trim();
+      if (_selectedProviderType == _TreatmentProviderType.vet) {
+        vetId = licenseText.isEmpty ? null : licenseText;
+      } else if (_selectedProviderType == _TreatmentProviderType.extensionOfficer) {
+        extensionOfficerId = licenseText.isEmpty ? null : licenseText;
+      }
+
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.vaccination!;
         final updatedModel = existing.copyWith(
           vaccinationNo: vaccinationNumber,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
-          vaccineId: _selectedVaccineId,
+          vaccineUuid: _selectedVaccineUuid,
           diseaseId: _selectedDiseaseId,
-          vetId: _vetIdController.text.trim().isEmpty
-              ? null
-              : _vetIdController.text.trim(),
-          extensionOfficerId: _extensionOfficerController.text.trim().isEmpty
-              ? null
-              : _extensionOfficerController.text.trim(),
+          vetId: vetId,
+          extensionOfficerId: extensionOfficerId,
           status: _selectedStatus,
           synced: false,
           syncAction: existing.syncAction == 'create' ? 'create' : 'update',
@@ -745,13 +860,10 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           farmUuid: selectedFarmUuid,
           livestockUuids: livestockUuids,
           vaccinationNo: vaccinationNumber,
-          vaccineId: _selectedVaccineId,
+          vaccineUuid: _selectedVaccineUuid,
           diseaseId: _selectedDiseaseId,
-          vetId:
-              _vetIdController.text.trim().isEmpty ? null : _vetIdController.text.trim(),
-          extensionOfficerId: _extensionOfficerController.text.trim().isEmpty
-              ? null
-              : _extensionOfficerController.text.trim(),
+          vetId: vetId,
+          extensionOfficerId: extensionOfficerId,
           status: _selectedStatus,
         );
 
@@ -768,14 +880,10 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           vaccinationNo: vaccinationNumber,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
-          vaccineId: _selectedVaccineId,
+          vaccineUuid: _selectedVaccineUuid,
           diseaseId: _selectedDiseaseId,
-          vetId: _vetIdController.text.trim().isEmpty
-              ? null
-              : _vetIdController.text.trim(),
-          extensionOfficerId: _extensionOfficerController.text.trim().isEmpty
-              ? null
-              : _extensionOfficerController.text.trim(),
+          vetId: vetId,
+          extensionOfficerId: extensionOfficerId,
           status: _selectedStatus,
           synced: false,
           syncAction: 'create',
@@ -850,3 +958,9 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 }
 
 enum InfoBannerTone { neutral, warning }
+
+enum _TreatmentProviderType {
+  none,
+  vet,
+  extensionOfficer,
+}

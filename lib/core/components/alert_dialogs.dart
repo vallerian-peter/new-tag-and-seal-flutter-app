@@ -398,7 +398,12 @@ class _SuccessDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: onPressed ?? () => Navigator.of(context).pop(true),
+                onPressed: () {
+                  // Always pop the dialog first using the dialog's context
+                  Navigator.of(context).pop(true);
+                  // Then call the callback if provided (for refresh, etc.)
+                  onPressed?.call();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.successColor,
                   foregroundColor: Colors.white,
@@ -505,7 +510,12 @@ class _ErrorDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: onPressed ?? () => Navigator.of(context).pop(),
+                onPressed: () {
+                  // Always pop the dialog first using the dialog's context
+                  Navigator.of(context).pop();
+                  // Then call the callback if provided
+                  onPressed?.call();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.dangerColor,
                   foregroundColor: Colors.white,

@@ -203,35 +203,48 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   Future<void> _syncVaccinations(dynamic payload) async {
-    if (payload is! List) return;
+    if (payload is! List) {
+      log('⚠️ Vaccinations payload is not a List: ${payload.runtimeType}');
+      return;
+    }
+
+    final vaccinations = payload.cast<Map<String, dynamic>>();
+    log('💉 Syncing ${vaccinations.length} vaccination logs from server...');
 
     final remoteUuids = <String>{};
 
-    for (final raw in payload.cast<Map<String, dynamic>>()) {
+    for (final raw in vaccinations) {
       try {
+        log('💉 Processing vaccination from server: ${raw['uuid']}, vaccineUuid: ${raw['vaccineUuid']}');
         final remote = VaccinationModel.fromJson(raw).copyWith(
           synced: true,
           syncAction: 'server-create',
         );
+        log('💉 Parsed vaccination model: uuid=${remote.uuid}, vaccineUuid=${remote.vaccineUuid}');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getVaccinationByUuid(remote.uuid);
         if (existing == null) {
           await _eventDao.upsertVaccination(_toVaccinationCompanion(remote));
+          log('  ✅ Inserted vaccination: ${remote.uuid}');
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
             final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
             await _eventDao.upsertVaccination(_toVaccinationCompanion(updated));
+            log('  ✅ Updated vaccination: ${remote.uuid}');
+          } else {
+            log('  ⏭️ Skipped vaccination (local is newer): ${remote.uuid}');
           }
         }
-      } catch (e) {
-        log('❌ Error syncing vaccination log: $e');
+      } catch (e, stackTrace) {
+        log('❌ Error syncing vaccination log: $e', stackTrace: stackTrace);
       }
     }
 
     await _eventDao.deleteServerVaccinationsNotIn(remoteUuids);
+    log('✅ Vaccination sync complete - Processed ${remoteUuids.length} vaccination(s)');
   }
 
   Future<void> _syncDisposals(dynamic payload) async {
@@ -628,6 +641,7 @@ class EventsRepository implements EventsRepositoryInterface {
   Future<VaccinationModel> createVaccination(VaccinationModel model) async {
     final now = DateTime.now().toIso8601String();
     log('📝 Creating vaccination log locally: ${model.uuid}');
+    log('💉 Vaccination model: farmUuid=${model.farmUuid}, livestockUuid=${model.livestockUuid}, vaccineUuid=${model.vaccineUuid}');
     final localModel = model.copyWith(
       createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
       updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
@@ -635,8 +649,18 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertVaccination(_toVaccinationCompanion(localModel));
-    return _mapVaccinationEntity(inserted);
+    try {
+      final companion = _toVaccinationCompanion(localModel);
+      log('💉 Vaccination companion: vaccineUuid=${companion.vaccineUuid.value}, vetId=${companion.vetId.value}, extensionOfficerId=${companion.extensionOfficerId.value}');
+      final inserted = await _eventDao.upsertVaccination(companion);
+      log('✅ Vaccination inserted successfully: uuid=${inserted.uuid}, vaccineUuid=${inserted.vaccineUuid}');
+      final mapped = _mapVaccinationEntity(inserted);
+      log('✅ Vaccination mapped: uuid=${mapped.uuid}, vaccineUuid=${mapped.vaccineUuid}');
+      return mapped;
+    } catch (e, stackTrace) {
+      log('❌ Error inserting vaccination: $e', stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override
@@ -879,7 +903,9 @@ class EventsRepository implements EventsRepositoryInterface {
   @override
   Future<List<VaccinationModel>> getVaccinations({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getVaccinations(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapVaccinationEntity).toList();
+    final models = rows.map(_mapVaccinationEntity).toList();
+    log('💉 Repository: Retrieved ${models.length} vaccination(s) from local DB (farmUuid: $farmUuid, livestockUuid: $livestockUuid)');
+    return models;
   }
 
   @override
@@ -891,31 +917,46 @@ class EventsRepository implements EventsRepositoryInterface {
   @override
   Future<List<MilkingModel>> getMilkings({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getMilkings(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapMilkingEntity).toList();
+    return rows
+        .map(_mapMilkingEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
   }
 
   @override
   Future<List<PregnancyModel>> getPregnancies({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getPregnancies(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapPregnancyEntity).toList();
+    return rows
+        .map(_mapPregnancyEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
   }
 
   @override
   Future<List<InseminationModel>> getInseminations({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getInseminations(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapInseminationEntity).toList();
+    return rows
+        .map(_mapInseminationEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
   }
 
   @override
   Future<List<DryoffModel>> getDryoffs({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getDryoffs(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapDryoffEntity).toList();
+    return rows
+        .map(_mapDryoffEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
   }
 
   @override
   Future<List<TransferModel>> getTransfers({String? farmUuid, String? livestockUuid}) async {
     final rows = await _eventDao.getTransfers(farmUuid: farmUuid, livestockUuid: livestockUuid);
-    return rows.map(_mapTransferEntity).toList();
+    return rows
+        .map(_mapTransferEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
   }
 
   @override
@@ -985,6 +1026,26 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
+    final inseminations = await getInseminations(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final milkings = await getMilkings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final pregnancies = await getPregnancies(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final dryoffs = await getDryoffs(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final transfers = await getTransfers(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
 
     // Count calving and farrowing separately
     final calvingCount = birthEvents.where((e) => e.eventType == EventLogTypes.calving).length;
@@ -1000,6 +1061,11 @@ class EventsRepository implements EventsRepositoryInterface {
       EventLogTypes.calving: calvingCount,
       EventLogTypes.farrowing: farrowingCount,
       EventLogTypes.abortedPregnancy: abortedPregnancies.length,
+      EventLogTypes.insemination: inseminations.length,
+      EventLogTypes.milking: milkings.length,
+      EventLogTypes.pregnancy: pregnancies.length,
+      EventLogTypes.dryoff: dryoffs.length,
+      EventLogTypes.transfer: transfers.length,
     };
   }
   
@@ -1080,7 +1146,13 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     log('📤 Preparing ${rows.length} vaccination logs for sync');
-    return rows.map((row) => _mapVaccinationEntity(row).toApiJson()).toList();
+    final apiData = rows.map((row) {
+      final model = _mapVaccinationEntity(row);
+      final json = model.toApiJson();
+      log('  💉 Vaccination for sync: uuid=${json['uuid']}, vaccineUuid=${json['vaccineUuid']}, farmUuid=${json['farmUuid']}, livestockUuid=${json['livestockUuid']}');
+      return json;
+    }).toList();
+    return apiData;
   }
 
   @override
@@ -1550,6 +1622,7 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   VaccinationsCompanion _toVaccinationCompanion(VaccinationModel model) {
+    log('💉 Creating VaccinationsCompanion: uuid=${model.uuid}, vaccineUuid=${model.vaccineUuid}, vetId=${model.vetId}, extensionOfficerId=${model.extensionOfficerId}');
     return VaccinationsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
@@ -1557,7 +1630,7 @@ class EventsRepository implements EventsRepositoryInterface {
           model.vaccinationNo != null ? Value(model.vaccinationNo!) : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      vaccineId: model.vaccineId != null ? Value(model.vaccineId!) : const Value.absent(),
+      vaccineUuid: model.vaccineUuid != null ? Value(model.vaccineUuid!) : const Value.absent(),
       diseaseId: model.diseaseId != null ? Value(model.diseaseId!) : const Value.absent(),
       vetId: model.vetId != null ? Value(model.vetId!) : const Value.absent(),
       extensionOfficerId: model.extensionOfficerId != null
@@ -1668,7 +1741,7 @@ class EventsRepository implements EventsRepositoryInterface {
       vaccinationNo: entity.vaccinationNo,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
-      vaccineId: entity.vaccineId,
+      vaccineUuid: entity.vaccineUuid,
       diseaseId: entity.diseaseId,
       vetId: entity.vetId,
       extensionOfficerId: entity.extensionOfficerId,

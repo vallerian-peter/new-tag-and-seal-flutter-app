@@ -3620,6 +3620,12 @@ abstract class AppLocalizations {
   /// **'Vaccines not available. Sync vaccine reference data first.'**
   String get vaccineOptionsMissing;
 
+  /// No description provided for @vaccineRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine is required'**
+  String get vaccineRequired;
+
   /// No description provided for @addDisposal.
   ///
   /// In en, this message translates to:

@@ -644,6 +644,7 @@
   "vaccinationLogSaved": "Rekodi ya chanjo imehifadhiwa kikamilifu",
   "vaccinationLogSaveFailed": "Imeshindwa kuhifadhi rekodi ya chanjo. Jaribu tena.",
   "vaccineOptionsMissing": "Hakuna chanjo. Sawazisha data ya chanjo kwanza.",
+  "vaccineRequired": "Chanjo inahitajika",
   "addDisposal": "Ongeza rekodi ya uondoaji",
   "disposalDetails": "Maelezo ya uondoaji",
   "disposalDetailsSubtitle": "Eleza sababu na mbinu ya uondoaji.",

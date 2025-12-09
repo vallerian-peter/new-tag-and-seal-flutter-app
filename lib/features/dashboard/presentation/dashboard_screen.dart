@@ -41,6 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _totalEventCount = 0;
   bool _syncPromptShown = false;
   bool _isLogoutDialogOpen = false;
+  FarmProvider? _farmProvider; // Store reference for cleanup
   
   String _userName = '';
   String _userEmail = '';
@@ -54,6 +55,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     getALlFarmsWithThereLivestocks();
     _loadEventSummary();
     WidgetsBinding.instance.addPostFrameCallback((_) => _showSyncToast());
+    
+    // Listen to FarmProvider changes to auto-refresh when farms are created/updated
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _farmProvider = Provider.of<FarmProvider>(context, listen: false);
+        _farmProvider?.addListener(_onFarmProviderChanged);
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    // Remove listener to prevent memory leaks
+    _farmProvider?.removeListener(_onFarmProviderChanged);
+    super.dispose();
+  }
+  
+  /// Called when FarmProvider notifies listeners (e.g., after farm creation)
+  void _onFarmProviderChanged() {
+    if (mounted) {
+      debugPrint('🔄 FarmProvider changed - refreshing dashboard...');
+      getALlFarmsWithThereLivestocks();
+      _loadEventSummary();
+    }
   }
   
   Future<void> _loadUserData() async {
@@ -409,9 +434,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     MaterialPageRoute(builder: (context) => const FarmFormScreen()),
                   );
                   
-                  // Reload farms if farm was successfully created
+                  debugPrint('🔄 Dashboard received navigation result: $result');
+                  
+                  // Reload farms and event summary if farm was successfully created
                   if (result == true && mounted) {
+                    debugPrint('🔄 Refreshing dashboard data...');
                     await getALlFarmsWithThereLivestocks();
+                    await _loadEventSummary();
+                    debugPrint('✅ Dashboard refresh completed');
+                  } else {
+                    debugPrint('⚠️ Dashboard refresh skipped - result: $result, mounted: $mounted');
                   }
                 },
               ),

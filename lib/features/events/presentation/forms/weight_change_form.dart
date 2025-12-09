@@ -438,49 +438,73 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         const SizedBox(height: 24),
         _buildSectionTitle(l10n.weightChange),
         const SizedBox(height: 16),
-        CustomTextField(
-          controller: _oldWeightController,
-          label: l10n.previousWeight,
-          hintText: l10n.previousWeight,
-          prefixIcon: Icons.history,
-          keyboardType:
-              const TextInputType.numberWithOptions(decimal: true, signed: false),
-        ),
-        const SizedBox(height: 12),
-        CustomDropdown<String>(
-          label: l10n.unit,
-          hint: l10n.unit,
-          icon: Icons.straighten,
-          value: _selectedOldWeightUnit,
-          dropdownItems: _weightUnitItems,
-          onChanged: (value) {
-            if (value == null) return;
-            setState(() => _selectedOldWeightUnit = value);
-          },
+        // Old Weight and Unit in a row
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: CustomTextField(
+                controller: _oldWeightController,
+                label: l10n.previousWeight,
+                hintText: l10n.previousWeight,
+                prefixIcon: Icons.history,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true, signed: false),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: CustomDropdown<String>(
+                label: l10n.unit,
+                hint: l10n.unit,
+                icon: Icons.straighten,
+                value: _selectedOldWeightUnit,
+                dropdownItems: _weightUnitItems,
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _selectedOldWeightUnit = value);
+                },
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
-        WeightInputWithBluetooth(
-          controller: _newWeightController,
-          label: l10n.currentWeight,
-          hintText: l10n.currentWeight,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return l10n.weightRequired;
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 12),
-        CustomDropdown<String>(
-          label: l10n.unit,
-          hint: l10n.unit,
-          icon: Icons.straighten,
-          value: _selectedNewWeightUnit,
-          dropdownItems: _weightUnitItems,
-          onChanged: (value) {
-            if (value == null) return;
-            setState(() => _selectedNewWeightUnit = value);
-          },
+        // New Weight and Unit in a row
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: WeightInputWithBluetooth(
+                controller: _newWeightController,
+                label: l10n.currentWeight,
+                hintText: l10n.currentWeight,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return l10n.weightRequired;
+                  }
+                  return null;
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: CustomDropdown<String>(
+                label: l10n.unit,
+                hint: l10n.unit,
+                icon: Icons.straighten,
+                value: _selectedNewWeightUnit,
+                dropdownItems: _weightUnitItems,
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _selectedNewWeightUnit = value);
+                },
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         _buildInfoCard(
@@ -725,7 +749,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         title: l10n.error,
         message: l10n.weightLogSaveFailed,
         buttonText: l10n.ok,
-        onPressed: () => Navigator.of(context).pop(),
+        // Dialog already pops itself, no need for onPressed
       );
     }
   }

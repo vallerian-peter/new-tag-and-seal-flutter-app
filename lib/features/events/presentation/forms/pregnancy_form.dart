@@ -8,6 +8,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_dropdown.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/number_input.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -385,15 +386,14 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
           },
         ),
         const SizedBox(height: 16),
-        CustomTextField(
+        NumberInput(
           controller: _noOfMonthsController,
           label: l10n.numberOfMonths,
           hintText: l10n.numberOfMonths,
           prefixIcon: Icons.calendar_month,
-          keyboardType: const TextInputType.numberWithOptions(
-            decimal: false,
-            signed: false,
-          ),
+          allowDecimal: false,
+          allowNegative: false,
+          min: 1,
         ),
         const SizedBox(height: 16),
         CustomTextField(
