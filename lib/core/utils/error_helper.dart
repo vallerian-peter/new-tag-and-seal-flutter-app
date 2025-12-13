@@ -12,6 +12,27 @@ class ErrorHelper {
   static String formatErrorMessage(String error, AppLocalizations l10n) {
     final lowerError = error.toLowerCase();
     
+    // Handle validation failed errors - check for specific validation messages
+    // Check for both email and username first (most specific case)
+    final hasEmailError = lowerError.contains('email') && 
+        (lowerError.contains('already') || lowerError.contains('taken') || lowerError.contains('already been taken'));
+    final hasUsernameError = lowerError.contains('username') && 
+        (lowerError.contains('already') || lowerError.contains('taken') || lowerError.contains('already been taken'));
+    
+    if (hasEmailError && hasUsernameError) {
+      return l10n.emailAndUsernameAlreadyTaken;
+    }
+    
+    // Check for email already taken
+    if (hasEmailError) {
+      return l10n.emailAlreadyTaken;
+    }
+    
+    // Check for username already taken
+    if (hasUsernameError) {
+      return l10n.usernameAlreadyTaken;
+    }
+    
     // Handle socket/connection errors
     if (lowerError.contains('socket') || 
         lowerError.contains('connection refused') ||

@@ -73,9 +73,9 @@ class CustomDatePicker extends StatelessWidget {
     this.enabled = true,
     this.autoFillValue = true,
   }) : assert(
-         (onDateSelected != null && controller == null) ||
-         (controller != null && selectedDate == null),
-         'Provide either onDateSelected (with optional selectedDate) OR controller, but not both',
+         // Allow both if autoFillValue is false (callback handles controller update manually)
+         !(controller != null && onDateSelected != null && autoFillValue),
+         'When using both controller and onDateSelected, set autoFillValue to false',
        );
 
   DateTime? _getCurrentDate() {
@@ -99,8 +99,8 @@ class CustomDatePicker extends StatelessWidget {
     return initialDate ?? DateTime.now();
   }
 
-  Future<void> _showDatePicker(BuildContext context) async {
-    if (!enabled) return;
+  Future<DateTime?> _showDatePicker(BuildContext context) async {
+    if (!enabled) return null;
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -144,20 +144,24 @@ class CustomDatePicker extends StatelessWidget {
     );
 
     if (date != null) {
+      final formattedDate = '${date.day}/${date.month}/${date.year}';
+      
       if (onDateSelected != null) {
         // Call the callback first (may handle controller update itself)
         await onDateSelected!(date);
         // If autoFillValue is true and controller exists and wasn't filled by callback, auto-fill
         if (autoFillValue && controller != null && controller!.text.isEmpty) {
-          controller!.text = '${date.day}/${date.month}/${date.year}';
+          controller!.text = formattedDate;
         }
       } else if (controller != null && autoFillValue) {
-        controller!.text = '${date.day}/${date.month}/${date.year}';
-      } else if (selectedDate != null) {
-        // This case is handled by the caller via onDateSelected callback
-        // But if no callback provided, we can't update selectedDate (it's final)
+        // Update controller with formatted date
+        controller!.text = formattedDate;
       }
+      // Note: If both controller and onDateSelected are provided with autoFillValue=false,
+      // the callback is responsible for updating the controller
     }
+    
+    return date;
   }
 
   String _formatDate(DateTime? date) {
@@ -175,45 +179,202 @@ class CustomDatePicker extends StatelessWidget {
     return '';
   }
 
-  bool _hasError() {
-    if (dateValidator != null && selectedDate != null) {
-      return dateValidator!(selectedDate) != null;
-    }
-    if (validator != null) {
-      if (selectedDate != null) {
-        // For DateTime-based API, convert to string for validation
-        final dateStr = _formatDate(selectedDate);
-        return validator!(dateStr.isEmpty ? null : dateStr) != null;
-      }
-      if (controller != null) {
-        return validator!(controller!.text.isEmpty ? null : controller!.text) != null;
-      }
-      return validator!(null) != null;
-    }
-    return false;
-  }
-
-  String? _getErrorText() {
-    if (dateValidator != null && selectedDate != null) {
-      return dateValidator!(selectedDate);
-    }
-    if (validator != null) {
-      if (selectedDate != null) {
-        final dateStr = _formatDate(selectedDate);
-        return validator!(dateStr.isEmpty ? null : dateStr);
-      }
-      if (controller != null) {
-        return validator!(controller!.text.isEmpty ? null : controller!.text);
-      }
-      return validator!(null);
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasError = _hasError();
+    
+    // If using controller, wrap in FormField for proper validation integration
+    if (controller != null) {
+      return FormField<String>(
+        initialValue: controller!.text,
+        validator: validator,
+        builder: (FormFieldState<String> field) {
+          // Use ValueListenableBuilder to listen to controller changes
+          return ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller!,
+            builder: (context, value, child) {
+              final displayText = value.text;
+              final isEmpty = displayText.isEmpty;
+              final hasError = field.hasError;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isRequired ? '$label *' : label,
+                    style: TextStyle(
+                      fontSize: Constants.textSize,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+              InkWell(
+                onTap: enabled
+                    ? () async {
+                        final selectedDate = await _showDatePicker(context);
+                        if (selectedDate != null) {
+                          // Controller is already updated in _showDatePicker (or by onDateSelected callback)
+                          // Update form field value after date selection
+                          field.didChange(controller!.text);
+                          // Validate the field
+                          field.validate();
+                        }
+                      }
+                    : null,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.brightness == Brightness.dark 
+                            ? theme.scaffoldBackgroundColor 
+                            : null,
+                        border: Border.all(
+                          color: hasError
+                              ? Constants.dangerColor
+                              : theme.colorScheme.onSurface.withOpacity(0.3),
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isEmpty ? hint : displayText,
+                            style: TextStyle(
+                              color: isEmpty
+                                  ? theme.colorScheme.onSurface.withOpacity(0.6)
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          Icon(
+                            Icons.calendar_today,
+                            color: Constants.primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (hasError)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 12),
+                      child: Text(
+                        field.errorText ?? '',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Constants.dangerColor,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+    
+    // For DateTime-based API (without controller)
+    // Wrap in FormField for proper validation integration
+    if (onDateSelected != null || selectedDate != null) {
+      return FormField<DateTime>(
+        initialValue: selectedDate,
+        validator: dateValidator != null
+            ? (value) => dateValidator!(value)
+            : validator != null
+                ? (value) {
+                    if (value == null) {
+                      final dateStr = '';
+                      return validator!(dateStr.isEmpty ? null : dateStr);
+                    }
+                    final dateStr = _formatDate(value);
+                    return validator!(dateStr.isEmpty ? null : dateStr);
+                  }
+                : null,
+        builder: (FormFieldState<DateTime> field) {
+          final currentDate = field.value ?? selectedDate;
+          final displayText = currentDate != null ? _formatDate(currentDate) : '';
+          final isEmpty = displayText.isEmpty;
+          final hasError = field.hasError;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isRequired ? '$label *' : label,
+                style: TextStyle(
+                  fontSize: Constants.textSize,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: enabled
+                    ? () async {
+                        final selectedDate = await _showDatePicker(context);
+                        if (selectedDate != null) {
+                          // Update form field value
+                          field.didChange(selectedDate);
+                          // Call the callback
+                          if (onDateSelected != null) {
+                            await onDateSelected!(selectedDate);
+                          }
+                          // Validate the field
+                          field.validate();
+                        }
+                      }
+                    : null,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.brightness == Brightness.dark 
+                        ? theme.scaffoldBackgroundColor 
+                        : null,
+                    border: Border.all(
+                      color: hasError
+                          ? Constants.dangerColor
+                          : theme.colorScheme.onSurface.withOpacity(0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isEmpty ? hint : displayText,
+                        style: TextStyle(
+                          color: isEmpty
+                              ? theme.colorScheme.onSurface.withOpacity(0.6)
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      Icon(
+                        Icons.calendar_today,
+                        color: Constants.primaryColor,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (hasError)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 12),
+                  child: Text(
+                    field.errorText ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Constants.dangerColor,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      );
+    }
+
+    // Fallback: No controller, no DateTime API (shouldn't happen, but handle gracefully)
     final displayText = _getDisplayText();
     final isEmpty = displayText.isEmpty;
 
@@ -261,17 +422,6 @@ class CustomDatePicker extends StatelessWidget {
             ),
           ),
         ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 12),
-            child: Text(
-              _getErrorText() ?? '',
-              style: TextStyle(
-                fontSize: 12,
-                color: Constants.dangerColor,
-              ),
-            ),
-          ),
       ],
     );
   }

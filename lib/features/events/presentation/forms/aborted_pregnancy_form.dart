@@ -11,6 +11,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.d
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
@@ -530,6 +531,10 @@ class _AbortedPregnancyFormScreenState
 
   Future<void> _pickAbortionDate() async {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
     final initialDate = _abortionDate ?? DateTime.now();
 
     final date = await showDatePicker(
@@ -543,10 +548,18 @@ class _AbortedPregnancyFormScreenState
             colorScheme: theme.colorScheme.copyWith(
               primary: Constants.primaryColor,
               onPrimary: theme.colorScheme.onPrimary,
-              surface: theme.colorScheme.surface,
               onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
             ),
-            dialogBackgroundColor: theme.colorScheme.surface,
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: Constants.primaryColor,

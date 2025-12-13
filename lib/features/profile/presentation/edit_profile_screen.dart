@@ -796,8 +796,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
+      // Prepare profile update data
+      // Backend handles date format conversion via convertDateFormat() trait
+      final profileData = {
+        'firstName': _firstNameController.text.trim(),
+        'middleName': _middleNameController.text.trim(),
+        'surname': _surnameController.text.trim(),
+        'phone1': _phone1Controller.text.trim(),
+        'phone2': _phone2Controller.text.trim().isEmpty 
+            ? null 
+            : _phone2Controller.text.trim(),
+        'physicalAddress': _physicalAddressController.text.trim(),
+        'farmerOrganizationMembership': _farmerOrganizationController.text.trim().isEmpty
+            ? null
+            : _farmerOrganizationController.text.trim(),
+        'dateOfBirth': _dateOfBirthController.text, // Backend converts DD/MM/YYYY to YYYY-MM-DD
+        'gender': _selectedGender,
+        'identityCardTypeId': _selectedIdentityCardTypeId,
+        'identityNumber': _identityNumberController.text.trim().isEmpty
+            ? null
+            : _identityNumberController.text.trim(),
+        'schoolLevelId': _selectedSchoolLevelId,
+        'streetId': _selectedStreetId,
+        'villageId': _selectedVillageId,
+        'wardId': _selectedWardId,
+        'districtId': _selectedDistrictId,
+        'regionId': _selectedRegionId,
+        'countryId': _selectedCountryId,
+        'farmerType': _selectedFarmerType,
+      };
+
       // TODO: Implement API call to update profile
       // For now, just show success message
+      log('📝 Profile update data prepared: $profileData');
       await Future.delayed(const Duration(seconds: 1));
 
       if (mounted) {

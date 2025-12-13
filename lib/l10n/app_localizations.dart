@@ -1124,6 +1124,12 @@ abstract class AppLocalizations {
   /// **'Farm Data Not Found'**
   String get farmDataNotFound;
 
+  /// No description provided for @fullNameText.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullNameText;
+
   /// No description provided for @howItWorks.
   ///
   /// In en, this message translates to:
@@ -4850,6 +4856,24 @@ abstract class AppLocalizations {
   /// **'An error occurred. Please try again.'**
   String get genericError;
 
+  /// Error message when email is already taken during registration
+  ///
+  /// In en, this message translates to:
+  /// **'This email address is already registered. Please use a different email or try logging in.'**
+  String get emailAlreadyTaken;
+
+  /// Error message when username is already taken during registration
+  ///
+  /// In en, this message translates to:
+  /// **'This username is already taken. Please choose a different username.'**
+  String get usernameAlreadyTaken;
+
+  /// Error message when both email and username are already taken during registration
+  ///
+  /// In en, this message translates to:
+  /// **'Both email and username are already taken. Please use different credentials or try logging in.'**
+  String get emailAndUsernameAlreadyTaken;
+
   /// No description provided for @addVaccine.
   ///
   /// In en, this message translates to:
@@ -5990,11 +6014,107 @@ abstract class AppLocalizations {
   /// **'Extension Officer Login'**
   String get extensionOfficerLogin;
 
-  /// Extension Officer login subtitle
+  /// Subtitle for extension officer login screen
   ///
   /// In en, this message translates to:
   /// **'Access farms you\'ve been invited to'**
   String get extensionOfficerLoginSubtitle;
+
+  /// Error message when extension officer is not found
+  ///
+  /// In en, this message translates to:
+  /// **'Extension officer not found with this email'**
+  String get extensionOfficerNotFound;
+
+  /// Message prompting user to search extension officer before inviting
+  ///
+  /// In en, this message translates to:
+  /// **'Please search and verify the extension officer first'**
+  String get pleaseSearchExtensionOfficerFirst;
+
+  /// Success message when extension officer is found
+  ///
+  /// In en, this message translates to:
+  /// **'Extension Officer Found'**
+  String get extensionOfficerFound;
+
+  /// Label for access code field
+  ///
+  /// In en, this message translates to:
+  /// **'Access Code'**
+  String get accessCode;
+
+  /// Hint text for access code field
+  ///
+  /// In en, this message translates to:
+  /// **'Access code will be generated after invitation'**
+  String get accessCodeWillBeGenerated;
+
+  /// Loading message when creating invite
+  ///
+  /// In en, this message translates to:
+  /// **'Creating invitation...'**
+  String get creatingInvite;
+
+  /// Success message when extension officer is invited
+  ///
+  /// In en, this message translates to:
+  /// **'Extension officer invited successfully'**
+  String get extensionOfficerInvitedSuccessfully;
+
+  /// Loading state text for inviting
+  ///
+  /// In en, this message translates to:
+  /// **'Inviting...'**
+  String get inviting;
+
+  /// Loading state text for searching
+  ///
+  /// In en, this message translates to:
+  /// **'Searching...'**
+  String get searching;
+
+  /// Hint text for extension officer email field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter extension officer email'**
+  String get enterExtensionOfficerEmail;
+
+  /// Search button text
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// Invite button text
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get invite;
+
+  /// Phone field label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// Specialization field label
+  ///
+  /// In en, this message translates to:
+  /// **'Specialization'**
+  String get specialization;
+
+  /// Message shown when access code is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Access code copied to clipboard'**
+  String get accessCodeCopied;
+
+  /// Copy button text
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
 
   /// Farmer Access Number field label
   ///

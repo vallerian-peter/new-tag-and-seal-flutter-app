@@ -10,6 +10,8 @@ import 'package:new_tag_and_seal_flutter_app/core/alarm/app_alarm_manager.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../domain/model/notification_model.dart';
@@ -314,23 +316,39 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                               final initialTime = TimeOfDay.fromDateTime(
                                 scheduledAt ?? DateTime.now(),
                               );
+                              final theme = Theme.of(context);
+                              final isDark = theme.brightness == Brightness.dark;
+                              final backgroundColor = isDark 
+                                  ? theme.scaffoldBackgroundColor 
+                                  : whiteColor;
                               final time = await showTimePicker(
                                 context: context,
                                 builder: (context, child) {
-                                  final theme = Theme.of(context);
-                                  final scaffoldColor = theme.scaffoldBackgroundColor;
                                   return Theme(
                                     data: theme.copyWith(
-                                      cardColor: scaffoldColor,
-                                      dialogBackgroundColor: scaffoldColor,
-                                      timePickerTheme: theme.timePickerTheme.copyWith(
-                                        backgroundColor: scaffoldColor,
-                                        dialBackgroundColor: scaffoldColor.withOpacity(
-                                            theme.brightness == Brightness.dark ? 0.6 : 1),
-                                        hourMinuteColor: scaffoldColor,
+                                      colorScheme: theme.colorScheme.copyWith(
+                                        primary: Constants.primaryColor,
+                                        onPrimary: theme.colorScheme.onPrimary,
+                                        onSurface: theme.colorScheme.onSurface,
+                                        surface: backgroundColor,
+                                        surfaceContainerHighest: backgroundColor,
+                                      ),
+                                      dialogBackgroundColor: backgroundColor,
+                                      canvasColor: backgroundColor,
+                                      cardColor: backgroundColor,
+                                      scaffoldBackgroundColor: backgroundColor,
+                                      timePickerTheme: TimePickerThemeData(
+                                        backgroundColor: backgroundColor,
+                                        dialBackgroundColor: backgroundColor,
+                                        hourMinuteColor: backgroundColor,
                                         hourMinuteTextColor: theme.colorScheme.onSurface,
-                                        dialHandColor: theme.colorScheme.primary,
+                                        dialHandColor: Constants.primaryColor,
                                         dialTextColor: theme.colorScheme.onSurface,
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Constants.primaryColor,
+                                        ),
                                       ),
                                     ),
                                     child: child!,
@@ -366,9 +384,45 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                             trailing: const Icon(Icons.access_time),
                             onTap: () async {
                               final initial = dailyTime ?? TimeOfDay.now();
+                              final theme = Theme.of(context);
+                              final isDark = theme.brightness == Brightness.dark;
+                              final backgroundColor = isDark 
+                                  ? theme.scaffoldBackgroundColor 
+                                  : whiteColor;
                               final time = await showTimePicker(
                                 context: context,
                                 initialTime: initial,
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: theme.copyWith(
+                                      colorScheme: theme.colorScheme.copyWith(
+                                        primary: Constants.primaryColor,
+                                        onPrimary: theme.colorScheme.onPrimary,
+                                        onSurface: theme.colorScheme.onSurface,
+                                        surface: backgroundColor,
+                                        surfaceContainerHighest: backgroundColor,
+                                      ),
+                                      dialogBackgroundColor: backgroundColor,
+                                      canvasColor: backgroundColor,
+                                      cardColor: backgroundColor,
+                                      scaffoldBackgroundColor: backgroundColor,
+                                      timePickerTheme: TimePickerThemeData(
+                                        backgroundColor: backgroundColor,
+                                        dialBackgroundColor: backgroundColor,
+                                        hourMinuteColor: backgroundColor,
+                                        hourMinuteTextColor: theme.colorScheme.onSurface,
+                                        dialHandColor: Constants.primaryColor,
+                                        dialTextColor: theme.colorScheme.onSurface,
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Constants.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                               );
                               if (time == null) return;
                               setModalState(() {

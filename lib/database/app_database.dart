@@ -144,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 19; // v19 changes vaccinations.vaccineId to vaccineUuid
+  int get schemaVersion => 20; // v20 adds primaryColor and secondaryColor to livestocks
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -265,6 +265,10 @@ class AppDatabase extends _$AppDatabase {
         // Version 19: Change vaccinations.vaccineId (integer) to vaccineUuid (text)
         await _migrateVaccinationsToVaccineUuid(m);
       }
+      if (from < 20) {
+        // Version 20: Add primaryColor and secondaryColor columns to livestocks table
+        await _addLivestockColorColumns(m);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
@@ -288,6 +292,35 @@ class AppDatabase extends _$AppDatabase {
           if (!hasVaccineUuid) {
             // Column missing - add it
             await customStatement('ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT');
+          }
+        }
+      } catch (e) {
+        // Ignore errors - migration will handle it
+      }
+
+      // Safety check: Ensure color columns exist in livestocks table
+      // This handles cases where migration might not have run or failed
+      try {
+        final livestocksExists = await customSelect(
+          'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+          variables: [
+            const Variable<String>('table'),
+            const Variable<String>('livestocks'),
+          ],
+        ).get();
+        
+        if (livestocksExists.isNotEmpty) {
+          final tableInfo = await customSelect('PRAGMA table_info(livestocks)').get();
+          final hasPrimaryColor = tableInfo.any((row) => row.data['name'] == 'primary_color');
+          final hasSecondaryColor = tableInfo.any((row) => row.data['name'] == 'secondary_color');
+          
+          if (!hasPrimaryColor) {
+            // Column missing - add it
+            await customStatement('ALTER TABLE livestocks ADD COLUMN primary_color TEXT');
+          }
+          if (!hasSecondaryColor) {
+            // Column missing - add it
+            await customStatement('ALTER TABLE livestocks ADD COLUMN secondary_color TEXT');
           }
         }
       } catch (e) {
@@ -588,6 +621,44 @@ class AppDatabase extends _$AppDatabase {
     } catch (e) {
       // Re-throw with context
       throw Exception('Failed to migrate vaccinations table: $e');
+    }
+  }
+
+  /// Migration to version 20: Add primaryColor and secondaryColor columns to livestocks table
+  Future<void> _addLivestockColorColumns(Migrator m) async {
+    try {
+      // Check if livestocks table exists
+      final livestocksExists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('livestocks'),
+        ],
+      ).get();
+
+      if (livestocksExists.isEmpty) {
+        // Table doesn't exist yet, just create it with new schema
+        await m.createTable(livestocks);
+        return;
+      }
+
+      // Check if columns already exist (Drift uses snake_case in SQLite)
+      final tableInfo = await customSelect('PRAGMA table_info(livestocks)').get();
+      final hasPrimaryColor = tableInfo.any((row) => row.data['name'] == 'primary_color');
+      final hasSecondaryColor = tableInfo.any((row) => row.data['name'] == 'secondary_color');
+
+      // Add primary_color column if it doesn't exist
+      if (!hasPrimaryColor) {
+        await m.addColumn(livestocks, livestocks.primaryColor);
+      }
+
+      // Add secondary_color column if it doesn't exist
+      if (!hasSecondaryColor) {
+        await m.addColumn(livestocks, livestocks.secondaryColor);
+      }
+    } catch (e) {
+      // Re-throw with context
+      throw Exception('Failed to add color columns to livestocks table: $e');
     }
   }
 }

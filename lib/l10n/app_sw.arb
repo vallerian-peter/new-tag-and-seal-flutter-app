@@ -343,6 +343,8 @@
   "registrationSuccess": "Usajili umefanikiwa!",
   "registrationFailed": "Usajili umeshindwa",
 
+  "fullNameText": "Jina Kamili",
+
   "firstNameRequired": "Jina la kwanza linahitajika",
   "surnameRequired": "Jina la ukoo linahitajika",
   "phoneRequired": "Nambari ya simu inahitajika",
@@ -870,6 +872,18 @@
   "networkError": "Hitilafu ya Mtandao",
   "networkErrorMessage": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wa mtandao wako.",
   "genericError": "Hitilafu imetokea. Tafadhali ujaribu tena.",
+  "emailAlreadyTaken": "Anwani ya barua pepe hii tayari imesajiliwa. Tafadhali tumia barua pepe nyingine au jaribu kuingia.",
+  "@emailAlreadyTaken": {
+    "description": "Ujumbe wa kosa wakati barua pepe tayari imetumika wakati wa usajili"
+  },
+  "usernameAlreadyTaken": "Jina la mtumiaji hili tayari limetumika. Tafadhali chagua jina jingine la mtumiaji.",
+  "@usernameAlreadyTaken": {
+    "description": "Ujumbe wa kosa wakati jina la mtumiaji tayari limetumika wakati wa usajili"
+  },
+  "emailAndUsernameAlreadyTaken": "Barua pepe na jina la mtumiaji zote tayari zimetumika. Tafadhali tumia hati za kuthibitisha nyingine au jaribu kuingia.",
+  "@emailAndUsernameAlreadyTaken": {
+    "description": "Ujumbe wa kosa wakati barua pepe na jina la mtumiaji zote tayari zimetumika wakati wa usajili"
+  },
 
   "name": "Jina",
   "nameRequired": "Jina linahitajika",
@@ -1130,6 +1144,70 @@
   "enterAsExtensionOfficer": "Ingia kama Bwana Shamba?",
   "extensionOfficerLogin": "Ingia kama Bwana Shamba",
   "extensionOfficerLoginSubtitle": "Fikia mashamba ulioalikwa",
+  "extensionOfficerNotFound": "Bwana Shamba hajapatikana kwa barua pepe hii",
+  "@extensionOfficerNotFound": {
+    "description": "Ujumbe wa kosa wakati Bwana Shamba hajapatikana"
+  },
+  "pleaseSearchExtensionOfficerFirst": "Tafadhali tafuta na uhakikishe Bwana Shamba kwanza",
+  "@pleaseSearchExtensionOfficerFirst": {
+    "description": "Ujumbe unaowahimiza mtumiaji kutafuta Bwana Shamba kabla ya kualika"
+  },
+  "extensionOfficerFound": "Bwana Shamba Amepatikana",
+  "@extensionOfficerFound": {
+    "description": "Ujumbe wa mafanikio wakati Bwana Shamba amepatikana"
+  },
+  "accessCode": "Nambari ya Ufikiaji",
+  "@accessCode": {
+    "description": "Lebo ya uga wa nambari ya ufikiaji"
+  },
+  "accessCodeWillBeGenerated": "Nambari ya ufikiaji itatengenezwa baada ya kualika",
+  "@accessCodeWillBeGenerated": {
+    "description": "Nakala ya kidokezo ya uga wa nambari ya ufikiaji"
+  },
+  "creatingInvite": "Inaunda ualiko...",
+  "@creatingInvite": {
+    "description": "Ujumbe wa kupakia wakati wa kuunda ualiko"
+  },
+  "extensionOfficerInvitedSuccessfully": "Bwana Shamba amealikwa kwa mafanikio",
+  "@extensionOfficerInvitedSuccessfully": {
+    "description": "Ujumbe wa mafanikio wakati Bwana Shamba amealikwa"
+  },
+  "inviting": "Inaalika...",
+  "@inviting": {
+    "description": "Nakala ya hali ya kupakia ya kualika"
+  },
+  "searching": "Inatafuta...",
+  "@searching": {
+    "description": "Nakala ya hali ya kupakia ya kutafuta"
+  },
+  "enterExtensionOfficerEmail": "Ingiza barua pepe ya Bwana Shamba",
+  "@enterExtensionOfficerEmail": {
+    "description": "Nakala ya kidokezo ya uga wa barua pepe ya Bwana Shamba"
+  },
+  "search": "Tafuta",
+  "@search": {
+    "description": "Nakala ya kitufe cha kutafuta"
+  },
+  "invite": "Alika",
+  "@invite": {
+    "description": "Nakala ya kitufe cha kualika"
+  },
+  "phone": "Simu",
+  "@phone": {
+    "description": "Lebo ya uga wa simu"
+  },
+  "specialization": "Utambuzi Maalum",
+  "@specialization": {
+    "description": "Lebo ya uga wa utambuzi maalum"
+  },
+  "accessCodeCopied": "Nambari ya ufikiaji imenakiliwa kwenye ubao wa kunakili",
+  "@accessCodeCopied": {
+    "description": "Ujumbe unaoonyeshwa wakati nambari ya ufikiaji inanakiliwa"
+  },
+  "copy": "Nakili",
+  "@copy": {
+    "description": "Nakala ya kitufe cha kunakili"
+  },
   "farmerAccessNumber": "Nambari ya Ufikiaji wa Mkulima",
   "enterFarmerAccessNumber": "Ingiza nambari ya ufikiaji wa mkulima",
   "pleaseEnterFarmerAccessNumber": "Tafadhali ingiza nambari ya ufikiaji wa mkulima"

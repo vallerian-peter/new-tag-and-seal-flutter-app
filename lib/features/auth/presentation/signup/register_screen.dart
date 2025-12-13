@@ -348,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
 
         const SizedBox(height: 16),
-        
+
         CustomDropdown<String>(
           value: _selectedGender,
           label: l10n.gender,
@@ -548,6 +548,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
+        
         const SizedBox(height: 16),
 
         // Region Dropdown
@@ -816,6 +817,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       // Prepare registration data with authentication fields
+      // Backend handles date format conversion via convertDateFormat() trait
       final registrationData = {
         // Authentication fields
         'username': _emailController.text, // Use email as username
@@ -831,7 +833,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'phone2': _phone2Controller.text,
         'physicalAddress': _physicalAddressController.text,
         'farmerOrganizationMembership': _farmerOrganizationController.text,
-        'dateOfBirth': _dateOfBirthController.text,
+        'dateOfBirth': _dateOfBirthController.text, // Backend converts DD/MM/YYYY to YYYY-MM-DD
         'gender': _selectedGender, // Already lowercase: 'male' or 'female'
 
         // Identity information

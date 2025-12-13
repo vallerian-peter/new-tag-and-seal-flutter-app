@@ -466,6 +466,7 @@
   "helpSupport": "Help & Support",
   
   "farmDataNotFound": "Farm Data Not Found",
+  "fullNameText": "Full Name",
 
   "howItWorks": "How It Works",
   "keyFeatures": "Key Features",
@@ -1133,6 +1134,18 @@
   "networkError": "Network Error",
   "networkErrorMessage": "Network error. Please check your internet connection.",
   "genericError": "An error occurred. Please try again.",
+  "emailAlreadyTaken": "This email address is already registered. Please use a different email or try logging in.",
+  "@emailAlreadyTaken": {
+    "description": "Error message when email is already taken during registration"
+  },
+  "usernameAlreadyTaken": "This username is already taken. Please choose a different username.",
+  "@usernameAlreadyTaken": {
+    "description": "Error message when username is already taken during registration"
+  },
+  "emailAndUsernameAlreadyTaken": "Both email and username are already taken. Please use different credentials or try logging in.",
+  "@emailAndUsernameAlreadyTaken": {
+    "description": "Error message when both email and username are already taken during registration"
+  },
   "addVaccine": "Add vaccine",
 
   "name": "Name",
@@ -1441,7 +1454,71 @@
   },
   "extensionOfficerLoginSubtitle": "Access farms you've been invited to",
   "@extensionOfficerLoginSubtitle": {
-    "description": "Extension Officer login subtitle"
+    "description": "Subtitle for extension officer login screen"
+  },
+  "extensionOfficerNotFound": "Extension officer not found with this email",
+  "@extensionOfficerNotFound": {
+    "description": "Error message when extension officer is not found"
+  },
+  "pleaseSearchExtensionOfficerFirst": "Please search and verify the extension officer first",
+  "@pleaseSearchExtensionOfficerFirst": {
+    "description": "Message prompting user to search extension officer before inviting"
+  },
+  "extensionOfficerFound": "Extension Officer Found",
+  "@extensionOfficerFound": {
+    "description": "Success message when extension officer is found"
+  },
+  "accessCode": "Access Code",
+  "@accessCode": {
+    "description": "Label for access code field"
+  },
+  "accessCodeWillBeGenerated": "Access code will be generated after invitation",
+  "@accessCodeWillBeGenerated": {
+    "description": "Hint text for access code field"
+  },
+  "creatingInvite": "Creating invitation...",
+  "@creatingInvite": {
+    "description": "Loading message when creating invite"
+  },
+  "extensionOfficerInvitedSuccessfully": "Extension officer invited successfully",
+  "@extensionOfficerInvitedSuccessfully": {
+    "description": "Success message when extension officer is invited"
+  },
+  "inviting": "Inviting...",
+  "@inviting": {
+    "description": "Loading state text for inviting"
+  },
+  "searching": "Searching...",
+  "@searching": {
+    "description": "Loading state text for searching"
+  },
+  "enterExtensionOfficerEmail": "Enter extension officer email",
+  "@enterExtensionOfficerEmail": {
+    "description": "Hint text for extension officer email field"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search button text"
+  },
+  "invite": "Invite",
+  "@invite": {
+    "description": "Invite button text"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field label"
+  },
+  "specialization": "Specialization",
+  "@specialization": {
+    "description": "Specialization field label"
+  },
+  "accessCodeCopied": "Access code copied to clipboard",
+  "@accessCodeCopied": {
+    "description": "Message shown when access code is copied"
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "Copy button text"
   },
   "farmerAccessNumber": "Farmer Access Number",
   "@farmerAccessNumber": {

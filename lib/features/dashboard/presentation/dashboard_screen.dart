@@ -19,6 +19,7 @@ import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/stat_car
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/farm_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm_user_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/extension_officer_invite_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/notification_screen.dart';
@@ -494,7 +495,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     return;
                   }
                   
-                  // Navigate to add officer
+                  // Navigate to extension officer invite form
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ExtensionOfficerInviteFormScreen(),
+                    ),
+                  );
                 },
               ),
               

@@ -12,6 +12,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
@@ -586,6 +587,11 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
   Future<void> _pickTransferDate() async {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
     final now = DateTime.now();
     final initialDate = _selectedTransferDate ?? now;
 
@@ -595,6 +601,33 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       firstDate: DateTime(now.year - 5),
       lastDate: DateTime(now.year + 5),
       helpText: l10n.selectTransferDate,
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (date == null || !mounted) return;
@@ -603,6 +636,37 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       context: context,
       initialTime: TimeOfDay.fromDateTime(initialDate),
       helpText: l10n.selectTransferDate,
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (time == null || !mounted) return;

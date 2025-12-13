@@ -556,6 +556,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get farmDataNotFound => 'Farm Data Not Found';
 
   @override
+  String get fullNameText => 'Full Name';
+
+  @override
   String get howItWorks => 'How It Works';
 
   @override
@@ -2513,6 +2516,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genericError => 'An error occurred. Please try again.';
 
   @override
+  String get emailAlreadyTaken =>
+      'This email address is already registered. Please use a different email or try logging in.';
+
+  @override
+  String get usernameAlreadyTaken =>
+      'This username is already taken. Please choose a different username.';
+
+  @override
+  String get emailAndUsernameAlreadyTaken =>
+      'Both email and username are already taken. Please use different credentials or try logging in.';
+
+  @override
   String get addVaccine => 'Add vaccine';
 
   @override
@@ -3127,6 +3142,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get extensionOfficerLoginSubtitle =>
       'Access farms you\'ve been invited to';
+
+  @override
+  String get extensionOfficerNotFound =>
+      'Extension officer not found with this email';
+
+  @override
+  String get pleaseSearchExtensionOfficerFirst =>
+      'Please search and verify the extension officer first';
+
+  @override
+  String get extensionOfficerFound => 'Extension Officer Found';
+
+  @override
+  String get accessCode => 'Access Code';
+
+  @override
+  String get accessCodeWillBeGenerated =>
+      'Access code will be generated after invitation';
+
+  @override
+  String get creatingInvite => 'Creating invitation...';
+
+  @override
+  String get extensionOfficerInvitedSuccessfully =>
+      'Extension officer invited successfully';
+
+  @override
+  String get inviting => 'Inviting...';
+
+  @override
+  String get searching => 'Searching...';
+
+  @override
+  String get enterExtensionOfficerEmail => 'Enter extension officer email';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get invite => 'Invite';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get specialization => 'Specialization';
+
+  @override
+  String get accessCodeCopied => 'Access code copied to clipboard';
+
+  @override
+  String get copy => 'Copy';
 
   @override
   String get farmerAccessNumber => 'Farmer Access Number';

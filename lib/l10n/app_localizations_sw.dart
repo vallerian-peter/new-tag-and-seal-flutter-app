@@ -560,6 +560,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get farmDataNotFound => 'Data za Shamba Hazipo';
 
   @override
+  String get fullNameText => 'Jina Kamili';
+
+  @override
   String get howItWorks => 'Jinsi Inavyofanya Kazi';
 
   @override
@@ -2528,6 +2531,18 @@ class AppLocalizationsSw extends AppLocalizations {
   String get genericError => 'Hitilafu imetokea. Tafadhali ujaribu tena.';
 
   @override
+  String get emailAlreadyTaken =>
+      'Anwani ya barua pepe hii tayari imesajiliwa. Tafadhali tumia barua pepe nyingine au jaribu kuingia.';
+
+  @override
+  String get usernameAlreadyTaken =>
+      'Jina la mtumiaji hili tayari limetumika. Tafadhali chagua jina jingine la mtumiaji.';
+
+  @override
+  String get emailAndUsernameAlreadyTaken =>
+      'Barua pepe na jina la mtumiaji zote tayari zimetumika. Tafadhali tumia hati za kuthibitisha nyingine au jaribu kuingia.';
+
+  @override
   String get addVaccine => 'Ongeza chanjo';
 
   @override
@@ -3141,6 +3156,59 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get extensionOfficerLoginSubtitle => 'Fikia mashamba ulioalikwa';
+
+  @override
+  String get extensionOfficerNotFound =>
+      'Bwana Shamba hajapatikana kwa barua pepe hii';
+
+  @override
+  String get pleaseSearchExtensionOfficerFirst =>
+      'Tafadhali tafuta na uhakikishe Bwana Shamba kwanza';
+
+  @override
+  String get extensionOfficerFound => 'Bwana Shamba Amepatikana';
+
+  @override
+  String get accessCode => 'Nambari ya Ufikiaji';
+
+  @override
+  String get accessCodeWillBeGenerated =>
+      'Nambari ya ufikiaji itatengenezwa baada ya kualika';
+
+  @override
+  String get creatingInvite => 'Inaunda ualiko...';
+
+  @override
+  String get extensionOfficerInvitedSuccessfully =>
+      'Bwana Shamba amealikwa kwa mafanikio';
+
+  @override
+  String get inviting => 'Inaalika...';
+
+  @override
+  String get searching => 'Inatafuta...';
+
+  @override
+  String get enterExtensionOfficerEmail => 'Ingiza barua pepe ya Bwana Shamba';
+
+  @override
+  String get search => 'Tafuta';
+
+  @override
+  String get invite => 'Alika';
+
+  @override
+  String get phone => 'Simu';
+
+  @override
+  String get specialization => 'Utambuzi Maalum';
+
+  @override
+  String get accessCodeCopied =>
+      'Nambari ya ufikiaji imenakiliwa kwenye ubao wa kunakili';
+
+  @override
+  String get copy => 'Nakili';
 
   @override
   String get farmerAccessNumber => 'Nambari ya Ufikiaji wa Mkulima';
