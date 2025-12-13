@@ -1654,6 +1654,12 @@ class AppLocalizationsSw extends AppLocalizations {
   String get nextFeedingTimeRequired => 'Muda ujao wa kulisha unahitajika';
 
   @override
+  String get feedingReminder => 'Ukumbusho wa Kulisha';
+
+  @override
+  String get timeToFeedLivestock => 'Ni wakati wa kulisha mifugo';
+
+  @override
   String get previousWeight => 'Uzito wa awali';
 
   @override
@@ -1799,6 +1805,13 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get ensureDewormingDetailsAccuracy =>
       'Hakikisha taarifa za dawa za minyoo ni sahihi kabla ya kuhifadhi.';
+
+  @override
+  String get dewormingReminder => 'Ukumbusho wa Dawa za Minyoo';
+
+  @override
+  String get timeToDewormLivestock =>
+      'Ni wakati wa kutoa dawa za minyoo kwa mifugo';
 
   @override
   String get weightChange => 'Mabadiliko ya Uzito';

@@ -20,12 +20,18 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemi
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/domain/model/notification_model.dart';
 
 class EventsProvider extends ChangeNotifier {
   final EventsRepositoryInterface _eventsRepository;
+  final NotificationProvider? _notificationProvider;
 
-  EventsProvider({required EventsRepositoryInterface eventsRepository})
-      : _eventsRepository = eventsRepository;
+  EventsProvider({
+    required EventsRepositoryInterface eventsRepository,
+    NotificationProvider? notificationProvider,
+  })  : _eventsRepository = eventsRepository,
+        _notificationProvider = notificationProvider;
 
   bool _isLoading = false;
   String? _error;
@@ -193,6 +199,10 @@ class EventsProvider extends ChangeNotifier {
       _feedings = [..._feedings, created];
       _allFeedings = [..._allFeedings, created];
       notifyListeners();
+      
+      // Create notification for next feeding time if it's in the future
+      await _createFeedingNotification(created);
+      
       return created;
     } catch (e) {
       log('❌ Failed to create feeding log locally: $e');
@@ -259,6 +269,10 @@ class EventsProvider extends ChangeNotifier {
       _dewormings = [..._dewormings, created];
       _allDewormings = [..._allDewormings, created];
       notifyListeners();
+      
+      // Create notification for next deworming date if it's in the future
+      await _createDewormingNotification(created);
+      
       return created;
     } catch (e) {
       _error = e.toString();
@@ -2455,6 +2469,102 @@ class EventsProvider extends ChangeNotifier {
     _allTransfers = const [];
     _error = null;
     notifyListeners();
+  }
+
+  // Helper method to create notification for feeding events
+  Future<void> _createFeedingNotification(FeedingModel feeding) async {
+    if (_notificationProvider == null) {
+      log('⚠️ NotificationProvider not available, skipping notification creation');
+      return;
+    }
+
+    try {
+      final nextFeedingTime = DateTime.tryParse(feeding.nextFeedingTime);
+      if (nextFeedingTime == null) {
+        log('⚠️ Invalid nextFeedingTime format: ${feeding.nextFeedingTime}');
+        return;
+      }
+
+      final now = DateTime.now();
+      if (nextFeedingTime.isBefore(now)) {
+        log('⚠️ Next feeding time is in the past, skipping notification');
+        return;
+      }
+
+      // Use notification_type field to allow UI to localize dynamically
+      final notification = NotificationModel(
+        farmUuid: feeding.farmUuid,
+        farmName: null, // Will be populated when displaying
+        livestockUuid: feeding.livestockUuid,
+        livestockName: null, // Will be populated when displaying
+        title: 'feeding_reminder', // Key for localization
+        description: 'time_to_feed_livestock', // Key for localization
+        scheduledAt: nextFeedingTime.toIso8601String(),
+        isCompleted: false,
+        synced: false,
+        syncAction: 'create',
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+        repeatDaily: false,
+      );
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Feeding notification created for ${nextFeedingTime.toLocal()}');
+    } catch (e) {
+      log('❌ Failed to create feeding notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail the feeding event
+    }
+  }
+
+  // Helper method to create notification for deworming events
+  Future<void> _createDewormingNotification(DewormingModel deworming) async {
+    if (_notificationProvider == null) {
+      log('⚠️ NotificationProvider not available, skipping notification creation');
+      return;
+    }
+
+    try {
+      final nextAdminDate = deworming.nextAdministrationDate;
+      if (nextAdminDate == null || nextAdminDate.isEmpty) {
+        log('⚠️ No next administration date set for deworming');
+        return;
+      }
+
+      final nextDate = DateTime.tryParse(nextAdminDate);
+      if (nextDate == null) {
+        log('⚠️ Invalid nextAdministrationDate format: $nextAdminDate');
+        return;
+      }
+
+      final now = DateTime.now();
+      if (nextDate.isBefore(now)) {
+        log('⚠️ Next deworming date is in the past, skipping notification');
+        return;
+      }
+
+      // Use notification_type field to allow UI to localize dynamically
+      final notification = NotificationModel(
+        farmUuid: deworming.farmUuid,
+        farmName: null, // Will be populated when displaying
+        livestockUuid: deworming.livestockUuid,
+        livestockName: null, // Will be populated when displaying
+        title: 'deworming_reminder', // Key for localization
+        description: 'time_to_deworm_livestock', // Key for localization
+        scheduledAt: nextDate.toIso8601String(),
+        isCompleted: false,
+        synced: false,
+        syncAction: 'create',
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+        repeatDaily: false,
+      );
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Deworming notification created for ${nextDate.toLocal()}');
+    } catch (e) {
+      log('❌ Failed to create deworming notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail the deworming event
+    }
   }
 
 }

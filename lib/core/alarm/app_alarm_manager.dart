@@ -84,7 +84,13 @@ class AppAlarmManager {
         DateFormat.yMMMd().add_jm().format(scheduledAt.toLocal());
     final defaultBody =
         l10n?.notificationScheduledOn(formattedDate) ?? 'Scheduled on $formattedDate';
-    final body = notification.description ?? defaultBody;
+    
+    // Localize notification title and description
+    final localizedTitle = _localizeNotificationText(notification.title, l10n);
+    final localizedDescription = notification.description != null 
+        ? _localizeNotificationText(notification.description!, l10n)
+        : defaultBody;
+    
     final stopLabel = l10n?.stopAlarm ?? 'Stop alarm';
 
     final alarmSettings = AlarmSettings(
@@ -100,8 +106,8 @@ class AppAlarmManager {
         volumeEnforced: true,
       ),
       notificationSettings: NotificationSettings(
-        title: notification.title,
-        body: body,
+        title: localizedTitle,
+        body: localizedDescription,
         stopButton: stopLabel,
       ),
       payload: jsonEncode({'notificationId': id}),
@@ -155,6 +161,24 @@ class AppAlarmManager {
           ),
         ),
       );
+    }
+  }
+
+  /// Localizes notification text if it's a key, otherwise returns as-is
+  String _localizeNotificationText(String text, AppLocalizations? l10n) {
+    if (l10n == null) return text;
+    
+    switch (text.toLowerCase()) {
+      case 'feeding_reminder':
+        return l10n.feedingReminder;
+      case 'time_to_feed_livestock':
+        return l10n.timeToFeedLivestock;
+      case 'deworming_reminder':
+        return l10n.dewormingReminder;
+      case 'time_to_deworm_livestock':
+        return l10n.timeToDewormLivestock;
+      default:
+        return text; // Return as-is if not a known key
     }
   }
 }

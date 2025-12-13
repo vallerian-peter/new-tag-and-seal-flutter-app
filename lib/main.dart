@@ -57,7 +57,6 @@ void main() async {
   final livestockProvider = LivestockProvider(livestockRepo: livestockRepo);
   final logAdditionalDataProvider =
       LogAdditionalDataProvider(repository: logAdditionalDataRepo);
-  final eventsProvider = EventsProvider(eventsRepository: eventsRepo);
   final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
   final farmUserProvider = FarmUserProvider(repository: farmUserRepo);
   final alarmManager = AppAlarmManager(
@@ -70,6 +69,12 @@ void main() async {
     alarmManager: alarmManager,
   );
   await notificationProvider.loadNotifications();
+  
+  // Initialize EventsProvider with NotificationProvider for automatic notification creation
+  final eventsProvider = EventsProvider(
+    eventsRepository: eventsRepo,
+    notificationProvider: notificationProvider,
+  );
 
   runApp(
     MultiProvider(

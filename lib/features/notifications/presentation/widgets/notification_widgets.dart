@@ -120,7 +120,7 @@ class NotificationTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          notification.title,
+                          _localizeNotificationText(notification.title, l10n),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             decoration: notification.isCompleted
@@ -171,7 +171,7 @@ class NotificationTile extends StatelessWidget {
                       notification.description!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      notification.description!,
+                      _localizeNotificationText(notification.description!, l10n),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.7),
                       ),
@@ -234,6 +234,22 @@ class NotificationTile extends StatelessWidget {
       return Icons.vaccines_outlined;
     }
     return Icons.notifications_active_outlined;
+  }
+
+  /// Localizes notification text if it's a key, otherwise returns as-is
+  static String _localizeNotificationText(String text, AppLocalizations l10n) {
+    switch (text.toLowerCase()) {
+      case 'feeding_reminder':
+        return l10n.feedingReminder;
+      case 'time_to_feed_livestock':
+        return l10n.timeToFeedLivestock;
+      case 'deworming_reminder':
+        return l10n.dewormingReminder;
+      case 'time_to_deworm_livestock':
+        return l10n.timeToDewormLivestock;
+      default:
+        return text; // Return as-is if not a known key
+    }
   }
 }
 

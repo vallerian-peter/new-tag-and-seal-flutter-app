@@ -9,7 +9,9 @@ import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.d
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/weight_input_with_bluetooth.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/livestock_date_entered_farm_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/color_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -385,36 +387,6 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     }
   }
 
-  /// Get list of colors with localization
-  List<DropdownItem<String>> _getColorDropdownItems(AppLocalizations l10n, {String? excludeColor}) {
-    final colors = [
-      DropdownItem(value: 'red', label: l10n.colorRed),
-      DropdownItem(value: 'green', label: l10n.colorGreen),
-      DropdownItem(value: 'blue', label: l10n.colorBlue),
-      DropdownItem(value: 'black', label: l10n.colorBlack),
-      DropdownItem(value: 'white', label: l10n.colorWhite),
-      DropdownItem(value: 'brown', label: l10n.colorBrown),
-      DropdownItem(value: 'yellow', label: l10n.colorYellow),
-      DropdownItem(value: 'orange', label: l10n.colorOrange),
-      DropdownItem(value: 'pink', label: l10n.colorPink),
-      DropdownItem(value: 'gray', label: l10n.colorGray),
-      DropdownItem(value: 'grey', label: l10n.colorGrey),
-      DropdownItem(value: 'purple', label: l10n.colorPurple),
-      DropdownItem(value: 'tan', label: l10n.colorTan),
-      DropdownItem(value: 'beige', label: l10n.colorBeige),
-      DropdownItem(value: 'cream', label: l10n.colorCream),
-      DropdownItem(value: 'gold', label: l10n.colorGold),
-      DropdownItem(value: 'silver', label: l10n.colorSilver),
-      DropdownItem(value: 'mixed', label: l10n.colorMixed),
-    ];
-
-    // Filter out excluded color if provided
-    if (excludeColor != null && excludeColor.isNotEmpty) {
-      return colors.where((item) => item.value != excludeColor).toList();
-    }
-
-    return colors;
-  }
 
   @override
   void dispose() {
@@ -1088,7 +1060,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           hint: l10n.selectPrimaryColor,
           icon: Icons.palette_outlined,
           value: _selectedPrimaryColor,
-          dropdownItems: _getColorDropdownItems(l10n),
+          dropdownItems: ColorHelper.getColorDropdownItems(l10n),
           onChanged: (value) {
             setState(() {
               _selectedPrimaryColor = value;
@@ -1109,7 +1081,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           hint: l10n.selectSecondaryColor,
           icon: Icons.color_lens_outlined,
           value: _selectedSecondaryColor,
-          dropdownItems: _getColorDropdownItems(l10n, excludeColor: _selectedPrimaryColor),
+          dropdownItems: ColorHelper.getColorDropdownItems(l10n, excludeColor: _selectedPrimaryColor),
           onChanged: (value) {
             setState(() => _selectedSecondaryColor = value);
           },
@@ -1221,12 +1193,18 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                 }
               }
             });
+            // Trigger form validation after state update to clear any errors
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_formKey.currentState != null) {
+                _formKey.currentState!.validate();
+              }
+            });
           },
         ),
         const SizedBox(height: 16),
 
         // Date First Entered to Farm
-        CustomDatePicker(
+        LivestockDateEnteredFarmPicker(
           label: l10n.dateEnteredFarmRequired,
           hint: _isBornOnFarmSelected() 
               ? '${l10n.selectDateOfBirth} (Same as Date of Birth)'
@@ -1236,9 +1214,11 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             setState(() => _selectedDateFirstEnteredToFarm = date);
           },
           enabled: !_isBornOnFarmSelected(), // Disable if "Born on Farm" is selected
+          isBornOnFarm: _isBornOnFarmSelected(),
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
           dateValidator: (date) {
+            // The validator receives the field value which gets updated via didChange() in the custom picker
             if (date == null) {
               return l10n.pleaseSelectDateEnteredFarm;
             }

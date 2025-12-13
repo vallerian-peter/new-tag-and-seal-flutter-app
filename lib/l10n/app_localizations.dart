@@ -3230,6 +3230,18 @@ abstract class AppLocalizations {
   /// **'Next feeding time is required'**
   String get nextFeedingTimeRequired;
 
+  /// No description provided for @feedingReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding Reminder'**
+  String get feedingReminder;
+
+  /// No description provided for @timeToFeedLivestock.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to feed livestock'**
+  String get timeToFeedLivestock;
+
   /// No description provided for @previousWeight.
   ///
   /// In en, this message translates to:
@@ -3505,6 +3517,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ensure the deworming information is accurate before saving.'**
   String get ensureDewormingDetailsAccuracy;
+
+  /// No description provided for @dewormingReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Deworming Reminder'**
+  String get dewormingReminder;
+
+  /// No description provided for @timeToDewormLivestock.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to deworm livestock'**
+  String get timeToDewormLivestock;
 
   /// No description provided for @weightChange.
   ///

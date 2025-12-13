@@ -1642,6 +1642,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextFeedingTimeRequired => 'Next feeding time is required';
 
   @override
+  String get feedingReminder => 'Feeding Reminder';
+
+  @override
+  String get timeToFeedLivestock => 'Time to feed livestock';
+
+  @override
   String get previousWeight => 'Old weight';
 
   @override
@@ -1787,6 +1793,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ensureDewormingDetailsAccuracy =>
       'Ensure the deworming information is accurate before saving.';
+
+  @override
+  String get dewormingReminder => 'Deworming Reminder';
+
+  @override
+  String get timeToDewormLivestock => 'Time to deworm livestock';
 
   @override
   String get weightChange => 'Weight Change';
