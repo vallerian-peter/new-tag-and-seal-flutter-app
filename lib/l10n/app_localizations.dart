@@ -368,7 +368,7 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @save.
+  /// Save button text
   ///
   /// In en, this message translates to:
   /// **'Save'**
@@ -476,6 +476,12 @@ abstract class AppLocalizations {
   /// **'Register'**
   String get register;
 
+  /// No description provided for @registerText.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerText;
+
   /// No description provided for @logout.
   ///
   /// In en, this message translates to:
@@ -511,6 +517,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forgot Password?'**
   String get forgotPassword;
+
+  /// Change password screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// Current password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// New password field label
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// Current password field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password'**
+  String get enterCurrentPassword;
+
+  /// New password field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new password'**
+  String get enterNewPassword;
+
+  /// Confirm password field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your new password'**
+  String get enterConfirmPassword;
+
+  /// Current password validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your current password'**
+  String get pleaseEnterCurrentPassword;
+
+  /// New password validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a new password'**
+  String get pleaseEnterNewPassword;
+
+  /// Confirm password validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get pleaseConfirmPassword;
+
+  /// Password minimum length validation error (8 characters)
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get passwordMinLength8;
+
+  /// New password must be different validation error
+  ///
+  /// In en, this message translates to:
+  /// **'New password must be different from current password'**
+  String get newPasswordMustBeDifferent;
+
+  /// Password mismatch validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// Password change confirmation dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to change your password? You will receive an SMS notification after the change.'**
+  String get passwordChangeConfirmation;
+
+  /// Password change success dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Password Changed'**
+  String get passwordChangedSuccessfully;
+
+  /// Password change success dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed successfully. You will receive an SMS notification shortly.'**
+  String get passwordChangeSuccessMessage;
+
+  /// Password change info message
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive an SMS notification on your registered phone number after successfully changing your password.'**
+  String get passwordChangeInfo;
+
+  /// Change password screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password and choose a new secure password. You will receive an SMS notification after the change.'**
+  String get changePasswordSubtitle;
+
+  /// Updating password loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Updating password...'**
+  String get updatingPassword;
+
+  /// Updating profile loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Updating profile...'**
+  String get updatingProfile;
+
+  /// Internet connection check error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your internet connection and try again.'**
+  String get pleaseCheckYourInternetConnection;
+
+  /// Confirm button text
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// Account settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settingsAccountTitle;
+
+  /// Edit profile button text
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// Confirm profile update dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to update your profile?'**
+  String get confirmUpdateProfile;
+
+  /// Profile update success dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Updated'**
+  String get profileUpdated;
+
+  /// Profile update success dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile has been updated successfully.'**
+  String get profileUpdatedSuccessfully;
 
   /// No description provided for @dontHaveAccount.
   ///
@@ -1514,6 +1676,150 @@ abstract class AppLocalizations {
   /// **'Female'**
   String get female;
 
+  /// No description provided for @primaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Color'**
+  String get primaryColor;
+
+  /// No description provided for @secondaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Color'**
+  String get secondaryColor;
+
+  /// No description provided for @selectPrimaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Primary Color'**
+  String get selectPrimaryColor;
+
+  /// No description provided for @selectSecondaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Secondary Color'**
+  String get selectSecondaryColor;
+
+  /// No description provided for @colorInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Color Information'**
+  String get colorInformation;
+
+  /// No description provided for @colorInformationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select primary and secondary colors (optional)'**
+  String get colorInformationSubtitle;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  /// No description provided for @colorBlack.
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get colorBlack;
+
+  /// No description provided for @colorWhite.
+  ///
+  /// In en, this message translates to:
+  /// **'White'**
+  String get colorWhite;
+
+  /// No description provided for @colorBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown'**
+  String get colorBrown;
+
+  /// No description provided for @colorYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get colorYellow;
+
+  /// No description provided for @colorOrange.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get colorOrange;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  /// No description provided for @colorGray.
+  ///
+  /// In en, this message translates to:
+  /// **'Gray'**
+  String get colorGray;
+
+  /// No description provided for @colorGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey'**
+  String get colorGrey;
+
+  /// No description provided for @colorPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get colorPurple;
+
+  /// No description provided for @colorTan.
+  ///
+  /// In en, this message translates to:
+  /// **'Tan'**
+  String get colorTan;
+
+  /// No description provided for @colorBeige.
+  ///
+  /// In en, this message translates to:
+  /// **'Beige'**
+  String get colorBeige;
+
+  /// No description provided for @colorCream.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream'**
+  String get colorCream;
+
+  /// No description provided for @colorGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get colorGold;
+
+  /// No description provided for @colorSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get colorSilver;
+
+  /// No description provided for @colorMixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get colorMixed;
+
   /// No description provided for @nationalId.
   ///
   /// In en, this message translates to:
@@ -1885,6 +2191,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please review all information before submitting. You will receive a confirmation email after successful registration.'**
   String get reviewInfoMessage;
+
+  /// No description provided for @confirmRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to register?'**
+  String get confirmRegister;
 
   /// No description provided for @registrationSuccess.
   ///
@@ -5641,6 +5953,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only farmers, farm managers, and authorized users can access {logType} logs.'**
   String logTypeAccessDenied(String logType);
+
+  /// Message shown when trying to add logs to a livestock that has been disposed (notActive status)
+  ///
+  /// In en, this message translates to:
+  /// **'This livestock is not active. Logs cannot be added for disposed livestock.'**
+  String get livestockNotActiveCannotAddLogs;
+
+  /// Title for forced sync dialog when unsynced data count is high
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Required'**
+  String get syncRequired;
+
+  /// Message for forced sync dialog
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count} unsynced items. Please sync your data to ensure all information is up to date.'**
+  String syncRequiredMessage(int count);
+
+  /// Button text for forced sync dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Now'**
+  String get syncNow;
+
+  /// Link text to Extension Officer login
+  ///
+  /// In en, this message translates to:
+  /// **'Enter as Extension Officer?'**
+  String get enterAsExtensionOfficer;
+
+  /// Extension Officer login screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Extension Officer Login'**
+  String get extensionOfficerLogin;
+
+  /// Extension Officer login subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Access farms you\'ve been invited to'**
+  String get extensionOfficerLoginSubtitle;
+
+  /// Farmer Access Number field label
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer Access Number'**
+  String get farmerAccessNumber;
+
+  /// Farmer Access Number field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter farmer access number'**
+  String get enterFarmerAccessNumber;
+
+  /// Farmer Access Number validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter farmer access number'**
+  String get pleaseEnterFarmerAccessNumber;
 }
 
 class _AppLocalizationsDelegate

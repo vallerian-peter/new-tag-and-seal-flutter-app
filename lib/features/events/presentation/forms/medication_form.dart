@@ -687,19 +687,13 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       builder: (context, child) {
         return Theme(
           data: theme.copyWith(
-            colorScheme: theme.brightness == Brightness.dark
-                ? ColorScheme.dark(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: const Color(0xFF1E1E1E),
-                    onSurface: Colors.white,
-                  )
-                : ColorScheme.light(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: Colors.white,
-                    onSurface: Colors.black87,
-                  ),
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              surface: theme.colorScheme.surface,
+              onSurface: theme.colorScheme.onSurface,
+            ),
+            dialogBackgroundColor: theme.colorScheme.surface,
           ),
           child: child!,
         );
@@ -716,19 +710,13 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       builder: (context, child) {
         return Theme(
           data: theme.copyWith(
-            colorScheme: theme.brightness == Brightness.dark
-                ? ColorScheme.dark(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: const Color(0xFF1E1E1E),
-                    onSurface: Colors.white,
-                  )
-                : ColorScheme.light(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: Colors.white,
-                    onSurface: Colors.black87,
-                  ),
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              surface: theme.colorScheme.surface,
+              onSurface: theme.colorScheme.onSurface,
+            ),
+            dialogBackgroundColor: theme.colorScheme.surface,
           ),
           child: child!,
         );
@@ -1046,9 +1034,8 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.08),
+        color: baseColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: baseColor.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [

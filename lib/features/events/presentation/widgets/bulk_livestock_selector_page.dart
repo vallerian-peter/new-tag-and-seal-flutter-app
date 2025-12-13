@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +48,8 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
     });
 
     try {
-      final livestock = await _database.livestockDao.getActiveLivestockByFarmUuid(
+      // Load all livestock including notActive ones
+      final livestock = await _database.livestockDao.getLivestockByFarmUuid(
         widget.farmUuid,
       );
       final farms = await _database.farmDao.getAllActiveFarms();
@@ -58,7 +59,9 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
 
       setState(() {
         _allLivestock = livestock;
+        // Only preselect active livestock (filter out notActive)
         _selectedLivestockUuids = widget.preselectedLivestock
+            .where((item) => !LivestockHelper.isNotActive(item))
             .map((item) => item.uuid)
             .toSet();
         _farmNames = farmNames;
@@ -103,6 +106,11 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
   }
 
   void _toggleSelection(Livestock livestock) {
+    // Prevent selection of notActive livestock
+    if (LivestockHelper.isNotActive(livestock)) {
+      return;
+    }
+    
     setState(() {
       if (_selectedLivestockUuids.contains(livestock.uuid)) {
         _selectedLivestockUuids.remove(livestock.uuid);
@@ -110,6 +118,10 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
         _selectedLivestockUuids.add(livestock.uuid);
       }
     });
+  }
+  
+  List<Livestock> get _activeLivestock {
+    return _filteredLivestock.where((l) => !LivestockHelper.isNotActive(l)).toList();
   }
 
   String _resolveIdentifier(Livestock livestock) {
@@ -221,15 +233,16 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: CheckboxListTile(
-                    value: _filteredLivestock.isNotEmpty &&
-                        _selectedLivestockUuids.length == _filteredLivestock.length,
-                    onChanged: _filteredLivestock.isEmpty
+                    value: _activeLivestock.isNotEmpty &&
+                        _selectedLivestockUuids.length == _activeLivestock.length,
+                    onChanged: _activeLivestock.isEmpty
                         ? null
                         : (value) {
                             setState(() {
                               if (value == true) {
+                                // Only select active livestock
                                 _selectedLivestockUuids =
-                                    _filteredLivestock.map((e) => e.uuid).toSet();
+                                    _activeLivestock.map((e) => e.uuid).toSet();
                               } else {
                                 _selectedLivestockUuids.clear();
                               }
@@ -301,6 +314,7 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                           separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[200]),
                           itemBuilder: (context, index) {
                             final livestock = _filteredLivestock[index];
+                            final isNotActive = LivestockHelper.isNotActive(livestock);
                             final isSelected =
                                 _selectedLivestockUuids.contains(livestock.uuid);
                             final identifier = _resolveIdentifier(livestock);
@@ -313,35 +327,86 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                               if (identifier.isNotEmpty) identifier,
                             ];
 
-                            return ListTile(
-                              onTap: () => _toggleSelection(livestock),
-                              leading: Checkbox(
-                                value: isSelected,
-                                onChanged: (_) => _toggleSelection(livestock),
-                              ),
-                              title: Text(
-                                livestock.name.isNotEmpty
-                                    ? livestock.name
-                                    : '${l10n.livestock} #${livestock.id}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                    color: theme.primaryColor
-                                  ),
-                              ),
-                              subtitle: subtitleParts.isEmpty
-                                  ? null
-                                  : Text(subtitleParts.join(' • '), 
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.grey[600],
+                            return Opacity(
+                              opacity: isNotActive ? 0.6 : 1.0,
+                              child: ListTile(
+                                onTap: isNotActive ? null : () => _toggleSelection(livestock),
+                                enabled: !isNotActive,
+                                leading: Checkbox(
+                                  value: isSelected,
+                                  onChanged: isNotActive ? null : (_) => _toggleSelection(livestock),
+                                ),
+                                title: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        livestock.name.isNotEmpty
+                                            ? livestock.name
+                                            : '${l10n.livestock} #${livestock.id}',
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                          color: isNotActive
+                                              ? Colors.grey[500]
+                                              : theme.primaryColor,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                              trailing: isSelected
-                                  ? Icon(
-                                      Icons.check_circle,
-                                      color: theme.colorScheme.primary,
-                                    )
-                                  : null,
+                                    // Not Active Badge
+                                    if (isNotActive) ...[
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: Colors.red.withOpacity(0.3),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.cancel_outlined,
+                                              size: 10,
+                                              color: Colors.red[700],
+                                            ),
+                                            const SizedBox(width: 3),
+                                            Text(
+                                              l10n.notActive,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.red[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                subtitle: subtitleParts.isEmpty
+                                    ? null
+                                    : Text(subtitleParts.join(' • '), 
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: isNotActive
+                                            ? Colors.grey[400]
+                                            : Colors.grey[600],
+                                      ),
+                                    ),
+                                trailing: isSelected
+                                    ? Icon(
+                                        Icons.check_circle,
+                                        color: theme.colorScheme.primary,
+                                      )
+                                    : null,
+                              ),
                             );
                           },
                         ),

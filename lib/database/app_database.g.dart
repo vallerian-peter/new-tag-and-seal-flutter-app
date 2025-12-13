@@ -3521,9 +3521,9 @@ class $LivestocksTable extends Livestocks
   late final GeneratedColumn<String> dummyTagId = GeneratedColumn<String>(
     'dummy_tag_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _barcodeTagIdMeta = const VerificationMeta(
     'barcodeTagId',
@@ -3532,9 +3532,9 @@ class $LivestocksTable extends Livestocks
   late final GeneratedColumn<String> barcodeTagId = GeneratedColumn<String>(
     'barcode_tag_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _rfidTagIdMeta = const VerificationMeta(
@@ -3544,9 +3544,9 @@ class $LivestocksTable extends Livestocks
   late final GeneratedColumn<String> rfidTagId = GeneratedColumn<String>(
     'rfid_tag_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _livestockTypeIdMeta = const VerificationMeta(
@@ -3676,6 +3676,28 @@ class $LivestocksTable extends Livestocks
         type: DriftSqlType.double,
         requiredDuringInsert: true,
       );
+  static const VerificationMeta _primaryColorMeta = const VerificationMeta(
+    'primaryColor',
+  );
+  @override
+  late final GeneratedColumn<String> primaryColor = GeneratedColumn<String>(
+    'primary_color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _secondaryColorMeta = const VerificationMeta(
+    'secondaryColor',
+  );
+  @override
+  late final GeneratedColumn<String> secondaryColor = GeneratedColumn<String>(
+    'secondary_color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
   @override
   late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
@@ -3744,6 +3766,8 @@ class $LivestocksTable extends Livestocks
     livestockObtainedMethodId,
     dateFirstEnteredToFarm,
     weightAsOnRegistration,
+    primaryColor,
+    secondaryColor,
     synced,
     syncAction,
     createdAt,
@@ -3799,8 +3823,6 @@ class $LivestocksTable extends Livestocks
           _dummyTagIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_dummyTagIdMeta);
     }
     if (data.containsKey('barcode_tag_id')) {
       context.handle(
@@ -3810,16 +3832,12 @@ class $LivestocksTable extends Livestocks
           _barcodeTagIdMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_barcodeTagIdMeta);
     }
     if (data.containsKey('rfid_tag_id')) {
       context.handle(
         _rfidTagIdMeta,
         rfidTagId.isAcceptableOrUnknown(data['rfid_tag_id']!, _rfidTagIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_rfidTagIdMeta);
     }
     if (data.containsKey('livestock_type_id')) {
       context.handle(
@@ -3926,6 +3944,24 @@ class $LivestocksTable extends Livestocks
     } else if (isInserting) {
       context.missing(_weightAsOnRegistrationMeta);
     }
+    if (data.containsKey('primary_color')) {
+      context.handle(
+        _primaryColorMeta,
+        primaryColor.isAcceptableOrUnknown(
+          data['primary_color']!,
+          _primaryColorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('secondary_color')) {
+      context.handle(
+        _secondaryColorMeta,
+        secondaryColor.isAcceptableOrUnknown(
+          data['secondary_color']!,
+          _secondaryColorMeta,
+        ),
+      );
+    }
     if (data.containsKey('synced')) {
       context.handle(
         _syncedMeta,
@@ -3982,15 +4018,15 @@ class $LivestocksTable extends Livestocks
       dummyTagId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}dummy_tag_id'],
-      )!,
+      ),
       barcodeTagId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}barcode_tag_id'],
-      )!,
+      ),
       rfidTagId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}rfid_tag_id'],
-      )!,
+      ),
       livestockTypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}livestock_type_id'],
@@ -4039,6 +4075,14 @@ class $LivestocksTable extends Livestocks
         DriftSqlType.double,
         data['${effectivePrefix}weight_as_on_registration'],
       )!,
+      primaryColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_color'],
+      ),
+      secondaryColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secondary_color'],
+      ),
       synced: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}synced'],
@@ -4069,9 +4113,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
   final String farmUuid;
   final String uuid;
   final String identificationNumber;
-  final String dummyTagId;
-  final String barcodeTagId;
-  final String rfidTagId;
+  final String? dummyTagId;
+  final String? barcodeTagId;
+  final String? rfidTagId;
   final int livestockTypeId;
   final String name;
   final String dateOfBirth;
@@ -4084,6 +4128,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
   final int livestockObtainedMethodId;
   final DateTime dateFirstEnteredToFarm;
   final double weightAsOnRegistration;
+  final String? primaryColor;
+  final String? secondaryColor;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -4093,9 +4139,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     required this.farmUuid,
     required this.uuid,
     required this.identificationNumber,
-    required this.dummyTagId,
-    required this.barcodeTagId,
-    required this.rfidTagId,
+    this.dummyTagId,
+    this.barcodeTagId,
+    this.rfidTagId,
     required this.livestockTypeId,
     required this.name,
     required this.dateOfBirth,
@@ -4108,6 +4154,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     required this.livestockObtainedMethodId,
     required this.dateFirstEnteredToFarm,
     required this.weightAsOnRegistration,
+    this.primaryColor,
+    this.secondaryColor,
     required this.synced,
     required this.syncAction,
     required this.createdAt,
@@ -4120,9 +4168,15 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['uuid'] = Variable<String>(uuid);
     map['identification_number'] = Variable<String>(identificationNumber);
-    map['dummy_tag_id'] = Variable<String>(dummyTagId);
-    map['barcode_tag_id'] = Variable<String>(barcodeTagId);
-    map['rfid_tag_id'] = Variable<String>(rfidTagId);
+    if (!nullToAbsent || dummyTagId != null) {
+      map['dummy_tag_id'] = Variable<String>(dummyTagId);
+    }
+    if (!nullToAbsent || barcodeTagId != null) {
+      map['barcode_tag_id'] = Variable<String>(barcodeTagId);
+    }
+    if (!nullToAbsent || rfidTagId != null) {
+      map['rfid_tag_id'] = Variable<String>(rfidTagId);
+    }
     map['livestock_type_id'] = Variable<int>(livestockTypeId);
     map['name'] = Variable<String>(name);
     map['date_of_birth'] = Variable<String>(dateOfBirth);
@@ -4143,6 +4197,12 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       dateFirstEnteredToFarm,
     );
     map['weight_as_on_registration'] = Variable<double>(weightAsOnRegistration);
+    if (!nullToAbsent || primaryColor != null) {
+      map['primary_color'] = Variable<String>(primaryColor);
+    }
+    if (!nullToAbsent || secondaryColor != null) {
+      map['secondary_color'] = Variable<String>(secondaryColor);
+    }
     map['synced'] = Variable<bool>(synced);
     map['sync_action'] = Variable<String>(syncAction);
     map['created_at'] = Variable<String>(createdAt);
@@ -4156,9 +4216,15 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       farmUuid: Value(farmUuid),
       uuid: Value(uuid),
       identificationNumber: Value(identificationNumber),
-      dummyTagId: Value(dummyTagId),
-      barcodeTagId: Value(barcodeTagId),
-      rfidTagId: Value(rfidTagId),
+      dummyTagId: dummyTagId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dummyTagId),
+      barcodeTagId: barcodeTagId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(barcodeTagId),
+      rfidTagId: rfidTagId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rfidTagId),
       livestockTypeId: Value(livestockTypeId),
       name: Value(name),
       dateOfBirth: Value(dateOfBirth),
@@ -4175,6 +4241,12 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       livestockObtainedMethodId: Value(livestockObtainedMethodId),
       dateFirstEnteredToFarm: Value(dateFirstEnteredToFarm),
       weightAsOnRegistration: Value(weightAsOnRegistration),
+      primaryColor: primaryColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(primaryColor),
+      secondaryColor: secondaryColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(secondaryColor),
       synced: Value(synced),
       syncAction: Value(syncAction),
       createdAt: Value(createdAt),
@@ -4194,9 +4266,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       identificationNumber: serializer.fromJson<String>(
         json['identificationNumber'],
       ),
-      dummyTagId: serializer.fromJson<String>(json['dummyTagId']),
-      barcodeTagId: serializer.fromJson<String>(json['barcodeTagId']),
-      rfidTagId: serializer.fromJson<String>(json['rfidTagId']),
+      dummyTagId: serializer.fromJson<String?>(json['dummyTagId']),
+      barcodeTagId: serializer.fromJson<String?>(json['barcodeTagId']),
+      rfidTagId: serializer.fromJson<String?>(json['rfidTagId']),
       livestockTypeId: serializer.fromJson<int>(json['livestockTypeId']),
       name: serializer.fromJson<String>(json['name']),
       dateOfBirth: serializer.fromJson<String>(json['dateOfBirth']),
@@ -4215,6 +4287,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       weightAsOnRegistration: serializer.fromJson<double>(
         json['weightAsOnRegistration'],
       ),
+      primaryColor: serializer.fromJson<String?>(json['primaryColor']),
+      secondaryColor: serializer.fromJson<String?>(json['secondaryColor']),
       synced: serializer.fromJson<bool>(json['synced']),
       syncAction: serializer.fromJson<String>(json['syncAction']),
       createdAt: serializer.fromJson<String>(json['createdAt']),
@@ -4229,9 +4303,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       'farmUuid': serializer.toJson<String>(farmUuid),
       'uuid': serializer.toJson<String>(uuid),
       'identificationNumber': serializer.toJson<String>(identificationNumber),
-      'dummyTagId': serializer.toJson<String>(dummyTagId),
-      'barcodeTagId': serializer.toJson<String>(barcodeTagId),
-      'rfidTagId': serializer.toJson<String>(rfidTagId),
+      'dummyTagId': serializer.toJson<String?>(dummyTagId),
+      'barcodeTagId': serializer.toJson<String?>(barcodeTagId),
+      'rfidTagId': serializer.toJson<String?>(rfidTagId),
       'livestockTypeId': serializer.toJson<int>(livestockTypeId),
       'name': serializer.toJson<String>(name),
       'dateOfBirth': serializer.toJson<String>(dateOfBirth),
@@ -4250,6 +4324,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       'weightAsOnRegistration': serializer.toJson<double>(
         weightAsOnRegistration,
       ),
+      'primaryColor': serializer.toJson<String?>(primaryColor),
+      'secondaryColor': serializer.toJson<String?>(secondaryColor),
       'synced': serializer.toJson<bool>(synced),
       'syncAction': serializer.toJson<String>(syncAction),
       'createdAt': serializer.toJson<String>(createdAt),
@@ -4262,9 +4338,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     String? farmUuid,
     String? uuid,
     String? identificationNumber,
-    String? dummyTagId,
-    String? barcodeTagId,
-    String? rfidTagId,
+    Value<String?> dummyTagId = const Value.absent(),
+    Value<String?> barcodeTagId = const Value.absent(),
+    Value<String?> rfidTagId = const Value.absent(),
     int? livestockTypeId,
     String? name,
     String? dateOfBirth,
@@ -4277,6 +4353,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     int? livestockObtainedMethodId,
     DateTime? dateFirstEnteredToFarm,
     double? weightAsOnRegistration,
+    Value<String?> primaryColor = const Value.absent(),
+    Value<String?> secondaryColor = const Value.absent(),
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -4286,9 +4364,9 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     farmUuid: farmUuid ?? this.farmUuid,
     uuid: uuid ?? this.uuid,
     identificationNumber: identificationNumber ?? this.identificationNumber,
-    dummyTagId: dummyTagId ?? this.dummyTagId,
-    barcodeTagId: barcodeTagId ?? this.barcodeTagId,
-    rfidTagId: rfidTagId ?? this.rfidTagId,
+    dummyTagId: dummyTagId.present ? dummyTagId.value : this.dummyTagId,
+    barcodeTagId: barcodeTagId.present ? barcodeTagId.value : this.barcodeTagId,
+    rfidTagId: rfidTagId.present ? rfidTagId.value : this.rfidTagId,
     livestockTypeId: livestockTypeId ?? this.livestockTypeId,
     name: name ?? this.name,
     dateOfBirth: dateOfBirth ?? this.dateOfBirth,
@@ -4304,6 +4382,10 @@ class Livestock extends DataClass implements Insertable<Livestock> {
         dateFirstEnteredToFarm ?? this.dateFirstEnteredToFarm,
     weightAsOnRegistration:
         weightAsOnRegistration ?? this.weightAsOnRegistration,
+    primaryColor: primaryColor.present ? primaryColor.value : this.primaryColor,
+    secondaryColor: secondaryColor.present
+        ? secondaryColor.value
+        : this.secondaryColor,
     synced: synced ?? this.synced,
     syncAction: syncAction ?? this.syncAction,
     createdAt: createdAt ?? this.createdAt,
@@ -4350,6 +4432,12 @@ class Livestock extends DataClass implements Insertable<Livestock> {
       weightAsOnRegistration: data.weightAsOnRegistration.present
           ? data.weightAsOnRegistration.value
           : this.weightAsOnRegistration,
+      primaryColor: data.primaryColor.present
+          ? data.primaryColor.value
+          : this.primaryColor,
+      secondaryColor: data.secondaryColor.present
+          ? data.secondaryColor.value
+          : this.secondaryColor,
       synced: data.synced.present ? data.synced.value : this.synced,
       syncAction: data.syncAction.present
           ? data.syncAction.value
@@ -4381,6 +4469,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
           ..write('livestockObtainedMethodId: $livestockObtainedMethodId, ')
           ..write('dateFirstEnteredToFarm: $dateFirstEnteredToFarm, ')
           ..write('weightAsOnRegistration: $weightAsOnRegistration, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('secondaryColor: $secondaryColor, ')
           ..write('synced: $synced, ')
           ..write('syncAction: $syncAction, ')
           ..write('createdAt: $createdAt, ')
@@ -4410,6 +4500,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
     livestockObtainedMethodId,
     dateFirstEnteredToFarm,
     weightAsOnRegistration,
+    primaryColor,
+    secondaryColor,
     synced,
     syncAction,
     createdAt,
@@ -4438,6 +4530,8 @@ class Livestock extends DataClass implements Insertable<Livestock> {
           other.livestockObtainedMethodId == this.livestockObtainedMethodId &&
           other.dateFirstEnteredToFarm == this.dateFirstEnteredToFarm &&
           other.weightAsOnRegistration == this.weightAsOnRegistration &&
+          other.primaryColor == this.primaryColor &&
+          other.secondaryColor == this.secondaryColor &&
           other.synced == this.synced &&
           other.syncAction == this.syncAction &&
           other.createdAt == this.createdAt &&
@@ -4449,9 +4543,9 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
   final Value<String> farmUuid;
   final Value<String> uuid;
   final Value<String> identificationNumber;
-  final Value<String> dummyTagId;
-  final Value<String> barcodeTagId;
-  final Value<String> rfidTagId;
+  final Value<String?> dummyTagId;
+  final Value<String?> barcodeTagId;
+  final Value<String?> rfidTagId;
   final Value<int> livestockTypeId;
   final Value<String> name;
   final Value<String> dateOfBirth;
@@ -4464,6 +4558,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
   final Value<int> livestockObtainedMethodId;
   final Value<DateTime> dateFirstEnteredToFarm;
   final Value<double> weightAsOnRegistration;
+  final Value<String?> primaryColor;
+  final Value<String?> secondaryColor;
   final Value<bool> synced;
   final Value<String> syncAction;
   final Value<String> createdAt;
@@ -4488,6 +4584,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     this.livestockObtainedMethodId = const Value.absent(),
     this.dateFirstEnteredToFarm = const Value.absent(),
     this.weightAsOnRegistration = const Value.absent(),
+    this.primaryColor = const Value.absent(),
+    this.secondaryColor = const Value.absent(),
     this.synced = const Value.absent(),
     this.syncAction = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -4498,9 +4596,9 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     required String farmUuid,
     required String uuid,
     required String identificationNumber,
-    required String dummyTagId,
-    required String barcodeTagId,
-    required String rfidTagId,
+    this.dummyTagId = const Value.absent(),
+    this.barcodeTagId = const Value.absent(),
+    this.rfidTagId = const Value.absent(),
     required int livestockTypeId,
     required String name,
     required String dateOfBirth,
@@ -4513,6 +4611,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     required int livestockObtainedMethodId,
     required DateTime dateFirstEnteredToFarm,
     required double weightAsOnRegistration,
+    this.primaryColor = const Value.absent(),
+    this.secondaryColor = const Value.absent(),
     this.synced = const Value.absent(),
     this.syncAction = const Value.absent(),
     required String createdAt,
@@ -4520,9 +4620,6 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
   }) : farmUuid = Value(farmUuid),
        uuid = Value(uuid),
        identificationNumber = Value(identificationNumber),
-       dummyTagId = Value(dummyTagId),
-       barcodeTagId = Value(barcodeTagId),
-       rfidTagId = Value(rfidTagId),
        livestockTypeId = Value(livestockTypeId),
        name = Value(name),
        dateOfBirth = Value(dateOfBirth),
@@ -4554,6 +4651,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     Expression<int>? livestockObtainedMethodId,
     Expression<DateTime>? dateFirstEnteredToFarm,
     Expression<double>? weightAsOnRegistration,
+    Expression<String>? primaryColor,
+    Expression<String>? secondaryColor,
     Expression<bool>? synced,
     Expression<String>? syncAction,
     Expression<String>? createdAt,
@@ -4583,6 +4682,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
         'date_first_entered_to_farm': dateFirstEnteredToFarm,
       if (weightAsOnRegistration != null)
         'weight_as_on_registration': weightAsOnRegistration,
+      if (primaryColor != null) 'primary_color': primaryColor,
+      if (secondaryColor != null) 'secondary_color': secondaryColor,
       if (synced != null) 'synced': synced,
       if (syncAction != null) 'sync_action': syncAction,
       if (createdAt != null) 'created_at': createdAt,
@@ -4595,9 +4696,9 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     Value<String>? farmUuid,
     Value<String>? uuid,
     Value<String>? identificationNumber,
-    Value<String>? dummyTagId,
-    Value<String>? barcodeTagId,
-    Value<String>? rfidTagId,
+    Value<String?>? dummyTagId,
+    Value<String?>? barcodeTagId,
+    Value<String?>? rfidTagId,
     Value<int>? livestockTypeId,
     Value<String>? name,
     Value<String>? dateOfBirth,
@@ -4610,6 +4711,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
     Value<int>? livestockObtainedMethodId,
     Value<DateTime>? dateFirstEnteredToFarm,
     Value<double>? weightAsOnRegistration,
+    Value<String?>? primaryColor,
+    Value<String?>? secondaryColor,
     Value<bool>? synced,
     Value<String>? syncAction,
     Value<String>? createdAt,
@@ -4638,6 +4741,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
           dateFirstEnteredToFarm ?? this.dateFirstEnteredToFarm,
       weightAsOnRegistration:
           weightAsOnRegistration ?? this.weightAsOnRegistration,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -4713,6 +4818,12 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
         weightAsOnRegistration.value,
       );
     }
+    if (primaryColor.present) {
+      map['primary_color'] = Variable<String>(primaryColor.value);
+    }
+    if (secondaryColor.present) {
+      map['secondary_color'] = Variable<String>(secondaryColor.value);
+    }
     if (synced.present) {
       map['synced'] = Variable<bool>(synced.value);
     }
@@ -4750,6 +4861,8 @@ class LivestocksCompanion extends UpdateCompanion<Livestock> {
           ..write('livestockObtainedMethodId: $livestockObtainedMethodId, ')
           ..write('dateFirstEnteredToFarm: $dateFirstEnteredToFarm, ')
           ..write('weightAsOnRegistration: $weightAsOnRegistration, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('secondaryColor: $secondaryColor, ')
           ..write('synced: $synced, ')
           ..write('syncAction: $syncAction, ')
           ..write('createdAt: $createdAt, ')
@@ -27233,9 +27346,9 @@ typedef $$LivestocksTableCreateCompanionBuilder =
       required String farmUuid,
       required String uuid,
       required String identificationNumber,
-      required String dummyTagId,
-      required String barcodeTagId,
-      required String rfidTagId,
+      Value<String?> dummyTagId,
+      Value<String?> barcodeTagId,
+      Value<String?> rfidTagId,
       required int livestockTypeId,
       required String name,
       required String dateOfBirth,
@@ -27248,6 +27361,8 @@ typedef $$LivestocksTableCreateCompanionBuilder =
       required int livestockObtainedMethodId,
       required DateTime dateFirstEnteredToFarm,
       required double weightAsOnRegistration,
+      Value<String?> primaryColor,
+      Value<String?> secondaryColor,
       Value<bool> synced,
       Value<String> syncAction,
       required String createdAt,
@@ -27259,9 +27374,9 @@ typedef $$LivestocksTableUpdateCompanionBuilder =
       Value<String> farmUuid,
       Value<String> uuid,
       Value<String> identificationNumber,
-      Value<String> dummyTagId,
-      Value<String> barcodeTagId,
-      Value<String> rfidTagId,
+      Value<String?> dummyTagId,
+      Value<String?> barcodeTagId,
+      Value<String?> rfidTagId,
       Value<int> livestockTypeId,
       Value<String> name,
       Value<String> dateOfBirth,
@@ -27274,6 +27389,8 @@ typedef $$LivestocksTableUpdateCompanionBuilder =
       Value<int> livestockObtainedMethodId,
       Value<DateTime> dateFirstEnteredToFarm,
       Value<double> weightAsOnRegistration,
+      Value<String?> primaryColor,
+      Value<String?> secondaryColor,
       Value<bool> synced,
       Value<String> syncAction,
       Value<String> createdAt,
@@ -27381,6 +27498,16 @@ class $$LivestocksTableFilterComposer
 
   ColumnFilters<double> get weightAsOnRegistration => $composableBuilder(
     column: $table.weightAsOnRegistration,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secondaryColor => $composableBuilder(
+    column: $table.secondaryColor,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -27509,6 +27636,16 @@ class $$LivestocksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secondaryColor => $composableBuilder(
+    column: $table.secondaryColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get synced => $composableBuilder(
     column: $table.synced,
     builder: (column) => ColumnOrderings(column),
@@ -27616,6 +27753,16 @@ class $$LivestocksTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get secondaryColor => $composableBuilder(
+    column: $table.secondaryColor,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<bool> get synced =>
       $composableBuilder(column: $table.synced, builder: (column) => column);
 
@@ -27666,9 +27813,9 @@ class $$LivestocksTableTableManager
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
                 Value<String> identificationNumber = const Value.absent(),
-                Value<String> dummyTagId = const Value.absent(),
-                Value<String> barcodeTagId = const Value.absent(),
-                Value<String> rfidTagId = const Value.absent(),
+                Value<String?> dummyTagId = const Value.absent(),
+                Value<String?> barcodeTagId = const Value.absent(),
+                Value<String?> rfidTagId = const Value.absent(),
                 Value<int> livestockTypeId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> dateOfBirth = const Value.absent(),
@@ -27681,6 +27828,8 @@ class $$LivestocksTableTableManager
                 Value<int> livestockObtainedMethodId = const Value.absent(),
                 Value<DateTime> dateFirstEnteredToFarm = const Value.absent(),
                 Value<double> weightAsOnRegistration = const Value.absent(),
+                Value<String?> primaryColor = const Value.absent(),
+                Value<String?> secondaryColor = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
                 Value<String> syncAction = const Value.absent(),
                 Value<String> createdAt = const Value.absent(),
@@ -27705,6 +27854,8 @@ class $$LivestocksTableTableManager
                 livestockObtainedMethodId: livestockObtainedMethodId,
                 dateFirstEnteredToFarm: dateFirstEnteredToFarm,
                 weightAsOnRegistration: weightAsOnRegistration,
+                primaryColor: primaryColor,
+                secondaryColor: secondaryColor,
                 synced: synced,
                 syncAction: syncAction,
                 createdAt: createdAt,
@@ -27716,9 +27867,9 @@ class $$LivestocksTableTableManager
                 required String farmUuid,
                 required String uuid,
                 required String identificationNumber,
-                required String dummyTagId,
-                required String barcodeTagId,
-                required String rfidTagId,
+                Value<String?> dummyTagId = const Value.absent(),
+                Value<String?> barcodeTagId = const Value.absent(),
+                Value<String?> rfidTagId = const Value.absent(),
                 required int livestockTypeId,
                 required String name,
                 required String dateOfBirth,
@@ -27731,6 +27882,8 @@ class $$LivestocksTableTableManager
                 required int livestockObtainedMethodId,
                 required DateTime dateFirstEnteredToFarm,
                 required double weightAsOnRegistration,
+                Value<String?> primaryColor = const Value.absent(),
+                Value<String?> secondaryColor = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
                 Value<String> syncAction = const Value.absent(),
                 required String createdAt,
@@ -27755,6 +27908,8 @@ class $$LivestocksTableTableManager
                 livestockObtainedMethodId: livestockObtainedMethodId,
                 dateFirstEnteredToFarm: dateFirstEnteredToFarm,
                 weightAsOnRegistration: weightAsOnRegistration,
+                primaryColor: primaryColor,
+                secondaryColor: secondaryColor,
                 synced: synced,
                 syncAction: syncAction,
                 createdAt: createdAt,

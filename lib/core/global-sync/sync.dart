@@ -281,7 +281,7 @@ class Sync {
   ///   12. Dryoffs ✅
   ///   13. Transfers ✅
   /// - Vaccines
-  /// - FarmUsers
+  /// - FarmUsers]
   static Future<Map<String, dynamic>> _collectUnsyncedData(
     AppDatabase database,
   ) async {

@@ -692,6 +692,13 @@ class EventsRepository implements EventsRepositoryInterface {
     );
 
     final inserted = await _eventDao.upsertDisposal(_toDisposalCompanion(localModel));
+    
+    // Update livestock status to 'notActive' if disposal type exists
+    // All disposal types (Dead, Slaughtered, Lost, Culled) mean livestock is no longer active
+    if (model.disposalTypeId != null) {
+      await _updateLivestockStatusForDisposal(model.livestockUuid, 'notActive');
+    }
+    
     return _mapDisposalEntity(inserted);
   }
 
@@ -1077,6 +1084,18 @@ class EventsRepository implements EventsRepositoryInterface {
     final medicationsCount = (await getMedications()).length;
     final vaccinationsCount = (await getVaccinations()).length;
     final disposalsCount = (await getDisposals()).length;
+    final birthEvents = await getBirthEvents();
+    final abortedPregnanciesCount = (await getAbortedPregnancies()).length;
+    final inseminationsCount = (await getInseminations()).length;
+    final milkingsCount = (await getMilkings()).length;
+    final pregnanciesCount = (await getPregnancies()).length;
+    final dryoffsCount = (await getDryoffs()).length;
+    final transfersCount = (await getTransfers()).length;
+
+    // Count calving and farrowing separately from birthEvents
+    final calvingCount = birthEvents.where((e) => e.eventType == EventLogTypes.calving).length;
+    final farrowingCount = birthEvents.where((e) => e.eventType == EventLogTypes.farrowing).length;
+
     return EventSummary(
       byType: {
         EventLogTypes.feeding: feedingsCount,
@@ -1085,6 +1104,14 @@ class EventsRepository implements EventsRepositoryInterface {
         EventLogTypes.medication: medicationsCount,
         EventLogTypes.vaccination: vaccinationsCount,
         EventLogTypes.disposal: disposalsCount,
+        EventLogTypes.calving: calvingCount,
+        EventLogTypes.farrowing: farrowingCount,
+        EventLogTypes.abortedPregnancy: abortedPregnanciesCount,
+        EventLogTypes.insemination: inseminationsCount,
+        EventLogTypes.milking: milkingsCount,
+        EventLogTypes.pregnancy: pregnanciesCount,
+        EventLogTypes.dryoff: dryoffsCount,
+        EventLogTypes.transfer: transfersCount,
       },
     );
   }
@@ -2441,6 +2468,75 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.upsertTransfer(_toTransferCompanion(model));
         log('✅ Marked transfer log as synced: $uuid');
       }
+    }
+  }
+
+  /// Update livestock status to 'notActive' when a disposal is created.
+  /// 
+  /// All disposal types (Dead, Slaughtered, Lost, Culled) indicate that the livestock
+  /// is no longer active in the farm, so the status should be updated to 'notActive'.
+  /// 
+  /// **Parameters:**
+  /// - `livestockUuid`: UUID of the livestock to update
+  /// - `newStatus`: New status to set (default: 'notActive')
+  /// 
+  /// **Returns:**
+  /// - `true` if update was successful, `false` otherwise
+  Future<bool> _updateLivestockStatusForDisposal(String livestockUuid, String newStatus) async {
+    try {
+      // Get livestock from database
+      final livestock = await _database.livestockDao.getLivestockByUuid(livestockUuid);
+      
+      if (livestock == null) {
+        log('⚠️ Livestock not found for disposal status update: UUID $livestockUuid');
+        return false;
+      }
+
+      // Check if livestock is already not-active
+      if (livestock.status == 'notActive' || livestock.status == 'not-active') {
+        log('ℹ️ Livestock already not-active: UUID $livestockUuid');
+        return true;
+      }
+
+      // Create updated livestock object with new status and mark as unsynced
+      final updatedLivestock = Livestock(
+        id: livestock.id,
+        farmUuid: livestock.farmUuid,
+        uuid: livestock.uuid,
+        identificationNumber: livestock.identificationNumber,
+        dummyTagId: livestock.dummyTagId,
+        barcodeTagId: livestock.barcodeTagId,
+        rfidTagId: livestock.rfidTagId,
+        livestockTypeId: livestock.livestockTypeId,
+        name: livestock.name,
+        dateOfBirth: livestock.dateOfBirth,
+        motherUuid: livestock.motherUuid,
+        fatherUuid: livestock.fatherUuid,
+        gender: livestock.gender,
+        breedId: livestock.breedId,
+        speciesId: livestock.speciesId,
+        status: newStatus, // Update status to 'notActive'
+        livestockObtainedMethodId: livestock.livestockObtainedMethodId,
+        dateFirstEnteredToFarm: livestock.dateFirstEnteredToFarm,
+        weightAsOnRegistration: livestock.weightAsOnRegistration,
+        synced: false, // Mark as unsynced so status update gets synced to server
+        syncAction: 'update', // Mark sync action as update
+        createdAt: livestock.createdAt,
+        updatedAt: DateTime.now().toIso8601String(), // Update timestamp
+      );
+
+      final success = await _database.livestockDao.updateLivestock(updatedLivestock);
+      
+      if (success) {
+        log('✅ Livestock status updated to $newStatus for disposal: UUID $livestockUuid');
+      } else {
+        log('⚠️ Failed to update livestock status for disposal: UUID $livestockUuid');
+      }
+      
+      return success;
+    } catch (e, stackTrace) {
+      log('❌ Error updating livestock status for disposal: $e', stackTrace: stackTrace);
+      return false;
     }
   }
 }

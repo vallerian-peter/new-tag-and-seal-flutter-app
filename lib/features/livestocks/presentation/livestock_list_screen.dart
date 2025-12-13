@@ -8,7 +8,6 @@ import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_stat_card.dart';
-import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_filter_pills.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_card.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_details_modal.dart';
 import 'package:provider/provider.dart';
@@ -27,8 +26,11 @@ class LivestockListScreen extends StatefulWidget {
 class _LivestockListScreenState extends State<LivestockListScreen>
     with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedFilter = 'All';
+  String _selectedGenderFilter = 'All';
+  String _selectedStatusFilter = 'All';
+  int? _selectedLivestockTypeId;
   String _currentSearchQuery = '';
+  List<LivestockType> _livestockTypes = [];
 
   @override
   void initState() {
@@ -70,24 +72,45 @@ class _LivestockListScreenState extends State<LivestockListScreen>
       farmNamesMap[farm.uuid] = farm.name;
     }
     livestockProvider.setFarmNames(farmNamesMap);
+
+    // Fetch livestock types
+    final livestockTypes = await database.livestockTypeDao.getAllLivestockTypes();
+    if (mounted) {
+      setState(() {
+        _livestockTypes = livestockTypes;
+      });
+      final livestockTypeNamesMap = <int, String>{};
+      for (var type in livestockTypes) {
+        livestockTypeNamesMap[type.id] = type.name;
+      }
+      livestockProvider.setLivestockTypeNames(livestockTypeNamesMap);
+    }
   }
 
-  void _onFilterSelected(String filter) {
+  void _onLivestockTypeFilterSelected(int? typeId) {
     setState(() {
-      _selectedFilter = filter;
+      _selectedLivestockTypeId = typeId; // null means "All"
     });
+    // Apply filters - when typeId is null, it should show all livestock types
+    _applyFilters();
+  }
+
+  void _applyFilters() {
     final livestockProvider =
         Provider.of<LivestockProvider>(context, listen: false);
-    livestockProvider.filterLivestock(_currentSearchQuery, filter);
+    livestockProvider.filterLivestock(
+      _currentSearchQuery,
+      genderFilter: _selectedGenderFilter,
+      statusFilter: _selectedStatusFilter,
+      livestockTypeId: _selectedLivestockTypeId,
+    );
   }
 
   void _onSearchChanged(String query) {
     setState(() {
       _currentSearchQuery = query;
     });
-    final livestockProvider =
-        Provider.of<LivestockProvider>(context, listen: false);
-    livestockProvider.filterLivestock(query, _selectedFilter);
+    _applyFilters();
   }
 
   void _onClearSearch() {
@@ -279,15 +302,83 @@ class _LivestockListScreenState extends State<LivestockListScreen>
 
                           const SizedBox(height: 16),
 
-                          // Filter Pills
-                          LivestockFilterPills(
-                            selectedFilter: _selectedFilter,
-                            onFilterSelected: _onFilterSelected,
-                            filters: [
-                              FilterOption(label: l10n.allText, value: 'All'),
-                              FilterOption(label: l10n.male, value: 'Male'),
-                              FilterOption(label: l10n.female, value: 'Female'),
-                            ],
+                          // Combined Filters Row - All horizontal
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                // All Filter
+                                _buildFilterPill(
+                                  context,
+                                  label: l10n.allText,
+                                  isSelected: _selectedGenderFilter == 'All' && _selectedStatusFilter == 'All' && _selectedLivestockTypeId == null,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = 'All';
+                                      _selectedStatusFilter = 'All';
+                                      _selectedLivestockTypeId = null;
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                // Gender Filters
+                                _buildFilterPill(
+                                  context,
+                                  label: l10n.male,
+                                  isSelected: _selectedGenderFilter == 'Male',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = _selectedGenderFilter == 'Male' ? 'All' : 'Male';
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildFilterPill(
+                                  context,
+                                  label: l10n.female,
+                                  isSelected: _selectedGenderFilter == 'Female',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = _selectedGenderFilter == 'Female' ? 'All' : 'Female';
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                // Status Filters
+                                _buildFilterPill(
+                                  context,
+                                  label: l10n.active,
+                                  isSelected: _selectedStatusFilter == 'active',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedStatusFilter = _selectedStatusFilter == 'active' ? 'All' : 'active';
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildFilterPill(
+                                  context,
+                                  label: l10n.notActive,
+                                  isSelected: _selectedStatusFilter == 'notActive',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedStatusFilter = _selectedStatusFilter == 'notActive' ? 'All' : 'notActive';
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                                const SizedBox(width: 12),
+                                // Livestock Type Dropdown
+                                SizedBox(
+                                  width: 140,
+                                  child: _buildLivestockTypeDropdown(context, l10n),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -434,6 +525,98 @@ class _LivestockListScreenState extends State<LivestockListScreen>
           childCount: livestockProvider.filteredLivestock.length,
         ),
       ),
+    );
+  }
+
+  Widget _buildFilterPill(
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? Constants.primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isSelected
+                ? Constants.primaryColor
+                : theme.colorScheme.outline.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLivestockTypeDropdown(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
+    return PopupMenuButton<int?>(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.outline.withOpacity(0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _selectedLivestockTypeId == null
+                  ? l10n.livestockType
+                  : (_livestockTypes.isNotEmpty
+                      ? _livestockTypes.firstWhere(
+                          (type) => type.id == _selectedLivestockTypeId,
+                          orElse: () => _livestockTypes.first,
+                        ).name
+                      : l10n.livestockType),
+              style: TextStyle(
+                fontSize: 12,
+                color: _selectedLivestockTypeId == null
+                    ? theme.colorScheme.onSurface.withOpacity(0.6)
+                    : theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.arrow_drop_down,
+              size: 20,
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ],
+        ),
+      ),
+      onSelected: (value) {
+        _onLivestockTypeFilterSelected(value);
+      },
+      itemBuilder: (context) => [
+        for (var type in _livestockTypes)
+          PopupMenuItem<int?>(
+            value: type.id,
+            child: Text(
+              type.name,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+      ],
+      color: isDarkMode ? Colors.grey[700] : Colors.white,
     );
   }
 }

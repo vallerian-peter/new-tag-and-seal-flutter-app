@@ -284,13 +284,13 @@ class _EventsScreenState extends State<EventsScreen> {
       case EventLogTypes.disposal:
         return provider.allDisposals;
       case EventLogTypes.insemination:
+        return provider.allInseminations;
       case EventLogTypes.pregnancy:
+        return provider.allPregnancies;
       case EventLogTypes.milking:
+        return provider.allMilkings;
       case EventLogTypes.dryoff:
-        // These event types are part of the product roadmap but their
-        // repositories are not yet implemented. Return empty lists so the UI
-        // can still display the cards while data support is added.
-        return const [];
+        return provider.allDryoffs;
       case EventLogTypes.calving:
       case EventLogTypes.farrowing:
         // Both calving and farrowing are stored as birth events

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
@@ -81,6 +82,7 @@ class LivestockCard extends StatelessWidget {
     final isMale = _isMaleGender(livestock.gender);
     final genderText = isMale ? l10n.male : l10n.female;
     final age = _calculateAge(livestock.dateOfBirth, context);
+    final isNotActive = LivestockHelper.isNotActive(livestock);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -91,19 +93,25 @@ class LivestockCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          child: Container(
+            child: Container(
             padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              color: isNotActive
+                  ? (isDarkMode ? Colors.grey[900] : Colors.grey[100])
+                  : (isDarkMode ? Colors.grey[850] : Colors.white),
               border: Border.all(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
-                width: 1,
+                color: isNotActive
+                    ? Colors.red.withOpacity(0.5)
+                    : (isDarkMode ? Colors.grey[700]! : Colors.grey[200]!),
+                width: isNotActive ? 2 : 1,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 // Header Row with Name and Gender
                 Row(
                   children: [
@@ -117,9 +125,11 @@ class LivestockCard extends StatelessWidget {
                                 : '${l10n.livestock} #${livestock.id}',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Constants.primaryColor,
+                              color: isNotActive
+                                  ? (isDarkMode ? Colors.grey[500] : Colors.grey[600])
+                                  : (isDarkMode
+                                      ? Colors.white
+                                      : Constants.primaryColor),
                               fontSize: 22,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -130,14 +140,18 @@ class LivestockCard extends StatelessWidget {
                               Icon(
                                 FontAwesome.seedling_solid,
                                 size: 12,
-                                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  isNotActive ? 0.3 : 0.5,
+                                ),
                               ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   farmName,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                    color: theme.colorScheme.onSurface.withOpacity(
+                                      isNotActive ? 0.4 : 0.6,
+                                    ),
                                     fontWeight: FontWeight.w500,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -153,11 +167,13 @@ class LivestockCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isMale
-                            ? Colors.blue.withOpacity(0.1)
-                            : Colors.pink.withOpacity(0.1),
+                            ? Colors.blue.withOpacity(isNotActive ? 0.05 : 0.1)
+                            : Colors.pink.withOpacity(isNotActive ? 0.05 : 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isMale ? Colors.blue : Colors.pink,
+                          color: isNotActive
+                              ? (isMale ? Colors.blue.withOpacity(0.3) : Colors.pink.withOpacity(0.3))
+                              : (isMale ? Colors.blue : Colors.pink),
                           width: 1,
                         ),
                       ),
@@ -166,14 +182,18 @@ class LivestockCard extends StatelessWidget {
                         children: [
                           Icon(
                             isMale ? Icons.male : Icons.female,
-                            color: isMale ? Colors.blue : Colors.pink,
+                            color: isNotActive
+                                ? (isMale ? Colors.blue.withOpacity(0.5) : Colors.pink.withOpacity(0.5))
+                                : (isMale ? Colors.blue : Colors.pink),
                             size: 16,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             genderText,
                             style: TextStyle(
-                              color: isMale ? Colors.blue : Colors.pink,
+                              color: isNotActive
+                                  ? (isMale ? Colors.blue.withOpacity(0.5) : Colors.pink.withOpacity(0.5))
+                                  : (isMale ? Colors.blue : Colors.pink),
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -287,20 +307,68 @@ class LivestockCard extends StatelessWidget {
                     Text(
                       l10n.tapForMoreDetails,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Constants.primaryColor,
+                        color: isNotActive
+                            ? Colors.grey[500]
+                            : Constants.primaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios,
                       size: 12,
-                      color: Constants.primaryColor,
+                      color: isNotActive
+                          ? Colors.grey[500]
+                          : Constants.primaryColor,
                     ),
                   ],
                 ),
-              ],
-            ),
+                  ],
+                ),
+                // Not Active Badge - Bottom Left
+                if (isNotActive)
+                  Positioned(
+                    left: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.15),
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(8),
+                          bottomLeft: Radius.circular(16),
+                        ),
+                        border: Border.all(
+                          color: Colors.red.withOpacity(0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.cancel_outlined,
+                            size: 12,
+                            color: Colors.red[700],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.notActive,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
           ),
         ),
       ),

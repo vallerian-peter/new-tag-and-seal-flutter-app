@@ -211,6 +211,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get register => 'Register';
 
   @override
+  String get registerText => 'Register';
+
+  @override
   String get logout => 'Logout';
 
   @override
@@ -227,6 +230,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get enterCurrentPassword => 'Enter your current password';
+
+  @override
+  String get enterNewPassword => 'Enter your new password';
+
+  @override
+  String get enterConfirmPassword => 'Confirm your new password';
+
+  @override
+  String get pleaseEnterCurrentPassword => 'Please enter your current password';
+
+  @override
+  String get pleaseEnterNewPassword => 'Please enter a new password';
+
+  @override
+  String get pleaseConfirmPassword => 'Please confirm your password';
+
+  @override
+  String get passwordMinLength8 => 'Password must be at least 8 characters';
+
+  @override
+  String get newPasswordMustBeDifferent =>
+      'New password must be different from current password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get passwordChangeConfirmation =>
+      'Are you sure you want to change your password? You will receive an SMS notification after the change.';
+
+  @override
+  String get passwordChangedSuccessfully => 'Password Changed';
+
+  @override
+  String get passwordChangeSuccessMessage =>
+      'Your password has been changed successfully. You will receive an SMS notification shortly.';
+
+  @override
+  String get passwordChangeInfo =>
+      'You will receive an SMS notification on your registered phone number after successfully changing your password.';
+
+  @override
+  String get changePasswordSubtitle =>
+      'Enter your current password and choose a new secure password. You will receive an SMS notification after the change.';
+
+  @override
+  String get updatingPassword => 'Updating password...';
+
+  @override
+  String get updatingProfile => 'Updating profile...';
+
+  @override
+  String get pleaseCheckYourInternetConnection =>
+      'Please check your internet connection and try again.';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get settingsAccountTitle => 'Account';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get confirmUpdateProfile =>
+      'Are you sure you want to update your profile?';
+
+  @override
+  String get profileUpdated => 'Profile Updated';
+
+  @override
+  String get profileUpdatedSuccessfully =>
+      'Your profile has been updated successfully.';
 
   @override
   String get dontHaveAccount => 'Don\'t have an account?';
@@ -754,6 +843,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String get female => 'Female';
 
   @override
+  String get primaryColor => 'Primary Color';
+
+  @override
+  String get secondaryColor => 'Secondary Color';
+
+  @override
+  String get selectPrimaryColor => 'Select Primary Color';
+
+  @override
+  String get selectSecondaryColor => 'Select Secondary Color';
+
+  @override
+  String get colorInformation => 'Color Information';
+
+  @override
+  String get colorInformationSubtitle =>
+      'Select primary and secondary colors (optional)';
+
+  @override
+  String get colorRed => 'Red';
+
+  @override
+  String get colorGreen => 'Green';
+
+  @override
+  String get colorBlue => 'Blue';
+
+  @override
+  String get colorBlack => 'Black';
+
+  @override
+  String get colorWhite => 'White';
+
+  @override
+  String get colorBrown => 'Brown';
+
+  @override
+  String get colorYellow => 'Yellow';
+
+  @override
+  String get colorOrange => 'Orange';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
+  String get colorGray => 'Gray';
+
+  @override
+  String get colorGrey => 'Grey';
+
+  @override
+  String get colorPurple => 'Purple';
+
+  @override
+  String get colorTan => 'Tan';
+
+  @override
+  String get colorBeige => 'Beige';
+
+  @override
+  String get colorCream => 'Cream';
+
+  @override
+  String get colorGold => 'Gold';
+
+  @override
+  String get colorSilver => 'Silver';
+
+  @override
+  String get colorMixed => 'Mixed';
+
+  @override
   String get nationalId => 'National ID';
 
   @override
@@ -939,6 +1101,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reviewInfoMessage =>
       'Please review all information before submitting. You will receive a confirmation email after successful registration.';
+
+  @override
+  String get confirmRegister => 'Are you sure you want to register?';
 
   @override
   String get registrationSuccess => 'Registration successful!';
@@ -2937,4 +3102,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String logTypeAccessDenied(String logType) {
     return 'Only farmers, farm managers, and authorized users can access $logType logs.';
   }
+
+  @override
+  String get livestockNotActiveCannotAddLogs =>
+      'This livestock is not active. Logs cannot be added for disposed livestock.';
+
+  @override
+  String get syncRequired => 'Sync Required';
+
+  @override
+  String syncRequiredMessage(int count) {
+    return 'You have $count unsynced items. Please sync your data to ensure all information is up to date.';
+  }
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get enterAsExtensionOfficer => 'Enter as Extension Officer?';
+
+  @override
+  String get extensionOfficerLogin => 'Extension Officer Login';
+
+  @override
+  String get extensionOfficerLoginSubtitle =>
+      'Access farms you\'ve been invited to';
+
+  @override
+  String get farmerAccessNumber => 'Farmer Access Number';
+
+  @override
+  String get enterFarmerAccessNumber => 'Enter farmer access number';
+
+  @override
+  String get pleaseEnterFarmerAccessNumber =>
+      'Please enter farmer access number';
 }

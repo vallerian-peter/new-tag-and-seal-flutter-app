@@ -724,9 +724,8 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withOpacity(0.1),
+        color: Constants.primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -751,9 +750,8 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.1),
+        color: Colors.amber.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.withOpacity(0.4), width: 1),
       ),
       child: Text(
         l10n.logContextMissing,

@@ -1,0 +1,131 @@
+{
+	"info": {
+		"name": "Tag & Seal - Livestock Sync",
+		"description": "Postman collection for creating livestock via sync endpoint",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Auth Details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Run the Flutter app and check console logs",
+							"// The app will print token and userId on startup"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/auth/profile",
+					"host": ["{{baseUrl}}"],
+					"path": ["auth", "profile"]
+				},
+				"description": "Get user profile to verify authentication"
+			}
+		},
+		{
+			"name": "Create Livestock on Sync",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"farms\": [],\n  \"livestock\": [\n    {\n      \"farmUuid\": \"{{farmUuid}}\",\n      \"uuid\": \"{{livestockUuid}}\",\n      \"identificationNumber\": \"LIV001\",\n      \"dummyTagId\": \"\",\n      \"barcodeTagId\": \"\",\n      \"rfidTagId\": \"\",\n      \"livestockTypeId\": 1,\n      \"name\": \"Test Cow\",\n      \"dateOfBirth\": \"2020-01-15\",\n      \"motherUuid\": null,\n      \"fatherUuid\": null,\n      \"gender\": \"female\",\n      \"breedId\": 1,\n      \"speciesId\": 1,\n      \"status\": \"active\",\n      \"livestockObtainedMethodId\": 1,\n      \"dateFirstEnteredToFarm\": \"2024-01-15\",\n      \"weightAsOnRegistration\": \"250.5\",\n      \"synced\": false,\n      \"syncAction\": \"create\",\n      \"createdAt\": \"2024-01-15T10:00:00Z\",\n      \"updatedAt\": \"2024-01-15T10:00:00Z\"\n    }\n  ],\n  \"logs\": {},\n  \"vaccines\": [],\n  \"farmUsers\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/sync/full-post-sync/{{userId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["v1", "sync", "full-post-sync", "{{userId}}"]
+				},
+				"description": "Create livestock via sync endpoint. Replace {{farmUuid}}, {{livestockUuid}}, and other values with actual data."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Splash Sync (GET)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/v1/sync/splash-sync-all/{{userId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["v1", "sync", "splash-sync-all", "{{userId}}"]
+				},
+				"description": "Get all data from server (farms, livestock, logs, etc.)"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://45.77.1.62:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "your-bearer-token-here",
+			"type": "string",
+			"description": "Get this from Flutter app console logs (run Sync.getAuthForPostman())"
+		},
+		{
+			"key": "userId",
+			"value": "your-user-id-here",
+			"type": "string",
+			"description": "Get this from Flutter app console logs (run Sync.getAuthForPostman())"
+		},
+		{
+			"key": "farmUuid",
+			"value": "your-farm-uuid-here",
+			"type": "string",
+			"description": "UUID of the farm where livestock will be created"
+		},
+		{
+			"key": "livestockUuid",
+			"value": "generate-new-uuid",
+			"type": "string",
+			"description": "Generate a new UUID for the livestock (use UUID generator)"
+		}
+	]
+}
+
+

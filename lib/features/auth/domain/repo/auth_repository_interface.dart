@@ -28,5 +28,14 @@ abstract class AuthRepositoryInterface {
   Future<Map<String, String>?> getSavedCredentials();
 
   Future<void> clearAuthData();
+
+  Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
+
+  Future<Map<String, dynamic>> updateProfile(
+    Map<String, dynamic> profileData,
+  );
 }
 

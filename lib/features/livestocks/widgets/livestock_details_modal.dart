@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/controllers/events_view_control.dart';
@@ -114,6 +115,7 @@ class LivestockDetailsModal {
   ) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isNotActive = LivestockHelper.isNotActive(livestock);
 
     return Row(
       children: [
@@ -140,11 +142,54 @@ class LivestockDetailsModal {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                livestock.name,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      livestock.name,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Status badge for notActive
+                  if (isNotActive) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.red.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.cancel_outlined,
+                            size: 14,
+                            color: Colors.red[700],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.notActive,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 4),
               Text(
@@ -375,6 +420,7 @@ class LivestockDetailsModal {
   }) {
     final l10n = AppLocalizations.of(context)!;
     final isFemale = livestock.gender.toLowerCase() == 'female';
+    final isNotActive = LivestockHelper.isNotActive(livestock);
 
     final logs = _buildLogConfigs(context, livestock, farmName, l10n, onRefresh);
     final applicableLogs = logs
@@ -418,6 +464,42 @@ class LivestockDetailsModal {
 
         return Column(
           children: [
+            // Show message if livestock is notActive
+            if (isNotActive) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.red.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.red[700],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '${l10n.notActive}. Logs cannot be added for disposed livestock.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.red[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             for (int i = 0; i < applicableLogs.length; i++) ...[
               _buildLogButton(
                 context: context,
@@ -425,6 +507,7 @@ class LivestockDetailsModal {
                 isDark: isDark,
                 count: counts[applicableLogs[i].logType] ?? 0,
                 fromScanner: fromScanner,
+                isNotActive: isNotActive,
               ),
               if (i != applicableLogs.length - 1) const SizedBox(height: 12),
             ],
@@ -860,24 +943,29 @@ class LivestockDetailsModal {
     required bool isDark,
     required int count,
     bool fromScanner = false,
+    bool isNotActive = false,
   }) {
+    final isDisabled = fromScanner || isNotActive;
+    
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: isDark ? Colors.grey[800] : Colors.white,
-          foregroundColor: isDark ? Colors.white : Colors.black87,
+          foregroundColor: isDisabled 
+              ? (isDark ? Colors.grey[600] : Colors.grey[400])
+              : (isDark ? Colors.white : Colors.black87),
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: config.color.withOpacity(0.3),
+              color: config.color.withOpacity(isDisabled ? 0.1 : 0.3),
               width: 1,
             ),
           ),
         ),
-        onPressed: fromScanner ? null : () => config.onAdd?.call(context),
+        onPressed: isDisabled ? null : () => config.onAdd?.call(context),
         child: Row(
           children: [
             Container(
@@ -940,8 +1028,8 @@ class LivestockDetailsModal {
               ),
             ),
 
-            // Only show add button if not from scanner
-            if (!fromScanner) ...[
+            // Only show add button if not from scanner and not notActive
+            if (!fromScanner && !isNotActive) ...[
               const SizedBox(width: 15),
 
               // Click to add log

@@ -211,6 +211,13 @@ class CustomStepper extends StatelessWidget {
     Color primary,
     Color onPrimary,
   ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    // Text colors for dark mode: white text
+    final buttonTextColor = isDark ? Colors.white : onPrimary;
+    final outlinedButtonTextColor = isDark ? Colors.white : primary;
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
@@ -237,7 +244,7 @@ class CustomStepper extends StatelessWidget {
                   style: TextStyle(
                     fontSize: Constants.textSize,
                     fontWeight: FontWeight.w600,
-                    color: primary,
+                    color: outlinedButtonTextColor,
                   ),
                 ),
               ),
@@ -249,7 +256,7 @@ class CustomStepper extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: primary,
-                foregroundColor: onPrimary,
+                foregroundColor: buttonTextColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -261,14 +268,19 @@ class CustomStepper extends StatelessWidget {
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          isDark ? Colors.white : Colors.white,
+                        ),
                       ),
                     )
                   : Text(
-                      continueButtonText ?? (currentStep == steps.length - 1 ? (finalStepButtonText ?? 'Register') : 'Continue'),
+                      currentStep == steps.length - 1
+                          ? (finalStepButtonText ?? continueButtonText ?? 'Register')
+                          : (continueButtonText ?? 'Continue'),
                       style: TextStyle(
                         fontSize: Constants.textSize,
                         fontWeight: FontWeight.w600,
+                        color: buttonTextColor,
                       ),
                     ),
             ),

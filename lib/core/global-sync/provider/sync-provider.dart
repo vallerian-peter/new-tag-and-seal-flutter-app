@@ -4,6 +4,9 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 import 'dart:developer';
 
 class SyncProvider extends ChangeNotifier {
@@ -12,6 +15,15 @@ class SyncProvider extends ChangeNotifier {
   String _syncStatus = '';
   int _syncProgress = 0;
   int _totalSteps = 4;
+  
+  // Scheduler properties
+  Timer? _syncSchedulerTimer;
+  BuildContext? _currentContext;
+  static const String _lastSyncTimestampKey = 'last_automatic_sync_timestamp';
+  static const String _lastUnsyncedCheckKey = 'last_unsynced_check_timestamp';
+  static const int _syncIntervalHours = 24;
+  static const int _forcedSyncThreshold = 15;
+  bool _isChecking = false;
 
   SyncProvider({required AppDatabase database}) : _database = database;
 
@@ -21,6 +33,142 @@ class SyncProvider extends ChangeNotifier {
   int get syncProgress => _syncProgress;
   int get totalSteps => _totalSteps;
   double get syncProgressPercentage => _totalSteps > 0 ? _syncProgress / _totalSteps : 0.0;
+
+  /// Initialize sync scheduler with context
+  /// Call this from dashboard screen initState
+  void initializeScheduler(BuildContext context) {
+    _currentContext = context;
+    
+    // Start periodic check (every hour to check if 24 hours have passed)
+    _syncSchedulerTimer?.cancel();
+    _syncSchedulerTimer = Timer.periodic(
+      const Duration(hours: 1),
+      (_) => _checkAndSyncIfNeeded(),
+    );
+
+    // Also check immediately on initialization
+    _checkAndSyncIfNeeded();
+  }
+
+  /// Check if 24 hours have passed and sync if needed
+  Future<void> _checkAndSyncIfNeeded() async {
+    if (_isChecking || _database == null) return;
+    
+    _isChecking = true;
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastSyncTimestamp = prefs.getInt(_lastSyncTimestampKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final hoursSinceLastSync = (now - lastSyncTimestamp) / (1000 * 60 * 60);
+
+      log('🕐 Last sync: ${hoursSinceLastSync.toStringAsFixed(1)} hours ago');
+
+      // Check if 24 hours have passed
+      if (hoursSinceLastSync >= _syncIntervalHours) {
+        log('⏰ 24 hours passed - checking for unsynced data...');
+        
+        // Get unsynced data summary
+        final summary = await Sync.getUnsyncedSummary(_database);
+        final unsyncedCount = summary.totalPending;
+
+        log('📊 Found $unsyncedCount unsynced items');
+
+        if (unsyncedCount > 0) {
+          // Check if we need to show forced sync dialog
+          if (unsyncedCount >= _forcedSyncThreshold && _currentContext != null && _currentContext!.mounted) {
+            log('⚠️ Unsynced count ($unsyncedCount) >= threshold ($_forcedSyncThreshold) - showing forced sync dialog');
+            await _showForcedSyncDialog();
+          } else {
+            // Trigger automatic sync in background
+            log('🔄 Triggering automatic background sync...');
+            await splashSync();
+            
+            // Update last sync timestamp
+            await prefs.setInt(_lastSyncTimestampKey, now);
+            log('✅ Automatic sync completed');
+          }
+        } else {
+          // No unsynced data, just update timestamp
+          await prefs.setInt(_lastSyncTimestampKey, now);
+          log('✅ No unsynced data - timestamp updated');
+        }
+      } else {
+        // Check unsynced count for forced sync dialog (even if not 24 hours yet)
+        await _checkForcedSync();
+      }
+    } catch (e) {
+      log('❌ Error in sync scheduler: $e');
+    } finally {
+      _isChecking = false;
+    }
+  }
+
+  /// Check if unsynced count requires forced sync dialog
+  Future<void> _checkForcedSync() async {
+    if (_database == null || _currentContext == null) return;
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastCheckTimestamp = prefs.getInt(_lastUnsyncedCheckKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      // Check every 6 hours to avoid too frequent checks
+      if (now - lastCheckTimestamp < 6 * 60 * 60 * 1000) {
+        return;
+      }
+
+      final summary = await Sync.getUnsyncedSummary(_database);
+      final unsyncedCount = summary.totalPending;
+
+      if (unsyncedCount >= _forcedSyncThreshold && _currentContext!.mounted) {
+        log('⚠️ Unsynced count ($unsyncedCount) >= threshold - showing forced sync dialog');
+        await _showForcedSyncDialog();
+      }
+
+      // Update last check timestamp
+      await prefs.setInt(_lastUnsyncedCheckKey, now);
+    } catch (e) {
+      log('❌ Error checking forced sync: $e');
+    }
+  }
+
+  /// Show forced sync dialog (no cancel option)
+  Future<void> _showForcedSyncDialog() async {
+    if (_currentContext == null || !_currentContext!.mounted) return;
+    
+    final context = _currentContext!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    try {
+      final summary = await Sync.getUnsyncedSummary(_database);
+      final unsyncedCount = summary.totalPending;
+
+      await showDialog(
+        context: context,
+        barrierDismissible: false, // Cannot dismiss by tapping outside
+        builder: (context) => _ForcedSyncDialog(
+          unsyncedCount: unsyncedCount,
+          onSync: () async {
+            Navigator.of(context).pop();
+            await splashSyncWithDialog(context);
+            
+            // Update last sync timestamp after successful sync
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt(_lastSyncTimestampKey, DateTime.now().millisecondsSinceEpoch);
+          },
+        ),
+      );
+    } catch (e) {
+      log('❌ Error showing forced sync dialog: $e');
+    }
+  }
+
+  /// Manually trigger sync check (for testing or manual triggers)
+  Future<void> checkSyncNow() async {
+    await _checkAndSyncIfNeeded();
+  }
 
   /// Show splash sync with loading dialog
   Future<void> splashSyncWithDialog(BuildContext context) async {
@@ -65,6 +213,10 @@ class SyncProvider extends ChangeNotifier {
       if (context.mounted) {
         await _showSuccessDialog(context);
       }
+
+      // Update last sync timestamp after successful sync
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_lastSyncTimestampKey, DateTime.now().millisecondsSinceEpoch);
 
     } catch (e) {
       log('❌ Sync error: $e');
@@ -252,4 +404,112 @@ class SyncProvider extends ChangeNotifier {
     }
   }
 
+  @override
+  void dispose() {
+    _syncSchedulerTimer?.cancel();
+    super.dispose();
+  }
+}
+
+/// Forced Sync Dialog Widget
+/// 
+/// Shows a dialog that requires user to sync when unsynced count >= 15
+/// No cancel option - user must sync to proceed
+class _ForcedSyncDialog extends StatelessWidget {
+  final int unsyncedCount;
+  final VoidCallback onSync;
+
+  const _ForcedSyncDialog({
+    required this.unsyncedCount,
+    required this.onSync,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Dialog(
+      backgroundColor: theme.brightness == Brightness.dark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: theme.brightness == Brightness.dark 
+              ? theme.scaffoldBackgroundColor 
+              : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Warning icon
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.sync_problem,
+                size: 40,
+                color: Colors.orange,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Title
+            Text(
+              l10n.syncRequired,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+
+            // Message
+            Text(
+              l10n.syncRequiredMessage(unsyncedCount),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+
+            // Sync button (only option - no cancel)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onSync,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.primaryColor,
+                  foregroundColor: theme.brightness == Brightness.dark 
+                      ? Colors.white 
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  l10n.syncNow,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

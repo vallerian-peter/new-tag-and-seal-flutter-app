@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -56,6 +58,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       ),
       child: Column(
         children: [
+
           // Handle bar
           Container(
             margin: const EdgeInsets.only(top: 12),
@@ -212,7 +215,12 @@ class FarmDetailsBottomSheet extends StatelessWidget {
           ),
           
           const SizedBox(height: 20),
-          
+
+          // Copy + FarmUuid
+          _CopyFarmUuidWidget(
+            farmUuid: farm['uuid'] as String,
+            theme: theme,
+          ),
           // Livestock List Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -439,18 +447,28 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary,
+        color: theme.brightness == Brightness.dark ? theme.colorScheme.surface.withValues(alpha: 0.1) : theme.colorScheme.secondary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade100,
-           offset: const Offset(-1, 2),
-           blurRadius: 8 
-          ),
-        ]
+        boxShadow: theme.brightness == Brightness.dark
+            ? [
+                // Subtle shadow for dark theme
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  offset: const Offset(0, 2),
+                  blurRadius: 8,
+                ),
+              ]
+            : [
+                // Light shadow for light theme
+                BoxShadow(
+                  color: Colors.grey.shade100,
+                  offset: const Offset(-1, 2),
+                  blurRadius: 8,
+                ),
+              ],
       ),
       child: Row(
         children: [
@@ -675,5 +693,76 @@ class FarmDetailsBottomSheet extends StatelessWidget {
 enum _FarmAction {
   bulkActions,
   addVaccine,
+}
+
+class _CopyFarmUuidWidget extends StatefulWidget {
+  final String farmUuid;
+  final ThemeData theme;
+
+  const _CopyFarmUuidWidget({
+    required this.farmUuid,
+    required this.theme,
+  });
+
+  @override
+  State<_CopyFarmUuidWidget> createState() => _CopyFarmUuidWidgetState();
+}
+
+class _CopyFarmUuidWidgetState extends State<_CopyFarmUuidWidget> {
+  bool _isCopied = false;
+  Timer? _copyTimer;
+
+  @override
+  void dispose() {
+    _copyTimer?.cancel();
+    super.dispose();
+  }
+
+  void _handleCopy() {
+    Clipboard.setData(ClipboardData(text: widget.farmUuid));
+    setState(() {
+      _isCopied = true;
+    });
+    _copyTimer?.cancel();
+    _copyTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _isCopied = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            onPressed: _isCopied ? null : _handleCopy,
+            icon: Icon(
+              _isCopied ? Icons.check_circle : Icons.copy,
+              color: _isCopied 
+                  ? Colors.green 
+                  : Constants.primaryColor,
+              size: 17,
+            ),
+          ),
+          Text(
+            '${l10n?.farm} UUID: ${widget.farmUuid}',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 

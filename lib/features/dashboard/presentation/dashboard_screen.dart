@@ -744,11 +744,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'pregnancies':
         return l10n.pregnancy;
       case 'calvings':
+      case 'calving':
         return l10n.calving;
+      case 'farrowings':
+      case 'farrowing':
+        return l10n.farrowing;
       case 'dryoffs':
         return l10n.dryoff;
       case 'inseminations':
         return l10n.insemination;
+      case 'transfers':
+      case 'transfer':
+        return l10n.transfer;
+      case 'abortedPregnancies':
+      case 'abortedPregnancy':
+        return l10n.abortedPregnancy;
       default:
         return key;
     }

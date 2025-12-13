@@ -837,7 +837,6 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

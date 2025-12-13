@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// A reusable multi-select checkbox list component
 /// 
@@ -82,10 +83,14 @@ class MultiSelectCheckboxList<T> extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.brightness == Brightness.dark
+            ? theme.scaffoldBackgroundColor
+            : Constants.veryLightGreyColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          color: theme.brightness == Brightness.dark
+              ? theme.colorScheme.outline.withValues(alpha: 0.3)
+              : Constants.primaryColor.withOpacity(0.2),
         ),
       ),
       child: Text(
@@ -105,10 +110,14 @@ class MultiSelectCheckboxList<T> extends StatelessWidget {
           ? BoxConstraints(maxHeight: maxHeight!)
           : null,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.brightness == Brightness.dark
+            ? theme.scaffoldBackgroundColor
+            : Constants.veryLightGreyColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          color: theme.brightness == Brightness.dark
+              ? theme.colorScheme.outline.withValues(alpha: 0.3)
+              : Constants.primaryColor.withOpacity(0.2),
         ),
       ),
       child: ListView.builder(

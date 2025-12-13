@@ -48,6 +48,8 @@ class LivestockMapper {
       livestockObtainedMethodId: entity['livestockObtainedMethodId'] as int,
       dateFirstEnteredToFarm: parsedDate,
       weightAsOnRegistration: _parseWeight(entity['weightAsOnRegistration']),
+      primaryColor: entity['primaryColor']?.toString(),  // Nullable, ensure string
+      secondaryColor: entity['secondaryColor']?.toString(),  // Nullable, ensure string
       synced: synced,
       syncAction: entity['syncAction']?.toString() ?? 'create',  // Ensure string
       createdAt: entity['createdAt'].toString(),  // Ensure string
@@ -80,6 +82,8 @@ class LivestockMapper {
       'livestockObtainedMethodId': model.livestockObtainedMethodId,
       'dateFirstEnteredToFarm': model.dateFirstEnteredToFarm.toIso8601String(),
       'weightAsOnRegistration': model.weightAsOnRegistration,
+      'primaryColor': model.primaryColor,
+      'secondaryColor': model.secondaryColor,
       'synced': model.synced,
       'syncAction': model.syncAction,
       'createdAt': model.createdAt,
@@ -111,6 +115,8 @@ class LivestockMapper {
       'livestockObtainedMethodId': model.livestockObtainedMethodId,
       'dateFirstEnteredToFarm': model.dateFirstEnteredToFarm.toIso8601String(),
       'weightAsOnRegistration': model.weightAsOnRegistration,
+      'primaryColor': model.primaryColor,
+      'secondaryColor': model.secondaryColor,
       'synced': model.synced,
       'syncAction': model.syncAction,
       'createdAt': model.createdAt,

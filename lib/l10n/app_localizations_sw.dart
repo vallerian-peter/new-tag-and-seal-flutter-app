@@ -212,6 +212,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get register => 'Jisajili';
 
   @override
+  String get registerText => 'Jisajili';
+
+  @override
   String get logout => 'Toka';
 
   @override
@@ -228,6 +231,93 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get forgotPassword => 'Umesahau Nywila?';
+
+  @override
+  String get changePassword => 'Badilisha Nywila';
+
+  @override
+  String get currentPassword => 'Nywila ya Sasa';
+
+  @override
+  String get newPassword => 'Nywila Mpya';
+
+  @override
+  String get enterCurrentPassword => 'Ingiza nywila yako ya sasa';
+
+  @override
+  String get enterNewPassword => 'Ingiza nywila yako mpya';
+
+  @override
+  String get enterConfirmPassword => 'Thibitisha nywila yako mpya';
+
+  @override
+  String get pleaseEnterCurrentPassword =>
+      'Tafadhali ingiza nywila yako ya sasa';
+
+  @override
+  String get pleaseEnterNewPassword => 'Tafadhali ingiza nywila mpya';
+
+  @override
+  String get pleaseConfirmPassword => 'Tafadhali thibitisha nywila yako';
+
+  @override
+  String get passwordMinLength8 => 'Nywila lazima iwe angalau herufi 8';
+
+  @override
+  String get newPasswordMustBeDifferent =>
+      'Nywila mpya lazima iwe tofauti na nywila ya sasa';
+
+  @override
+  String get passwordsDoNotMatch => 'Nywila hazifanani';
+
+  @override
+  String get passwordChangeConfirmation =>
+      'Je, una uhakika unataka kubadilisha nywila yako? Utapokea arifa ya SMS baada ya mabadiliko.';
+
+  @override
+  String get passwordChangedSuccessfully => 'Nywila Imebadilishwa';
+
+  @override
+  String get passwordChangeSuccessMessage =>
+      'Nywila yako imebadilishwa kwa mafanikio. Utapokea arifa ya SMS hivi karibuni.';
+
+  @override
+  String get passwordChangeInfo =>
+      'Utapokea arifa ya SMS kwenye nambari yako ya simu iliyosajiliwa baada ya kubadilisha nywila yako kwa mafanikio.';
+
+  @override
+  String get changePasswordSubtitle =>
+      'Ingiza nywila yako ya sasa na uchague nywila mpya salama. Utapokea arifa ya SMS baada ya mabadiliko.';
+
+  @override
+  String get updatingPassword => 'Inabadilisha nywila...';
+
+  @override
+  String get updatingProfile => 'Inasasisha wasifu...';
+
+  @override
+  String get pleaseCheckYourInternetConnection =>
+      'Tafadhali kagua muunganisho wako wa intaneti na ujaribu tena.';
+
+  @override
+  String get confirm => 'Thibitisha';
+
+  @override
+  String get settingsAccountTitle => 'Akaunti';
+
+  @override
+  String get editProfile => 'Hariri Wasifu';
+
+  @override
+  String get confirmUpdateProfile =>
+      'Je, una uhakika unataka kusasisha wasifu wako?';
+
+  @override
+  String get profileUpdated => 'Wasifu Umesasishwa';
+
+  @override
+  String get profileUpdatedSuccessfully =>
+      'Wasifu wako umesasishwa kwa mafanikio.';
 
   @override
   String get dontHaveAccount => 'Huna akaunti?';
@@ -757,6 +847,79 @@ class AppLocalizationsSw extends AppLocalizations {
   String get female => 'Mwanamke';
 
   @override
+  String get primaryColor => 'Rangi ya Msingi';
+
+  @override
+  String get secondaryColor => 'Rangi ya Pili';
+
+  @override
+  String get selectPrimaryColor => 'Chagua Rangi ya Msingi';
+
+  @override
+  String get selectSecondaryColor => 'Chagua Rangi ya Pili';
+
+  @override
+  String get colorInformation => 'Taarifa za Rangi';
+
+  @override
+  String get colorInformationSubtitle =>
+      'Chagua rangi ya msingi na ya pili (si lazima)';
+
+  @override
+  String get colorRed => 'Nyekundu';
+
+  @override
+  String get colorGreen => 'Kijani';
+
+  @override
+  String get colorBlue => 'Samawati';
+
+  @override
+  String get colorBlack => 'Nyeusi';
+
+  @override
+  String get colorWhite => 'Nyeupe';
+
+  @override
+  String get colorBrown => 'Kahawia';
+
+  @override
+  String get colorYellow => 'Njano';
+
+  @override
+  String get colorOrange => 'Machungwa';
+
+  @override
+  String get colorPink => 'Waridi';
+
+  @override
+  String get colorGray => 'Kijivu';
+
+  @override
+  String get colorGrey => 'Kijivu';
+
+  @override
+  String get colorPurple => 'Zambarau';
+
+  @override
+  String get colorTan => 'Kahawia Nyepesi';
+
+  @override
+  String get colorBeige => 'Beji';
+
+  @override
+  String get colorCream => 'Krimu';
+
+  @override
+  String get colorGold => 'Dhahabu';
+
+  @override
+  String get colorSilver => 'Fedha';
+
+  @override
+  String get colorMixed => 'Mchanganyiko';
+
+  @override
   String get nationalId => 'Kitambulisho cha Taifa';
 
   @override
@@ -945,6 +1108,9 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get reviewInfoMessage =>
       'Tafadhali kagua taarifa zote kabla ya kuwasilisha. Utapokea barua pepe ya uthibitisho baada ya usajili kuisha.';
+
+  @override
+  String get confirmRegister => 'Je, una uhakika unataka kusajili?';
 
   @override
   String get registrationSuccess => 'Usajili umefanikiwa!';
@@ -1170,7 +1336,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get setNewFarmText => 'Weka Shamba Jipya';
 
   @override
-  String get addExtensionOfficerText => 'Ongeza Mofisa wa Uenezi';
+  String get addExtensionOfficerText => 'Ongeza Bwana Shamba';
 
   @override
   String get farmsText => 'Mashamba';
@@ -1411,33 +1577,35 @@ class AppLocalizationsSw extends AppLocalizations {
       'Imeshindikana kuhifadhi tukio la kulisha. Tafadhali jaribu tena.';
 
   @override
-  String get birthEventSaved => 'Birth event saved successfully';
+  String get birthEventSaved => 'Tukio la kuzaliwa limehifadhiwa kwa mafanikio';
 
   @override
-  String get birthEventUpdated => 'Birth event updated successfully';
+  String get birthEventUpdated =>
+      'Tukio la kuzaliwa limesasishwa kwa mafanikio';
 
   @override
   String get birthEventSaveFailed =>
-      'Failed to save birth event. Please try again.';
+      'Imeshindikana kuhifadhi tukio la kuzaliwa. Tafadhali jaribu tena.';
 
   @override
   String get birthEventUpdateFailed =>
-      'Failed to update birth event. Please try again.';
+      'Imeshindikana kusasisha tukio la kuzaliwa. Tafadhali jaribu tena.';
 
   @override
-  String get abortedPregnancySaved => 'Aborted pregnancy saved successfully';
+  String get abortedPregnancySaved =>
+      'Mimba iliyokatika imehifadhiwa kwa mafanikio';
 
   @override
   String get abortedPregnancyUpdated =>
-      'Aborted pregnancy updated successfully';
+      'Mimba iliyokatika imesasishwa kwa mafanikio';
 
   @override
   String get abortedPregnancySaveFailed =>
-      'Failed to save aborted pregnancy. Please try again.';
+      'Imeshindikana kuhifadhi mimba iliyokatika. Tafadhali jaribu tena.';
 
   @override
   String get abortedPregnancyUpdateFailed =>
-      'Failed to update aborted pregnancy. Please try again.';
+      'Imeshindikana kusasisha mimba iliyokatika. Tafadhali jaribu tena.';
 
   @override
   String get feeding => 'Malisho';
@@ -1592,7 +1760,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get treatmentProviderVet => 'Daktari wa mifugo';
 
   @override
-  String get treatmentProviderExtensionOfficer => 'Afisa ugani';
+  String get treatmentProviderExtensionOfficer => 'Bwana Shamba';
 
   @override
   String get medicalLicenseNumber => 'Nambari ya leseni';
@@ -1611,7 +1779,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get vetLicense => 'Leseni ya daktari wa mifugo';
 
   @override
-  String get extensionOfficerLicense => 'Leseni ya afisa ugani';
+  String get extensionOfficerLicense => 'Leseni ya Bwana Shamba';
 
   @override
   String get enterQuantity => 'Ingiza kiasi';
@@ -1838,7 +2006,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get enterExtensionOfficerLicenseOptional =>
-      'Ingiza leseni ya afisa ugani (si lazima)';
+      'Ingiza leseni ya Bwana Shamba (si lazima)';
 
   @override
   String get vaccinationNotesInfo => 'Ongeza maelezo kuhusu chanjo hii.';
@@ -2949,4 +3117,38 @@ class AppLocalizationsSw extends AppLocalizations {
   String logTypeAccessDenied(String logType) {
     return 'Wakulima, wasimamizi wa shamba, na watumiaji walioidhinishwa tu wanaweza kufikia nakala za $logType.';
   }
+
+  @override
+  String get livestockNotActiveCannotAddLogs =>
+      'Mifugo hii haipo hai. Nakala haziwezi kuongezwa kwa mifugo iliyotolewa.';
+
+  @override
+  String get syncRequired => 'Sinkronisha Inahitajika';
+
+  @override
+  String syncRequiredMessage(int count) {
+    return 'Una vitu $count visivyosinkronishwa. Tafadhali sinkronisha data yako ili kuhakikisha taarifa zote ni za kisasa.';
+  }
+
+  @override
+  String get syncNow => 'Sinkronisha Sasa';
+
+  @override
+  String get enterAsExtensionOfficer => 'Ingia kama Bwana Shamba?';
+
+  @override
+  String get extensionOfficerLogin => 'Ingia kama Bwana Shamba';
+
+  @override
+  String get extensionOfficerLoginSubtitle => 'Fikia mashamba ulioalikwa';
+
+  @override
+  String get farmerAccessNumber => 'Nambari ya Ufikiaji wa Mkulima';
+
+  @override
+  String get enterFarmerAccessNumber => 'Ingiza nambari ya ufikiaji wa mkulima';
+
+  @override
+  String get pleaseEnterFarmerAccessNumber =>
+      'Tafadhali ingiza nambari ya ufikiaji wa mkulima';
 }

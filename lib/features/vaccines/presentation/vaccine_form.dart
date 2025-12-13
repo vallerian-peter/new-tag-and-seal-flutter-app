@@ -680,9 +680,8 @@ class _VaccineFormScreenState extends State<VaccineFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.1),
+        color: baseColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: baseColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -713,11 +712,8 @@ class _VaccineFormScreenState extends State<VaccineFormScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withValues(alpha: 0.08),
+        color: Constants.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Constants.primaryColor.withValues(alpha: 0.2),
-        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

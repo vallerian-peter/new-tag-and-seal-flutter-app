@@ -150,7 +150,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
               fontSize: Constants.textSize,
             ),
             filled: true,
-            fillColor: widget.fillColor ?? Constants.veryLightGreyColor,
+            fillColor: widget.fillColor ?? 
+                (theme.brightness == Brightness.dark 
+                    ? theme.scaffoldBackgroundColor 
+                    : Constants.veryLightGreyColor),
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
                     widget.prefixIcon,
@@ -181,14 +184,20 @@ class _CustomTextFieldState extends State<CustomTextField> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
               borderSide: BorderSide(
-                color: widget.borderColor ?? Constants.primaryColor.withOpacity(0.2),
+                color: widget.borderColor ?? 
+                    (theme.brightness == Brightness.dark
+                        ? theme.colorScheme.outline.withOpacity(0.3)
+                        : Constants.primaryColor.withOpacity(0.2)),
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius ?? 12),
               borderSide: BorderSide(
-                color: widget.borderColor ?? Constants.primaryColor.withOpacity(0.2),
+                color: widget.borderColor ?? 
+                    (theme.brightness == Brightness.dark
+                        ? theme.colorScheme.outline.withOpacity(0.3)
+                        : Constants.primaryColor.withOpacity(0.2)),
                 width: 1.5,
               ),
             ),
@@ -303,20 +312,29 @@ class SimpleTextField extends StatelessWidget {
           fontSize: Constants.textSize,
         ),
         filled: true,
-        fillColor: fillColor ?? Constants.veryLightGreyColor,
+        fillColor: fillColor ?? 
+            (theme.brightness == Brightness.dark 
+                ? theme.scaffoldBackgroundColor 
+                : Constants.veryLightGreyColor),
         contentPadding: contentPadding ??
             const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
           borderSide: BorderSide(
-            color: borderColor ?? Constants.primaryColor.withOpacity(0.2),
+            color: borderColor ?? 
+                (theme.brightness == Brightness.dark
+                    ? theme.colorScheme.outline.withOpacity(0.3)
+                    : Constants.primaryColor.withOpacity(0.2)),
             width: 1.5,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
           borderSide: BorderSide(
-            color: borderColor ?? Constants.primaryColor.withOpacity(0.2),
+            color: borderColor ?? 
+                (theme.brightness == Brightness.dark
+                    ? theme.colorScheme.outline.withOpacity(0.3)
+                    : Constants.primaryColor.withOpacity(0.2)),
             width: 1.5,
           ),
         ),

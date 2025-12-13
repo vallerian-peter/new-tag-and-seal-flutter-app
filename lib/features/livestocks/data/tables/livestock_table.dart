@@ -6,9 +6,10 @@ class Livestocks extends Table {
   TextColumn get farmUuid => text()();  // Farm UUID reference
   TextColumn get uuid => text()();
   TextColumn get identificationNumber => text()();
-  TextColumn get dummyTagId => text()();
-  TextColumn get barcodeTagId => text().unique()();
-  TextColumn get rfidTagId => text().unique()();
+  // Tag fields are optional (backend allows null); keep uniqueness when provided
+  TextColumn get dummyTagId => text().nullable()();
+  TextColumn get barcodeTagId => text().nullable().unique()();
+  TextColumn get rfidTagId => text().nullable().unique()();
   IntColumn get livestockTypeId => integer()();
   TextColumn get name => text()();
   TextColumn get dateOfBirth => text()();
@@ -21,6 +22,8 @@ class Livestocks extends Table {
   IntColumn get livestockObtainedMethodId => integer()();
   DateTimeColumn get dateFirstEnteredToFarm => dateTime()();
   RealColumn get weightAsOnRegistration => real()();
+  TextColumn get primaryColor => text().nullable()();
+  TextColumn get secondaryColor => text().nullable()();
   
   // Syncing fields for offline tracking
   BoolColumn get synced => boolean().withDefault(const Constant(false))();

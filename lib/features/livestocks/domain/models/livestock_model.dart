@@ -19,6 +19,8 @@ class LivestockModel {
   final int livestockObtainedMethodId;
   final DateTime dateFirstEnteredToFarm;
   final double weightAsOnRegistration;
+  final String? primaryColor;
+  final String? secondaryColor;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -44,6 +46,8 @@ class LivestockModel {
     required this.livestockObtainedMethodId,
     required this.dateFirstEnteredToFarm,
     required this.weightAsOnRegistration,
+    this.primaryColor,
+    this.secondaryColor,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -71,6 +75,8 @@ class LivestockModel {
     int? livestockObtainedMethodId,
     DateTime? dateFirstEnteredToFarm,
     double? weightAsOnRegistration,
+    String? primaryColor,
+    String? secondaryColor,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -96,6 +102,8 @@ class LivestockModel {
       livestockObtainedMethodId: livestockObtainedMethodId ?? this.livestockObtainedMethodId,
       dateFirstEnteredToFarm: dateFirstEnteredToFarm ?? this.dateFirstEnteredToFarm,
       weightAsOnRegistration: weightAsOnRegistration ?? this.weightAsOnRegistration,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -129,6 +137,8 @@ class LivestockModel {
       'livestockObtainedMethodId': livestockObtainedMethodId,
       'dateFirstEnteredToFarm': dateOnly,  // Send as date only (Y-m-d)
       'weightAsOnRegistration': weightAsOnRegistration.toString(),  // Send as string
+      'primaryColor': primaryColor,
+      'secondaryColor': secondaryColor,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -158,6 +168,8 @@ class LivestockModel {
       'livestockObtainedMethodId': livestockObtainedMethodId,
       'dateFirstEnteredToFarm': dateFirstEnteredToFarm.toIso8601String(),
       'weightAsOnRegistration': weightAsOnRegistration,
+      'primaryColor': primaryColor,
+      'secondaryColor': secondaryColor,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -193,6 +205,8 @@ class LivestockModel {
       livestockObtainedMethodId: json['livestockObtainedMethodId'] as int,
       dateFirstEnteredToFarm: DateTime.parse(json['dateFirstEnteredToFarm'] as String),
       weightAsOnRegistration: weight,
+      primaryColor: json['primaryColor'] as String?,
+      secondaryColor: json['secondaryColor'] as String?,
       synced: json['synced'] as bool? ?? false,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -223,6 +237,8 @@ class LivestockModel {
         other.livestockObtainedMethodId == livestockObtainedMethodId &&
         other.dateFirstEnteredToFarm == dateFirstEnteredToFarm &&
         other.weightAsOnRegistration == weightAsOnRegistration &&
+        other.primaryColor == primaryColor &&
+        other.secondaryColor == secondaryColor &&
         other.synced == synced &&
         other.syncAction == syncAction &&
         other.createdAt == createdAt &&
@@ -251,6 +267,8 @@ class LivestockModel {
       livestockObtainedMethodId,
       dateFirstEnteredToFarm,
       weightAsOnRegistration,
+      primaryColor,
+      secondaryColor,
       synced,
       syncAction,
       createdAt,
@@ -260,6 +278,6 @@ class LivestockModel {
 
   @override
   String toString() {
-    return 'LivestockModel(id: $id, farmUuid: $farmUuid, uuid: $uuid, identificationNumber: $identificationNumber, dummyTagId: $dummyTagId, barcodeTagId: $barcodeTagId, rfidTagId: $rfidTagId, livestockTypeId: $livestockTypeId, name: $name, dateOfBirth: $dateOfBirth, motherUuid: $motherUuid, fatherUuid: $fatherUuid, gender: $gender, breedId: $breedId, speciesId: $speciesId, status: $status, livestockObtainedMethodId: $livestockObtainedMethodId, dateFirstEnteredToFarm: $dateFirstEnteredToFarm, weightAsOnRegistration: $weightAsOnRegistration, synced: $synced, syncAction: $syncAction, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'LivestockModel(id: $id, farmUuid: $farmUuid, uuid: $uuid, identificationNumber: $identificationNumber, dummyTagId: $dummyTagId, barcodeTagId: $barcodeTagId, rfidTagId: $rfidTagId, livestockTypeId: $livestockTypeId, name: $name, dateOfBirth: $dateOfBirth, motherUuid: $motherUuid, fatherUuid: $fatherUuid, gender: $gender, breedId: $breedId, speciesId: $speciesId, status: $status, livestockObtainedMethodId: $livestockObtainedMethodId, dateFirstEnteredToFarm: $dateFirstEnteredToFarm, weightAsOnRegistration: $weightAsOnRegistration, primaryColor: $primaryColor, secondaryColor: $secondaryColor, synced: $synced, syncAction: $syncAction, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

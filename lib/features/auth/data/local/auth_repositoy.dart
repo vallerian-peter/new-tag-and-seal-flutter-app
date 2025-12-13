@@ -518,6 +518,128 @@ class AuthRepository implements AuthRepositoryInterface {
   }
 
   // ==========================================================================
+  // Change Password
+  // ==========================================================================
+
+  @override
+  Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      // Call remote API to change password
+      final success = await AuthService.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+
+      // If password change successful, update stored password
+      if (success) {
+        // Update password in secure storage if we have stored credentials
+        final credentials = await getSavedCredentials();
+        if (credentials != null) {
+          // Update password in secure storage
+          await _secureStorage.write(key: _passwordKey, value: newPassword);
+          await _secureStorage.write(key: 'password', value: newPassword);
+        }
+      }
+
+      return success;
+    } catch (e) {
+      throw Exception('Repository: Failed to change password - $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> updateProfile(
+    Map<String, dynamic> profileData,
+  ) async {
+    try {
+      final response = await AuthService.updateProfile(profileData);
+      
+      // Update stored user data if profile was updated successfully (status 200)
+      if (response['status'] == true && response['data'] != null) {
+        final data = response['data'] as Map<String, dynamic>;
+        final user = data['user'] as Map<String, dynamic>?;
+        final profile = data['profile'] as Map<String, dynamic>?;
+        
+        if (user != null && profile != null) {
+          // Extract roleTitle for farm users
+          String? roleTitle;
+          if (user['role'] == 'farmInvitedUser') {
+            roleTitle = profile['roleTitle']?.toString();
+          }
+          
+          // Get current token before updating (preserve it)
+          final currentToken = await getToken();
+          
+          // Update secure storage with all new data
+          await storeUserData(
+            userId: user['id']?.toString() ?? '',
+            username: user['username'] ?? '',
+            email: user['email'] ?? '',
+            role: user['role'] ?? '',
+            roleId: user['roleId']?.toString() ?? '1',
+            firstname: user['firstname'] ?? profile['firstName']?.toString() ?? '',
+            surname: user['surname'] ?? profile['surname']?.toString() ?? '',
+            phone1: user['phone1'] ?? profile['phone1']?.toString() ?? '',
+            physicalAddress: user['physicalAddress'] ?? profile['physicalAddress']?.toString() ?? '',
+            dateOfBirth: user['dateOfBirth'] ?? profile['dateOfBirth']?.toString() ?? '',
+            gender: user['gender'] ?? profile['gender']?.toString() ?? '',
+            accessToken: currentToken ?? '',
+            tokenType: 'Bearer',
+            password: '', // Don't update password here - preserve existing password
+            profile: profile, // Store full profile JSON
+            roleTitle: roleTitle ?? '',
+          );
+          
+          // Also update individual profile fields in secure storage for easy access
+          // Store phone2 if available
+          if (profile['phone2'] != null) {
+            await _secureStorage.write(key: 'phone2', value: profile['phone2'].toString());
+          }
+          
+          // Store middleName if available
+          if (profile['middleName'] != null) {
+            await _secureStorage.write(key: 'middleName', value: profile['middleName'].toString());
+          }
+          
+          // Store other profile fields that might have been updated
+          final additionalFields = [
+            'farmerOrganizationMembership',
+            'identityCardTypeId',
+            'identityNumber',
+            'streetId',
+            'schoolLevelId',
+            'villageId',
+            'wardId',
+            'districtId',
+            'regionId',
+            'countryId',
+            'farmerType',
+          ];
+          
+          for (final field in additionalFields) {
+            if (profile[field] != null) {
+              await _secureStorage.write(
+                key: field,
+                value: profile[field].toString(),
+              );
+            }
+          }
+          
+          log('✅ Profile data updated in secure storage successfully');
+        }
+      }
+      
+      return response;
+    } catch (e) {
+      log('❌ Error updating profile in repository: $e');
+      throw Exception('Repository: Failed to update profile - $e');
+    }
+  }
+
+  // ==========================================================================
   // Private Helper Methods
   // ==========================================================================
 

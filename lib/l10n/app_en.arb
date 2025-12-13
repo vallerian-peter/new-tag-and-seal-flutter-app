@@ -221,12 +221,148 @@
   "searchText":"Search",
   "login": "Login",
   "register": "Register",
+  "registerText": "Register",
   "logout": "Logout",
   "username": "Username",
   "email": "Email",
   "password": "Password",
   "confirmPassword": "Confirm Password",
   "forgotPassword": "Forgot Password?",
+  
+  "changePassword": "Change Password",
+  "@changePassword": {
+    "description": "Change password screen title"
+  },
+  
+  "currentPassword": "Current Password",
+  "@currentPassword": {
+    "description": "Current password field label"
+  },
+  
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "New password field label"
+  },
+  
+  "enterCurrentPassword": "Enter your current password",
+  "@enterCurrentPassword": {
+    "description": "Current password field hint"
+  },
+  
+  "enterNewPassword": "Enter your new password",
+  "@enterNewPassword": {
+    "description": "New password field hint"
+  },
+  
+  "enterConfirmPassword": "Confirm your new password",
+  "@enterConfirmPassword": {
+    "description": "Confirm password field hint"
+  },
+  
+  "pleaseEnterCurrentPassword": "Please enter your current password",
+  "@pleaseEnterCurrentPassword": {
+    "description": "Current password validation error"
+  },
+  
+  "pleaseEnterNewPassword": "Please enter a new password",
+  "@pleaseEnterNewPassword": {
+    "description": "New password validation error"
+  },
+  
+  "pleaseConfirmPassword": "Please confirm your password",
+  "@pleaseConfirmPassword": {
+    "description": "Confirm password validation error"
+  },
+  
+  "passwordMinLength8": "Password must be at least 8 characters",
+  "@passwordMinLength8": {
+    "description": "Password minimum length validation error (8 characters)"
+  },
+  
+  "newPasswordMustBeDifferent": "New password must be different from current password",
+  "@newPasswordMustBeDifferent": {
+    "description": "New password must be different validation error"
+  },
+  
+  "passwordsDoNotMatch": "Passwords do not match",
+  "@passwordsDoNotMatch": {
+    "description": "Password mismatch validation error"
+  },
+  
+  "passwordChangeConfirmation": "Are you sure you want to change your password? You will receive an SMS notification after the change.",
+  "@passwordChangeConfirmation": {
+    "description": "Password change confirmation dialog message"
+  },
+  
+  "passwordChangedSuccessfully": "Password Changed",
+  "@passwordChangedSuccessfully": {
+    "description": "Password change success dialog title"
+  },
+  
+  "passwordChangeSuccessMessage": "Your password has been changed successfully. You will receive an SMS notification shortly.",
+  "@passwordChangeSuccessMessage": {
+    "description": "Password change success dialog message"
+  },
+  
+  "passwordChangeInfo": "You will receive an SMS notification on your registered phone number after successfully changing your password.",
+  "@passwordChangeInfo": {
+    "description": "Password change info message"
+  },
+  
+  "changePasswordSubtitle": "Enter your current password and choose a new secure password. You will receive an SMS notification after the change.",
+  "@changePasswordSubtitle": {
+    "description": "Change password screen subtitle"
+  },
+  
+  "updatingPassword": "Updating password...",
+  "@updatingPassword": {
+    "description": "Updating password loading message"
+  },
+  
+  "updatingProfile": "Updating profile...",
+  "@updatingProfile": {
+    "description": "Updating profile loading message"
+  },
+  
+  "pleaseCheckYourInternetConnection": "Please check your internet connection and try again.",
+  "@pleaseCheckYourInternetConnection": {
+    "description": "Internet connection check error message"
+  },
+  
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  
+  "settingsAccountTitle": "Account",
+  "@settingsAccountTitle": {
+    "description": "Account settings section title"
+  },
+  
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+  
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  
+  "confirmUpdateProfile": "Are you sure you want to update your profile?",
+  "@confirmUpdateProfile": {
+    "description": "Confirm profile update dialog message"
+  },
+  
+  "profileUpdated": "Profile Updated",
+  "@profileUpdated": {
+    "description": "Profile update success dialog title"
+  },
+  
+  "profileUpdatedSuccessfully": "Your profile has been updated successfully.",
+  "@profileUpdatedSuccessfully": {
+    "description": "Profile update success dialog message"
+  },
   "dontHaveAccount": "Don't have an account?",
   "alreadyHaveAccount": "Already have an account?",
 
@@ -433,6 +569,30 @@
   "farmerType": "Farmer Type",
   "male": "Male",
   "female": "Female",
+  "primaryColor": "Primary Color",
+  "secondaryColor": "Secondary Color",
+  "selectPrimaryColor": "Select Primary Color",
+  "selectSecondaryColor": "Select Secondary Color",
+  "colorInformation": "Color Information",
+  "colorInformationSubtitle": "Select primary and secondary colors (optional)",
+  "colorRed": "Red",
+  "colorGreen": "Green",
+  "colorBlue": "Blue",
+  "colorBlack": "Black",
+  "colorWhite": "White",
+  "colorBrown": "Brown",
+  "colorYellow": "Yellow",
+  "colorOrange": "Orange",
+  "colorPink": "Pink",
+  "colorGray": "Gray",
+  "colorGrey": "Grey",
+  "colorPurple": "Purple",
+  "colorTan": "Tan",
+  "colorBeige": "Beige",
+  "colorCream": "Cream",
+  "colorGold": "Gold",
+  "colorSilver": "Silver",
+  "colorMixed": "Mixed",
   "nationalId": "National ID",
   "passport": "Passport",
   "drivingLicense": "Driving License",
@@ -499,6 +659,7 @@
   "tanzania": "Tanzania",
 
   "reviewInfoMessage": "Please review all information before submitting. You will receive a confirmation email after successful registration.",
+  "confirmRegister": "Are you sure you want to register?",
   "registrationSuccess": "Registration successful!",
   "registrationFailed": "Registration failed",
 
@@ -1244,6 +1405,55 @@
         "example": "feeding"
       }
     }
+  },
+  "livestockNotActiveCannotAddLogs": "This livestock is not active. Logs cannot be added for disposed livestock.",
+  "@livestockNotActiveCannotAddLogs": {
+    "description": "Message shown when trying to add logs to a livestock that has been disposed (notActive status)"
+  },
+
+  "syncRequired": "Sync Required",
+  "@syncRequired": {
+    "description": "Title for forced sync dialog when unsynced data count is high"
+  },
+
+  "syncRequiredMessage": "You have {count} unsynced items. Please sync your data to ensure all information is up to date.",
+  "@syncRequiredMessage": {
+    "description": "Message for forced sync dialog",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "syncNow": "Sync Now",
+  "@syncNow": {
+    "description": "Button text for forced sync dialog"
+  },
+
+  "enterAsExtensionOfficer": "Enter as Extension Officer?",
+  "@enterAsExtensionOfficer": {
+    "description": "Link text to Extension Officer login"
+  },
+  "extensionOfficerLogin": "Extension Officer Login",
+  "@extensionOfficerLogin": {
+    "description": "Extension Officer login screen title"
+  },
+  "extensionOfficerLoginSubtitle": "Access farms you've been invited to",
+  "@extensionOfficerLoginSubtitle": {
+    "description": "Extension Officer login subtitle"
+  },
+  "farmerAccessNumber": "Farmer Access Number",
+  "@farmerAccessNumber": {
+    "description": "Farmer Access Number field label"
+  },
+  "enterFarmerAccessNumber": "Enter farmer access number",
+  "@enterFarmerAccessNumber": {
+    "description": "Farmer Access Number field hint"
+  },
+  "pleaseEnterFarmerAccessNumber": "Please enter farmer access number",
+  "@pleaseEnterFarmerAccessNumber": {
+    "description": "Farmer Access Number validation error"
   }
 }
 

@@ -1,55 +1,48 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_dropdown.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.dart';
-import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
-import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/home/presentation/home_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/signup/register_alert_dialogs.dart';
-import 'package:new_tag_and_seal_flutter_app/main.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  // AuthProvider will be accessed via Provider.of<AuthProvider>(context)
-  int _currentStep = 0;
+class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _secureStorage = const FlutterSecureStorage();
 
-  // Controllers for Step 1: Personal Information
+  // Controllers for Personal Information
   final _firstNameController = TextEditingController();
   final _middleNameController = TextEditingController();
   final _surnameController = TextEditingController();
   final _dateOfBirthController = TextEditingController();
 
-  // Controllers for Step 2: Contact Information
+  // Controllers for Contact Information
   final _phone1Controller = TextEditingController();
   final _phone2Controller = TextEditingController();
   final _emailController = TextEditingController();
   final _physicalAddressController = TextEditingController();
 
-  // Controllers for Step 3: Identity Information
+  // Controllers for Identity Information
   final _identityNumberController = TextEditingController();
 
-  // Controllers for Step 4: Location Information
-  // We'll store IDs from dropdowns
-
-  // Controllers for Step 5: Additional Information
+  // Controllers for Additional Information
   final _farmerOrganizationController = TextEditingController();
 
   // Form field values
@@ -65,12 +58,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int? _selectedStreetId;
 
   bool _isLoading = false;
+  bool _isLoadingData = true;
 
   @override
   void initState() {
     super.initState();
-    // Fetch locations when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserData();
       _loadLocationsIfNeeded();
     });
   }
@@ -81,13 +75,79 @@ class _RegisterScreenState extends State<RegisterScreen> {
       listen: false,
     );
 
-    // Load if not already loaded and not currently loading
-    // Also retry if there was an error (locationError is not null)
     if (!additionalDataProvider.hasLocationData &&
         !additionalDataProvider.isLoadingLocations) {
-      // Clear any previous errors before retrying
       additionalDataProvider.clearLocationError();
       await additionalDataProvider.fetchLocationsWithDialogs(context);
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      // Load profile data from secure storage
+      final profileJson = await _secureStorage.read(key: 'profile');
+      final firstname = await _secureStorage.read(key: 'firstname') ?? '';
+      final surname = await _secureStorage.read(key: 'surname') ?? '';
+      final email = await _secureStorage.read(key: 'email') ?? '';
+      final phone1 = await _secureStorage.read(key: 'phone1') ?? '';
+      final phone2 = await _secureStorage.read(key: 'phone2') ?? '';
+      final physicalAddress = await _secureStorage.read(key: 'physicalAddress') ?? '';
+      final dateOfBirth = await _secureStorage.read(key: 'dateOfBirth') ?? '';
+      final gender = await _secureStorage.read(key: 'gender') ?? '';
+
+      // Parse profile JSON if available
+      Map<String, dynamic>? profileData;
+      if (profileJson != null && profileJson.isNotEmpty) {
+        try {
+          profileData = Map<String, dynamic>.from(
+            // Parse JSON string
+            profileJson.startsWith('{') 
+              ? jsonDecode(profileJson) 
+              : {}
+          );
+        } catch (e) {
+          log('Error parsing profile JSON: $e');
+        }
+      }
+
+      // Populate form fields with current data
+      if (mounted) {
+        setState(() {
+          _firstNameController.text = firstname;
+          _surnameController.text = surname;
+          _emailController.text = email;
+          _phone1Controller.text = phone1;
+          _phone2Controller.text = phone2;
+          _physicalAddressController.text = physicalAddress;
+          _dateOfBirthController.text = dateOfBirth;
+          _selectedGender = gender.isNotEmpty ? gender.toLowerCase() : null;
+
+          // Load from profile if available
+          if (profileData != null) {
+            _middleNameController.text = profileData['middleName']?.toString() ?? '';
+            _identityNumberController.text = profileData['identityNumber']?.toString() ?? '';
+            _farmerOrganizationController.text = profileData['farmerOrganizationMembership']?.toString() ?? '';
+            _selectedFarmerType = profileData['farmerType']?.toString().toLowerCase();
+            _selectedIdentityCardTypeId = profileData['identityCardTypeId'] as int?;
+            _selectedSchoolLevelId = profileData['schoolLevelId'] as int?;
+            _selectedCountryId = profileData['countryId'] as int?;
+            _selectedRegionId = profileData['regionId'] as int?;
+            _selectedDistrictId = profileData['districtId'] as int?;
+            _selectedWardId = profileData['wardId'] as int?;
+            _selectedVillageId = profileData['villageId'] as int?;
+            _selectedStreetId = profileData['streetId'] as int?;
+          }
+
+          _isLoadingData = false;
+        });
+      }
+    } catch (e) {
+      log('Error loading user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingData = false;
+        });
+      }
     }
   }
 
@@ -110,29 +170,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarBrightness: Theme.of(context).brightness == Brightness.dark
-            ? Brightness.light
-            : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
     );
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: CustomBackButton(
           isEnabledBgColor: false,
-          iconColor: Theme.of(context).colorScheme.tertiary,
+          iconColor: theme.colorScheme.onSurface,
           iconSize: 24,
         ),
         title: Text(
-          l10n.register,
+          l10n.editProfile,
           style: TextStyle(
             fontSize: Constants.largeTextSize,
             fontWeight: FontWeight.bold,
@@ -143,12 +202,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: Consumer<AdditionalDataProvider>(
         builder: (context, additionalDataProvider, child) {
-          // Show loading indicator while fetching data
-          if (additionalDataProvider.isLoadingLocations) {
+          if (_isLoadingData || additionalDataProvider.isLoadingLocations) {
             return const Center(child: LoadingIndicator());
           }
-          
-          // Show error message if data failed to load
+
           if (additionalDataProvider.locationError != null) {
             return Center(
               child: Padding(
@@ -176,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: Constants.textSize,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -198,8 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             );
           }
-          
-          // Show loading if data is not yet loaded
+
           if (!additionalDataProvider.hasLocationData) {
             return const Center(child: LoadingIndicator());
           }
@@ -207,52 +263,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
           return SafeArea(
             child: Form(
               key: _formKey,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CustomStepper(
-                      currentStep: _currentStep,
-                      onStepContinue: _onStepContinue,
-                      onStepCancel: _onStepCancel,
-                      isLoading: _isLoading,
-                      backButtonText: l10n.back,
-                      continueButtonText: l10n.continueButton,
-                      finalStepButtonText: l10n.registerText,
-                      steps: [
-                        StepperStep(
-                          title: l10n.personalInfoStep,
-                          subtitle: l10n.personalInfoStepSubtitle,
-                          icon: Icons.person_outline,
-                          content: _buildPersonalInfoStep(),
-                        ),
-                        StepperStep(
-                          title: l10n.contactInfoStep,
-                          subtitle: l10n.contactInfoStepSubtitle,
-                          icon: Icons.contact_phone_outlined,
-                          content: _buildContactInfoStep(),
-                        ),
-                        StepperStep(
-                          title: l10n.identityInfoStep,
-                          subtitle: l10n.identityInfoStepSubtitle,
-                          icon: Icons.badge_outlined,
-                          content: _buildIdentityInfoStep(),
-                        ),
-                        StepperStep(
-                          title: l10n.locationInfoStep,
-                          subtitle: l10n.locationInfoStepSubtitle,
-                          icon: Icons.location_on_outlined,
-                          content: _buildLocationInfoStep(),
-                        ),
-                        StepperStep(
-                          title: l10n.additionalInfoStep,
-                          subtitle: l10n.additionalInfoStepSubtitle,
-                          icon: Icons.info_outline,
-                          content: _buildAdditionalInfoStep(),
-                        ),
-                      ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Personal Information Section
+                    _buildSectionTitle(l10n.personalInformation),
+                    const SizedBox(height: 20),
+                    _buildPersonalInfoFields(l10n),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Contact Information Section
+                    _buildSectionTitle(l10n.contactDetails),
+                    const SizedBox(height: 20),
+                    _buildContactInfoFields(l10n),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Identity Information Section
+                    _buildSectionTitle(l10n.identityCardType),
+                    const SizedBox(height: 20),
+                    _buildIdentityInfoFields(l10n, additionalDataProvider),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Location Information Section
+                    _buildSectionTitle(l10n.addressInformation),
+                    const SizedBox(height: 20),
+                    _buildLocationInfoFields(l10n, additionalDataProvider),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Additional Information Section
+                    _buildSectionTitle(l10n.additionalDetails),
+                    const SizedBox(height: 20),
+                    _buildAdditionalInfoFields(l10n),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Save Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: CustomButton(
+                        text: _isLoading ? l10n.loading : l10n.save,
+                        color: Constants.primaryColor,
+                        isLoading: _isLoading,
+                        onPressed: _isLoading ? null : _handleSave,
+                      ),
                     ),
-                  ),
-                ],
+                    
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
           );
@@ -261,45 +325,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  //               StepperStep(
-  //                 title: l10n.personalInfoStep,
-  //                 subtitle: l10n.personalInfoStepSubtitle,
-  //                 icon: Icons.person_outline,
-  //                 content: _buildPersonalInfoStep(),
-  //               ),
-  //               StepperStep(
-  //                 title: l10n.contactInfoStep,
-  //                 subtitle: l10n.contactInfoStepSubtitle,
-  //                 icon: Icons.contact_phone_outlined,
-  //                 content: _buildContactInfoStep(),
-  //               ),
-  //               StepperStep(
-  //                 title: l10n.identityInfoStep,
-  //                 subtitle: l10n.identityInfoStepSubtitle,
-  //                 icon: Icons.badge_outlined,
-  //                 content: _buildIdentityInfoStep(),
-  //               ),
-  //               StepperStep(
-  //                 title: l10n.locationInfoStep,
-  //                 subtitle: l10n.locationInfoStepSubtitle,
-  //                 icon: Icons.location_on_outlined,
-  //                 content: _buildLocationInfoStep(),
-  //               ),
-  //               StepperStep(
-  //                 title: l10n.additionalInfoStep,
-  //                 subtitle: l10n.additionalInfoStepSubtitle,
-  //                 icon: Icons.info_outline,
-  // }
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: Constants.largeTextSize,
+        fontWeight: FontWeight.bold,
+        color: Constants.primaryColor,
+      ),
+    );
+  }
 
-  // Step 1: Personal Information
-  Widget _buildPersonalInfoStep() {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildPersonalInfoFields(AppLocalizations l10n) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.personalInformation),
-        const SizedBox(height: 20),
         CustomTextField(
           controller: _firstNameController,
           label: l10n.firstName,
@@ -332,9 +371,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
-        
         const SizedBox(height: 16),
-
         CustomDatePicker(
           controller: _dateOfBirthController,
           label: l10n.dateOfBirth,
@@ -346,9 +383,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
-
         const SizedBox(height: 16),
-        
         CustomDropdown<String>(
           value: _selectedGender,
           label: l10n.gender,
@@ -370,15 +405,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Step 2: Contact Information
-  Widget _buildContactInfoStep() {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildContactInfoFields(AppLocalizations l10n) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.contactDetails),
-        const SizedBox(height: 20),
         CustomTextField(
           controller: _phone1Controller,
           label: l10n.phone1,
@@ -395,9 +424,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
-
         const SizedBox(height: 16),
-        
         CustomTextField(
           controller: _phone2Controller,
           label: '${l10n.phone2} (${l10n.optional})',
@@ -412,6 +439,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hintText: l10n.enterEmail,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
+          enabled: false, // Email should not be editable
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.emailRequired;
@@ -440,18 +468,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Step 3: Identity Information
-  Widget _buildIdentityInfoStep() {
-    final l10n = AppLocalizations.of(context)!;
-    final additionalDataProvider = Provider.of<AdditionalDataProvider>(context);
-
+  Widget _buildIdentityInfoFields(
+    AppLocalizations l10n,
+    AdditionalDataProvider additionalDataProvider,
+  ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.identityCardType),
-        const SizedBox(height: 20),
-
-        // Identity Card Type Dropdown
         CustomDropdown<int>(
           value: _selectedIdentityCardTypeId,
           label: l10n.identityCardType,
@@ -473,7 +495,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
         CustomTextField(
           controller: _identityNumberController,
           label: l10n.identityNumber,
@@ -487,8 +508,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
-        // School Level Dropdown
         CustomDropdown<int>(
           value: _selectedSchoolLevelId,
           label: l10n.schoolLevel,
@@ -510,18 +529,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Step 4: Location Information
-  Widget _buildLocationInfoStep() {
-    final l10n = AppLocalizations.of(context)!;
-    final additionalDataProvider = Provider.of<AdditionalDataProvider>(context);
-
+  Widget _buildLocationInfoFields(
+    AppLocalizations l10n,
+    AdditionalDataProvider additionalDataProvider,
+  ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.addressInformation),
-        const SizedBox(height: 20),
-
-        // Country Dropdown
         CustomDropdown<int>(
           value: _selectedCountryId,
           label: l10n.country,
@@ -549,8 +562,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
-        // Region Dropdown
         CustomDropdown<int>(
           value: _selectedRegionId,
           label: l10n.region,
@@ -585,8 +596,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
-        // District Dropdown
         CustomDropdown<int>(
           value: _selectedDistrictId,
           label: l10n.district,
@@ -620,8 +629,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
-        // Ward Dropdown
         CustomDropdown<int>(
           value: _selectedWardId,
           label: l10n.ward,
@@ -654,8 +661,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         ),
         const SizedBox(height: 16),
-
-        // Village Dropdown (Optional)
         CustomDropdown<int>(
           value: _selectedVillageId,
           label: '${l10n.village} (${l10n.optional})',
@@ -674,11 +679,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     .toList()
               : [],
           onChanged: (value) => setState(() => _selectedVillageId = value),
-          // No validator - field is optional
         ),
         const SizedBox(height: 16),
-
-        // Street Dropdown (Optional)
         CustomDropdown<int>(
           value: _selectedStreetId,
           label: '${l10n.street} (${l10n.optional})',
@@ -697,21 +699,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     .toList()
               : [],
           onChanged: (value) => setState(() => _selectedStreetId = value),
-          // No validator - field is optional
         ),
       ],
     );
   }
 
-  // Step 5: Additional Information
-  Widget _buildAdditionalInfoStep() {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildAdditionalInfoFields(AppLocalizations l10n) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.additionalDetails),
-        const SizedBox(height: 20),
         CustomDropdown<String>(
           value: _selectedFarmerType,
           label: l10n.farmerType,
@@ -736,197 +731,104 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hintText: l10n.enterOrganizationName,
           prefixIcon: Icons.group_outlined,
         ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Constants.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, color: Constants.primaryColor, size: 24),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.reviewInfoMessage,
-                  style: TextStyle(
-                    fontSize: Constants.textSize,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
 
-  // Reusable widget builders
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: Constants.largeTextSize,
-        fontWeight: FontWeight.bold,
-        color: Constants.primaryColor,
+  Future<void> _handleSave() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Show confirmation dialog
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        title: Text(
+          l10n.editProfile,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        content: Text(
+          l10n.confirmUpdateProfile,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Constants.primaryColor,
+            ),
+            child: Text(
+              l10n.save,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
-  }
 
-  // Step navigation logic
-  void _onStepContinue() async {
-    if (_currentStep < 4) {
-      // Validate current step using form validation
-      if (_formKey.currentState!.validate()) {
-        setState(() => _currentStep++);
-      }
-    } else {
-      // Final step - validate and show confirmation dialog
-      if (_formKey.currentState!.validate()) {
-        final l10n = AppLocalizations.of(context)!;
+    if (confirm != true) {
+      return;
+    }
 
-        // Show confirmation dialog via a registration-scoped helper to avoid affecting other screens
-        await RegisterAlertDialogs.showConfirmation(
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // TODO: Implement API call to update profile
+      // For now, just show success message
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        await AlertDialogs.showSuccess(
           context: context,
-          title: l10n.registerText,
-          message: l10n.confirmRegister,
-          confirmText: l10n.registerText,
-          cancelText: l10n.cancel,
-          onConfirm: () async {
-        await _submitRegistration();
+          title: l10n.profileUpdated,
+          message: l10n.profileUpdatedSuccessfully,
+          buttonText: l10n.ok,
+          onPressed: () {
+            Navigator.of(context).pop(); // Go back to profile screen
           },
         );
       }
-    }
-  }
-
-  void _onStepCancel() {
-    if (_currentStep > 0) {
-      setState(() => _currentStep--);
-    }
-  }
-
-  Future<void> _submitRegistration() async {
-    final l10n = AppLocalizations.of(context)!;
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    setState(() => _isLoading = true);
-
-    try {
-      // Prepare registration data with authentication fields
-      final registrationData = {
-        // Authentication fields
-        'username': _emailController.text, // Use email as username
-        'email': _emailController.text,
-        'password': _emailController.text, // Use email as password
-        // 'password_confirmation': _emailController.text,
-
-        // Personal information
-        'firstName': _firstNameController.text,
-        'middleName': _middleNameController.text,
-        'surname': _surnameController.text,
-        'phone1': _phone1Controller.text,
-        'phone2': _phone2Controller.text,
-        'physicalAddress': _physicalAddressController.text,
-        'farmerOrganizationMembership': _farmerOrganizationController.text,
-        'dateOfBirth': _dateOfBirthController.text,
-        'gender': _selectedGender, // Already lowercase: 'male' or 'female'
-
-        // Identity information
-        'identityCardTypeId': _selectedIdentityCardTypeId,
-        'identityNumber': _identityNumberController.text,
-        'schoolLevelId': _selectedSchoolLevelId,
-
-        // Location information
-        'streetId': _selectedStreetId,
-        'villageId': _selectedVillageId,
-        'wardId': _selectedWardId,
-        'districtId': _selectedDistrictId,
-        'regionId': _selectedRegionId,
-        'countryId': _selectedCountryId,
-
-        // Farmer information
-        'farmerType': _selectedFarmerType, // Already lowercase: 'individual' or 'organization'
-      };
-
-      final isRegistered = await authProvider.registerFarmer(
-        context: context,
-        farmerData: registrationData,
-      );
-
-      if (isRegistered && mounted) {
-        // Verify auth state is set correctly
-        if (!authProvider.isAuthenticated) {
-          log('⚠️ WARNING: Auth state not set after registration, checking auth status...');
-          await authProvider.checkAuthStatus();
-        }
-        
-        log('🔐 DEBUG: Auth state after registration - isAuthenticated: ${authProvider.isAuthenticated}');
-        
-        if (mounted && authProvider.isAuthenticated) {
-          log('🔐 DEBUG: Navigating to HomeScreen - user is authenticated');
-          
-          // Close loading dialog BEFORE navigation
-          if (context.mounted) {
-            try {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-                log('🔐 DEBUG: Loading dialog closed before navigation');
-              }
-            } catch (e) {
-              log('⚠️ WARNING: Error closing loading dialog: $e');
-            }
-          }
-          
-          // Small delay to ensure dialog is fully closed before navigation
-          await Future.delayed(const Duration(milliseconds: 100));
-          
-          // Navigate directly to HomeScreen using appNavigatorKey to ensure app-level navigation
-          // This bypasses any route guards and goes directly to HomeScreen
-          if (appNavigatorKey.currentState != null) {
-            appNavigatorKey.currentState!.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false, // Remove all previous routes including SplashScreen and GetStartedScreen
-            );
-            log('🔐 DEBUG: Navigation to HomeScreen completed');
-          } else {
-            log('⚠️ WARNING: appNavigatorKey.currentState is null, cannot navigate');
-          }
-        } else if (mounted) {
-          log('⚠️ WARNING: Cannot navigate - auth state not authenticated. isAuthenticated: ${authProvider.isAuthenticated}');
-          
-          // Close loading dialog even if navigation fails
-          if (context.mounted) {
-            try {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-            } catch (e) {
-              log('⚠️ WARNING: Error closing loading dialog after failed navigation: $e');
-            }
-          }
-        }
-      }
     } catch (e) {
       if (mounted) {
-        // Show user-friendly error dialog
-        final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
-        final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
+        setState(() {
+          _isLoading = false;
+        });
 
         await AlertDialogs.showError(
           context: context,
-          title: errorTitle,
-          message: errorMessage,
+          title: l10n.error,
+          message: e.toString(),
           buttonText: l10n.ok,
-          onPressed: () => Navigator.of(context).pop(),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
       }
     }
   }
 }
+

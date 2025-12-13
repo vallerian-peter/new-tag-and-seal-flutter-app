@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
-import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
-import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
-import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/login/login_screen.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/change_password/change_password_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/main.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
@@ -110,6 +104,30 @@ class SettingsScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            // Account Settings
+            _buildSettingsSection(
+              context: context,
+              title: l10n.settingsAccountTitle,
+              children: [
+                _buildSettingOption(
+                  context: context,
+                  icon: Iconsax.lock_outline,
+                  title: l10n.changePassword,
+                  subtitle: l10n.changePasswordSubtitle,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChangePasswordScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
             // Theme Settings
             _buildSettingsSection(
               context: context,
@@ -207,36 +225,6 @@ class SettingsScreen extends StatelessWidget {
                 ),
 
               ],
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Logout Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () => _onLogoutPressed(context),
-                  icon: const Icon(Iconsax.logout_outline),
-                  label: Text(
-                    l10n.logout,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
             ),
             
             const SizedBox(height: 40),
@@ -394,205 +382,6 @@ class SettingsScreen extends StatelessWidget {
         );
       },
     );
-  }
-
-  Future<void> _onLogoutPressed(BuildContext context) async {
-    final database = Provider.of<AppDatabase>(context, listen: false);
-    SyncUnsyncedSummary summary;
-
-    try {
-      summary = await Sync.getUnsyncedSummary(database);
-    } catch (_) {
-      summary = const SyncUnsyncedSummary.empty();
-    }
-
-    if (!context.mounted) return;
-
-    final l10n = AppLocalizations.of(context)!;
-
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        final theme = Theme.of(dialogContext);
-        final isDark = theme.brightness == Brightness.dark;
-
-        return AlertDialog(
-          backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: Text(l10n.logout),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(summary.hasPending
-                  ? l10n.unsyncedDataWarning
-                  : l10n.noUnsyncedDataMessage),
-              if (summary.hasPending) ...[
-                const SizedBox(height: 12),
-                ..._buildUnsyncedSummaryItems(dialogContext, l10n, summary),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.cancel),
-            ),
-            if (summary.hasPending)
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  _logoutFlow(context, syncBefore: true);
-                },
-                child: Text(l10n.syncAndLogout),
-              ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _logoutFlow(context, syncBefore: false);
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-              child: Text(l10n.logout),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _logoutFlow(BuildContext context, {required bool syncBefore}) async {
-    final l10n = AppLocalizations.of(context)!;
-    final database = Provider.of<AppDatabase>(context, listen: false);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final additionalDataProvider =
-        Provider.of<AdditionalDataProvider>(context, listen: false);
-    final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
-
-    if (syncBefore) {
-      AlertDialogs.showLoading(
-        context: context,
-        title: l10n.sync,
-        message: l10n.syncingBeforeLogout,
-        isDismissible: false,
-      );
-
-      try {
-        await Sync.fullSyncPostData(database);
-      } catch (error) {
-        if (context.mounted) {
-          await Navigator.of(context, rootNavigator: true).maybePop();
-          await AlertDialogs.showError(
-            context: context,
-            title: l10n.syncFailed,
-            message: error.toString(),
-            buttonText: l10n.ok,
-          );
-        }
-        return;
-      }
-
-      if (context.mounted) {
-        await Navigator.of(context, rootNavigator: true).maybePop();
-      }
-    }
-
-    await authProvider.logout(context);
-
-    try {
-      await database.clearAllData();
-    } catch (_) {
-      // Ignore database clearing errors but continue logout flow
-    }
-
-    eventsProvider.clear();
-    additionalDataProvider.clearLocationData();
-
-    if (!context.mounted) return;
-
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
-  }
-
-  List<Widget> _buildUnsyncedSummaryItems(
-    BuildContext context,
-    AppLocalizations l10n,
-    SyncUnsyncedSummary summary,
-  ) {
-    final items = <Widget>[];
-
-    void addItem(String label, int count) {
-      if (count <= 0) return;
-      items.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-              Text(
-                count.toString(),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    addItem(l10n.farms, summary.farms);
-    addItem(l10n.livestock, summary.livestock);
-    summary.logCounts.forEach(
-      (logType, count) => addItem(_logLabel(l10n, logType), count),
-    );
-    addItem(l10n.vaccination, summary.vaccines);
-    addItem(l10n.invitedUsersText, summary.farmUsers);
-
-    return items;
-  }
-
-  String _logLabel(AppLocalizations l10n, String key) {
-    switch (key) {
-      case 'feedings':
-        return l10n.feeding;
-      case 'weightChanges':
-        return l10n.weightChange;
-      case 'dewormings':
-        return l10n.deworming;
-      case 'medications':
-        return l10n.medication;
-      case 'vaccinations':
-        return l10n.vaccination;
-      case 'disposals':
-        return l10n.disposal;
-      case 'milkings':
-        return l10n.milking;
-      case 'pregnancies':
-        return l10n.pregnancy;
-      case 'calvings':
-        return l10n.calving;
-      case 'dryoffs':
-        return l10n.dryoff;
-      case 'inseminations':
-        return l10n.insemination;
-      default:
-        return key;
-    }
   }
 
   void _showLocaleDialog(BuildContext context) {

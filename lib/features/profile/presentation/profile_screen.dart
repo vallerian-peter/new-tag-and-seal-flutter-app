@@ -14,6 +14,7 @@ import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provide
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
+import 'package:new_tag_and_seal_flutter_app/features/profile/presentation/edit_profile_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/settings/presentation/settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -119,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: _isLoading
           ? const Center(child: LoadingIndicator())
           : SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 32),
               child: Column(
                 children: [
@@ -308,6 +309,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   label: l10n.role,
                                   value: _userRole,
                                 ),
+
+                                const SizedBox(height: 16),
+
+                                  // Edit Profile Button (only show for farmers)
+                                  if (_userRole.toLowerCase() == 'farmer')
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Constants.primaryColor,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const EditProfileScreen(),
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Iconsax.edit_outline, size: 18),
+                                        label: Text(
+                                          l10n.editProfile,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                
                               ],
                             ),
                           ),
@@ -701,11 +738,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'pregnancies':
         return l10n.pregnancy;
       case 'calvings':
+      case 'calving':
         return l10n.calving;
+      case 'farrowings':
+      case 'farrowing':
+        return l10n.farrowing;
       case 'dryoffs':
         return l10n.dryoff;
       case 'inseminations':
         return l10n.insemination;
+      case 'transfers':
+      case 'transfer':
+        return l10n.transfer;
+      case 'abortedPregnancies':
+      case 'abortedPregnancy':
+        return l10n.abortedPregnancy;
       default:
         return key;
     }

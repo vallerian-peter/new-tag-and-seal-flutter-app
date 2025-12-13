@@ -553,9 +553,8 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(
         message,
@@ -575,11 +574,8 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withOpacity(0.1),
+        color: Constants.primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Constants.primaryColor.withOpacity(0.3),
-        ),
       ),
       child: Row(
         children: [

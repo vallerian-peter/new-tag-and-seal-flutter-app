@@ -73,6 +73,9 @@ class ApiEndpoints {
   /// Get user profile (GET request, requires auth)
   static String get profile => '$authBase/profile';
   
+  /// Update user profile (PUT request, requires auth)
+  static String get updateProfile => '$authBase/profile';
+  
   /// Change user password (POST request, requires auth)
   static String get changePassword => '$authBase/change-password';
 

@@ -100,9 +100,15 @@ class CustomDropdown<T> extends StatelessWidget {
         const SizedBox(height: 8),
         Theme(
           data: Theme.of(context).copyWith(
-            canvasColor: Colors.white,
-            cardColor: Colors.white,
-            dialogBackgroundColor: Colors.white,
+            canvasColor: theme.brightness == Brightness.dark 
+                ? theme.colorScheme.surface 
+                : Colors.white,
+            cardColor: theme.brightness == Brightness.dark 
+                ? theme.colorScheme.surface 
+                : Colors.white,
+            dialogBackgroundColor: theme.brightness == Brightness.dark 
+                ? theme.colorScheme.surface 
+                : Colors.white,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -112,7 +118,9 @@ class CustomDropdown<T> extends StatelessWidget {
             child: DropdownButtonFormField<T>(
             value: value,
             isExpanded: true,
-            dropdownColor: Colors.white,
+            dropdownColor: theme.brightness == Brightness.dark 
+                ? theme.colorScheme.surface 
+                : Colors.white,
             onChanged: enabled ? onChanged : null,
             decoration: InputDecoration(
               hintText: hint,
@@ -127,20 +135,28 @@ class CustomDropdown<T> extends StatelessWidget {
               ),
               filled: true,
               fillColor: enabled
-                  ? Constants.veryLightGreyColor
-                  : Constants.veryLightGreyColor.withOpacity(0.6),
+                  ? (theme.brightness == Brightness.dark 
+                      ? theme.scaffoldBackgroundColor 
+                      : Constants.veryLightGreyColor)
+                  : (theme.brightness == Brightness.dark 
+                      ? theme.scaffoldBackgroundColor.withOpacity(0.6)
+                      : Constants.veryLightGreyColor.withOpacity(0.6)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Constants.primaryColor.withOpacity(0.2),
+                  color: theme.brightness == Brightness.dark
+                      ? theme.colorScheme.outline.withOpacity(0.3)
+                      : Constants.primaryColor.withOpacity(0.2),
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Constants.primaryColor.withOpacity(0.2),
+                  color: theme.brightness == Brightness.dark
+                      ? theme.colorScheme.outline.withOpacity(0.3)
+                      : Constants.primaryColor.withOpacity(0.2),
                   width: 1.5,
                 ),
               ),

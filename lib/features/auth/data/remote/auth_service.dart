@@ -254,5 +254,171 @@ class AuthService {
       return true;
     }
   }
+
+  /// Update user profile
+  /// 
+  /// Sends profile update data to the backend.
+  /// Returns the updated profile data if successful.
+  /// 
+  /// Throws an exception if:
+  /// - Network request fails
+  /// - Validation fails
+  /// - Response status is not 200
+  /// 
+  /// Example:
+  /// ```dart
+  /// final profileData = {
+  ///   'firstName': 'John',
+  ///   'surname': 'Doe',
+  ///   'phone1': '+255712345678',
+  ///   // ... other fields
+  /// };
+  /// 
+  /// final response = await AuthService.updateProfile(profileData);
+  /// print(response['data']['profile']); // Updated profile data
+  /// ```
+  static Future<Map<String, dynamic>> updateProfile(
+    Map<String, dynamic> profileData,
+  ) async {
+    try {
+      // Build headers with auth token
+      final headers = await _buildHeaders();
+
+      // Make PUT request
+      final response = await http.put(
+        Uri.parse(ApiEndpoints.updateProfile),
+        headers: headers,
+        body: jsonEncode(profileData),
+      );
+
+      log('🔐 DEBUG: Update profile response: ${response.body}');
+
+      // Parse response
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      // Check response status code
+      if (response.statusCode == 200) {
+        // Check API status flag
+        if (responseData['status'] == true) {
+          return responseData;
+        } else {
+          final message = responseData['message'] ?? 'Profile update failed';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized. Please login again');
+      } else if (response.statusCode == 403) {
+        throw Exception('You do not have permission to update this profile');
+      } else if (response.statusCode == 404) {
+        throw Exception('Profile not found');
+      } else if (response.statusCode == 422) {
+        final errors = responseData['errors'] as Map<String, dynamic>?;
+        if (errors != null && errors.isNotEmpty) {
+          final firstError = errors.values.first;
+          final errorMessage = firstError is List ? firstError.first : firstError.toString();
+          throw Exception(errorMessage);
+        }
+        final message = responseData['message'] ?? 'Validation failed';
+        throw Exception(message);
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Profile update failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Failed to update profile: $e');
+    }
+  }
+
+  /// Change user password
+  /// 
+  /// Sends old and new password to the backend to update user password.
+  /// Returns true if password change was successful.
+  /// 
+  /// Throws an exception if:
+  /// - Network request fails
+  /// - Old password is incorrect
+  /// - New password doesn't meet requirements
+  /// - Response status is not 200
+  /// 
+  /// Example:
+  /// ```dart
+  /// final success = await AuthService.changePassword(
+  ///   oldPassword: 'current_password',
+  ///   newPassword: 'new_secure_password',
+  /// );
+  /// if (success) {
+  ///   print('Password changed successfully');
+  /// }
+  /// ```
+  static Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      // Build headers with auth token
+      final headers = await _buildHeaders();
+
+      // Prepare password change data - only send oldPassword and newPassword
+      // confirmPassword is validated on the frontend and not sent to server
+      final passwordData = {
+        'currentPassword': oldPassword,
+        'newPassword': newPassword,
+      };
+
+      // Make POST request
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.changePassword),
+        headers: headers,
+        body: jsonEncode(passwordData),
+      );
+
+      log('🔐 DEBUG: Change password response: ${response.body}');
+
+      // Parse response
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      // Check response status code
+      if (response.statusCode == 200) {
+        // Check API status flag
+        if (responseData['status'] == true) {
+          return true;
+        } else {
+          final message = responseData['message'] ?? 'Password change failed';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 422) {
+        // Validation errors
+        final errors = responseData['errors'];
+        if (errors != null && errors is Map) {
+          final errorMessages = <String>[];
+          errors.forEach((key, value) {
+            if (value is List) {
+              errorMessages.addAll(value.cast<String>());
+            } else {
+              errorMessages.add(value.toString());
+            }
+          });
+          throw Exception('Validation failed: ${errorMessages.join(', ')}');
+        }
+        final message = responseData['message'] ?? 'Current password is incorrect';
+        throw Exception(message);
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized. Please login again');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Password change failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Failed to change password: $e');
+    }
+  }
 }
 

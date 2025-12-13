@@ -5,6 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/features/auth/data/local/auth_repos
 import 'package:new_tag_and_seal_flutter_app/features/auth/domain/models/farmer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/domain/farm_user_permissions.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +45,14 @@ class AuthProvider extends ChangeNotifier {
   /// Loading state for logout
   bool _isLoggingOut = false;
   bool get isLoggingOut => _isLoggingOut;
+
+  /// Loading state for changing password
+  bool _isChangingPassword = false;
+  bool get isChangingPassword => _isChangingPassword;
+
+  /// Loading state for updating profile
+  bool _isUpdatingProfile = false;
+  bool get isUpdatingProfile => _isUpdatingProfile;
 
   /// Error message
   String? _errorMessage;
@@ -87,10 +96,10 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     final l10n = AppLocalizations.of(context)!;
 
-    // Show loading dialog
+    // Show loading dialog on the register screen using the provided context
     AlertDialogs.showLoading(
       context: context,
-      title: l10n.register,
+      title: l10n.registerText,
       message: l10n.creatingAccount,
       isDismissible: false,
     );
@@ -120,25 +129,23 @@ class AuthProvider extends ChangeNotifier {
         log('⚠️ WARNING: No stored user data found after registration');
       }
       
+      // Verify authentication status from repository (auto-login should have set this)
+      _isAuthenticated = await _authRepository.isAuthenticated();
+      log('🔐 DEBUG: Authentication status after registration: $_isAuthenticated');
+      
+      if (!_isAuthenticated) {
+        log('⚠️ WARNING: User not authenticated after registration and auto-login!');
+      }
+      
       // Update state
       _currentFarmer = farmer;
-      _isAuthenticated = true;
       _isRegisteringFarmer = false;
       notifyListeners();
 
-      // Close loading dialog
-      if (context.mounted) Navigator.pop(context);
-
-      // Show success dialog
-      if (context.mounted) {
-        await AlertDialogs.showSuccess(
-          context: context,
-          title: l10n.success,
-          message: l10n.registrationSuccessful,
-          buttonText: l10n.continueText,
-        );
-      }
-
+      // DO NOT close loading dialog here - let it stay open until navigation completes
+      // The dialog will be closed in register_screen after navigation to HomeScreen
+      log('🔐 DEBUG: Registration and auto-login completed - keeping loading dialog open until navigation');
+      log('🔐 DEBUG: Registration flow completed, returning true - navigation will happen in register_screen');
       return true;
     } catch (e) {
       // Update error state
@@ -588,6 +595,221 @@ class AuthProvider extends ChangeNotifier {
     final roleTitle = profile?['roleTitle'] as String?;
     if (roleTitle == null || roleTitle.trim().isEmpty) return null;
     return resolveFarmUserPermissions(roleTitle);
+  }
+
+  // ==========================================================================
+  // Change Password
+  // ==========================================================================
+
+  /// Change user password
+  /// 
+  /// Checks network connectivity, shows loading dialog, calls repository, handles success/error.
+  /// 
+  /// Example:
+  /// ```dart
+  /// final success = await authProvider.changePassword(
+  ///   context: context,
+  ///   oldPassword: 'current_password',
+  ///   newPassword: 'new_secure_password',
+  /// );
+  /// ```
+  Future<bool> changePassword({
+    required BuildContext context,
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Check network connectivity first
+    final networkCheck = NetworkCheck.instance;
+    final isConnected = await networkCheck.isConnected;
+
+    if (!isConnected) {
+      if (context.mounted) {
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.noInternetConnection,
+          message: l10n.pleaseCheckYourInternetConnection,
+          buttonText: l10n.ok,
+        );
+      }
+      return false;
+    }
+
+    // Show loading dialog
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.changePassword,
+      message: l10n.updatingPassword,
+      isDismissible: false,
+    );
+
+    // Set loading state
+    _isChangingPassword = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      log('🔐 DEBUG: Changing password');
+
+      // Call repository to change password
+      final success = await _authRepository.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+
+      log('🔐 DEBUG: Password changed successfully');
+
+      // Update state
+      _isChangingPassword = false;
+      notifyListeners();
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      return success;
+    } catch (e) {
+      log('❌ Error changing password: ${e.toString()}');
+
+      _isChangingPassword = false;
+      notifyListeners();
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      // Show user-friendly error dialog
+      if (context.mounted) {
+        final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+        final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
+        
+        await AlertDialogs.showError(
+          context: context,
+          title: errorTitle,
+          message: errorMessage,
+          buttonText: l10n.tryAgain,
+        );
+      }
+
+      return false;
+    }
+  }
+
+  // ==========================================================================
+  // Update Profile
+  // ==========================================================================
+
+  /// Update user profile
+  /// 
+  /// Checks network connectivity, shows loading dialog, calls repository, handles success/error.
+  /// Updates local stored data on success.
+  /// 
+  /// Example:
+  /// ```dart
+  /// final profileData = {
+  ///   'firstName': 'John',
+  ///   'surname': 'Doe',
+  ///   'phone1': '+255712345678',
+  ///   // ... other fields
+  /// };
+  /// 
+  /// final success = await authProvider.updateProfile(
+  ///   context: context,
+  ///   profileData: profileData,
+  /// );
+  /// ```
+  Future<bool> updateProfile({
+    required BuildContext context,
+    required Map<String, dynamic> profileData,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Check network connectivity first
+    final networkCheck = NetworkCheck.instance;
+    final isConnected = await networkCheck.isConnected;
+
+    if (!isConnected) {
+      if (context.mounted) {
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.noInternetConnection,
+          message: l10n.pleaseCheckYourInternetConnection,
+          buttonText: l10n.ok,
+        );
+      }
+      return false;
+    }
+
+    // Show loading dialog
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.editProfile,
+      message: l10n.updatingProfile,
+      isDismissible: false,
+    );
+
+    // Set loading state
+    _isUpdatingProfile = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      log('🔐 DEBUG: Updating profile');
+
+      // Call repository to update profile
+      final response = await _authRepository.updateProfile(profileData);
+
+      log('🔐 DEBUG: Profile updated successfully');
+
+      // Check if update was successful (status 200)
+      if (response['status'] == true) {
+        // Repository already updated secure storage, now refresh provider state from storage
+        // This ensures everything is in sync with what's actually stored
+        final storedData = await _authRepository.getStoredUserData();
+        if (storedData != null) {
+          _currentUser = storedData['user'] as Map<String, dynamic>?;
+          _currentProfile = storedData['profile'] as Map<String, dynamic>?;
+          
+          // Update farmer data if user is a farmer
+          if (_currentUser?['role'] == 'farmer') {
+            _currentFarmer = await _authRepository.getCurrentFarmer();
+          }
+          
+          log('✅ Provider state refreshed from secure storage after profile update');
+        }
+      }
+
+      // Update state
+      _isUpdatingProfile = false;
+      notifyListeners();
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      return true;
+    } catch (e) {
+      log('❌ Error updating profile: ${e.toString()}');
+
+      _isUpdatingProfile = false;
+      notifyListeners();
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      // Show user-friendly error dialog
+      if (context.mounted) {
+        final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+        final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
+        
+        await AlertDialogs.showError(
+          context: context,
+          title: errorTitle,
+          message: errorMessage,
+          buttonText: l10n.tryAgain,
+        );
+      }
+
+      return false;
+    }
   }
 }
 

@@ -942,9 +942,8 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.08),
+        color: baseColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: baseColor.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [

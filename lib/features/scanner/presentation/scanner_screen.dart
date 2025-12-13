@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/camera_allow_permission_alert.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livesto
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/bluetooth_rfid_bottom_sheet.dart';
 
 enum TagScanMode { qr, barcode, rfid }
 
@@ -32,17 +33,45 @@ Future<String?> showTagScannerBottomSheet(
     return null;
   }
 
-  if (config.usesCamera && !await _ensureCameraPermission(context)) {
-    return null;
+  // Check and request camera permission if needed
+  if (config.usesCamera) {
+    final hasPermission = await _ensureCameraPermission(context);
+    if (!hasPermission) {
+      return null; // Permission denied or not granted
+    }
+    
+    // Ensure context is still mounted after permission check
+    if (!context.mounted) {
+      return null;
+    }
+    
+    // Small delay to ensure permission is fully processed
+    await Future.delayed(const Duration(milliseconds: 100));
+    
+    // Double-check context is still mounted
+    if (!context.mounted) {
+      return null;
+    }
   }
 
   MobileScannerController? controller;
   if (config.usesCamera) {
-    controller = MobileScannerController(
-      detectionSpeed: DetectionSpeed.normal,
-      torchEnabled: false,
-      formats: config.formats,
-    );
+    try {
+      controller = MobileScannerController(
+        detectionSpeed: DetectionSpeed.normal,
+        torchEnabled: false,
+        formats: config.formats,
+      );
+    } catch (e) {
+      debugPrint('Failed to create MobileScannerController: $e');
+      if (context.mounted) {
+        ToastAlerts.showError(
+          context,
+          message: l10n.scanUnsupportedDevice,
+        );
+      }
+      return null;
+    }
   }
 
   String? result;
@@ -58,6 +87,16 @@ Future<String?> showTagScannerBottomSheet(
     );
   } on MissingPluginException {
     controller?.dispose();
+    if (context.mounted) {
+      ToastAlerts.showError(
+        context,
+        message: l10n.scanUnsupportedDevice,
+      );
+    }
+    return null;
+  } catch (e) {
+    controller?.dispose();
+    debugPrint('Error showing scanner bottom sheet: $e');
     if (context.mounted) {
       ToastAlerts.showError(
         context,
@@ -88,42 +127,76 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
     return true;
   }
 
+  // Check current permission status
   var status = await Permission.camera.status;
   if (status.isGranted) {
     return true;
   }
 
+  // If permanently denied or restricted, show settings dialog
   if (status.isPermanentlyDenied || status.isRestricted) {
     if (!context.mounted) return false;
     final goToSettings = await _showPermissionSettingsDialog(context, l10n);
     if (goToSettings == true) {
       await openAppSettings();
-    }
-    return false;
-  }
-
-  if (context.mounted) {
-    final shouldRequest = await _showPermissionRationaleDialog(context, l10n);
-    if (shouldRequest != true) {
-      return false;
-    }
-  }
-
-  status = await Permission.camera.request();
-  if (status.isGranted) {
-    return true;
-  }
-
-  if (status.isPermanentlyDenied || status.isRestricted) {
-    if (context.mounted) {
-      final goToSettings = await _showPermissionSettingsDialog(context, l10n);
-      if (goToSettings == true) {
-        await openAppSettings();
+      // Wait a bit for user to return from settings
+      await Future.delayed(const Duration(milliseconds: 500));
+      // Re-check permission status after returning
+      if (!context.mounted) return false;
+      status = await Permission.camera.status;
+      if (status.isGranted) {
+        return true;
       }
     }
     return false;
   }
 
+  // Show rationale dialog first (explains why we need permission)
+  if (!context.mounted) return false;
+  final shouldRequest = await _showPermissionRationaleDialog(context, l10n);
+  
+  // User cancelled the rationale dialog
+  if (shouldRequest != true) {
+    return false;
+  }
+
+  // Small delay to ensure dialog is fully dismissed before showing system popup
+  await Future.delayed(const Duration(milliseconds: 300));
+  
+  // Check if context is still mounted after dialog dismissal
+  if (!context.mounted) return false;
+
+  // Request permission - this will show the system permission popup
+  status = await Permission.camera.request();
+  
+  // Re-check context after async permission request
+  if (!context.mounted) return false;
+  
+  // Check if permission was granted
+  if (status.isGranted) {
+    return true;
+  }
+
+  // Handle permanently denied or restricted after request
+  if (status.isPermanentlyDenied || status.isRestricted) {
+    if (context.mounted) {
+      final goToSettings = await _showPermissionSettingsDialog(context, l10n);
+      if (goToSettings == true) {
+        await openAppSettings();
+        // Wait a bit for user to return from settings
+        await Future.delayed(const Duration(milliseconds: 500));
+        // Re-check permission status after returning
+        if (!context.mounted) return false;
+        status = await Permission.camera.status;
+        if (status.isGranted) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Permission denied (but not permanently) - show error message
   if (context.mounted) {
     ToastAlerts.showError(
       context,
@@ -136,32 +209,28 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
 Future<bool?> _showPermissionRationaleDialog(
   BuildContext context,
   AppLocalizations l10n,
-) {
-  // Use our custom dialog styling and return a bool based on user choice
-  return AlertDialogs.showConfirmation<bool>(
+) async {
+  // Use camera permission alert component
+  return CameraPermissionAlert.showRationaleDialog(
     context: context,
     title: l10n.scanPermissionRationaleTitle,
     message: l10n.scanPermissionRationaleMessage,
-    confirmText: l10n.scanPermissionAllow,
-    cancelText: l10n.scanPermissionNotNow,
-    onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
-    onCancel: () => Navigator.of(context, rootNavigator: true).pop(false),
+    allowText: l10n.scanPermissionAllow,
+    notNowText: l10n.scanPermissionNotNow,
   );
 }
 
 Future<bool?> _showPermissionSettingsDialog(
   BuildContext context,
   AppLocalizations l10n,
-) {
-  // Use our custom dialog styling for "Go to settings"
-  return AlertDialogs.showConfirmation<bool>(
+) async {
+  // Use camera permission alert component for settings dialog
+  return CameraPermissionAlert.showSettingsDialog(
     context: context,
     title: l10n.scanPermissionSettingsTitle,
     message: l10n.scanPermissionSettingsMessage,
-    confirmText: l10n.scanPermissionGoToSettings,
-    cancelText: l10n.scanPermissionNotNow,
-    onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
-    onCancel: () => Navigator.of(context, rootNavigator: true).pop(false),
+    goToSettingsText: l10n.scanPermissionGoToSettings,
+    notNowText: l10n.scanPermissionNotNow,
   );
 }
 
@@ -400,7 +469,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
                 label: Text(l10n.scanStartButton),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -837,7 +906,7 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                             ),
                             onDetect: _onDetect,
                           )
-                        : _RfidPlaceholder(accentColor: widget.config.accentColor),
+                        : _RfidBluetoothScanner(accentColor: widget.config.accentColor),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -848,6 +917,22 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 16),
+                  // Bluetooth RFID Scanner Button
+                  FilledButton.icon(
+                    onPressed: () => _openBluetoothRfidScanner(),
+                    icon: const Icon(Icons.bluetooth),
+                    label: const Text('Connect Bluetooth RFID Scanner'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: widget.config.accentColor,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Manual Entry Option
                   TextField(
                     controller: _manualController,
                     onChanged: (value) => setState(() {
@@ -867,10 +952,10 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                     onPressed:
                         _manualValue.isEmpty ? null : () => _submitManual(),
                     style: FilledButton.styleFrom(
-                      backgroundColor: widget.config.accentColor,
-                    foregroundColor: Colors.white,
+                      backgroundColor: widget.config.accentColor.withOpacity(0.7),
+                      foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
@@ -912,12 +997,20 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
     _hasCaptured = true;
     Navigator.of(context).pop(trimmed);
   }
+
+  Future<void> _openBluetoothRfidScanner() async {
+    final tag = await BluetoothRfidBottomSheet.show(context);
+    if (tag != null && tag.isNotEmpty && !_hasCaptured) {
+      _hasCaptured = true;
+      Navigator.of(context).pop(tag);
+    }
+  }
 }
 
-class _RfidPlaceholder extends StatelessWidget {
+class _RfidBluetoothScanner extends StatelessWidget {
   final Color accentColor;
 
-  const _RfidPlaceholder({required this.accentColor});
+  const _RfidBluetoothScanner({required this.accentColor});
 
   @override
   Widget build(BuildContext context) {
@@ -925,10 +1018,31 @@ class _RfidPlaceholder extends StatelessWidget {
     return Container(
       color: theme.colorScheme.surface.withOpacity(0.9),
       child: Center(
-        child: Icon(
-          Iconsax.radar_outline,
-          color: accentColor,
-          size: 72,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bluetooth,
+              color: accentColor,
+              size: 72,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Bluetooth RFID Scanner',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: accentColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Connect your Bluetooth RFID scanner to scan tags',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ],
         ),
       ),
     );

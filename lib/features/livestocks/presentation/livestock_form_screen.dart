@@ -8,6 +8,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/weight_input_with_bluetooth.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
@@ -64,6 +65,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   DateTime? _selectedDateOfBirth;
   DateTime? _selectedDateFirstEnteredToFarm;
   String _selectedStatus = 'active';
+  String? _selectedPrimaryColor;
+  String? _selectedSecondaryColor;
 
   // Local data
   List<Farm> _farms = [];
@@ -146,10 +149,12 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
     _nameController.text = livestock.name;
     _identificationNumberController.text = livestock.identificationNumber;
-    _dummyTagIdController.text = livestock.dummyTagId;
-    _barcodeTagIdController.text = livestock.barcodeTagId;
-    _rfidTagIdController.text = livestock.rfidTagId;
+    _dummyTagIdController.text = livestock.dummyTagId ?? '';
+    _barcodeTagIdController.text = livestock.barcodeTagId ?? '';
+    _rfidTagIdController.text = livestock.rfidTagId ?? '';
     _weightController.text = livestock.weightAsOnRegistration.toString();
+    _selectedPrimaryColor = livestock.primaryColor;
+    _selectedSecondaryColor = livestock.secondaryColor;
 
     _selectedFarmUuid = livestock.farmUuid;
     _selectedLivestockTypeId = livestock.livestockTypeId;
@@ -243,7 +248,16 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   /// Filter breeds by livestock type
   void _filterBreedsByLivestockType() {
-    if (_selectedLivestockTypeId == null) return;
+    if (_selectedLivestockTypeId == null) {
+      // Reset filters if no livestock type selected
+      setState(() {
+        _filteredSpecies = _species;
+        _filteredBreeds = _breeds;
+        _selectedSpeciesId = null;
+        _selectedBreedId = null;
+      });
+      return;
+    }
 
     setState(() {
       // Filter species by livestock typeId if present
@@ -254,20 +268,41 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         _filteredSpecies = _species;
       }
 
+      // Reset species if not valid for current type
+      if (_selectedSpeciesId != null) {
+        final isValidSpecies = _filteredSpecies.any((s) => s.id == _selectedSpeciesId);
+        if (!isValidSpecies) {
+          _selectedSpeciesId = null;
+        }
+      }
+
       _filteredBreeds = _breeds
           .where((breed) => breed.livestockTypeId == _selectedLivestockTypeId)
           .toList();
 
       // Reset breed if not valid for current type
       if (_selectedBreedId != null) {
-        final isValid = _filteredBreeds.any((b) => b.id == _selectedBreedId);
-        if (!isValid) {
+        final isValidBreed = _filteredBreeds.any((b) => b.id == _selectedBreedId);
+        if (!isValidBreed) {
           _selectedBreedId = null;
         }
       }
     });
     _autoSelectSpeciesForLivestockType();
     log('✅ Filtered ${_filteredBreeds.length} breeds and ${_filteredSpecies.length} species for type $_selectedLivestockTypeId');
+  }
+
+  /// Check if "Born on Farm" method is selected
+  bool _isBornOnFarmSelected() {
+    if (_selectedLivestockObtainedMethodId == null) return false;
+    try {
+      final selectedMethod = _livestockObtainedMethods.firstWhere(
+        (method) => method.id == _selectedLivestockObtainedMethodId,
+      );
+      return selectedMethod.name.toLowerCase().contains('born');
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Recompute eligible mothers and fathers based on current livestock type.
@@ -348,6 +383,37 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       });
       log('✅ Auto-selected species "${matchingSpecies.name}" for livestock type "${selectedType.name}"');
     }
+  }
+
+  /// Get list of colors with localization
+  List<DropdownItem<String>> _getColorDropdownItems(AppLocalizations l10n, {String? excludeColor}) {
+    final colors = [
+      DropdownItem(value: 'red', label: l10n.colorRed),
+      DropdownItem(value: 'green', label: l10n.colorGreen),
+      DropdownItem(value: 'blue', label: l10n.colorBlue),
+      DropdownItem(value: 'black', label: l10n.colorBlack),
+      DropdownItem(value: 'white', label: l10n.colorWhite),
+      DropdownItem(value: 'brown', label: l10n.colorBrown),
+      DropdownItem(value: 'yellow', label: l10n.colorYellow),
+      DropdownItem(value: 'orange', label: l10n.colorOrange),
+      DropdownItem(value: 'pink', label: l10n.colorPink),
+      DropdownItem(value: 'gray', label: l10n.colorGray),
+      DropdownItem(value: 'grey', label: l10n.colorGrey),
+      DropdownItem(value: 'purple', label: l10n.colorPurple),
+      DropdownItem(value: 'tan', label: l10n.colorTan),
+      DropdownItem(value: 'beige', label: l10n.colorBeige),
+      DropdownItem(value: 'cream', label: l10n.colorCream),
+      DropdownItem(value: 'gold', label: l10n.colorGold),
+      DropdownItem(value: 'silver', label: l10n.colorSilver),
+      DropdownItem(value: 'mixed', label: l10n.colorMixed),
+    ];
+
+    // Filter out excluded color if provided
+    if (excludeColor != null && excludeColor.isNotEmpty) {
+      return colors.where((item) => item.value != excludeColor).toList();
+    }
+
+    return colors;
   }
 
   @override
@@ -507,9 +573,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           farmUuid: _selectedFarmUuid!,
           uuid: widget.livestock!.uuid,
           identificationNumber: _identificationNumberController.text.trim(),
-          dummyTagId: _dummyTagIdController.text.trim(),
-          barcodeTagId: _barcodeTagIdController.text.trim(),
-          rfidTagId: _rfidTagIdController.text.trim(),
+          dummyTagId: _dummyTagIdController.text.trim().isEmpty ? null : _dummyTagIdController.text.trim(),
+          barcodeTagId: _barcodeTagIdController.text.trim().isEmpty ? null : _barcodeTagIdController.text.trim(),
+          rfidTagId: _rfidTagIdController.text.trim().isEmpty ? null : _rfidTagIdController.text.trim(),
           livestockTypeId: _selectedLivestockTypeId!,
           name: _nameController.text.trim(),
           dateOfBirth: _selectedDateOfBirth!.toIso8601String().split('T')[0],
@@ -522,6 +588,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           livestockObtainedMethodId: _selectedLivestockObtainedMethodId ?? 1,
           dateFirstEnteredToFarm: _selectedDateFirstEnteredToFarm!,
           weightAsOnRegistration: double.parse(_weightController.text.trim()),
+          primaryColor: _selectedPrimaryColor,
+          secondaryColor: _selectedSecondaryColor,
           synced: false,
           syncAction: 'update',
           createdAt: widget.livestock!.createdAt,
@@ -552,9 +620,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             farmUuid: _selectedFarmUuid!,
             uuid: uuid,
             identificationNumber: _identificationNumberController.text.trim(),
-            dummyTagId: _dummyTagIdController.text.trim(),
-            barcodeTagId: _barcodeTagIdController.text.trim(),
-            rfidTagId: _rfidTagIdController.text.trim(),
+            dummyTagId: drift.Value(_dummyTagIdController.text.trim().isEmpty ? null : _dummyTagIdController.text.trim()),
+            barcodeTagId: drift.Value(_barcodeTagIdController.text.trim().isEmpty ? null : _barcodeTagIdController.text.trim()),
+            rfidTagId: drift.Value(_rfidTagIdController.text.trim().isEmpty ? null : _rfidTagIdController.text.trim()),
             livestockTypeId: _selectedLivestockTypeId!,
             name: _nameController.text.trim(),
             dateOfBirth: _selectedDateOfBirth!.toIso8601String().split('T')[0],
@@ -567,6 +635,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             livestockObtainedMethodId: _selectedLivestockObtainedMethodId ?? 1,
             dateFirstEnteredToFarm: _selectedDateFirstEnteredToFarm!,
             weightAsOnRegistration: double.parse(_weightController.text.trim()),
+            primaryColor: drift.Value(_selectedPrimaryColor),
+            secondaryColor: drift.Value(_selectedSecondaryColor),
             synced: const drift.Value(false),
             syncAction: const drift.Value('create'),
             createdAt: now,
@@ -615,14 +685,18 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         : l10n.continueButton;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.brightness == Brightness.dark ? theme.scaffoldBackgroundColor : Constants.veryLightGreyColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: theme.brightness == Brightness.dark 
+              ? Brightness.light 
+              : Brightness.dark,
+          statusBarBrightness: theme.brightness == Brightness.dark 
+              ? Brightness.dark 
+              : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -763,6 +837,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           controller: _dummyTagIdController,
           label: l10n.dummyTagId,
           hintText: l10n.enterDummyTagId,
+          validator: (value) {
+            // Dummy tag is optional
+            return null;
+          },
         ),
         const SizedBox(height: 16),
 
@@ -775,6 +853,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             // Keep barcode and RFID IDs in sync when typing or deleting
             _updateTagIds(value);
           },
+          // Optional: if needed, enforce uniqueness server-side; allow empty here
+          validator: (value) => null,
           suffixIcon: _buildScanSuffixButton(
             icon: Icons.qr_code_scanner,
             tooltip: l10n.scanOptionBarcode,
@@ -796,6 +876,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             // Keep RFID and barcode IDs in sync when typing or deleting
             _updateTagIds(value);
           },
+          // Optional: if needed, enforce uniqueness server-side; allow empty here
+          validator: (value) => null,
           suffixIcon: _buildScanSuffixButton(
             icon: Icons.nfc,
             tooltip: l10n.scanOptionRfid,
@@ -854,10 +936,12 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
         // Species (filtered by Livestock Type when available)
         CustomDropdown<int>(
+          key: ValueKey('species_dropdown_${_selectedLivestockTypeId}_${_filteredSpecies.length}'), // Force rebuild when species list changes
           label: l10n.species,
-          hint: l10n.select,
+          hint: _selectedLivestockTypeId == null ? l10n.pleaseSelectLivestockType : l10n.select,
           icon: Icons.pets_outlined,
           value: _selectedSpeciesId,
+          enabled: _selectedLivestockTypeId != null, // Disable until livestock type is selected
           dropdownItems: _filteredSpecies.map((species) {
             return DropdownItem<int>(
               value: species.id,
@@ -865,9 +949,16 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             );
           }).toList(),
           onChanged: (value) {
-            setState(() => _selectedSpeciesId = value);
+            setState(() {
+              _selectedSpeciesId = value;
+              // When species changes, reset breed selection (breed depends on species)
+              _selectedBreedId = null;
+            });
           },
           validator: (value) {
+            if (_selectedLivestockTypeId == null) {
+              return null; // Don't validate if livestock type is not selected
+            }
             if (value == null) {
               return l10n.speciesRequired;
             }
@@ -878,11 +969,14 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
         // Breed (Filtered by Livestock Type)
         CustomDropdown<int>(
-          key: ValueKey('breed_dropdown_${_selectedLivestockTypeId}_${_filteredBreeds.length}'), // Force rebuild when breeds change
+          key: ValueKey('breed_dropdown_${_selectedLivestockTypeId}_${_selectedSpeciesId}_${_filteredBreeds.length}'), // Force rebuild when breeds change
           label: l10n.breed,
-          hint: l10n.select,
+          hint: _selectedLivestockTypeId == null 
+              ? l10n.pleaseSelectLivestockType 
+              : (_selectedSpeciesId == null ? l10n.pleaseSelectSpecies : l10n.select),
           icon: Icons.menu_book_outlined,
           value: _selectedBreedId,
+          enabled: _selectedLivestockTypeId != null && _selectedSpeciesId != null, // Disable until both livestock type and species are selected
           dropdownItems: _filteredBreeds.map((breed) {
             return DropdownItem<int>(
               value: breed.id,
@@ -893,6 +987,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             setState(() => _selectedBreedId = value);
           },
           validator: (value) {
+            if (_selectedLivestockTypeId == null || _selectedSpeciesId == null) {
+              return null; // Don't validate if livestock type or species is not selected
+            }
             if (value == null) {
               return l10n.breedRequired;
             }
@@ -953,57 +1050,70 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         const SizedBox(height: 16),
 
         // Date of Birth
-        InkWell(
-          onTap: () async {
-            final date = await showDatePicker(
-              context: context,
-              initialDate: _selectedDateOfBirth ?? DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.light(
-                      primary: Constants.primaryColor, // header background color
-                      onPrimary: Colors.white, // header text color
-                      onSurface: Colors.black, // body text color
-                    ),
-                    dialogBackgroundColor: Colors.white,
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Constants.primaryColor, // button text color
-                      ),
-                    ),
-                  ),
-                  child: child!,
-                );
-              },
-            );
-            if (date != null) {
-              setState(() => _selectedDateOfBirth = date);
-            }
+        CustomDatePicker(
+          label: l10n.dateOfBirth,
+          hint: l10n.selectDateOfBirth,
+          selectedDate: _selectedDateOfBirth,
+          onDateSelected: (date) {
+            setState(() {
+              _selectedDateOfBirth = date;
+              // If "Born on Farm" is selected, also update date first entered to farm
+              if (_isBornOnFarmSelected()) {
+                _selectedDateFirstEnteredToFarm = date;
+              }
+            });
           },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedDateOfBirth != null
-                      ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
-                      : l10n.dateOfBirthRequired,
-                  style: TextStyle(
-                    color: _selectedDateOfBirth != null ? Colors.black : Colors.grey,
-                  ),
-                ),
-                const Icon(Icons.calendar_today, color: Constants.primaryColor),
-              ],
-            ),
-          ),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+          dateValidator: (date) {
+            if (date == null) {
+              return l10n.pleaseSelectDateOfBirth;
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 24),
+
+        // Section Title: Color Information
+        _buildSectionTitle(
+          icon: Icons.palette_outlined,
+          title: l10n.colorInformation,
+          subtitle: l10n.colorInformationSubtitle,
+        ),
+        const SizedBox(height: 12),
+
+        // Primary Color
+        CustomDropdown<String>(
+          label: l10n.primaryColor,
+          hint: l10n.selectPrimaryColor,
+          icon: Icons.palette_outlined,
+          value: _selectedPrimaryColor,
+          dropdownItems: _getColorDropdownItems(l10n),
+          onChanged: (value) {
+            setState(() {
+              _selectedPrimaryColor = value;
+              // If the selected primary color matches secondary color, clear secondary color
+              if (_selectedPrimaryColor == _selectedSecondaryColor) {
+                _selectedSecondaryColor = null;
+              }
+            });
+          },
+          validator: (value) => null, // Optional field
+        ),
+        const SizedBox(height: 16),
+
+        // Secondary Color
+        CustomDropdown<String>(
+          key: ValueKey('secondary_color_${_selectedPrimaryColor}'), // Force rebuild when primary color changes
+          label: l10n.secondaryColor,
+          hint: l10n.selectSecondaryColor,
+          icon: Icons.color_lens_outlined,
+          value: _selectedSecondaryColor,
+          dropdownItems: _getColorDropdownItems(l10n, excludeColor: _selectedPrimaryColor),
+          onChanged: (value) {
+            setState(() => _selectedSecondaryColor = value);
+          },
+          validator: (value) => null, // Optional field
         ),
       ],
     );
@@ -1097,64 +1207,45 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             );
           }).toList(),
           onChanged: (value) {
-            setState(() => _selectedLivestockObtainedMethodId = value);
+            setState(() {
+              _selectedLivestockObtainedMethodId = value;
+              // If "Born on Farm" is selected, set date first entered to farm = date of birth
+              if (value != null) {
+                final selectedMethod = _livestockObtainedMethods.firstWhere(
+                  (method) => method.id == value,
+                  orElse: () => _livestockObtainedMethods.first,
+                );
+                if (selectedMethod.name.toLowerCase().contains('born') && 
+                    _selectedDateOfBirth != null) {
+                  _selectedDateFirstEnteredToFarm = _selectedDateOfBirth;
+                }
+              }
+            });
           },
         ),
         const SizedBox(height: 16),
 
         // Date First Entered to Farm
-        InkWell(
-          onTap: () async {
-            final date = await showDatePicker(
-              context: context,
-              initialDate: _selectedDateFirstEnteredToFarm ?? DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.light(
-                      primary: Constants.primaryColor, // header background color
-                      onPrimary: Colors.white, // header text color
-                      onSurface: Colors.black, // body text color
-                    ),
-                    dialogBackgroundColor: Colors.white,
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Constants.primaryColor, // button text color
-                      ),
-                    ),
-                  ),
-                  child: child!,
-                );
-              },
-            );
-            if (date != null) {
-              setState(() => _selectedDateFirstEnteredToFarm = date);
-            }
+        CustomDatePicker(
+          label: l10n.dateEnteredFarmRequired,
+          hint: _isBornOnFarmSelected() 
+              ? '${l10n.selectDateOfBirth} (Same as Date of Birth)'
+              : l10n.selectDateOfBirth,
+          selectedDate: _selectedDateFirstEnteredToFarm,
+          onDateSelected: (date) {
+            setState(() => _selectedDateFirstEnteredToFarm = date);
           },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedDateFirstEnteredToFarm != null
-                      ? '${_selectedDateFirstEnteredToFarm!.day}/${_selectedDateFirstEnteredToFarm!.month}/${_selectedDateFirstEnteredToFarm!.year}'
-                      : l10n.dateEnteredFarmRequired,
-                  style: TextStyle(
-                    color: _selectedDateFirstEnteredToFarm != null ? Colors.black : Colors.grey,
-                  ),
-                ),
-                const Icon(Icons.calendar_today, color: Constants.primaryColor),
-              ],
-            ),
-          ),
+          enabled: !_isBornOnFarmSelected(), // Disable if "Born on Farm" is selected
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+          dateValidator: (date) {
+            if (date == null) {
+              return l10n.pleaseSelectDateEnteredFarm;
+            }
+            return null;
+          },
         ),
+
         const SizedBox(height: 24),
 
         // Section Title: Status
@@ -1163,6 +1254,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           title: l10n.livestockStatus,
           subtitle: l10n.setCurrentStatus,
         ),
+        
         const SizedBox(height: 12),
 
         // Status
@@ -1192,12 +1284,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withOpacity(0.1),
+        color: Constants.primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Constants.primaryColor.withOpacity(0.3),
-          width: 1,
-        ),
       ),
       child: Row(
         children: [
@@ -1219,7 +1307,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                     color: Constants.primaryColor,
                   ),
                 ),
+
                 const SizedBox(height: 2),
+                
                 Text(
                   subtitle,
                   style: TextStyle(

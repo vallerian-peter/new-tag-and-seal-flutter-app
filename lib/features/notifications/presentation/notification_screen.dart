@@ -252,12 +252,28 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.addNotification,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.addNotification,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: const Icon(Icons.cancel_outlined),
+                              style: IconButton.styleFrom(
+                                backgroundColor: theme.colorScheme.surface,
+                                shape: const CircleBorder(),
+                              ),
+                              tooltip: l10n.cancel,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(
@@ -444,79 +460,94 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                           label: (volume * 100).round().toString(),
                         ),
                         const SizedBox(height: 16),
-                        CustomButton(
-                          text: l10n.saveNotification,
-                          onPressed: () async {
-                            if (titleController.text.trim().isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.enterNotificationTitle)),
-                              );
-                              return;
-                            }
-                            DateTime? computedDateTime;
-                            if (repeatDaily) {
-                              if (dailyTime == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.selectTimeRequired)),
-                                );
-                                return;
-                              }
-                              final now = DateTime.now();
-                              var candidate = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                dailyTime!.hour,
-                                dailyTime!.minute,
-                              );
-                              if (!candidate.isAfter(now)) {
-                                candidate = candidate.add(const Duration(days: 1));
-                              }
-                              computedDateTime = candidate;
-                            } else {
-                              if (scheduledAt == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.scheduleDate)),
-                                );
-                                return;
-                              }
-                              computedDateTime = scheduledAt;
-                            }
-
-                            final nowIso = DateTime.now().toIso8601String();
-
-                            await provider.saveNotification(
-                              NotificationModel(
-                                id: null,
-                                farmUuid: null,
-                                farmName: farmNameController.text.trim().isEmpty
-                                    ? null
-                                    : farmNameController.text.trim(),
-                                livestockUuid: null,
-                                livestockName: livestockNameController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? null
-                                    : livestockNameController.text.trim(),
-                                title: titleController.text.trim(),
-                                description: descriptionController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? null
-                                    : descriptionController.text.trim(),
-                                scheduledAt: computedDateTime!.toIso8601String(),
-                                createdAt: nowIso,
-                                updatedAt: nowIso,
-                                soundPath: selectedSoundPath,
-                                soundName: selectedSoundName,
-                                loopAudio: loopAudio,
-                                vibrate: vibrate,
-                                volume: volume,
-                                repeatDaily: repeatDaily,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomOutlinedButton(
+                                text: l10n.cancel,
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                            );
-                            if (mounted) Navigator.of(context).pop();
-                          },
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomButton(
+                                text: l10n.saveNotification,
+                                onPressed: () async {
+                                  if (titleController.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(l10n.enterNotificationTitle)),
+                                    );
+                                    return;
+                                  }
+                                  DateTime? computedDateTime;
+                                  if (repeatDaily) {
+                                    if (dailyTime == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(l10n.selectTimeRequired)),
+                                      );
+                                      return;
+                                    }
+                                    final now = DateTime.now();
+                                    var candidate = DateTime(
+                                      now.year,
+                                      now.month,
+                                      now.day,
+                                      dailyTime!.hour,
+                                      dailyTime!.minute,
+                                    );
+                                    if (!candidate.isAfter(now)) {
+                                      candidate = candidate.add(const Duration(days: 1));
+                                    }
+                                    computedDateTime = candidate;
+                                  } else {
+                                    if (scheduledAt == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(l10n.scheduleDate)),
+                                      );
+                                      return;
+                                    }
+                                    computedDateTime = scheduledAt;
+                                  }
+
+                                  final nowIso = DateTime.now().toIso8601String();
+
+                                  await provider.saveNotification(
+                                    NotificationModel(
+                                      id: null,
+                                      farmUuid: null,
+                                      farmName: farmNameController.text.trim().isEmpty
+                                          ? null
+                                          : farmNameController.text.trim(),
+                                      livestockUuid: null,
+                                      livestockName: livestockNameController.text
+                                              .trim()
+                                              .isEmpty
+                                          ? null
+                                          : livestockNameController.text.trim(),
+                                      title: titleController.text.trim(),
+                                      description: descriptionController.text
+                                              .trim()
+                                              .isEmpty
+                                          ? null
+                                          : descriptionController.text.trim(),
+                                      scheduledAt: computedDateTime!.toIso8601String(),
+                                      createdAt: nowIso,
+                                      updatedAt: nowIso,
+                                      soundPath: selectedSoundPath,
+                                      soundName: selectedSoundName,
+                                      loopAudio: loopAudio,
+                                      vibrate: vibrate,
+                                      volume: volume,
+                                      repeatDaily: repeatDaily,
+                                    ),
+                                  );
+                                  if (mounted) Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 26),
                       ],

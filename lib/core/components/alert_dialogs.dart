@@ -251,12 +251,15 @@ class _LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: theme.brightness != Brightness.dark ? theme.colorScheme.secondary : Colors.grey[800],
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: theme.brightness == Brightness.dark
               ? null
@@ -336,17 +339,22 @@ class _SuccessDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -448,17 +456,22 @@ class _ErrorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -560,17 +573,22 @@ class _WarningDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -579,6 +597,7 @@ class _WarningDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            
             // Warning icon
             Container(
               width: 80,
@@ -671,17 +690,22 @@ class _NetworkIssuesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -811,17 +835,22 @@ class _ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark 
+          ? theme.scaffoldBackgroundColor 
+          : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),

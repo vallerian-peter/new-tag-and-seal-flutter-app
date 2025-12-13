@@ -9,23 +9,21 @@ import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart'
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/signup/register_screen.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/widgets/forgot_password_bottom_sheet.dart';
-import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/login/extension_officer_login_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/home/presentation/home_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ExtensionOfficerLoginScreen extends StatefulWidget {
+  const ExtensionOfficerLoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ExtensionOfficerLoginScreen> createState() => _ExtensionOfficerLoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _secureStorage = const FlutterSecureStorage();
   
+  final _farmerAccessNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -39,15 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _farmerAccessNumberController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   /// Pre-fill credentials if available in secure storage
-  /// 
-  /// Note: Auto-login is handled in GetStartedScreen on app launch.
-  /// This just pre-fills the form for better UX.
   Future<void> _prefillCredentials() async {
     try {
       final email = await _secureStorage.read(key: 'email');
@@ -68,10 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Handle manual login
-  /// 
-  /// Validates form, calls AuthProvider.login, and navigates on success.
-  /// AuthProvider automatically stores all data in secure storage.
+  /// Handle Extension Officer login
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -80,13 +73,14 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      final l10n = AppLocalizations.of(context)!; // Get l10n at method start
+      final l10n = AppLocalizations.of(context)!;
       
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         
         // Call auth provider login method
-        // AuthProvider will automatically store all user data, tokens, and password
+        // Note: This will need to be updated to handle Extension Officer login
+        // with farmer access number in the backend
         final success = await authProvider.login(
           context: context,
           username: _emailController.text,
@@ -181,13 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         
           // Main Content
-          Positioned.fill(
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-
-                   // Back Button
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Back Button
                   CustomBackButton(
                     isEnabledBgColor: true,
                     iconColor: Colors.white,
@@ -196,9 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   
-                  // Logo and Welcome Section
-                  // SizedBox(height: size.height * 0.08),
-                  
+                  // Logo
                   Hero(
                     tag: 'app-logo',
                     child: Image.asset(
@@ -211,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 15),
                   
                   Text(
-                    l10n.welcomeAgain,
+                    l10n.extensionOfficerLogin,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: Constants.defaultSize,
@@ -231,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      l10n.continueTrackingYourLivestocks,
+                      l10n.extensionOfficerLoginSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
@@ -254,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     width: double.infinity,
                     constraints: BoxConstraints(
-                      minHeight: size.height * 0.65,
+                      minHeight: size.height * 0.55,
                     ),
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor,
@@ -262,13 +252,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         topLeft: Radius.circular(17),
                         topRight: Radius.circular(17),
                       ),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black.withOpacity(0.1),
-                      //     blurRadius: 20,
-                      //     offset: const Offset(0, -5),
-                      //   ),
-                      // ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -276,12 +259,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
                           children: [
-
                             // Login Title
                             Text(
-                              l10n.login,
+                              l10n.extensionOfficerLogin,
                               style: TextStyle(
                                 fontSize: Constants.extraLargeTextSize,
                                 fontWeight: FontWeight.bold,
@@ -292,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 6),
                             
                             Text(
-                              l10n.enterCredentialsToContinue,
+                              l10n.extensionOfficerLoginSubtitle,
                               style: TextStyle(
                                 fontSize: Constants.textSize,
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -301,7 +282,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             
                             const SizedBox(height: 24),
                             
-                            // Email Field with Icon
+                            // Farmer Access Number Field
+                            CustomTextField(
+                              label: l10n.farmerAccessNumber,
+                              hintText: l10n.enterFarmerAccessNumber,
+                              prefixIcon: Icons.business_outlined,
+                              controller: _farmerAccessNumberController,
+                              keyboardType: TextInputType.text,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterFarmerAccessNumber;
+                                }
+                                return null;
+                              },
+                            ),
+                            
+                            const SizedBox(height: 16),
+                            
+                            // Email Field
                             CustomTextField(
                               label: l10n.email,
                               hintText: l10n.emailHint,
@@ -321,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             
                             const SizedBox(height: 16),
                             
-                            // Password Field with Eye Icon
+                            // Password Field
                             CustomTextField(
                               label: l10n.password,
                               hintText: l10n.passwordHint,
@@ -339,45 +337,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             
-                            const SizedBox(height: 8),
-                            
-                            // Forgot Password
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () async {
-                                  if (!mounted) return;
-                                  final navigatorContext = context;
-                                  final result = await ForgotPasswordBottomSheet.show(context);
-                                  if (result != null && mounted) {
-                                    ScaffoldMessenger.of(navigatorContext).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          result == 'email'
-                                              ? 'Password reset link will be sent to your email'
-                                              : 'Password reset code will be sent to your phone',
-                                        ),
-                                        backgroundColor: Constants.successColor,
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: const Duration(seconds: 3),
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                ),
-                                child: Text(
-                                  l10n.forgotPassword,
-                                  style: TextStyle(
-                                    color: Constants.primaryColor,
-                                    fontSize: Constants.textSize,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
                             const SizedBox(height: 20),
                             
                             // Login Button
@@ -390,82 +349,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: _isLoading ? null : _handleLogin,
                               ),
                             ),
-                            
-                            const SizedBox(height: 40),
-                            
-                            // Sign Up Link
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  l10n.dontHaveAccount,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                    fontSize: Constants.textSize,
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  ),
-                                  child: Text(
-                                    l10n.register,
-                                    style: TextStyle(
-                                      color: Constants.primaryColor,
-                                      fontSize: Constants.textSize,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 1),
-                            
-                            // Extension Officer Login Link
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const ExtensionOfficerLoginFormScreen(),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  ),
-                                  child: Text(
-                                    l10n.extensionOfficerLogin,
-                                    style: TextStyle(
-                                      color: Constants.primaryColor,
-                                      fontSize: Constants.textSize,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-
-                                // Text(
-                                //   l10n.enterAsExtensionOfficer,
-                                //   style: TextStyle(
-                                //     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                //     fontSize: Constants.textSize,
-                                //   ),
-                                // ),
-
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 30),
-                           
                           ],
                         ),
                       ),
@@ -475,9 +358,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-        ),
         ],
       ),
     );
   }
 }
+

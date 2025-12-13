@@ -287,10 +287,17 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final title = widget.isEditMode
+    // Check if we're in edit mode (same pattern as Farm form)
+    final isEditMode = widget.isEditMode;
+
+    final title = isEditMode
         ? '${l10n.edit} ${l10n.disposal}'
         : l10n.addDisposal;
-    final submitLabel = widget.isEditMode ? l10n.update : l10n.save;
+    
+    // Button text changes based on edit mode and current step (same pattern as Farm form)
+    final buttonText = _currentStep == 1
+        ? (isEditMode ? l10n.update : l10n.save)
+        : l10n.continueButton;
 
     return Scaffold(
       backgroundColor: Constants.veryLightGreyColor,
@@ -328,9 +335,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
                         currentStep: _currentStep,
                         onStepContinue: _onStepContinue,
                         onStepCancel: _onStepCancel,
-                        continueButtonText: null,
+                        continueButtonText: buttonText,
                         backButtonText: l10n.back,
-                        finalStepButtonText: submitLabel,
+                        finalStepButtonText: null, // Use continueButtonText instead
                         steps: [
                           StepperStep(
                             title: l10n.basicInformation,
@@ -526,31 +533,35 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
   void _onStepContinue() async {
     final l10n = AppLocalizations.of(context)!;
-    if (_currentStep == 0) {
+    
+    // Same pattern as Farm form: validate current step before moving forward
+    if (_currentStep < 1) {
       if (_formKey.currentState!.validate() &&
           _hasValidLivestockSelection(l10n)) {
-        setState(() => _currentStep = 1);
+        setState(() => _currentStep++);
       }
       return;
     }
 
-    if (!_formKey.currentState!.validate()) return;
-    if (!_hasValidLivestockSelection(l10n)) return;
+    // Final step - validate and show confirmation dialog (same pattern as Farm form)
+    if (_formKey.currentState!.validate() && _hasValidLivestockSelection(l10n)) {
+      final isEditMode = widget.isEditMode;
 
-    await AlertDialogs.showConfirmation(
-      context: context,
-      title: widget.isEditMode ? l10n.update : l10n.save,
-      message: widget.isEditMode
-          ? l10n.confirmUpdateDisposal
-          : l10n.confirmSaveDisposal,
-      confirmText: widget.isEditMode ? l10n.update : l10n.save,
-      cancelText: l10n.cancel,
-      onConfirm: () async {
-        if (!mounted) return;
-        Navigator.of(context).pop(true);
-        await _submit();
-      },
-    );
+      // Show confirmation dialog
+      await AlertDialogs.showConfirmation(
+        context: context,
+        title: isEditMode ? l10n.update : l10n.save,
+        message: isEditMode
+            ? l10n.confirmUpdateDisposal
+            : l10n.confirmSaveDisposal,
+        confirmText: isEditMode ? l10n.update : l10n.save,
+        cancelText: l10n.cancel,
+        onConfirm: () async {
+          Navigator.of(context).pop(true);
+          await _submit();
+        },
+      );
+    }
   }
 
   void _onStepCancel() {
@@ -607,7 +618,11 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           ? null
           : _remarksController.text.trim();
 
-      if (widget.isEditMode && !_isBulk) {
+      // Check if we're in edit mode (same pattern as Farm form)
+      final isEditMode = widget.isEditMode;
+
+      if (isEditMode && !_isBulk) {
+        // Update existing disposal (same pattern as Farm form - use method without dialog)
         final existing = widget.disposal!;
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
@@ -621,14 +636,27 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           updatedAt: DateTime.now().toIso8601String(),
         );
 
-        final updated = await eventsProvider.updateDisposalWithDialog(
-          context,
-          updatedModel,
-        );
-        if (updated != null && mounted) {
-          Navigator.pop(context, updated);
+        final updated = await eventsProvider.updateDisposal(updatedModel);
+
+        if (mounted) {
+          // Show success dialog (same pattern as Farm form)
+          await AlertDialogs.showSuccess(
+            context: context,
+            title: l10n.success,
+            message: l10n.disposalLogSaved,
+            buttonText: l10n.ok,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          );
+
+          // Navigate back after success dialog is dismissed (same pattern as Farm form)
+          if (mounted) {
+            Navigator.pop(context, updated);
+          }
         }
       } else if (_isBulk) {
+        // Bulk creation - keep existing dialog-based flow
         final created = await eventsProvider.addDisposalBatchWithDialog(
           context: context,
           farmUuid: selectedFarmUuid,
@@ -643,6 +671,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           Navigator.pop(context, true);
         }
       } else {
+        // Create new disposal - keep existing dialog-based flow
         final now = DateTime.now().toIso8601String();
         final uuid =
             'disposal-${DateTime.now().microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
@@ -712,9 +741,8 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.08),
+        color: baseColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: baseColor.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [

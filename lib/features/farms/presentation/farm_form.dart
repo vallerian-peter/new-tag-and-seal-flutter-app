@@ -347,9 +347,8 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Constants.primaryColor.withOpacity(0.1),
+            color: Constants.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -697,9 +696,8 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Constants.primaryColor.withOpacity(0.1),
+            color: Constants.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [

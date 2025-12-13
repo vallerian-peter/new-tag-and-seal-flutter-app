@@ -630,9 +630,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(
         message,
@@ -652,11 +651,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Constants.primaryColor.withOpacity(0.1),
+        color: Constants.primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Constants.primaryColor.withOpacity(0.3),
-        ),
       ),
       child: Row(
         children: [
@@ -724,22 +720,13 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       builder: (context, child) {
         return Theme(
           data: theme.copyWith(
-            colorScheme: theme.brightness == Brightness.dark
-                ? ColorScheme.dark(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: const Color(0xFF1E1E1E),
-                    onSurface: Colors.white,
-                  )
-                : ColorScheme.light(
-                    primary: Constants.primaryColor,
-                    onPrimary: Colors.white,
-                    surface: Colors.white,
-                    onSurface: Colors.black87,
-                  ),
-            dialogBackgroundColor: theme.brightness == Brightness.dark
-                ? const Color(0xFF1E1E1E)
-                : Colors.white,
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              surface: theme.colorScheme.surface,
+              onSurface: theme.colorScheme.onSurface,
+            ),
+            dialogBackgroundColor: theme.colorScheme.surface,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: Constants.primaryColor,

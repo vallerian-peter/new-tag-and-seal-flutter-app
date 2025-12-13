@@ -15,6 +15,7 @@ class LivestockProvider extends ChangeNotifier {
   List<Livestock> _allLivestock = [];
   List<Livestock> _filteredLivestock = [];
   Map<String, String> _farmNames = {};
+  Map<int, String> _livestockTypeNames = {};
   bool _isLoading = false;
   String? _error;
 
@@ -22,6 +23,7 @@ class LivestockProvider extends ChangeNotifier {
   List<Livestock> get allLivestock => _allLivestock;
   List<Livestock> get filteredLivestock => _filteredLivestock;
   Map<String, String> get farmNames => _farmNames;
+  Map<int, String> get livestockTypeNames => _livestockTypeNames;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -61,15 +63,42 @@ class LivestockProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Filter livestock by search query
-  void filterLivestock(String query, String genderFilter) {
-    List<Livestock> baseList = _allLivestock;
+  /// Set livestock type names map
+  void setLivestockTypeNames(Map<int, String> livestockTypeNames) {
+    _livestockTypeNames = livestockTypeNames;
+    notifyListeners();
+  }
+
+  /// Filter livestock by search query and multiple filters
+  void filterLivestock(
+    String query, {
+    String genderFilter = 'All',
+    String statusFilter = 'All',
+    int? livestockTypeId,
+  }) {
+    // Start with all livestock
+    List<Livestock> baseList = List<Livestock>.from(_allLivestock);
 
     // Apply gender filter
     if (genderFilter != 'All') {
-      baseList = _allLivestock
+      baseList = baseList
           .where((livestock) =>
               livestock.gender.toLowerCase() == genderFilter.toLowerCase())
+          .toList();
+    }
+
+    // Apply status filter
+    if (statusFilter != 'All') {
+      baseList = baseList
+          .where((livestock) =>
+              livestock.status.toLowerCase() == statusFilter.toLowerCase())
+          .toList();
+    }
+
+    // Apply livestock type filter - only if livestockTypeId is NOT null
+    if (livestockTypeId != null) {
+      baseList = baseList
+          .where((livestock) => livestock.livestockTypeId == livestockTypeId)
           .toList();
     }
 
