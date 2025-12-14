@@ -136,20 +136,17 @@ class EventFormControl {
         return;
 
       case EventLogTypes.disposal:
-        final result = await Navigator.of(context).push(
+        await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => DisposalFormScreen(
               farmUuid: farmUuid,
               livestockUuid: livestockUuid,
               isBulk: isBulk,
               bulkLivestockUuids: bulkLivestockUuids,
+              onCompleted: onCompleted,
             ),
           ),
         );
-        // Only refresh if form completed successfully (result is not null)
-        if (result != null) {
-          onCompleted?.call();
-        }
         return;
 
       case EventLogTypes.calving:

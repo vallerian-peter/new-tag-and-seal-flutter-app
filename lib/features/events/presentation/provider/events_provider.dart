@@ -2179,8 +2179,9 @@ class EventsProvider extends ChangeNotifier {
 
   Future<DisposalModel?> addDisposalWithDialog(
     BuildContext context,
-    DisposalModel model,
-  ) async {
+    DisposalModel model, {
+    VoidCallback? onSuccess,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
     AlertDialogs.showLoading(
       context: context,
@@ -2199,7 +2200,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          // Dialog already pops itself, no need for onPressed
+          onPressed: onSuccess,
         );
       }
       return created;
@@ -2221,8 +2222,9 @@ class EventsProvider extends ChangeNotifier {
 
   Future<DisposalModel?> updateDisposalWithDialog(
     BuildContext context,
-    DisposalModel model,
-  ) async {
+    DisposalModel model, {
+    VoidCallback? onSuccess,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
     AlertDialogs.showLoading(
       context: context,
@@ -2241,7 +2243,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          // Dialog already pops itself, no need for onPressed
+          onPressed: onSuccess,
         );
       }
       return updated;
@@ -2269,6 +2271,7 @@ class EventsProvider extends ChangeNotifier {
     required String reasons,
     String? remarks,
     String status = 'completed',
+    VoidCallback? onSuccess,
   }) async {
     final l10n = AppLocalizations.of(context)!;
     if (livestockUuids.isEmpty) return const [];
@@ -2309,7 +2312,7 @@ class EventsProvider extends ChangeNotifier {
           title: l10n.success,
           message: l10n.disposalLogSaved,
           buttonText: l10n.ok,
-          // Dialog already pops itself, no need for onPressed
+          onPressed: onSuccess,
         );
       }
 

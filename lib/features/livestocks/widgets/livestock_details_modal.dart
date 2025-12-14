@@ -782,18 +782,19 @@ class LivestockDetailsModal {
         supportsFemale: true,
         onAdd: wrapWithRoleCheck(
           EventLogTypes.disposal,
-          (ctx) => EventFormControl.open(
-            context: context,
-            logType: EventLogTypes.disposal,
-            title: l10n.disposal,
-            farmUuid: farmUuid,
-            livestockUuid: livestockUuid,
-            onCompleted: () {
-              // Close the modal and refresh parent
-              Navigator.of(ctx).pop();
-              onRefresh();
-            },
-          ),
+          (ctx) {
+            // Close the modal first
+            Navigator.of(ctx).pop();
+            // Open disposal form with callback to refresh and filter to notActive
+            EventFormControl.open(
+              context: context,
+              logType: EventLogTypes.disposal,
+              title: l10n.disposal,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              onCompleted: onRefresh,
+            );
+          },
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,

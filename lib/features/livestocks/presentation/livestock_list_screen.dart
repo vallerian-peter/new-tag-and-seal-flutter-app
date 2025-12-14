@@ -185,6 +185,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                               ),
                             ],
                           ),
+
                           const SizedBox(height: 20),
 
                           // Stats Cards

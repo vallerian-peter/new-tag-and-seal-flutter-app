@@ -51,7 +51,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Controllers for Step 5: Additional Information
   final _farmerOrganizationController = TextEditingController();
-  final _dateEnteredFarmController = TextEditingController();
 
   // Form field values
   String? _selectedGender;
@@ -64,7 +63,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int? _selectedWardId;
   int? _selectedVillageId;
   int? _selectedStreetId;
-  int? _selectedLivestockObtainedMethodId;
 
   bool _isLoading = false;
 
@@ -105,7 +103,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _physicalAddressController.dispose();
     _identityNumberController.dispose();
     _farmerOrganizationController.dispose();
-    _dateEnteredFarmController.dispose();
 
     super.dispose();
   }
@@ -751,74 +748,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hintText: l10n.enterOrganizationName,
           prefixIcon: Icons.group_outlined,
         ),
-        const SizedBox(height: 16),
-        
-        // Obtained Method Dropdown
-        CustomDropdown<int>(
-          value: _selectedLivestockObtainedMethodId,
-          label: l10n.obtainedMethod,
-          hint: l10n.select,
-          icon: Icons.source_outlined,
-          items: additionalDataProvider.livestockObtainedMethods
-              .map((m) => m.id)
-              .whereType<int>()
-              .toList(),
-          itemLabels: additionalDataProvider.livestockObtainedMethods
-              .where((m) => m.id != null)
-              .map((m) => m.name)
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedLivestockObtainedMethodId = value;
-              // If "Born on Farm" is selected, auto-fill date_entered_farm with date_of_birth
-              if (value != null) {
-                final selectedMethod = additionalDataProvider.livestockObtainedMethods.firstWhere(
-                  (method) => method.id == value,
-                  orElse: () => additionalDataProvider.livestockObtainedMethods.first,
-                );
-                final isBornOnFarm = selectedMethod.name.toLowerCase().contains('born');
-                if (isBornOnFarm && _dateOfBirthController.text.isNotEmpty) {
-                  // Copy date_of_birth to date_entered_farm
-                  _dateEnteredFarmController.text = _dateOfBirthController.text;
-                } else if (!isBornOnFarm) {
-                  // Clear the field if not born on farm
-                  _dateEnteredFarmController.clear();
-                }
-              }
-            });
-            // Trigger form validation after state update
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (_formKey.currentState != null) {
-                _formKey.currentState!.validate();
-              }
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-
-        // Date Entered Farm
-        CustomDatePicker(
-          key: ValueKey('date_entered_farm_${_isBornOnFarmSelected()}_${_dateEnteredFarmController.text}'),
-          controller: _dateEnteredFarmController,
-          label: l10n.dateEnteredFarmRequired,
-          hint: _isBornOnFarmSelected() 
-              ? '${l10n.selectDateOfBirth} (Same as Date of Birth)'
-              : l10n.pleaseSelectDateEnteredFarm,
-          enabled: !_isBornOnFarmSelected(), // Disable if "Born on Farm" is selected
-          validator: (value) {
-            // Check the controller's text directly, not the FormField's value
-            final actualValue = _dateEnteredFarmController.text;
-            
-            // Skip validation if "Born on Farm" is selected and field is auto-filled
-            if (_isBornOnFarmSelected() && actualValue.isNotEmpty) {
-              return null;
-            }
-            if (actualValue.isEmpty) {
-              return l10n.dateEnteredFarmRequired;
-            }
-            return null;
-          },
-        ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -845,20 +774,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ],
     );
-  }
-
-  // Helper method to check if "Born on Farm" method is selected
-  bool _isBornOnFarmSelected() {
-    if (_selectedLivestockObtainedMethodId == null) return false;
-    try {
-      final additionalDataProvider = Provider.of<AdditionalDataProvider>(context, listen: false);
-      final selectedMethod = additionalDataProvider.livestockObtainedMethods.firstWhere(
-        (method) => method.id == _selectedLivestockObtainedMethodId,
-      );
-      return selectedMethod.name.toLowerCase().contains('born');
-    } catch (e) {
-      return false;
-    }
   }
 
   // Reusable widget builders

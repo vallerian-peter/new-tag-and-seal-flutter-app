@@ -25,6 +25,7 @@ class DisposalFormScreen extends StatefulWidget {
   final String? livestockUuid;
   final bool isBulk;
   final List<String>? bulkLivestockUuids;
+  final VoidCallback? onCompleted;
 
   const DisposalFormScreen({
     super.key,
@@ -33,6 +34,7 @@ class DisposalFormScreen extends StatefulWidget {
     this.livestockUuid,
     this.isBulk = false,
     this.bulkLivestockUuids,
+    this.onCompleted,
   });
 
   bool get isEditMode => disposal != null;
@@ -646,7 +648,10 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             message: l10n.disposalLogSaved,
             buttonText: l10n.ok,
             onPressed: () {
+              // Close the form screen
               Navigator.of(context).pop();
+              // Trigger the onCompleted callback to refresh livestock list
+              widget.onCompleted?.call();
             },
           );
 
@@ -657,7 +662,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         }
       } else if (_isBulk) {
         // Bulk creation - keep existing dialog-based flow
-        final created = await eventsProvider.addDisposalBatchWithDialog(
+        await eventsProvider.addDisposalBatchWithDialog(
           context: context,
           farmUuid: selectedFarmUuid,
           livestockUuids: livestockUuids,
@@ -665,11 +670,15 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           reasons: reasons,
           remarks: remarks,
           status: _selectedStatus,
+          onSuccess: () {
+            // Close the form screen
+            if (mounted) {
+              Navigator.pop(context, true);
+            }
+            // Trigger the onCompleted callback to refresh livestock list
+            widget.onCompleted?.call();
+          },
         );
-
-        if (created.isNotEmpty && mounted) {
-          Navigator.pop(context, true);
-        }
       } else {
         // Create new disposal - keep existing dialog-based flow
         final now = DateTime.now().toIso8601String();
@@ -690,13 +699,18 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           updatedAt: now,
         );
 
-        final created = await eventsProvider.addDisposalWithDialog(
+        await eventsProvider.addDisposalWithDialog(
           context,
           newModel,
+          onSuccess: () {
+            // Close the form screen
+            if (mounted) {
+              Navigator.pop(context, true);
+            }
+            // Trigger the onCompleted callback to refresh livestock list
+            widget.onCompleted?.call();
+          },
         );
-        if (created != null && mounted) {
-          Navigator.pop(context, created);
-        }
       }
     } catch (e, stackTrace) {
       log('❌ Failed to save disposal log: $e', stackTrace: stackTrace);
