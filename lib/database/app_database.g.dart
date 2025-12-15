@@ -3535,7 +3535,6 @@ class $LivestocksTable extends Livestocks
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _rfidTagIdMeta = const VerificationMeta(
     'rfidTagId',
@@ -3547,7 +3546,6 @@ class $LivestocksTable extends Livestocks
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _livestockTypeIdMeta = const VerificationMeta(
     'livestockTypeId',

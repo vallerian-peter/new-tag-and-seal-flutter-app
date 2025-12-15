@@ -1163,6 +1163,8 @@
   "enterIdentificationNumber": "Enter identification number",
   "identificationNumberExists": "Another livestock already uses this identification number. Please enter a unique ID.",
   "identificationNumberRequired": "Identification number is required",
+  "rfidTagIdExists": "Another livestock already uses this RFID Tag ID.",
+  "barcodeTagIdExists": "Another livestock already uses this Barcode Tag ID.",
   
   "dummyTagId": "Dummy Tag ID",
   "enterDummyTagId": "Enter dummy tag ID (optional)",

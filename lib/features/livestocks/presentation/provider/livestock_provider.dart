@@ -9,7 +9,7 @@ class LivestockProvider extends ChangeNotifier {
   final LivestockRepo _livestockRepo;
 
   LivestockProvider({required LivestockRepo livestockRepo})
-      : _livestockRepo = livestockRepo;
+    : _livestockRepo = livestockRepo;
 
   // State
   List<Livestock> _allLivestock = [];
@@ -42,10 +42,10 @@ class LivestockProvider extends ChangeNotifier {
     try {
       log('📦 LivestockProvider: Fetching all active livestock...');
       final livestock = await _livestockRepo.getAllActiveLivestock();
-      
+
       _allLivestock = livestock;
       _filteredLivestock = livestock;
-      
+
       log('✅ LivestockProvider: Loaded ${livestock.length} livestock');
       _isLoading = false;
       notifyListeners();
@@ -82,16 +82,20 @@ class LivestockProvider extends ChangeNotifier {
     // Apply gender filter
     if (genderFilter != 'All') {
       baseList = baseList
-          .where((livestock) =>
-              livestock.gender.toLowerCase() == genderFilter.toLowerCase())
+          .where(
+            (livestock) =>
+                livestock.gender.toLowerCase() == genderFilter.toLowerCase(),
+          )
           .toList();
     }
 
     // Apply status filter
     if (statusFilter != 'All') {
       baseList = baseList
-          .where((livestock) =>
-              livestock.status.toLowerCase() == statusFilter.toLowerCase())
+          .where(
+            (livestock) =>
+                livestock.status.toLowerCase() == statusFilter.toLowerCase(),
+          )
           .toList();
     }
 
@@ -107,11 +111,13 @@ class LivestockProvider extends ChangeNotifier {
       _filteredLivestock = baseList;
     } else {
       _filteredLivestock = baseList
-          .where((livestock) =>
-              livestock.name.toLowerCase().contains(query.toLowerCase()) ||
-              livestock.identificationNumber
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
+          .where(
+            (livestock) =>
+                livestock.name.toLowerCase().contains(query.toLowerCase()) ||
+                livestock.identificationNumber.toLowerCase().contains(
+                  query.toLowerCase(),
+                ),
+          )
           .toList();
     }
 
@@ -167,13 +173,13 @@ class LivestockProvider extends ChangeNotifier {
     try {
       log('🗑️ LivestockProvider: Marking livestock as deleted...');
       final success = await _livestockRepo.markLivestockAsDeleted(livestockId);
-      
+
       if (success) {
         // Refresh the list
         await fetchAllLivestock();
         log('✅ LivestockProvider: Livestock marked as deleted');
       }
-      
+
       return success;
     } catch (e) {
       log('❌ LivestockProvider: Error marking livestock as deleted: $e');
@@ -186,19 +192,24 @@ class LivestockProvider extends ChangeNotifier {
   /// Mark livestock by farm UUID as deleted
   Future<int> markLivestockByFarmUuidAsDeleted(String farmUuid) async {
     try {
-      log('🗑️ LivestockProvider: Marking livestock by farm UUID as deleted...');
-      final count =
-          await _livestockRepo.markLivestockByFarmUuidAsDeleted(farmUuid);
-      
+      log(
+        '🗑️ LivestockProvider: Marking livestock by farm UUID as deleted...',
+      );
+      final count = await _livestockRepo.markLivestockByFarmUuidAsDeleted(
+        farmUuid,
+      );
+
       if (count > 0) {
         // Refresh the list
         await fetchAllLivestock();
         log('✅ LivestockProvider: $count livestock marked as deleted');
       }
-      
+
       return count;
     } catch (e) {
-      log('❌ LivestockProvider: Error marking livestock by farm UUID as deleted: $e');
+      log(
+        '❌ LivestockProvider: Error marking livestock by farm UUID as deleted: $e',
+      );
       _error = e.toString();
       notifyListeners();
       return 0;
@@ -218,6 +229,7 @@ class LivestockProvider extends ChangeNotifier {
   }
 
   /// Check if identification number is unique (optionally excluding a livestock by UUID)
+  /// Checks uniqueness globally across all farms.
   Future<bool> isIdentificationNumberUnique(
     String identificationNumber, {
     String? excludeUuid,
@@ -225,10 +237,91 @@ class LivestockProvider extends ChangeNotifier {
     final normalized = identificationNumber.trim();
     if (normalized.isEmpty) return true;
 
-    final existing =
-        await _livestockRepo.getLivestockByIdentificationNumber(normalized);
+    // Global check
+    final existing = await _livestockRepo.getLivestockByIdentificationNumber(
+      normalized,
+    );
     if (existing == null) return true;
     if (excludeUuid != null && existing.uuid == excludeUuid) return true;
     return false;
+  }
+
+  /// Check if RFID tag ID is unique globally
+  Future<bool> isRfidTagIdUnique(
+    String rfidTagId, {
+    String? excludeUuid,
+  }) async {
+    final normalized = rfidTagId.trim();
+    if (normalized.isEmpty) return true;
+    return await _livestockRepo.isRfidTagIdUnique(
+      normalized,
+      excludeUuid: excludeUuid,
+    );
+  }
+
+  /// Check if Barcode tag ID is unique globally
+  Future<bool> isBarcodeTagIdUnique(
+    String barcodeTagId, {
+    String? excludeUuid,
+  }) async {
+    final normalized = barcodeTagId.trim();
+    if (normalized.isEmpty) return true;
+    return await _livestockRepo.isBarcodeTagIdUnique(
+      normalized,
+      excludeUuid: excludeUuid,
+    );
+  }
+
+  /// Create livestock
+  Future<Livestock?> createLivestock(Map<String, dynamic> livestockData) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      log('📦 LivestockProvider: Creating livestock...');
+      final livestock = await _livestockRepo.createLivestock(livestockData);
+
+      // Refresh list
+      await fetchAllLivestock();
+
+      _isLoading = false;
+      notifyListeners();
+      return livestock;
+    } catch (e) {
+      log('❌ LivestockProvider: Error creating livestock: $e');
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  /// Update livestock
+  Future<bool> updateLivestock(
+    int id,
+    Map<String, dynamic> livestockData,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      log('📦 LivestockProvider: Updating livestock...');
+      final success = await _livestockRepo.updateLivestock(id, livestockData);
+
+      if (success) {
+        // Refresh list
+        await fetchAllLivestock();
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      log('❌ LivestockProvider: Error updating livestock: $e');
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 }

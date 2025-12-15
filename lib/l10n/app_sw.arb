@@ -155,6 +155,8 @@
   "livestock": "Mifugo",
   "addLivestock": "Ongeza Mifugo",
   "tagId": "Nambari ya Lebo",
+  "rfidTagIdExists": "Mnyama mwingine tayari anatumia Kitambulisho hiki cha RFID.",
+  "barcodeTagIdExists": "Mnyama mwingine tayari anatumia Kitambulisho hiki cha Msimbo Pau.",
   "animalName": "Jina la Mnyama",
   "breed": "Aina",
   "species": "Spishi",

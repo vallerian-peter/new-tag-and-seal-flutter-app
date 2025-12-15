@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -144,7 +145,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 20; // v20 adds primaryColor and secondaryColor to livestocks
+  int get schemaVersion => 21; // v21 removes UNIQUE constraints from nullable tag columns (rfidTagId, barcodeTagId)
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -268,6 +269,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 20) {
         // Version 20: Add primaryColor and secondaryColor columns to livestocks table
         await _addLivestockColorColumns(m);
+      }
+      if (from < 21) {
+        // Version 21: Remove UNIQUE constraints from nullable tag columns
+        // This allows multiple NULL values and handles uniqueness at application level
+        await _removeTagUniqueConstraints(m);
       }
     },
     beforeOpen: (details) async {
@@ -659,6 +665,68 @@ class AppDatabase extends _$AppDatabase {
     } catch (e) {
       // Re-throw with context
       throw Exception('Failed to add color columns to livestocks table: $e');
+    }
+  }
+
+  /// Migration to version 21: Remove UNIQUE constraints from nullable tag columns
+  /// This migration recreates the livestocks table without UNIQUE constraints on
+  /// rfidTagId, barcodeTagId, and dummyTagId to allow multiple NULL values.
+  /// Uniqueness validation is now handled at the application level.
+  Future<void> _removeTagUniqueConstraints(Migrator m) async {
+    try {
+      // Check if livestocks table exists
+      final livestocksExists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('livestocks'),
+        ],
+      ).get();
+
+      if (livestocksExists.isEmpty) {
+        // Table doesn't exist yet, just create it with new schema (no UNIQUE constraints)
+        await m.createTable(livestocks);
+        return;
+      }
+
+      // SQLite doesn't support DROP CONSTRAINT directly, so we need to recreate the table
+      // Step 1: Create backup table with all data
+      await customStatement('''
+        CREATE TABLE livestocks_backup AS 
+        SELECT * FROM livestocks
+      ''');
+
+      // Step 2: Drop old table
+      await m.deleteTable('livestocks');
+
+      // Step 3: Create new table without UNIQUE constraints on tag columns
+      await m.createTable(livestocks);
+
+      // Step 4: Copy data back from backup
+      await customStatement('''
+        INSERT INTO livestocks (
+          id, farm_uuid, uuid, identification_number, dummy_tag_id, barcode_tag_id, 
+          rfid_tag_id, livestock_type_id, name, date_of_birth, mother_uuid, father_uuid,
+          gender, breed_id, species_id, status, livestock_obtained_method_id,
+          date_first_entered_to_farm, weight_as_on_registration, primary_color,
+          secondary_color, synced, sync_action, created_at, updated_at
+        )
+        SELECT 
+          id, farm_uuid, uuid, identification_number, dummy_tag_id, barcode_tag_id,
+          rfid_tag_id, livestock_type_id, name, date_of_birth, mother_uuid, father_uuid,
+          gender, breed_id, species_id, status, livestock_obtained_method_id,
+          date_first_entered_to_farm, weight_as_on_registration, primary_color,
+          secondary_color, synced, sync_action, created_at, updated_at
+        FROM livestocks_backup
+      ''');
+
+      // Step 5: Drop backup table
+      await customStatement('DROP TABLE livestocks_backup');
+
+      log('✅ Successfully removed UNIQUE constraints from tag columns');
+    } catch (e) {
+      // Re-throw with context
+      throw Exception('Failed to remove UNIQUE constraints from tag columns: $e');
     }
   }
 }

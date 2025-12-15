@@ -529,7 +529,44 @@ class Sync {
         farmUsers.isEmpty;
   }
 
+  // OLD VERSION - COMMENTED OUT (had bug: double extraction of data['data'])
+  // /// Sends post sync data to server
+  // static Future<Map<String, dynamic>> _sendPostSyncData(
+  //   String userId,
+  //   String token,
+  //   Map<String, dynamic> payload,
+  // ) async {
+  //   try {
+  //     log('📤 Sending data to server...');
+  //     
+  //     final response = await http.post(
+  //       Uri.parse('${ApiEndpoints.fullSyncPostData}/$userId'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Accept': 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: jsonEncode(payload),
+  //     );
+
+  //     log('✅ Response From Server Sync Post Data: ${response.body}');
+  //     final data = _handleSyncResponse(response, 'post sync');
+  //     log('✅ Data synced successfully');
+  //     
+  //     return data['data'] as Map<String, dynamic>? ?? {}; // BUG: double extraction
+  //   } on SocketException catch (e) {
+  //     log('❌ Socket error: ${e.message}');
+  //     throw Exception('Failed to connect to server. Please check your internet connection.');
+  //   } on FormatException catch (e) {
+  //     log('❌ Invalid response format: ${e.message}');
+  //     throw Exception('Invalid server response. Please try again.');
+  //   }
+  // }
+
   /// Sends post sync data to server
+  /// 
+  /// **FIXED:** Returns data directly from _handleSyncResponse since it already extracts responseBody['data']
+  /// The old version had a bug where it tried to extract data['data'] again, resulting in empty map
   static Future<Map<String, dynamic>> _sendPostSyncData(
     String userId,
     String token,
@@ -550,9 +587,12 @@ class Sync {
 
       log('✅ Response From Server Sync Post Data: ${response.body}');
       final data = _handleSyncResponse(response, 'post sync');
-      log('✅ Data synced successfully');
+      log('✅ Data synced successfully: ${data.entries.map((e) => '${e.key}: ${e.value}').join(', ')}');
       
-      return data['data'] as Map<String, dynamic>? ?? {};
+      // FIX: _handleSyncResponse already returns responseBody['data'], so we don't need to extract it again
+      // The old code had: return data['data'] as Map<String, dynamic>? ?? {};
+      // This was causing syncedData to be empty, preventing livestock from being marked as synced
+      return data;
     } on SocketException catch (e) {
       log('❌ Socket error: ${e.message}');
       throw Exception('Failed to connect to server. Please check your internet connection.');
@@ -582,11 +622,20 @@ class Sync {
     final syncedLivestockUuids = (syncedData['syncedLivestock'] as List<dynamic>?)
         ?.map((item) => item['uuid'] as String)
         .toList() ?? [];
+
+    log('🔍 [DEBUG] Extracted livestock UUIDs: $syncedLivestockUuids');
+    log('🔍 [DEBUG] syncedData[\'syncedLivestock\']: ${syncedData['syncedLivestock']}');
+    log('🔍 [DEBUG] syncedData[\'syncedLivestock\'] type: ${syncedData['syncedLivestock']?.runtimeType}');
+    log('🔍 [DEBUG] syncedData keys: ${syncedData.keys.toList()}');
     
     if (syncedLivestockUuids.isNotEmpty) {
+      log('🔍 [DEBUG] Calling markLivestockAsSynced with ${syncedLivestockUuids.length} UUIDs');
       final livestockRepository = LivestockRepository(database);
-      await livestockRepository.markLivestockAsSynced(syncedLivestockUuids);
-      log('  ✅ Marked ${syncedLivestockUuids.length} livestock as synced');
+      final result = await livestockRepository.markLivestockAsSynced(syncedLivestockUuids);
+      log('  ✅ Marked ${syncedLivestockUuids.length} livestock as synced (result: $result)');
+    } else {
+      log('⚠️ [DEBUG] No livestock UUIDs to mark as synced');
+      log('⚠️ [DEBUG] syncedData[\'syncedLivestock\'] is: ${syncedData['syncedLivestock']}');
     }
 
     final syncedLogs = syncedData['syncedLogs'] as Map<String, dynamic>?;

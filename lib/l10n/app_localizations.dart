@@ -4964,6 +4964,18 @@ abstract class AppLocalizations {
   /// **'Identification number is required'**
   String get identificationNumberRequired;
 
+  /// No description provided for @rfidTagIdExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Another livestock already uses this RFID Tag ID.'**
+  String get rfidTagIdExists;
+
+  /// No description provided for @barcodeTagIdExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Another livestock already uses this Barcode Tag ID.'**
+  String get barcodeTagIdExists;
+
   /// No description provided for @dummyTagId.
   ///
   /// In en, this message translates to:

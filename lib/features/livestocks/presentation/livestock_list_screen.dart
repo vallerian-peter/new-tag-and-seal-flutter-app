@@ -199,7 +199,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   color: Constants.primaryColor,
                                 ),
                               ),
+                              
                               const SizedBox(width: 12),
+
                               Expanded(
                                 child: LivestockStatCard(
                                   title: l10n.male,
@@ -208,7 +210,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   color: Colors.blue,
                                 ),
                               ),
+
                               const SizedBox(width: 12),
+                              
                               Expanded(
                                 child: LivestockStatCard(
                                   title: l10n.female,

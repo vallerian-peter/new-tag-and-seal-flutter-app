@@ -2591,6 +2591,14 @@ class AppLocalizationsSw extends AppLocalizations {
       'Namba ya kitambulisho inahitajika';
 
   @override
+  String get rfidTagIdExists =>
+      'Mnyama mwingine tayari anatumia Kitambulisho hiki cha RFID.';
+
+  @override
+  String get barcodeTagIdExists =>
+      'Mnyama mwingine tayari anatumia Kitambulisho hiki cha Msimbo Pau.';
+
+  @override
   String get dummyTagId => 'Namba ya Lebo ya Muda';
 
   @override

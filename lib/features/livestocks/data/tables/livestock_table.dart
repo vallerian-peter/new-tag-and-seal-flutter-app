@@ -6,10 +6,10 @@ class Livestocks extends Table {
   TextColumn get farmUuid => text()();  // Farm UUID reference
   TextColumn get uuid => text()();
   TextColumn get identificationNumber => text()();
-  // Tag fields are optional (backend allows null); keep uniqueness when provided
+  // Tag fields are optional (backend allows null); uniqueness handled at application level
   TextColumn get dummyTagId => text().nullable()();
-  TextColumn get barcodeTagId => text().nullable().unique()();
-  TextColumn get rfidTagId => text().nullable().unique()();
+  TextColumn get barcodeTagId => text().nullable()();
+  TextColumn get rfidTagId => text().nullable()();
   IntColumn get livestockTypeId => integer()();
   TextColumn get name => text()();
   TextColumn get dateOfBirth => text()();

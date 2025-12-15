@@ -2575,6 +2575,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Identification number is required';
 
   @override
+  String get rfidTagIdExists =>
+      'Another livestock already uses this RFID Tag ID.';
+
+  @override
+  String get barcodeTagIdExists =>
+      'Another livestock already uses this Barcode Tag ID.';
+
+  @override
   String get dummyTagId => 'Dummy Tag ID';
 
   @override
