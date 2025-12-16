@@ -5,6 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provid
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/view_events.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 
 class EventsViewControl {
   static Future<void> openForm({
@@ -20,9 +21,9 @@ class EventsViewControl {
         farmUuid.isEmpty ||
         livestockUuid == null ||
         livestockUuid.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.logContextMissing)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
       return;
     }
 
@@ -38,9 +39,9 @@ class EventsViewControl {
         );
         break;
       default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title - ${l10n.comingSoon}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$title - ${l10n.comingSoon}')));
     }
   }
 
@@ -54,6 +55,15 @@ class EventsViewControl {
     String? livestockName,
   }) async {
     final l10n = AppLocalizations.of(context)!;
+
+    // If current user is an extension officer, ensure they have access to this log type
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.hasAccessToLogType(logType)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.logTypeAccessDenied(logType))),
+      );
+      return;
+    }
 
     switch (logType) {
       case EventLogTypes.feeding:
@@ -70,7 +80,10 @@ class EventsViewControl {
       case EventLogTypes.insemination:
       case EventLogTypes.dryoff:
       case EventLogTypes.transfer:
-        final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
+        final eventsProvider = Provider.of<EventsProvider>(
+          context,
+          listen: false,
+        );
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ViewEventsScreen(
@@ -86,11 +99,9 @@ class EventsViewControl {
         );
         break;
       default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title - ${l10n.comingSoon}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$title - ${l10n.comingSoon}')));
     }
   }
 }
-
-

@@ -65,7 +65,12 @@ class LivestockDetailsModal {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header with image, name, and actions menu
-                      _buildHeaderWithActions(context, livestock, isDark, onRefresh),
+                      _buildHeaderWithActions(
+                        context,
+                        livestock,
+                        isDark,
+                        onRefresh,
+                      ),
 
                       const SizedBox(height: 24),
 
@@ -146,7 +151,9 @@ class LivestockDetailsModal {
                 children: [
                   Expanded(
                     child: Text(
-                      livestock.name,
+                      LivestockHelper.getDisplayName(livestock).isNotEmpty
+                          ? LivestockHelper.getDisplayName(livestock)
+                          : '${l10n.livestock} #${livestock.id}',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -213,13 +220,16 @@ class LivestockDetailsModal {
             borderRadius: BorderRadius.circular(12),
           ),
           onSelected: (value) {
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final authProvider = Provider.of<AuthProvider>(
+              context,
+              listen: false,
+            );
             final l10n = AppLocalizations.of(context)!;
-            
+
             if (value == 'edit') {
               if (!RoleHelper.checkCanManageLivestock(
-                context, 
-                l10n, 
+                context,
+                l10n,
                 authProvider,
                 customErrorMessage: l10n.notAFarmerOrFarmManagerEdit,
               )) {
@@ -229,13 +239,14 @@ class LivestockDetailsModal {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LivestockFormScreen(livestock: livestock),
+                  builder: (context) =>
+                      LivestockFormScreen(livestock: livestock),
                 ),
               ).then((_) => onRefresh());
             } else if (value == 'delete') {
               if (!RoleHelper.checkCanManageLivestock(
-                context, 
-                l10n, 
+                context,
+                l10n,
                 authProvider,
                 customErrorMessage: l10n.notAFarmerOrFarmManagerDelete,
               )) {
@@ -250,7 +261,11 @@ class LivestockDetailsModal {
               value: 'edit',
               child: Row(
                 children: [
-                  const Icon(Iconsax.edit_outline, size: 18, color: Colors.blue),
+                  const Icon(
+                    Iconsax.edit_outline,
+                    size: 18,
+                    color: Colors.blue,
+                  ),
                   const SizedBox(width: 12),
                   Text(l10n.editLivestock),
                 ],
@@ -260,7 +275,11 @@ class LivestockDetailsModal {
               value: 'delete',
               child: Row(
                 children: [
-                  const Icon(Iconsax.trash_outline, size: 18, color: Colors.red),
+                  const Icon(
+                    Iconsax.trash_outline,
+                    size: 18,
+                    color: Colors.red,
+                  ),
                   const SizedBox(width: 12),
                   Text(l10n.deleteLivestock),
                 ],
@@ -307,8 +326,12 @@ class LivestockDetailsModal {
             context,
             l10n.gender,
             livestock.gender.toLowerCase() == 'male' ? l10n.male : l10n.female,
-            livestock.gender.toLowerCase() == 'male' ? Icons.male : Icons.female,
-            livestock.gender.toLowerCase() == 'male' ? Colors.blue : Colors.pink,
+            livestock.gender.toLowerCase() == 'male'
+                ? Icons.male
+                : Icons.female,
+            livestock.gender.toLowerCase() == 'male'
+                ? Colors.blue
+                : Colors.pink,
             isDark,
           ),
           const SizedBox(width: 12),
@@ -372,10 +395,7 @@ class LivestockDetailsModal {
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -422,7 +442,13 @@ class LivestockDetailsModal {
     final isFemale = livestock.gender.toLowerCase() == 'female';
     final isNotActive = LivestockHelper.isNotActive(livestock);
 
-    final logs = _buildLogConfigs(context, livestock, farmName, l10n, onRefresh);
+    final logs = _buildLogConfigs(
+      context,
+      livestock,
+      farmName,
+      l10n,
+      onRefresh,
+    );
     final applicableLogs = logs
         // Filter by gender support
         .where((log) => isFemale ? log.supportsFemale : log.supportsMale)
@@ -480,11 +506,7 @@ class LivestockDetailsModal {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.red[700],
-                      size: 20,
-                    ),
+                    Icon(Icons.info_outline, color: Colors.red[700], size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -534,7 +556,12 @@ class LivestockDetailsModal {
       void Function(BuildContext) originalCallback,
     ) {
       return (ctx) {
-        if (!RoleHelper.checkCanAccessLogType(ctx, l10n, authProvider, logType)) {
+        if (!RoleHelper.checkCanAccessLogType(
+          ctx,
+          l10n,
+          authProvider,
+          logType,
+        )) {
           return; // Access denied, toast already shown
         }
         originalCallback(ctx);
@@ -543,8 +570,9 @@ class LivestockDetailsModal {
 
     // Choose birth log type/title based on livestock type
     final isPig = livestock.livestockTypeId == 2;
-    final birthLogType =
-        isPig ? EventLogTypes.farrowing : EventLogTypes.calving;
+    final birthLogType = isPig
+        ? EventLogTypes.farrowing
+        : EventLogTypes.calving;
     final birthTitle = isPig ? l10n.farrowing : l10n.calving;
 
     return [
@@ -577,7 +605,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -609,7 +637,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -641,7 +669,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -673,7 +701,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -706,7 +734,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -738,7 +766,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -770,7 +798,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -780,22 +808,19 @@ class LivestockDetailsModal {
         color: Colors.brown,
         supportsMale: true,
         supportsFemale: true,
-        onAdd: wrapWithRoleCheck(
-          EventLogTypes.disposal,
-          (ctx) {
-            // Close the modal first
-            Navigator.of(ctx).pop();
-            // Open disposal form with callback to refresh and filter to notActive
-            EventFormControl.open(
-              context: context,
-              logType: EventLogTypes.disposal,
-              title: l10n.disposal,
-              farmUuid: farmUuid,
-              livestockUuid: livestockUuid,
-              onCompleted: onRefresh,
-            );
-          },
-        ),
+        onAdd: wrapWithRoleCheck(EventLogTypes.disposal, (ctx) {
+          // Close the modal first
+          Navigator.of(ctx).pop();
+          // Open disposal form with callback to refresh and filter to notActive
+          EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.disposal,
+            title: l10n.disposal,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: onRefresh,
+          );
+        }),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
           logType: EventLogTypes.disposal,
@@ -803,7 +828,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -835,10 +860,10 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
-      
+
       _LogConfig(
         logType: EventLogTypes.abortedPregnancy,
         title: l10n.abortedPregnancy,
@@ -868,7 +893,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -900,7 +925,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
       _LogConfig(
@@ -932,7 +957,7 @@ class LivestockDetailsModal {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
-          livestockName: livestock.name,
+          livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
     ];
@@ -947,13 +972,13 @@ class LivestockDetailsModal {
     bool isNotActive = false,
   }) {
     final isDisabled = fromScanner || isNotActive;
-    
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: isDark ? Colors.grey[800] : Colors.white,
-          foregroundColor: isDisabled 
+          foregroundColor: isDisabled
               ? (isDark ? Colors.grey[600] : Colors.grey[400])
               : (isDark ? Colors.white : Colors.black87),
           elevation: 0,
@@ -990,10 +1015,7 @@ class LivestockDetailsModal {
 
             // Count badge
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 6,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: config.color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -1021,11 +1043,7 @@ class LivestockDetailsModal {
                   color: config.color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.visibility,
-                  size: 18,
-                  color: config.color,
-                ),
+                child: Icon(Icons.visibility, size: 18, color: config.color),
               ),
             ),
 
@@ -1044,11 +1062,7 @@ class LivestockDetailsModal {
                     color: config.color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    Icons.add,
-                    size: 18,
-                    color: config.color,
-                  ),
+                  child: Icon(Icons.add, size: 18, color: config.color),
                 ),
               ),
             ],
@@ -1073,15 +1087,11 @@ class LivestockDetailsModal {
           backgroundColor: isDark ? Colors.grey[900] : Colors.white,
           title: Text(
             l10n.deleteLivestock,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black87,
-            ),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
           ),
           content: Text(
             '${l10n.confirmDelete} ${livestock.name}?',
-            style: TextStyle(
-              color: isDark ? Colors.grey[300] : Colors.black87,
-            ),
+            style: TextStyle(color: isDark ? Colors.grey[300] : Colors.black87),
           ),
           actions: [
             TextButton(
@@ -1179,9 +1189,15 @@ class LivestockDetailsModal {
     }
   }
 
-  static Future<String> _getSpeciesName(BuildContext context, int speciesId) async {
+  static Future<String> _getSpeciesName(
+    BuildContext context,
+    int speciesId,
+  ) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       return await provider.getSpeciesNameById(speciesId);
     } catch (e) {
       log('Error fetching species: $e');
@@ -1191,7 +1207,10 @@ class LivestockDetailsModal {
 
   static Future<String> _getBreedName(BuildContext context, int breedId) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       return await provider.getBreedNameById(breedId);
     } catch (e) {
       log('Error fetching breed: $e');
@@ -1224,11 +1243,7 @@ class LivestockDetailsModal {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.info_outline,
-                    size: 18,
-                    color: Colors.white,
-                  ),
+                  const Icon(Icons.info_outline, size: 18, color: Colors.white),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -1244,7 +1259,7 @@ class LivestockDetailsModal {
               ),
             ),
           ),
-    );
+        );
       },
     );
 

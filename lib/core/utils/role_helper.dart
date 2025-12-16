@@ -5,17 +5,17 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 /// Role Helper Utility
-/// 
+///
 /// Provides helper methods for role-based access control and permission checking.
 /// Shows appropriate error messages when access is denied.
 class RoleHelper {
   RoleHelper._();
 
   /// Checks if the current user is a farmer.
-  /// 
+  ///
   /// Returns `true` if user is a farmer, `false` otherwise.
   /// Shows a toast error message if user is not a farmer.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// if (RoleHelper.checkFarmerRole(context, l10n)) {
@@ -25,33 +25,27 @@ class RoleHelper {
   static bool checkFarmerRole(BuildContext context, AppLocalizations l10n) {
     final authProvider = context.read<AuthProvider>();
     if (!authProvider.isFarmer) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.notAFarmer,
-      );
+      ToastAlerts.showError(context, message: l10n.notAFarmer);
       return false;
     }
     return true;
   }
 
   /// Checks if the current user is a farm invited user.
-  /// 
+  ///
   /// Returns `true` if user is a farm invited user, `false` otherwise.
   /// Shows a toast error message if user is not a farm invited user.
   static bool checkFarmUserRole(BuildContext context, AppLocalizations l10n) {
     final authProvider = context.read<AuthProvider>();
     if (!authProvider.isFarmUser) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.notAFarmUser,
-      );
+      ToastAlerts.showError(context, message: l10n.notAFarmUser);
       return false;
     }
     return true;
   }
 
   /// Checks if the current user has a specific role.
-  /// 
+  ///
   /// Returns `true` if user has the specified role, `false` otherwise.
   /// Shows a toast error message if user doesn't have the required role.
   static bool checkRole(
@@ -62,12 +56,12 @@ class RoleHelper {
   }) {
     final authProvider = context.read<AuthProvider>();
     final userRole = authProvider.userRole;
-    
+
     if (userRole?.toLowerCase() != requiredRole.toLowerCase()) {
       ToastAlerts.showError(
         context,
-        message: customErrorMessage ?? 
-          l10n.accessDeniedRequiredRole(requiredRole),
+        message:
+            customErrorMessage ?? l10n.accessDeniedRequiredRole(requiredRole),
       );
       return false;
     }
@@ -75,7 +69,7 @@ class RoleHelper {
   }
 
   /// Checks if the current user can create livestock.
-  /// 
+  ///
   /// Returns `true` if user is a farmer OR has roleTitle = 'farm-manager'.
   /// Shows a toast error message if user doesn't have permission.
   static bool checkCanCreateLivestock(
@@ -92,22 +86,19 @@ class RoleHelper {
     if (authProvider.isFarmUser) {
       final profile = authProvider.currentProfile;
       final roleTitle = profile?['roleTitle'] as String?;
-      if (roleTitle != null && 
+      if (roleTitle != null &&
           roleTitle.toLowerCase().trim() == 'farm-manager') {
         return true;
       }
     }
 
     // User doesn't have permission
-    ToastAlerts.showError(
-      context,
-      message: l10n.notAFarmerOrFarmManager,
-    );
+    ToastAlerts.showError(context, message: l10n.notAFarmerOrFarmManager);
     return false;
   }
 
   /// Checks if the current user can add vaccines.
-  /// 
+  ///
   /// Returns `true` if user is a farmer OR has roleTitle = 'farm-manager' OR roleTitle = 'vaccination-user'.
   /// Shows a toast error message if user doesn't have permission.
   static bool checkCanAddVaccine(
@@ -126,7 +117,7 @@ class RoleHelper {
       final roleTitle = profile?['roleTitle'] as String?;
       if (roleTitle != null) {
         final normalizedRoleTitle = roleTitle.toLowerCase().trim();
-        if (normalizedRoleTitle == 'farm-manager' || 
+        if (normalizedRoleTitle == 'farm-manager' ||
             normalizedRoleTitle == 'vaccination-user') {
           return true;
         }
@@ -142,11 +133,11 @@ class RoleHelper {
   }
 
   /// Checks if the current user can manage (edit/delete) livestock.
-  /// 
+  ///
   /// Returns `true` if user is a farmer OR has roleTitle = 'farm-manager'.
   /// Shows a toast error message if user doesn't have permission.
-  /// 
-  /// [customErrorMessage] - Optional custom error message to show. 
+  ///
+  /// [customErrorMessage] - Optional custom error message to show.
   /// If not provided, uses the default manage livestock message.
   static bool checkCanManageLivestock(
     BuildContext context,
@@ -163,7 +154,7 @@ class RoleHelper {
     if (authProvider.isFarmUser) {
       final profile = authProvider.currentProfile;
       final roleTitle = profile?['roleTitle'] as String?;
-      if (roleTitle != null && 
+      if (roleTitle != null &&
           roleTitle.toLowerCase().trim() == 'farm-manager') {
         return true;
       }
@@ -178,7 +169,7 @@ class RoleHelper {
   }
 
   /// Maps log type to the corresponding role title for that log type.
-  /// 
+  ///
   /// Returns the role title string (e.g., 'feeding-user') or null if no mapping exists.
   static String? _getRoleTitleForLogType(String logType) {
     switch (logType.toLowerCase()) {
@@ -215,14 +206,14 @@ class RoleHelper {
   }
 
   /// Checks if the current user can access a specific log type.
-  /// 
+  ///
   /// Returns `true` if user is:
   /// - A farmer (always allowed)
   /// - A farm-manager (always allowed)
   /// - A farm user with roleTitle matching the log type (e.g., 'feeding-user' for 'feeding' log)
-  /// 
+  ///
   /// Shows a toast error message if user doesn't have permission.
-  /// 
+  ///
   /// [logType] - The log type to check (e.g., 'feeding', 'medication', 'vaccination')
   /// [customErrorMessage] - Optional custom error message to show.
   static bool checkCanAccessLogType(
@@ -249,23 +240,35 @@ class RoleHelper {
 
         // Check if user has the specific log type role
         final requiredRoleTitle = _getRoleTitleForLogType(logType);
-        if (requiredRoleTitle != null && 
+        if (requiredRoleTitle != null &&
             normalizedRoleTitle == requiredRoleTitle) {
           return true;
         }
       }
     }
 
+    // If user is an extension officer, apply additional restriction: only technical logs allowed
+    if (authProvider.isExtensionOfficer) {
+      if (!authProvider.hasAccessToLogType(logType)) {
+        final logTypeName = logType.isNotEmpty
+            ? '${logType[0].toUpperCase()}${logType.substring(1)}'
+            : logType;
+        ToastAlerts.showError(
+          context,
+          message: customErrorMessage ?? l10n.logTypeAccessDenied(logTypeName),
+        );
+        return false;
+      }
+    }
+
     // User doesn't have permission
-    final logTypeName = logType.isNotEmpty 
+    final logTypeName = logType.isNotEmpty
         ? '${logType[0].toUpperCase()}${logType.substring(1)}'
         : logType;
     ToastAlerts.showError(
       context,
-      message: customErrorMessage ?? 
-        l10n.logTypeAccessDenied(logTypeName),
+      message: customErrorMessage ?? l10n.logTypeAccessDenied(logTypeName),
     );
     return false;
   }
 }
-

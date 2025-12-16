@@ -4,6 +4,7 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/view_events.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -63,8 +64,13 @@ class _EventsScreenState extends State<EventsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final eventsProvider = context.watch<EventsProvider>();
 
-    final eventTypes = _eventTypesConfig(l10n);
-    final totalLogs = eventTypes.fold<int>(
+  final eventTypes = _eventTypesConfig(l10n);
+  // If current user is an extension officer, filter to technical event types only
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  final filteredEventTypes = authProvider.isExtensionOfficer
+    ? eventTypes.where((cfg) => authProvider.hasAccessToLogType(cfg.logType)).toList()
+    : eventTypes;
+    final totalLogs = filteredEventTypes.fold<int>(
       0,
       (acc, config) => acc + _logsForType(eventsProvider, config.logType).length,
     );
@@ -125,7 +131,7 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            ...eventTypes.map((config) {
+            ...filteredEventTypes.map((config) {
               final logs = _logsForType(eventsProvider, config.logType);
               return _EventTypeCard(
                 config: config,

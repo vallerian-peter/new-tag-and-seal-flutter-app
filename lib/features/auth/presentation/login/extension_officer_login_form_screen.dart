@@ -15,13 +15,15 @@ class ExtensionOfficerLoginFormScreen extends StatefulWidget {
   const ExtensionOfficerLoginFormScreen({super.key});
 
   @override
-  State<ExtensionOfficerLoginFormScreen> createState() => _ExtensionOfficerLoginFormScreenState();
+  State<ExtensionOfficerLoginFormScreen> createState() =>
+      _ExtensionOfficerLoginFormScreenState();
 }
 
-class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginFormScreen> {
+class _ExtensionOfficerLoginFormScreenState
+    extends State<ExtensionOfficerLoginFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _secureStorage = const FlutterSecureStorage();
-  
+
   final _farmerAccessNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -47,7 +49,7 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
     try {
       final email = await _secureStorage.read(key: 'email');
       final password = await _secureStorage.read(key: 'password');
-      
+
       if (mounted) {
         setState(() {
           if (email != null && email.isNotEmpty) {
@@ -67,29 +69,34 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       setState(() {
         _isLoading = true;
       });
 
       final l10n = AppLocalizations.of(context)!;
-      
+
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        
+
+        // Store farmer access number (used by backend to attach extension officer to farm context)
+        final accessNumber = _farmerAccessNumberController.text.trim();
+        if (accessNumber.isNotEmpty) {
+          await authProvider.storeExtensionOfficerAccessNumber(accessNumber);
+        }
+
         // Call auth provider login method
-        // TODO: Update to handle Extension Officer login with farmer access number
         final success = await authProvider.login(
           context: context,
           username: _emailController.text,
           password: _passwordController.text,
         );
-        
+
         if (success && mounted) {
           setState(() {
             _isLoading = false;
           });
-          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -106,10 +113,13 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
           setState(() {
             _isLoading = false;
           });
-          
-          final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+
+          final errorMessage = ErrorHelper.formatErrorMessage(
+            e.toString(),
+            l10n,
+          );
           final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-          
+
           await AlertDialogs.showError(
             context: context,
             title: errorTitle,
@@ -128,11 +138,13 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -161,9 +173,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Extension Officer Icon
                     Container(
                       width: 100,
@@ -182,9 +194,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                         color: Constants.primaryColor,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Title
                     Text(
                       l10n.extensionOfficerLogin,
@@ -196,15 +208,17 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Subtitle
                     Text(
                       l10n.extensionOfficerLoginSubtitle,
                       style: TextStyle(
                         fontSize: 16,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,
@@ -212,13 +226,15 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                   ],
                 ),
               ),
-              
+
               // Form Card
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark ? Colors.grey[800] : theme.colorScheme.surface.withValues(alpha: 0.17),
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : theme.colorScheme.surface.withValues(alpha: 0.17),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isDark
                         ? []
@@ -253,9 +269,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                               return null;
                             },
                           ),
-                          
+
                           const SizedBox(height: 20),
-                          
+
                           // Email Field
                           CustomTextField(
                             label: l10n.email,
@@ -267,15 +283,17 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                               if (value == null || value.isEmpty) {
                                 return l10n.pleaseEnterEmail;
                               }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              if (!RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              ).hasMatch(value)) {
                                 return l10n.pleaseEnterValidEmail;
                               }
                               return null;
                             },
                           ),
-                          
+
                           const SizedBox(height: 20),
-                          
+
                           // Password Field
                           CustomTextField(
                             label: l10n.password,
@@ -293,9 +311,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                               return null;
                             },
                           ),
-                          
+
                           const SizedBox(height: 12),
-                          
+
                           // Forgot Password Link
                           Align(
                             alignment: Alignment.centerRight,
@@ -326,9 +344,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                               ),
                             ),
                           ),
-                          
+
                           const SizedBox(height: 24),
-                          
+
                           // Login Button
                           CustomButton(
                             text: _isLoading ? l10n.loading : l10n.login,
@@ -342,7 +360,7 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                   ),
                 ),
               ),
-              
+
               // Bottom Info Section
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -371,7 +389,9 @@ class _ExtensionOfficerLoginFormScreenState extends State<ExtensionOfficerLoginF
                               l10n.extensionOfficerLoginSubtitle,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ),
                                 height: 1.4,
                               ),
                             ),

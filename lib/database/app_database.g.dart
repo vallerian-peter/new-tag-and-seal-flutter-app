@@ -23014,6 +23014,910 @@ class NotificationEntriesCompanion extends UpdateCompanion<NotificationEntry> {
   }
 }
 
+class $InvitedExtensionOfficersTable extends InvitedExtensionOfficers
+    with TableInfo<$InvitedExtensionOfficersTable, InvitedExtensionOfficer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InvitedExtensionOfficersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _inviteIdMeta = const VerificationMeta(
+    'inviteId',
+  );
+  @override
+  late final GeneratedColumn<int> inviteId = GeneratedColumn<int>(
+    'invite_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _accessCodeMeta = const VerificationMeta(
+    'accessCode',
+  );
+  @override
+  late final GeneratedColumn<String> accessCode = GeneratedColumn<String>(
+    'access_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _officerIdMeta = const VerificationMeta(
+    'officerId',
+  );
+  @override
+  late final GeneratedColumn<int> officerId = GeneratedColumn<int>(
+    'officer_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstNameMeta = const VerificationMeta(
+    'firstName',
+  );
+  @override
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+    'first_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _middleNameMeta = const VerificationMeta(
+    'middleName',
+  );
+  @override
+  late final GeneratedColumn<String> middleName = GeneratedColumn<String>(
+    'middle_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastNameMeta = const VerificationMeta(
+    'lastName',
+  );
+  @override
+  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
+    'last_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _specializationMeta = const VerificationMeta(
+    'specialization',
+  );
+  @override
+  late final GeneratedColumn<String> specialization = GeneratedColumn<String>(
+    'specialization',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _inviteDateMeta = const VerificationMeta(
+    'inviteDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> inviteDate = GeneratedColumn<DateTime>(
+    'invite_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('server-create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    inviteId,
+    accessCode,
+    officerId,
+    firstName,
+    middleName,
+    lastName,
+    email,
+    phone,
+    specialization,
+    inviteDate,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'invited_extension_officers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InvitedExtensionOfficer> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('invite_id')) {
+      context.handle(
+        _inviteIdMeta,
+        inviteId.isAcceptableOrUnknown(data['invite_id']!, _inviteIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_inviteIdMeta);
+    }
+    if (data.containsKey('access_code')) {
+      context.handle(
+        _accessCodeMeta,
+        accessCode.isAcceptableOrUnknown(data['access_code']!, _accessCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accessCodeMeta);
+    }
+    if (data.containsKey('officer_id')) {
+      context.handle(
+        _officerIdMeta,
+        officerId.isAcceptableOrUnknown(data['officer_id']!, _officerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_officerIdMeta);
+    }
+    if (data.containsKey('first_name')) {
+      context.handle(
+        _firstNameMeta,
+        firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_firstNameMeta);
+    }
+    if (data.containsKey('middle_name')) {
+      context.handle(
+        _middleNameMeta,
+        middleName.isAcceptableOrUnknown(data['middle_name']!, _middleNameMeta),
+      );
+    }
+    if (data.containsKey('last_name')) {
+      context.handle(
+        _lastNameMeta,
+        lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastNameMeta);
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('specialization')) {
+      context.handle(
+        _specializationMeta,
+        specialization.isAcceptableOrUnknown(
+          data['specialization']!,
+          _specializationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('invite_date')) {
+      context.handle(
+        _inviteDateMeta,
+        inviteDate.isAcceptableOrUnknown(data['invite_date']!, _inviteDateMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InvitedExtensionOfficer map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InvitedExtensionOfficer(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      inviteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}invite_id'],
+      )!,
+      accessCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}access_code'],
+      )!,
+      officerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}officer_id'],
+      )!,
+      firstName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}first_name'],
+      )!,
+      middleName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}middle_name'],
+      ),
+      lastName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_name'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      specialization: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}specialization'],
+      ),
+      inviteDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}invite_date'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $InvitedExtensionOfficersTable createAlias(String alias) {
+    return $InvitedExtensionOfficersTable(attachedDatabase, alias);
+  }
+}
+
+class InvitedExtensionOfficer extends DataClass
+    implements Insertable<InvitedExtensionOfficer> {
+  final int id;
+  final int inviteId;
+  final String accessCode;
+  final int officerId;
+  final String firstName;
+  final String? middleName;
+  final String lastName;
+  final String email;
+  final String? phone;
+  final String? specialization;
+  final DateTime? inviteDate;
+  final String status;
+  final bool synced;
+  final String syncAction;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  const InvitedExtensionOfficer({
+    required this.id,
+    required this.inviteId,
+    required this.accessCode,
+    required this.officerId,
+    required this.firstName,
+    this.middleName,
+    required this.lastName,
+    required this.email,
+    this.phone,
+    this.specialization,
+    this.inviteDate,
+    required this.status,
+    required this.synced,
+    required this.syncAction,
+    this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['invite_id'] = Variable<int>(inviteId);
+    map['access_code'] = Variable<String>(accessCode);
+    map['officer_id'] = Variable<int>(officerId);
+    map['first_name'] = Variable<String>(firstName);
+    if (!nullToAbsent || middleName != null) {
+      map['middle_name'] = Variable<String>(middleName);
+    }
+    map['last_name'] = Variable<String>(lastName);
+    map['email'] = Variable<String>(email);
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || specialization != null) {
+      map['specialization'] = Variable<String>(specialization);
+    }
+    if (!nullToAbsent || inviteDate != null) {
+      map['invite_date'] = Variable<DateTime>(inviteDate);
+    }
+    map['status'] = Variable<String>(status);
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    if (!nullToAbsent || createdAt != null) {
+      map['created_at'] = Variable<DateTime>(createdAt);
+    }
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  InvitedExtensionOfficersCompanion toCompanion(bool nullToAbsent) {
+    return InvitedExtensionOfficersCompanion(
+      id: Value(id),
+      inviteId: Value(inviteId),
+      accessCode: Value(accessCode),
+      officerId: Value(officerId),
+      firstName: Value(firstName),
+      middleName: middleName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(middleName),
+      lastName: Value(lastName),
+      email: Value(email),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      specialization: specialization == null && nullToAbsent
+          ? const Value.absent()
+          : Value(specialization),
+      inviteDate: inviteDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inviteDate),
+      status: Value(status),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory InvitedExtensionOfficer.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InvitedExtensionOfficer(
+      id: serializer.fromJson<int>(json['id']),
+      inviteId: serializer.fromJson<int>(json['inviteId']),
+      accessCode: serializer.fromJson<String>(json['accessCode']),
+      officerId: serializer.fromJson<int>(json['officerId']),
+      firstName: serializer.fromJson<String>(json['firstName']),
+      middleName: serializer.fromJson<String?>(json['middleName']),
+      lastName: serializer.fromJson<String>(json['lastName']),
+      email: serializer.fromJson<String>(json['email']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      specialization: serializer.fromJson<String?>(json['specialization']),
+      inviteDate: serializer.fromJson<DateTime?>(json['inviteDate']),
+      status: serializer.fromJson<String>(json['status']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'inviteId': serializer.toJson<int>(inviteId),
+      'accessCode': serializer.toJson<String>(accessCode),
+      'officerId': serializer.toJson<int>(officerId),
+      'firstName': serializer.toJson<String>(firstName),
+      'middleName': serializer.toJson<String?>(middleName),
+      'lastName': serializer.toJson<String>(lastName),
+      'email': serializer.toJson<String>(email),
+      'phone': serializer.toJson<String?>(phone),
+      'specialization': serializer.toJson<String?>(specialization),
+      'inviteDate': serializer.toJson<DateTime?>(inviteDate),
+      'status': serializer.toJson<String>(status),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<DateTime?>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  InvitedExtensionOfficer copyWith({
+    int? id,
+    int? inviteId,
+    String? accessCode,
+    int? officerId,
+    String? firstName,
+    Value<String?> middleName = const Value.absent(),
+    String? lastName,
+    String? email,
+    Value<String?> phone = const Value.absent(),
+    Value<String?> specialization = const Value.absent(),
+    Value<DateTime?> inviteDate = const Value.absent(),
+    String? status,
+    bool? synced,
+    String? syncAction,
+    Value<DateTime?> createdAt = const Value.absent(),
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => InvitedExtensionOfficer(
+    id: id ?? this.id,
+    inviteId: inviteId ?? this.inviteId,
+    accessCode: accessCode ?? this.accessCode,
+    officerId: officerId ?? this.officerId,
+    firstName: firstName ?? this.firstName,
+    middleName: middleName.present ? middleName.value : this.middleName,
+    lastName: lastName ?? this.lastName,
+    email: email ?? this.email,
+    phone: phone.present ? phone.value : this.phone,
+    specialization: specialization.present
+        ? specialization.value
+        : this.specialization,
+    inviteDate: inviteDate.present ? inviteDate.value : this.inviteDate,
+    status: status ?? this.status,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt.present ? createdAt.value : this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  InvitedExtensionOfficer copyWithCompanion(
+    InvitedExtensionOfficersCompanion data,
+  ) {
+    return InvitedExtensionOfficer(
+      id: data.id.present ? data.id.value : this.id,
+      inviteId: data.inviteId.present ? data.inviteId.value : this.inviteId,
+      accessCode: data.accessCode.present
+          ? data.accessCode.value
+          : this.accessCode,
+      officerId: data.officerId.present ? data.officerId.value : this.officerId,
+      firstName: data.firstName.present ? data.firstName.value : this.firstName,
+      middleName: data.middleName.present
+          ? data.middleName.value
+          : this.middleName,
+      lastName: data.lastName.present ? data.lastName.value : this.lastName,
+      email: data.email.present ? data.email.value : this.email,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      specialization: data.specialization.present
+          ? data.specialization.value
+          : this.specialization,
+      inviteDate: data.inviteDate.present
+          ? data.inviteDate.value
+          : this.inviteDate,
+      status: data.status.present ? data.status.value : this.status,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InvitedExtensionOfficer(')
+          ..write('id: $id, ')
+          ..write('inviteId: $inviteId, ')
+          ..write('accessCode: $accessCode, ')
+          ..write('officerId: $officerId, ')
+          ..write('firstName: $firstName, ')
+          ..write('middleName: $middleName, ')
+          ..write('lastName: $lastName, ')
+          ..write('email: $email, ')
+          ..write('phone: $phone, ')
+          ..write('specialization: $specialization, ')
+          ..write('inviteDate: $inviteDate, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    inviteId,
+    accessCode,
+    officerId,
+    firstName,
+    middleName,
+    lastName,
+    email,
+    phone,
+    specialization,
+    inviteDate,
+    status,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InvitedExtensionOfficer &&
+          other.id == this.id &&
+          other.inviteId == this.inviteId &&
+          other.accessCode == this.accessCode &&
+          other.officerId == this.officerId &&
+          other.firstName == this.firstName &&
+          other.middleName == this.middleName &&
+          other.lastName == this.lastName &&
+          other.email == this.email &&
+          other.phone == this.phone &&
+          other.specialization == this.specialization &&
+          other.inviteDate == this.inviteDate &&
+          other.status == this.status &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class InvitedExtensionOfficersCompanion
+    extends UpdateCompanion<InvitedExtensionOfficer> {
+  final Value<int> id;
+  final Value<int> inviteId;
+  final Value<String> accessCode;
+  final Value<int> officerId;
+  final Value<String> firstName;
+  final Value<String?> middleName;
+  final Value<String> lastName;
+  final Value<String> email;
+  final Value<String?> phone;
+  final Value<String?> specialization;
+  final Value<DateTime?> inviteDate;
+  final Value<String> status;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<DateTime?> createdAt;
+  final Value<DateTime?> updatedAt;
+  const InvitedExtensionOfficersCompanion({
+    this.id = const Value.absent(),
+    this.inviteId = const Value.absent(),
+    this.accessCode = const Value.absent(),
+    this.officerId = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.middleName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.email = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.specialization = const Value.absent(),
+    this.inviteDate = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  InvitedExtensionOfficersCompanion.insert({
+    this.id = const Value.absent(),
+    required int inviteId,
+    required String accessCode,
+    required int officerId,
+    required String firstName,
+    this.middleName = const Value.absent(),
+    required String lastName,
+    required String email,
+    this.phone = const Value.absent(),
+    this.specialization = const Value.absent(),
+    this.inviteDate = const Value.absent(),
+    this.status = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : inviteId = Value(inviteId),
+       accessCode = Value(accessCode),
+       officerId = Value(officerId),
+       firstName = Value(firstName),
+       lastName = Value(lastName),
+       email = Value(email);
+  static Insertable<InvitedExtensionOfficer> custom({
+    Expression<int>? id,
+    Expression<int>? inviteId,
+    Expression<String>? accessCode,
+    Expression<int>? officerId,
+    Expression<String>? firstName,
+    Expression<String>? middleName,
+    Expression<String>? lastName,
+    Expression<String>? email,
+    Expression<String>? phone,
+    Expression<String>? specialization,
+    Expression<DateTime>? inviteDate,
+    Expression<String>? status,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (inviteId != null) 'invite_id': inviteId,
+      if (accessCode != null) 'access_code': accessCode,
+      if (officerId != null) 'officer_id': officerId,
+      if (firstName != null) 'first_name': firstName,
+      if (middleName != null) 'middle_name': middleName,
+      if (lastName != null) 'last_name': lastName,
+      if (email != null) 'email': email,
+      if (phone != null) 'phone': phone,
+      if (specialization != null) 'specialization': specialization,
+      if (inviteDate != null) 'invite_date': inviteDate,
+      if (status != null) 'status': status,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  InvitedExtensionOfficersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? inviteId,
+    Value<String>? accessCode,
+    Value<int>? officerId,
+    Value<String>? firstName,
+    Value<String?>? middleName,
+    Value<String>? lastName,
+    Value<String>? email,
+    Value<String?>? phone,
+    Value<String?>? specialization,
+    Value<DateTime?>? inviteDate,
+    Value<String>? status,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<DateTime?>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return InvitedExtensionOfficersCompanion(
+      id: id ?? this.id,
+      inviteId: inviteId ?? this.inviteId,
+      accessCode: accessCode ?? this.accessCode,
+      officerId: officerId ?? this.officerId,
+      firstName: firstName ?? this.firstName,
+      middleName: middleName ?? this.middleName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      specialization: specialization ?? this.specialization,
+      inviteDate: inviteDate ?? this.inviteDate,
+      status: status ?? this.status,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (inviteId.present) {
+      map['invite_id'] = Variable<int>(inviteId.value);
+    }
+    if (accessCode.present) {
+      map['access_code'] = Variable<String>(accessCode.value);
+    }
+    if (officerId.present) {
+      map['officer_id'] = Variable<int>(officerId.value);
+    }
+    if (firstName.present) {
+      map['first_name'] = Variable<String>(firstName.value);
+    }
+    if (middleName.present) {
+      map['middle_name'] = Variable<String>(middleName.value);
+    }
+    if (lastName.present) {
+      map['last_name'] = Variable<String>(lastName.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (specialization.present) {
+      map['specialization'] = Variable<String>(specialization.value);
+    }
+    if (inviteDate.present) {
+      map['invite_date'] = Variable<DateTime>(inviteDate.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InvitedExtensionOfficersCompanion(')
+          ..write('id: $id, ')
+          ..write('inviteId: $inviteId, ')
+          ..write('accessCode: $accessCode, ')
+          ..write('officerId: $officerId, ')
+          ..write('firstName: $firstName, ')
+          ..write('middleName: $middleName, ')
+          ..write('lastName: $lastName, ')
+          ..write('email: $email, ')
+          ..write('phone: $phone, ')
+          ..write('specialization: $specialization, ')
+          ..write('inviteDate: $inviteDate, ')
+          ..write('status: $status, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -23077,6 +23981,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FarmUsersTable farmUsers = $FarmUsersTable(this);
   late final $NotificationEntriesTable notificationEntries =
       $NotificationEntriesTable(this);
+  late final $InvitedExtensionOfficersTable invitedExtensionOfficers =
+      $InvitedExtensionOfficersTable(this);
   late final LocationDao locationDao = LocationDao(this as AppDatabase);
   late final ReferenceDataDao referenceDataDao = ReferenceDataDao(
     this as AppDatabase,
@@ -23095,6 +24001,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final FarmUserDao farmUserDao = FarmUserDao(this as AppDatabase);
+  late final ExtensionOfficerDao extensionOfficerDao = ExtensionOfficerDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -23149,6 +24058,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vaccines,
     farmUsers,
     notificationEntries,
+    invitedExtensionOfficers,
   ];
 }
 
@@ -37153,6 +38063,438 @@ typedef $$NotificationEntriesTableProcessedTableManager =
       NotificationEntry,
       PrefetchHooks Function()
     >;
+typedef $$InvitedExtensionOfficersTableCreateCompanionBuilder =
+    InvitedExtensionOfficersCompanion Function({
+      Value<int> id,
+      required int inviteId,
+      required String accessCode,
+      required int officerId,
+      required String firstName,
+      Value<String?> middleName,
+      required String lastName,
+      required String email,
+      Value<String?> phone,
+      Value<String?> specialization,
+      Value<DateTime?> inviteDate,
+      Value<String> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<DateTime?> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$InvitedExtensionOfficersTableUpdateCompanionBuilder =
+    InvitedExtensionOfficersCompanion Function({
+      Value<int> id,
+      Value<int> inviteId,
+      Value<String> accessCode,
+      Value<int> officerId,
+      Value<String> firstName,
+      Value<String?> middleName,
+      Value<String> lastName,
+      Value<String> email,
+      Value<String?> phone,
+      Value<String?> specialization,
+      Value<DateTime?> inviteDate,
+      Value<String> status,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<DateTime?> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+class $$InvitedExtensionOfficersTableFilterComposer
+    extends Composer<_$AppDatabase, $InvitedExtensionOfficersTable> {
+  $$InvitedExtensionOfficersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get inviteId => $composableBuilder(
+    column: $table.inviteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accessCode => $composableBuilder(
+    column: $table.accessCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get officerId => $composableBuilder(
+    column: $table.officerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get middleName => $composableBuilder(
+    column: $table.middleName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get specialization => $composableBuilder(
+    column: $table.specialization,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get inviteDate => $composableBuilder(
+    column: $table.inviteDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InvitedExtensionOfficersTableOrderingComposer
+    extends Composer<_$AppDatabase, $InvitedExtensionOfficersTable> {
+  $$InvitedExtensionOfficersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get inviteId => $composableBuilder(
+    column: $table.inviteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accessCode => $composableBuilder(
+    column: $table.accessCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get officerId => $composableBuilder(
+    column: $table.officerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get middleName => $composableBuilder(
+    column: $table.middleName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get specialization => $composableBuilder(
+    column: $table.specialization,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get inviteDate => $composableBuilder(
+    column: $table.inviteDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InvitedExtensionOfficersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InvitedExtensionOfficersTable> {
+  $$InvitedExtensionOfficersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get inviteId =>
+      $composableBuilder(column: $table.inviteId, builder: (column) => column);
+
+  GeneratedColumn<String> get accessCode => $composableBuilder(
+    column: $table.accessCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get officerId =>
+      $composableBuilder(column: $table.officerId, builder: (column) => column);
+
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
+
+  GeneratedColumn<String> get middleName => $composableBuilder(
+    column: $table.middleName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastName =>
+      $composableBuilder(column: $table.lastName, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get specialization => $composableBuilder(
+    column: $table.specialization,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get inviteDate => $composableBuilder(
+    column: $table.inviteDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$InvitedExtensionOfficersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InvitedExtensionOfficersTable,
+          InvitedExtensionOfficer,
+          $$InvitedExtensionOfficersTableFilterComposer,
+          $$InvitedExtensionOfficersTableOrderingComposer,
+          $$InvitedExtensionOfficersTableAnnotationComposer,
+          $$InvitedExtensionOfficersTableCreateCompanionBuilder,
+          $$InvitedExtensionOfficersTableUpdateCompanionBuilder,
+          (
+            InvitedExtensionOfficer,
+            BaseReferences<
+              _$AppDatabase,
+              $InvitedExtensionOfficersTable,
+              InvitedExtensionOfficer
+            >,
+          ),
+          InvitedExtensionOfficer,
+          PrefetchHooks Function()
+        > {
+  $$InvitedExtensionOfficersTableTableManager(
+    _$AppDatabase db,
+    $InvitedExtensionOfficersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InvitedExtensionOfficersTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$InvitedExtensionOfficersTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$InvitedExtensionOfficersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> inviteId = const Value.absent(),
+                Value<String> accessCode = const Value.absent(),
+                Value<int> officerId = const Value.absent(),
+                Value<String> firstName = const Value.absent(),
+                Value<String?> middleName = const Value.absent(),
+                Value<String> lastName = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> specialization = const Value.absent(),
+                Value<DateTime?> inviteDate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<DateTime?> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => InvitedExtensionOfficersCompanion(
+                id: id,
+                inviteId: inviteId,
+                accessCode: accessCode,
+                officerId: officerId,
+                firstName: firstName,
+                middleName: middleName,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                specialization: specialization,
+                inviteDate: inviteDate,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int inviteId,
+                required String accessCode,
+                required int officerId,
+                required String firstName,
+                Value<String?> middleName = const Value.absent(),
+                required String lastName,
+                required String email,
+                Value<String?> phone = const Value.absent(),
+                Value<String?> specialization = const Value.absent(),
+                Value<DateTime?> inviteDate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<DateTime?> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => InvitedExtensionOfficersCompanion.insert(
+                id: id,
+                inviteId: inviteId,
+                accessCode: accessCode,
+                officerId: officerId,
+                firstName: firstName,
+                middleName: middleName,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                specialization: specialization,
+                inviteDate: inviteDate,
+                status: status,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InvitedExtensionOfficersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InvitedExtensionOfficersTable,
+      InvitedExtensionOfficer,
+      $$InvitedExtensionOfficersTableFilterComposer,
+      $$InvitedExtensionOfficersTableOrderingComposer,
+      $$InvitedExtensionOfficersTableAnnotationComposer,
+      $$InvitedExtensionOfficersTableCreateCompanionBuilder,
+      $$InvitedExtensionOfficersTableUpdateCompanionBuilder,
+      (
+        InvitedExtensionOfficer,
+        BaseReferences<
+          _$AppDatabase,
+          $InvitedExtensionOfficersTable,
+          InvitedExtensionOfficer
+        >,
+      ),
+      InvitedExtensionOfficer,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -37258,4 +38600,9 @@ class $AppDatabaseManager {
       $$FarmUsersTableTableManager(_db, _db.farmUsers);
   $$NotificationEntriesTableTableManager get notificationEntries =>
       $$NotificationEntriesTableTableManager(_db, _db.notificationEntries);
+  $$InvitedExtensionOfficersTableTableManager get invitedExtensionOfficers =>
+      $$InvitedExtensionOfficersTableTableManager(
+        _db,
+        _db.invitedExtensionOfficers,
+      );
 }

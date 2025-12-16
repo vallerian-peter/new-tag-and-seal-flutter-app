@@ -38,7 +38,7 @@ class LivestockCard extends StatelessWidget {
       }
 
       final l10n = AppLocalizations.of(context)!;
-      
+
       if (years > 0) {
         if (months == 0) {
           return years == 1 ? '1 ${l10n.year}' : '$years ${l10n.years}';
@@ -56,7 +56,10 @@ class LivestockCard extends StatelessWidget {
 
   Future<String> _getSpeciesName(BuildContext context, int speciesId) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       return await provider.getSpeciesNameById(speciesId);
     } catch (e) {
       log('Error fetching species: $e');
@@ -66,7 +69,10 @@ class LivestockCard extends StatelessWidget {
 
   Future<String> _getBreedName(BuildContext context, int breedId) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       return await provider.getBreedNameById(breedId);
     } catch (e) {
       log('Error fetching breed: $e');
@@ -93,7 +99,7 @@ class LivestockCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-            child: Container(
+          child: Container(
             padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
@@ -112,217 +118,244 @@ class LivestockCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                // Header Row with Name and Gender
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            livestock.name.isNotEmpty
-                                ? livestock.name
-                                : '${l10n.livestock} #${livestock.id}',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isNotActive
-                                  ? (isDarkMode ? Colors.grey[500] : Colors.grey[600])
-                                  : (isDarkMode
-                                      ? Colors.white
-                                      : Constants.primaryColor),
-                              fontSize: 22,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                    // Header Row with Name and Gender
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                LivestockHelper.getDisplayName(
+                                      livestock,
+                                    ).isNotEmpty
+                                    ? LivestockHelper.getDisplayName(livestock)
+                                    : '${l10n.livestock} #${livestock.id}',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isNotActive
+                                      ? (isDarkMode
+                                            ? Colors.grey[500]
+                                            : Colors.grey[600])
+                                      : (isDarkMode
+                                            ? Colors.white
+                                            : Constants.primaryColor),
+                                  fontSize: 22,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    FontAwesome.seedling_solid,
+                                    size: 12,
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(isNotActive ? 0.3 : 0.5),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      farmName,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withOpacity(
+                                                  isNotActive ? 0.4 : 0.6,
+                                                ),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Row(
+                        ),
+                        // Gender Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMale
+                                ? Colors.blue.withOpacity(
+                                    isNotActive ? 0.05 : 0.1,
+                                  )
+                                : Colors.pink.withOpacity(
+                                    isNotActive ? 0.05 : 0.1,
+                                  ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isNotActive
+                                  ? (isMale
+                                        ? Colors.blue.withOpacity(0.3)
+                                        : Colors.pink.withOpacity(0.3))
+                                  : (isMale ? Colors.blue : Colors.pink),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                FontAwesome.seedling_solid,
-                                size: 12,
-                                color: theme.colorScheme.onSurface.withOpacity(
-                                  isNotActive ? 0.3 : 0.5,
+                                isMale ? Icons.male : Icons.female,
+                                color: isNotActive
+                                    ? (isMale
+                                          ? Colors.blue.withOpacity(0.5)
+                                          : Colors.pink.withOpacity(0.5))
+                                    : (isMale ? Colors.blue : Colors.pink),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                genderText,
+                                style: TextStyle(
+                                  color: isNotActive
+                                      ? (isMale
+                                            ? Colors.blue.withOpacity(0.5)
+                                            : Colors.pink.withOpacity(0.5))
+                                      : (isMale ? Colors.blue : Colors.pink),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  farmName,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface.withOpacity(
-                                      isNotActive ? 0.4 : 0.6,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Main Content Row
+                    Row(
+                      children: [
+                        // Livestock Image
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? Colors.transparent
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            image: DecorationImage(
+                              fit: BoxFit.contain,
+                              scale: 6.0,
+                              image: AssetImage(
+                                LivestockImageHelper.getPlaceholderForLivestock(
+                                  livestock,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 16),
+
+                        // Details Grid
+                        Expanded(
+                          child: Column(
+                            children: [
+                              // First Row of Details
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _DetailItem(
+                                      label: l10n.age,
+                                      value: age,
+                                      icon: Iconsax.cake_outline,
                                     ),
-                                    fontWeight: FontWeight.w500,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                  Expanded(
+                                    child: _DetailItem(
+                                      label: l10n.weight,
+                                      value:
+                                          '${livestock.weightAsOnRegistration.toStringAsFixed(0)}kg',
+                                      icon: Iconsax.weight_outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              // Second Row of Details
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: FutureBuilder<String>(
+                                      future: _getSpeciesName(
+                                        context,
+                                        livestock.speciesId,
+                                      ),
+                                      builder: (context, snapshot) {
+                                        return _DetailItem(
+                                          label: l10n.species,
+                                          value: snapshot.data ?? '---',
+                                          icon: Iconsax.pet_outline,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: FutureBuilder<String>(
+                                      future: _getBreedName(
+                                        context,
+                                        livestock.breedId,
+                                      ),
+                                      builder: (context, snapshot) {
+                                        return _DetailItem(
+                                          label: l10n.breed,
+                                          value: snapshot.data ?? '---',
+                                          icon: Icons.category_outlined,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    // Gender Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isMale
-                            ? Colors.blue.withOpacity(isNotActive ? 0.05 : 0.1)
-                            : Colors.pink.withOpacity(isNotActive ? 0.05 : 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isNotActive
-                              ? (isMale ? Colors.blue.withOpacity(0.3) : Colors.pink.withOpacity(0.3))
-                              : (isMale ? Colors.blue : Colors.pink),
-                          width: 1,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isMale ? Icons.male : Icons.female,
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Action Indicator
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          l10n.tapForMoreDetails,
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: isNotActive
-                                ? (isMale ? Colors.blue.withOpacity(0.5) : Colors.pink.withOpacity(0.5))
-                                : (isMale ? Colors.blue : Colors.pink),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            genderText,
-                            style: TextStyle(
-                              color: isNotActive
-                                  ? (isMale ? Colors.blue.withOpacity(0.5) : Colors.pink.withOpacity(0.5))
-                                  : (isMale ? Colors.blue : Colors.pink),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Main Content Row
-                Row(
-                  children: [
-                    // Livestock Image
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.transparent : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                        image: DecorationImage(
-                          fit: BoxFit.contain,
-                          scale: 6.0,
-                          image: AssetImage(
-                            LivestockImageHelper.getPlaceholderForLivestock(
-                              livestock,
-                            ),
+                                ? Colors.grey[500]
+                                : Constants.primaryColor,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: isNotActive
+                              ? Colors.grey[500]
+                              : Constants.primaryColor,
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(width: 16),
-
-                    // Details Grid
-                    Expanded(
-                      child: Column(
-                        children: [
-                          // First Row of Details
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _DetailItem(
-                                  label: l10n.age,
-                                  value: age,
-                                  icon: Iconsax.cake_outline,
-                                ),
-                              ),
-                              Expanded(
-                                child: _DetailItem(
-                                  label: l10n.weight,
-                                  value: '${livestock.weightAsOnRegistration.toStringAsFixed(0)}kg',
-                                  icon: Iconsax.weight_outline,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Second Row of Details
-                          Row(
-                            children: [
-                              Expanded(
-                                child: FutureBuilder<String>(
-                                  future: _getSpeciesName(context, livestock.speciesId),
-                                  builder: (context, snapshot) {
-                                    return _DetailItem(
-                                      label: l10n.species,
-                                      value: snapshot.data ?? '---',
-                                      icon: Iconsax.pet_outline,
-                                    );
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: FutureBuilder<String>(
-                                  future: _getBreedName(context, livestock.breedId),
-                                  builder: (context, snapshot) {
-                                    return _DetailItem(
-                                      label: l10n.breed,
-                                      value: snapshot.data ?? '---',
-                                      icon: Icons.category_outlined,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Action Indicator
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      l10n.tapForMoreDetails,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isNotActive
-                            ? Colors.grey[500]
-                            : Constants.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: isNotActive
-                          ? Colors.grey[500]
-                          : Constants.primaryColor,
-                    ),
-                  ],
-                ),
                   ],
                 ),
                 // Not Active Badge - Bottom Left
@@ -367,8 +400,8 @@ class LivestockCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-              ),
+              ],
+            ),
           ),
         ),
       ),

@@ -13,29 +13,26 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vacc
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_image_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 
 class FarmDetailsBottomSheet extends StatelessWidget {
   final Map<String, dynamic> farm;
   final VoidCallback? onRefresh;
 
-  const FarmDetailsBottomSheet({
-    super.key,
-    required this.farm,
-    this.onRefresh,
-  });
+  const FarmDetailsBottomSheet({super.key, required this.farm, this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Get actual livestock data from farm
     final livestock = farm['livestock'] as List? ?? [];
-    
+
     // Count livestock by gender
     int maleCount = 0;
     int femaleCount = 0;
-    
+
     for (var animal in livestock) {
       if (animal is Livestock) {
         final gender = animal.gender;
@@ -58,7 +55,6 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       ),
       child: Column(
         children: [
-
           // Handle bar
           Container(
             margin: const EdgeInsets.only(top: 12),
@@ -69,7 +65,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(20),
@@ -112,7 +108,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         farm['location'] ?? l10n.location,
                         style: TextStyle(
                           fontSize: 14,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
+                          ),
                         ),
                       ),
                     ],
@@ -130,15 +128,26 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                   onSelected: (action) {
                     switch (action) {
                       case _FarmAction.bulkActions:
-                        Navigator.pop(context); // Close the current bottom sheet
+                        Navigator.pop(
+                          context,
+                        ); // Close the current bottom sheet
                         _showBulkActionsSheet(context, farm);
                         break;
                       case _FarmAction.addVaccine:
-                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                        if (!RoleHelper.checkCanAddVaccine(context, l10n, authProvider)) {
+                        final authProvider = Provider.of<AuthProvider>(
+                          context,
+                          listen: false,
+                        );
+                        if (!RoleHelper.checkCanAddVaccine(
+                          context,
+                          l10n,
+                          authProvider,
+                        )) {
                           return; // Access denied, toast already shown
                         }
-                        Navigator.pop(context); // Close the current bottom sheet
+                        Navigator.pop(
+                          context,
+                        ); // Close the current bottom sheet
                         _navigateToVaccineForm(context);
                         break;
                     }
@@ -169,13 +178,12 @@ class FarmDetailsBottomSheet extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Stats
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-
                 Expanded(
                   child: _buildStatCard(
                     context: context,
@@ -187,7 +195,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 ),
 
                 const SizedBox(width: 16),
-                
+
                 Expanded(
                   child: _buildStatCardWithUnicode(
                     context: context,
@@ -199,7 +207,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 ),
 
                 const SizedBox(width: 16),
-                
+
                 Expanded(
                   child: _buildStatCardWithUnicode(
                     context: context,
@@ -209,24 +217,19 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     color: Colors.pink,
                   ),
                 ),
-                
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
 
           // Copy + FarmUuid
-          _CopyFarmUuidWidget(
-            farmUuid: farm['uuid'] as String,
-            theme: theme,
-          ),
+          _CopyFarmUuidWidget(farmUuid: farm['uuid'] as String, theme: theme),
           // Livestock List Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-
                 Text(
                   '${l10n.allLivestocksText} (${livestock.length})',
                   style: TextStyle(
@@ -237,14 +240,21 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 ),
 
                 const Spacer(),
-                
+
                 TextButton.icon(
                   onPressed: () async {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    if (!RoleHelper.checkCanCreateLivestock(context, l10n, authProvider)) {
+                    final authProvider = Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    );
+                    if (!RoleHelper.checkCanCreateLivestock(
+                      context,
+                      l10n,
+                      authProvider,
+                    )) {
                       return; // Access denied, toast already shown
                     }
-                    
+
                     Navigator.pop(context); // Close bottom sheet
                     final result = await Navigator.push(
                       context,
@@ -254,16 +264,13 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ),
                       ),
                     );
-                    
+
                     // Refresh dashboard if livestock was successfully registered
                     if (result == true && onRefresh != null) {
                       onRefresh!();
                     }
                   },
-                  icon: const Icon(
-                    Icons.add,
-                    size: 18,
-                  ),
+                  icon: const Icon(Icons.add, size: 18),
                   label: Text(
                     l10n.addLivestock,
                     style: const TextStyle(
@@ -273,15 +280,18 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: Constants.primaryColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Livestock List
           Expanded(
             child: livestock.isEmpty
@@ -292,13 +302,17 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         Icon(
                           Iconsax.pet_outline,
                           size: 48,
-                          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                          color: theme.colorScheme.outline.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           l10n.noLivestockFound,
                           style: TextStyle(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                             fontSize: 16,
                           ),
                         ),
@@ -327,27 +341,18 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     required Color color,
   }) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            height: 25,
-            child: Icon(
-              icon,
-              color: color,
-              size: 20,
-            ),
-          ),
+          SizedBox(height: 25, child: Icon(icon, color: color, size: 20)),
           const SizedBox(height: 8),
           Text(
             value,
@@ -377,15 +382,13 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     required Color color,
   }) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -431,14 +434,15 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     print(animal);
 
     // Extract animal data
-    final animalName = animal.name.isEmpty ? '---' : animal.name;
-    final animalGender = animal.gender.isEmpty ? '---': animal.gender;
-    
+    final displayName = LivestockHelper.getDisplayName(animal);
+    final animalName = displayName.isEmpty ? '---' : displayName;
+    final animalGender = animal.gender.isEmpty ? '---' : animal.gender;
+
     // Calculate age from dateOfBirth
     final birthDate = DateTime.parse(animal.dateOfBirth);
     final today = DateTime.now();
     int age = today.year - birthDate.year;
-    if (today.month < birthDate.month || 
+    if (today.month < birthDate.month ||
         (today.month == birthDate.month && today.day < birthDate.day)) {
       age--;
     }
@@ -447,7 +451,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark ? theme.colorScheme.surface.withValues(alpha: 0.1) : theme.colorScheme.secondary,
+        color: theme.brightness == Brightness.dark
+            ? theme.colorScheme.surface.withValues(alpha: 0.1)
+            : theme.colorScheme.secondary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -486,9 +492,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Animal details
           Expanded(
             child: Column(
@@ -504,7 +510,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Details in a more organized grid layout
                 Row(
                   children: [
@@ -512,20 +518,20 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     Expanded(
                       child: _buildInfoItem(
                         context: context,
-                        icon: animalGender.toLowerCase() == 'male' 
-                            ? Icons.male 
+                        icon: animalGender.toLowerCase() == 'male'
+                            ? Icons.male
                             : Icons.female,
-                        iconColor: animalGender.toLowerCase() == 'male' 
-                            ? Colors.blue 
+                        iconColor: animalGender.toLowerCase() == 'male'
+                            ? Colors.blue
                             : Colors.pink,
                         label: l10n.gender,
-                        value: animalGender.toLowerCase() == 'male' 
-                            ? l10n.male 
+                        value: animalGender.toLowerCase() == 'male'
+                            ? l10n.male
                             : l10n.female,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Age
                     Expanded(
                       child: _buildInfoItem(
@@ -539,7 +545,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Second row: Species and Breed
                 Row(
                   children: [
@@ -560,7 +566,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Breed - Using FutureBuilder to fetch breed name
                     Expanded(
                       child: FutureBuilder<String>(
@@ -586,7 +592,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       ),
     );
   }
-  
+
   // Helper widget to build info items
   Widget _buildInfoItem({
     required BuildContext context,
@@ -601,11 +607,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 14,
-              color: iconColor,
-            ),
+            Icon(icon, size: 14, color: iconColor),
             const SizedBox(width: 4),
             Text(
               label,
@@ -634,11 +636,14 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       ],
     );
   }
-  
+
   // Helper method to get species name using provider
   Future<String> _getSpeciesName(BuildContext context, int speciesId) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       final name = await provider.getSpeciesNameById(speciesId);
       print('Species lookup for ID $speciesId: $name');
       return name;
@@ -647,11 +652,14 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       return '---';
     }
   }
-  
+
   // Helper method to get breed name using provider
   Future<String> _getBreedName(BuildContext context, int breedId) async {
     try {
-      final provider = Provider.of<AdditionalDataProvider>(context, listen: false);
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       final name = await provider.getBreedNameById(breedId);
       print('Breed lookup for ID $breedId: $name');
       return name;
@@ -677,9 +685,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VaccineFormScreen(
-          farmUuid: farmUuid,
-        ),
+        builder: (context) => VaccineFormScreen(farmUuid: farmUuid),
       ),
     ).then((_) {
       // Refresh the dashboard if vaccine was successfully created
@@ -690,19 +696,13 @@ class FarmDetailsBottomSheet extends StatelessWidget {
   }
 }
 
-enum _FarmAction {
-  bulkActions,
-  addVaccine,
-}
+enum _FarmAction { bulkActions, addVaccine }
 
 class _CopyFarmUuidWidget extends StatefulWidget {
   final String farmUuid;
   final ThemeData theme;
 
-  const _CopyFarmUuidWidget({
-    required this.farmUuid,
-    required this.theme,
-  });
+  const _CopyFarmUuidWidget({required this.farmUuid, required this.theme});
 
   @override
   State<_CopyFarmUuidWidget> createState() => _CopyFarmUuidWidgetState();
@@ -746,9 +746,7 @@ class _CopyFarmUuidWidgetState extends State<_CopyFarmUuidWidget> {
             onPressed: _isCopied ? null : _handleCopy,
             icon: Icon(
               _isCopied ? Icons.check_circle : Icons.copy,
-              color: _isCopied 
-                  ? Colors.green 
-                  : Constants.primaryColor,
+              color: _isCopied ? Colors.green : Constants.primaryColor,
               size: 17,
             ),
           ),
@@ -765,4 +763,3 @@ class _CopyFarmUuidWidgetState extends State<_CopyFarmUuidWidget> {
     );
   }
 }
-

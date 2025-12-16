@@ -7,14 +7,17 @@ import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart'
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/domain/farm_user_permissions.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/extension_officer_permissions.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/models/extension_officer_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Auth Provider
-/// 
+///
 /// Manages authentication state and provides methods for UI interaction.
 /// This is the connection layer between the UI and the repository.
-/// 
+///
 /// Responsibilities:
 /// - Manage loading states
 /// - Handle errors and show dialogs
@@ -28,7 +31,7 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   AuthProvider({required AuthRepository authRepository, required repository})
-      : _authRepository = authRepository;
+    : _authRepository = authRepository;
 
   // ==========================================================================
   // State Variables
@@ -70,6 +73,39 @@ class AuthProvider extends ChangeNotifier {
   FarmerModel? _currentFarmer;
   FarmerModel? get currentFarmer => _currentFarmer;
 
+  /// Current logged in extension officer profile (typed)
+  ExtensionOfficerModel? _currentExtensionOfficer;
+  ExtensionOfficerModel? get currentExtensionOfficer =>
+      _currentExtensionOfficer;
+
+  /// Check if the current user (extension officer) has access to a given log type
+  /// Only technical event log types are allowed for extension officers.
+  /// Currently: medication, vaccination, deworming.
+  bool hasAccessToLogType(String logType) {
+    if (!isExtensionOfficer) return true; // non-extension officers unaffected
+
+    final normalized = logType.toLowerCase();
+
+    // Technical event types defined in EventLogTypes
+    final allowed = <String>{
+      EventLogTypes.medication.toLowerCase(),
+      EventLogTypes.vaccination.toLowerCase(),
+      EventLogTypes.deworming.toLowerCase(),
+    };
+
+    // Allow if the normalized logType exactly matches an allowed event type
+    if (allowed.contains(normalized)) return true;
+
+    // Also allow if logType contains known technical keywords (defensive)
+    if (normalized.contains('medic') ||
+        normalized.contains('vaccin') ||
+        normalized.contains('deworm')) {
+      return true;
+    }
+
+    return false;
+  }
+
   /// Authentication status
   bool _isAuthenticated = false;
   bool get isAuthenticated => _isAuthenticated;
@@ -79,10 +115,10 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Register a new farmer
-  /// 
+  ///
   /// Shows loading dialog, calls repository, handles success/error.
   /// Automatically navigates and shows appropriate dialogs.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await authProvider.registerFarmer(
@@ -111,32 +147,38 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       log('🔐 DEBUG: Registering farmer: $farmerData');
-      
+
       // Call repository to register farmer
       final farmer = await _authRepository.registerFarmer(farmerData);
 
       log('🔐 DEBUG: Farmer registered: $farmer');
-      
+
       // Load user data from storage (repository stores it after auto-login)
       // This is critical for role-based access control
       final storedData = await _authRepository.getStoredUserData();
-      
+
       if (storedData != null) {
         _currentUser = storedData['user'] as Map<String, dynamic>?;
         _currentProfile = storedData['profile'] as Map<String, dynamic>?;
-        log('🔐 DEBUG: Loaded user data after registration - Role: ${_currentUser?['role']}');
+        log(
+          '🔐 DEBUG: Loaded user data after registration - Role: ${_currentUser?['role']}',
+        );
       } else {
         log('⚠️ WARNING: No stored user data found after registration');
       }
-      
+
       // Verify authentication status from repository (auto-login should have set this)
       _isAuthenticated = await _authRepository.isAuthenticated();
-      log('🔐 DEBUG: Authentication status after registration: $_isAuthenticated');
-      
+      log(
+        '🔐 DEBUG: Authentication status after registration: $_isAuthenticated',
+      );
+
       if (!_isAuthenticated) {
-        log('⚠️ WARNING: User not authenticated after registration and auto-login!');
+        log(
+          '⚠️ WARNING: User not authenticated after registration and auto-login!',
+        );
       }
-      
+
       // Update state
       _currentFarmer = farmer;
       _isRegisteringFarmer = false;
@@ -144,8 +186,12 @@ class AuthProvider extends ChangeNotifier {
 
       // DO NOT close loading dialog here - let it stay open until navigation completes
       // The dialog will be closed in register_screen after navigation to HomeScreen
-      log('🔐 DEBUG: Registration and auto-login completed - keeping loading dialog open until navigation');
-      log('🔐 DEBUG: Registration flow completed, returning true - navigation will happen in register_screen');
+      log(
+        '🔐 DEBUG: Registration and auto-login completed - keeping loading dialog open until navigation',
+      );
+      log(
+        '🔐 DEBUG: Registration flow completed, returning true - navigation will happen in register_screen',
+      );
       return true;
     } catch (e) {
       // Update error state
@@ -160,7 +206,7 @@ class AuthProvider extends ChangeNotifier {
       if (context.mounted) {
         final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
         final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-        
+
         await AlertDialogs.showError(
           context: context,
           title: errorTitle,
@@ -178,10 +224,10 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Login user with username and password
-  /// 
+  ///
   /// Shows loading dialog, calls repository, handles success/error.
   /// Stores user data, profile, and token in secure storage on success.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await authProvider.login(
@@ -231,12 +277,14 @@ class AuthProvider extends ChangeNotifier {
 
       // Extract roleTitle/jobTitle from profile for farm users
       String? roleTitle;
-      if (profile != null && user != null && user['role'] == 'farmInvitedUser') {
+      if (profile != null &&
+          user != null &&
+          user['role'] == 'farmInvitedUser') {
         roleTitle = (profile as Map<String, dynamic>?)?['roleTitle'] as String?;
       }
 
       // Store all data in secure storage (using camelCase keys)
-      if (user != null) {
+        if (user != null) {
         await _authRepository.storeUserData(
           userId: user['id']?.toString() ?? '',
           username: user['username'] ?? '',
@@ -251,7 +299,8 @@ class AuthProvider extends ChangeNotifier {
           gender: user['gender'] ?? '',
           accessToken: accessToken ?? '',
           tokenType: tokenType ?? 'Bearer',
-          password: user['password'] ?? user['email'] ?? '',
+          // Store the actual password used for login (parameter `password`)
+          password: password,
           profile: profile,
           roleTitle: roleTitle ?? '',
         );
@@ -264,6 +313,19 @@ class AuthProvider extends ChangeNotifier {
       // Load farmer data if user is a farmer
       if (_currentUser?['role'] == 'farmer') {
         _currentFarmer = await _authRepository.getCurrentFarmer();
+      } else if (isExtensionOfficer) {
+        _currentExtensionOfficer = await _authRepository
+            .getCurrentExtensionOfficer();
+        // Persist typed model for quick offline access
+        if (_currentExtensionOfficer != null) {
+          try {
+            await _authRepository.storeExtensionOfficerModel(
+              _currentExtensionOfficer!,
+            );
+          } catch (e) {
+            log('⚠️ Failed to cache extension officer model: $e');
+          }
+        }
       }
 
       notifyListeners();
@@ -285,7 +347,7 @@ class AuthProvider extends ChangeNotifier {
       if (context.mounted) {
         final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
         final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-        
+
         await AlertDialogs.showError(
           context: context,
           title: errorTitle,
@@ -303,10 +365,10 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Silent login without showing dialogs
-  /// 
+  ///
   /// Used for auto-login flows where we don't want to show error dialogs.
   /// Returns true on success, false on failure.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await authProvider.silentLogin(
@@ -338,7 +400,9 @@ class AuthProvider extends ChangeNotifier {
 
       // Extract roleTitle/jobTitle from profile for farm users
       String? roleTitle;
-      if (profile != null && user != null && user['role'] == 'farmInvitedUser') {
+      if (profile != null &&
+          user != null &&
+          user['role'] == 'farmInvitedUser') {
         roleTitle = (profile as Map<String, dynamic>?)?['roleTitle'] as String?;
       }
 
@@ -367,6 +431,17 @@ class AuthProvider extends ChangeNotifier {
       // Load farmer data if user is a farmer
       if (_currentUser?['role'] == 'farmer') {
         _currentFarmer = await _authRepository.getCurrentFarmer();
+      } else if (isExtensionOfficer) {
+        _currentExtensionOfficer = await _authRepository
+            .getCurrentExtensionOfficer();
+        // cache typed model
+        if (_currentExtensionOfficer != null) {
+          try {
+            await _authRepository.storeExtensionOfficerModel(
+              _currentExtensionOfficer!,
+            );
+          } catch (_) {}
+        }
       }
 
       notifyListeners();
@@ -385,9 +460,9 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Logout current user
-  /// 
+  ///
   /// Shows loading, clears all data, updates state.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await authProvider.logout(context);
@@ -439,10 +514,10 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Check if user is currently authenticated
-  /// 
+  ///
   /// Checks both repository and updates local state.
   /// Call this on app startup.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await authProvider.checkAuthStatus();
@@ -461,7 +536,7 @@ class AuthProvider extends ChangeNotifier {
       if (_isAuthenticated) {
         // Get stored user data including profile
         final storedData = await _authRepository.getStoredUserData();
-        
+
         if (storedData != null) {
           _currentUser = storedData['user'] as Map<String, dynamic>?;
           _currentProfile = storedData['profile'] as Map<String, dynamic>?;
@@ -469,7 +544,7 @@ class AuthProvider extends ChangeNotifier {
           // Fallback to getCurrentUser if getStoredUserData fails
           _currentUser = await _authRepository.getCurrentUser();
         }
-        
+
         // Load farmer data if user is a farmer
         if (_currentUser?['role'] == 'farmer') {
           _currentFarmer = await _authRepository.getCurrentFarmer();
@@ -491,11 +566,11 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Attempt automatic login using saved credentials
-  /// 
+  ///
   /// Retrieves stored user data from secure storage without making API calls.
   /// Returns true if auto-login was successful.
   /// Call this on app startup if user is not authenticated.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final autoLoginSuccess = await authProvider.tryAutoLogin();
@@ -510,7 +585,7 @@ class AuthProvider extends ChangeNotifier {
       // Check if user is already authenticated
       final isAuthenticated = await _authRepository.isAuthenticated();
       log('🔐 DEBUG: Is authenticated: $isAuthenticated');
-      
+
       if (!isAuthenticated) {
         return false;
       }
@@ -518,7 +593,7 @@ class AuthProvider extends ChangeNotifier {
       // Get stored user data from secure storage
       final storedData = await _authRepository.getStoredUserData();
       log('🔐 DEBUG: Stored data: $storedData');
-      
+
       if (storedData == null) {
         return false;
       }
@@ -536,6 +611,23 @@ class AuthProvider extends ChangeNotifier {
         _currentFarmer = await _authRepository.getCurrentFarmer();
       }
 
+      // If extension officer, attempt to load and cache typed model
+      if (isExtensionOfficer) {
+        _currentExtensionOfficer = await _authRepository
+            .getCurrentExtensionOfficer();
+        if (_currentExtensionOfficer != null) {
+          try {
+            await _authRepository.storeExtensionOfficerModel(
+              _currentExtensionOfficer!,
+            );
+          } catch (e) {
+            log(
+              '⚠️ Failed to cache extension officer model during auto-login: $e',
+            );
+          }
+        }
+      }
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -549,7 +641,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Check if saved credentials exist
-  /// 
+  ///
   /// Returns true if username and password are stored securely.
   /// Useful for showing "remember me" or auto-login status.
   Future<bool> hasSavedCredentials() async {
@@ -566,7 +658,7 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Clear error message
-  /// 
+  ///
   /// Call this when user dismisses error or before new operation.
   void clearError() {
     _errorMessage = null;
@@ -578,7 +670,7 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Get current user's role
-  /// 
+  ///
   /// Returns null if no user is logged in.
   String? get userRole => _currentUser?['role'] as String?;
 
@@ -588,10 +680,32 @@ class AuthProvider extends ChangeNotifier {
   /// Check if current user is a farm invited user (farm user)
   bool get isFarmUser => userRole == 'farmInvitedUser';
 
+  /// Check if current user is an extension officer
+  bool get isExtensionOfficer =>
+      userRole == 'extension_officer' || userRole == 'extensionOfficer';
+
   /// Resolve farm user permissions based on current profile.roleTitle
   FarmUserPermissions? get farmUserPermissions {
-    if (!isFarmUser) return null;
+    if (!isFarmUser && !isExtensionOfficer) return null;
     final profile = _currentProfile;
+
+    // For Extension Officer, return a specialized permissions object that
+    // allows creating/viewing technical logs only (medication, vaccination, etc.)
+    if (isExtensionOfficer) {
+      // Lazily import resolver
+      try {
+        // Avoid circular imports by referencing resolver here
+        return resolveExtensionOfficerPermissions();
+      } catch (_) {
+        return const FarmUserPermissions(
+          scope: FarmUserAccessScope.logsOnly,
+          canManageLivestock: false,
+          canCreateLogs: true,
+          canViewLogs: true,
+        );
+      }
+    }
+
     final roleTitle = profile?['roleTitle'] as String?;
     if (roleTitle == null || roleTitle.trim().isEmpty) return null;
     return resolveFarmUserPermissions(roleTitle);
@@ -601,10 +715,19 @@ class AuthProvider extends ChangeNotifier {
   // Change Password
   // ==========================================================================
 
+  /// Store extension officer access number in secure storage
+  Future<void> storeExtensionOfficerAccessNumber(String accessNumber) async {
+    try {
+      await _authRepository.storeExtensionOfficerAccessNumber(accessNumber);
+    } catch (e) {
+      log('⚠️ Failed to store extension officer access number: $e');
+    }
+  }
+
   /// Change user password
-  /// 
+  ///
   /// Checks network connectivity, shows loading dialog, calls repository, handles success/error.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await authProvider.changePassword(
@@ -681,7 +804,7 @@ class AuthProvider extends ChangeNotifier {
       if (context.mounted) {
         final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
         final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-        
+
         await AlertDialogs.showError(
           context: context,
           title: errorTitle,
@@ -699,10 +822,10 @@ class AuthProvider extends ChangeNotifier {
   // ==========================================================================
 
   /// Update user profile
-  /// 
+  ///
   /// Checks network connectivity, shows loading dialog, calls repository, handles success/error.
   /// Updates local stored data on success.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final profileData = {
@@ -711,7 +834,7 @@ class AuthProvider extends ChangeNotifier {
   ///   'phone1': '+255712345678',
   ///   // ... other fields
   /// };
-  /// 
+  ///
   /// final success = await authProvider.updateProfile(
   ///   context: context,
   ///   profileData: profileData,
@@ -768,13 +891,15 @@ class AuthProvider extends ChangeNotifier {
         if (storedData != null) {
           _currentUser = storedData['user'] as Map<String, dynamic>?;
           _currentProfile = storedData['profile'] as Map<String, dynamic>?;
-          
+
           // Update farmer data if user is a farmer
           if (_currentUser?['role'] == 'farmer') {
             _currentFarmer = await _authRepository.getCurrentFarmer();
           }
-          
-          log('✅ Provider state refreshed from secure storage after profile update');
+
+          log(
+            '✅ Provider state refreshed from secure storage after profile update',
+          );
         }
       }
 
@@ -799,7 +924,7 @@ class AuthProvider extends ChangeNotifier {
       if (context.mounted) {
         final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
         final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-        
+
         await AlertDialogs.showError(
           context: context,
           title: errorTitle,
@@ -812,4 +937,3 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 }
-

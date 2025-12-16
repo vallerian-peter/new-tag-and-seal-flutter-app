@@ -178,7 +178,9 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
               .toList();
         } else {
           selectedBulkLivestock = selectedBulkLivestock
-              .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
+              .where(
+                (item) => livestock.any((animal) => animal.uuid == item.uuid),
+              )
               .toList();
         }
       }
@@ -216,7 +218,9 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (!_isBulk && _selectedLivestockUuid == null && livestock.isNotEmpty) {
+        if (!_isBulk &&
+            _selectedLivestockUuid == null &&
+            livestock.isNotEmpty) {
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
@@ -232,10 +236,7 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.farmRequired,
-      );
+      ToastAlerts.showError(context, message: l10n.farmRequired);
       return;
     }
 
@@ -259,20 +260,14 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ToastAlerts.showError(
-          context,
-          message: l10n.livestockRequired,
-        );
+        ToastAlerts.showError(context, message: l10n.livestockRequired);
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.livestockRequired,
-      );
+      ToastAlerts.showError(context, message: l10n.livestockRequired);
       return false;
     }
 
@@ -643,6 +638,12 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
         hintText: effectiveLabel,
         prefixIcon: Icons.analytics_outlined,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return '$label required';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -650,10 +651,8 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
   List<DropdownItem<String>> _buildAmountUnitItems() {
     return _amountUnits
         .map(
-          (unit) => DropdownItem<String>(
-            value: unit,
-            label: unit.toUpperCase(),
-          ),
+          (unit) =>
+              DropdownItem<String>(value: unit, label: unit.toUpperCase()),
         )
         .toList();
   }
@@ -668,11 +667,11 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
 
     final parts = value.split(',');
     final primary = parts.first.trim();
-    final secondary =
-        parts.length > 1 ? parts.last.trim().toLowerCase() : null;
+    final secondary = parts.length > 1 ? parts.last.trim().toLowerCase() : null;
 
-    final match =
-        RegExp(r'^([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z]+)?$').firstMatch(primary);
+    final match = RegExp(
+      r'^([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z]+)?$',
+    ).firstMatch(primary);
 
     String resolvedAmount = primary;
     String? primaryUnit;
@@ -820,25 +819,20 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     final livestockUuids = _isBulk
         ? _selectedBulkLivestock.map((livestock) => livestock.uuid).toList()
         : [
-            if (widget.livestockUuid != null && widget.livestockUuid!.isNotEmpty)
+            if (widget.livestockUuid != null &&
+                widget.livestockUuid!.isNotEmpty)
               widget.livestockUuid!
             else if (_selectedLivestockUuid != null &&
                 _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
+              _selectedLivestockUuid!,
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.farmRequired,
-      );
+      ToastAlerts.showError(context, message: l10n.farmRequired);
       return;
     }
     if (livestockUuids.isEmpty) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.livestockRequired,
-      );
+      ToastAlerts.showError(context, message: l10n.livestockRequired);
       return;
     }
 
@@ -849,8 +843,9 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     final solid = _solidController.text.trim();
     final solidNonFat = _solidNonFatController.text.trim();
     final protein = _proteinController.text.trim();
-    final correctedLactometerReading =
-        _correctedLactometerReadingController.text.trim();
+    final correctedLactometerReading = _correctedLactometerReadingController
+        .text
+        .trim();
     final totalSolids = _totalSolidsController.text.trim();
     final colonyFormingUnits = _colonyFormingUnitsController.text.trim();
     final acidityText = _acidityController.text.trim();

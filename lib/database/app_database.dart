@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p; 
+import 'package:path/path.dart' as p;
 // Import all table definitions
 import '../features/all.additional.data/data/local/tables/country_table.dart';
 import '../features/all.additional.data/data/local/tables/region_table.dart';
@@ -54,6 +54,7 @@ import '../features/all.logs.additional.data/data/local/tables/reproductive_prob
 import '../features/vaccines/data/tables/vaccine_type_table.dart';
 import '../features/notifications/data/tables/notification_table.dart';
 import '../features/farmUser/data/tables/farm_user_table.dart';
+import '../features/extensionOfficer/data/tables/invited_extension_officer_table.dart';
 
 // Import DAOs
 import 'daos/location_dao.dart';
@@ -71,6 +72,7 @@ import 'daos/vaccine_dao.dart';
 import 'daos/vaccine_type_dao.dart';
 import '../features/notifications/data/dao/notification_dao.dart';
 import 'daos/farm_user_dao.dart';
+import '../features/extensionOfficer/data/dao/extension_officer_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -128,6 +130,7 @@ part 'app_database.g.dart';
     Vaccines,
     FarmUsers,
     NotificationEntries,
+    InvitedExtensionOfficers,
   ],
   daos: [
     LocationDao,
@@ -139,13 +142,14 @@ part 'app_database.g.dart';
     VaccineTypeDao,
     NotificationDao,
     FarmUserDao,
+    ExtensionOfficerDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 21; // v21 removes UNIQUE constraints from nullable tag columns (rfidTagId, barcodeTagId)
+  int get schemaVersion => 23; // v23 Added sync columns to InvitedExtensionOfficers
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -243,10 +247,12 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 16) {
         // Version 16: Add livestockTypeId to species (if not already present)
-        final speciesInfo =
-            await customSelect('PRAGMA table_info(species)').get();
-        final hasLivestockTypeId =
-            speciesInfo.any((row) => row.data['name'] == 'livestockTypeId');
+        final speciesInfo = await customSelect(
+          'PRAGMA table_info(species)',
+        ).get();
+        final hasLivestockTypeId = speciesInfo.any(
+          (row) => row.data['name'] == 'livestockTypeId',
+        );
         if (!hasLivestockTypeId) {
           await m.addColumn(species, species.livestockTypeId);
         }
@@ -275,11 +281,19 @@ class AppDatabase extends _$AppDatabase {
         // This allows multiple NULL values and handles uniqueness at application level
         await _removeTagUniqueConstraints(m);
       }
+      if (from < 22) {
+        // Version 22: Added InvitedExtensionOfficers table
+        await _createTableIfMissing(m, invitedExtensionOfficers);
+      }
+      if (from < 23) {
+        // Version 23: Add sync/audit columns to InvitedExtensionOfficers
+        await _migrateInvitedExtensionOfficersColumns(m);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
       await customStatement('PRAGMA foreign_keys = ON');
-      
+
       // Safety check: Ensure vaccine_uuid column exists in vaccinations table
       // This handles cases where migration might not have run or failed
       try {
@@ -290,14 +304,20 @@ class AppDatabase extends _$AppDatabase {
             const Variable<String>('vaccinations'),
           ],
         ).get();
-        
+
         if (vaccinationsExists.isNotEmpty) {
-          final tableInfo = await customSelect('PRAGMA table_info(vaccinations)').get();
-          final hasVaccineUuid = tableInfo.any((row) => row.data['name'] == 'vaccine_uuid');
-          
+          final tableInfo = await customSelect(
+            'PRAGMA table_info(vaccinations)',
+          ).get();
+          final hasVaccineUuid = tableInfo.any(
+            (row) => row.data['name'] == 'vaccine_uuid',
+          );
+
           if (!hasVaccineUuid) {
             // Column missing - add it
-            await customStatement('ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT');
+            await customStatement(
+              'ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT',
+            );
           }
         }
       } catch (e) {
@@ -314,19 +334,29 @@ class AppDatabase extends _$AppDatabase {
             const Variable<String>('livestocks'),
           ],
         ).get();
-        
+
         if (livestocksExists.isNotEmpty) {
-          final tableInfo = await customSelect('PRAGMA table_info(livestocks)').get();
-          final hasPrimaryColor = tableInfo.any((row) => row.data['name'] == 'primary_color');
-          final hasSecondaryColor = tableInfo.any((row) => row.data['name'] == 'secondary_color');
-          
+          final tableInfo = await customSelect(
+            'PRAGMA table_info(livestocks)',
+          ).get();
+          final hasPrimaryColor = tableInfo.any(
+            (row) => row.data['name'] == 'primary_color',
+          );
+          final hasSecondaryColor = tableInfo.any(
+            (row) => row.data['name'] == 'secondary_color',
+          );
+
           if (!hasPrimaryColor) {
             // Column missing - add it
-            await customStatement('ALTER TABLE livestocks ADD COLUMN primary_color TEXT');
+            await customStatement(
+              'ALTER TABLE livestocks ADD COLUMN primary_color TEXT',
+            );
           }
           if (!hasSecondaryColor) {
             // Column missing - add it
-            await customStatement('ALTER TABLE livestocks ADD COLUMN secondary_color TEXT');
+            await customStatement(
+              'ALTER TABLE livestocks ADD COLUMN secondary_color TEXT',
+            );
           }
         }
       } catch (e) {
@@ -336,24 +366,26 @@ class AppDatabase extends _$AppDatabase {
   );
 
   // ==================== DAO GETTERS ====================
-  
+
   /// Access location-related data (Country, Region, District, etc.)
   @override
   late final LocationDao locationDao = LocationDao(this);
-  
+
   /// Access reference/lookup data (SchoolLevel, IdentityCardType, LegalStatus)
   @override
   late final ReferenceDataDao referenceDataDao = ReferenceDataDao(this);
 
   /// Access livestock management operations (livestock, farms, species, breeds, etc.)
   @override
-  late final LivestockManagementDao livestockManagementDao = LivestockManagementDao(this);
+  late final LivestockManagementDao livestockManagementDao =
+      LivestockManagementDao(this);
 
   // Individual DAOs for direct access
   late final SpecieDao specieDao = SpecieDao(this);
   late final LivestockTypeDao livestockTypeDao = LivestockTypeDao(this);
   late final BreedDao breedDao = BreedDao(this);
-  late final LivestockObtainedMethodDao livestockObtainedMethodDao = LivestockObtainedMethodDao(this);
+  late final LivestockObtainedMethodDao livestockObtainedMethodDao =
+      LivestockObtainedMethodDao(this);
   late final FarmDao farmDao = FarmDao(this);
   late final LivestockDao livestockDao = LivestockDao(this);
   late final EventDao eventDao = EventDao(this);
@@ -361,6 +393,9 @@ class AppDatabase extends _$AppDatabase {
   late final VaccineDao vaccineDao = VaccineDao(this);
   late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(this);
   late final NotificationDao notificationDao = NotificationDao(this);
+  late final ExtensionOfficerDao extensionOfficerDao = ExtensionOfficerDao(
+    this,
+  );
 
   // ==================== UTILITY METHODS ====================
 
@@ -384,14 +419,14 @@ class AppDatabase extends _$AppDatabase {
     return countries.isEmpty;
   }
 
-  Future<void> _createTableIfMissing(Migrator migrator, TableInfo<Table, Object?> table) async {
+  Future<void> _createTableIfMissing(
+    Migrator migrator,
+    TableInfo<Table, Object?> table,
+  ) async {
     final tableName = table.actualTableName;
     final result = await customSelect(
       'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
-      variables: [
-        const Variable<String>('table'),
-        Variable<String>(tableName),
-      ],
+      variables: [const Variable<String>('table'), Variable<String>(tableName)],
     ).get();
 
     if (result.isEmpty) {
@@ -538,11 +573,15 @@ class AppDatabase extends _$AppDatabase {
     if (calvingTypesExists.isNotEmpty) {
       // Rename calving_types to birth_types
       await customStatement('ALTER TABLE calving_types RENAME TO birth_types');
-      
+
       // Add livestockTypeId column if it doesn't exist
-      final birthTypesInfo = await customSelect('PRAGMA table_info(birth_types)').get();
-      final hasLivestockTypeId = birthTypesInfo.any((row) => row.data['name'] == 'livestockTypeId');
-      
+      final birthTypesInfo = await customSelect(
+        'PRAGMA table_info(birth_types)',
+      ).get();
+      final hasLivestockTypeId = birthTypesInfo.any(
+        (row) => row.data['name'] == 'livestockTypeId',
+      );
+
       if (!hasLivestockTypeId) {
         await m.addColumn(birthTypes, birthTypes.livestockTypeId);
       }
@@ -562,12 +601,18 @@ class AppDatabase extends _$AppDatabase {
 
     if (calvingProblemsExists.isNotEmpty) {
       // Rename calving_problems to birth_problems
-      await customStatement('ALTER TABLE calving_problems RENAME TO birth_problems');
-      
+      await customStatement(
+        'ALTER TABLE calving_problems RENAME TO birth_problems',
+      );
+
       // Add livestockTypeId column if it doesn't exist
-      final birthProblemsInfo = await customSelect('PRAGMA table_info(birth_problems)').get();
-      final hasLivestockTypeId = birthProblemsInfo.any((row) => row.data['name'] == 'livestockTypeId');
-      
+      final birthProblemsInfo = await customSelect(
+        'PRAGMA table_info(birth_problems)',
+      ).get();
+      final hasLivestockTypeId = birthProblemsInfo.any(
+        (row) => row.data['name'] == 'livestockTypeId',
+      );
+
       if (!hasLivestockTypeId) {
         await m.addColumn(birthProblems, birthProblems.livestockTypeId);
       }
@@ -599,19 +644,27 @@ class AppDatabase extends _$AppDatabase {
       }
 
       // Check if vaccine_uuid column already exists (Drift uses snake_case in SQLite)
-      final tableInfo = await customSelect('PRAGMA table_info(vaccinations)').get();
-      final hasVaccineUuid = tableInfo.any((row) => row.data['name'] == 'vaccine_uuid');
-      
+      final tableInfo = await customSelect(
+        'PRAGMA table_info(vaccinations)',
+      ).get();
+      final hasVaccineUuid = tableInfo.any(
+        (row) => row.data['name'] == 'vaccine_uuid',
+      );
+
       if (hasVaccineUuid) {
         // Migration already done
         return;
       }
 
       // Add vaccine_uuid column (Drift converts camelCase to snake_case)
-      await customStatement('ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT');
+      await customStatement(
+        'ALTER TABLE vaccinations ADD COLUMN vaccine_uuid TEXT',
+      );
 
       // If vaccine_id exists, copy its values to vaccine_uuid by looking up UUIDs
-      final hasVaccineId = tableInfo.any((row) => row.data['name'] == 'vaccine_id');
+      final hasVaccineId = tableInfo.any(
+        (row) => row.data['name'] == 'vaccine_id',
+      );
       if (hasVaccineId) {
         await customStatement('''
           UPDATE vaccinations 
@@ -649,9 +702,15 @@ class AppDatabase extends _$AppDatabase {
       }
 
       // Check if columns already exist (Drift uses snake_case in SQLite)
-      final tableInfo = await customSelect('PRAGMA table_info(livestocks)').get();
-      final hasPrimaryColor = tableInfo.any((row) => row.data['name'] == 'primary_color');
-      final hasSecondaryColor = tableInfo.any((row) => row.data['name'] == 'secondary_color');
+      final tableInfo = await customSelect(
+        'PRAGMA table_info(livestocks)',
+      ).get();
+      final hasPrimaryColor = tableInfo.any(
+        (row) => row.data['name'] == 'primary_color',
+      );
+      final hasSecondaryColor = tableInfo.any(
+        (row) => row.data['name'] == 'secondary_color',
+      );
 
       // Add primary_color column if it doesn't exist
       if (!hasPrimaryColor) {
@@ -726,7 +785,59 @@ class AppDatabase extends _$AppDatabase {
       log('✅ Successfully removed UNIQUE constraints from tag columns');
     } catch (e) {
       // Re-throw with context
-      throw Exception('Failed to remove UNIQUE constraints from tag columns: $e');
+      throw Exception(
+        'Failed to remove UNIQUE constraints from tag columns: $e',
+      );
+    }
+  }
+
+  /// Migration to version 23: Add sync and audit columns to InvitedExtensionOfficers
+  Future<void> _migrateInvitedExtensionOfficersColumns(Migrator m) async {
+    // Check if table exists
+    final tableExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('invited_extension_officers'),
+      ],
+    ).get();
+
+    if (tableExists.isEmpty) {
+      // Logic in v22 block creates it with current columns, so we don't need to do anything if it's new
+      return;
+    }
+
+    // Check existing columns to avoid errors
+    final tableInfo = await customSelect(
+      'PRAGMA table_info(invited_extension_officers)',
+    ).get();
+
+    bool hasColumn(String name) =>
+        tableInfo.any((row) => row.data['name'] == name);
+
+    if (!hasColumn('synced')) {
+      await m.addColumn(
+        invitedExtensionOfficers,
+        invitedExtensionOfficers.synced,
+      );
+    }
+    if (!hasColumn('sync_action')) {
+      await m.addColumn(
+        invitedExtensionOfficers,
+        invitedExtensionOfficers.syncAction,
+      );
+    }
+    if (!hasColumn('created_at')) {
+      await m.addColumn(
+        invitedExtensionOfficers,
+        invitedExtensionOfficers.createdAt,
+      );
+    }
+    if (!hasColumn('updated_at')) {
+      await m.addColumn(
+        invitedExtensionOfficers,
+        invitedExtensionOfficers.updatedAt,
+      );
     }
   }
 }

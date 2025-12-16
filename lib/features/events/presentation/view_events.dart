@@ -44,6 +44,9 @@ class ViewEventsScreen extends StatelessWidget {
     this.initialLogs,
   });
 
+  bool get _isContextSpecific =>
+      livestockUuid != null && livestockUuid!.isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -68,8 +71,8 @@ class ViewEventsScreen extends StatelessWidget {
 
     // Use the title directly (already includes "Calving" or "Farrowing" from livestock details modal)
     // Add "Records" only if title is empty
-    final displayTitle = title.trim().isNotEmpty 
-        ? title.trim() 
+    final displayTitle = title.trim().isNotEmpty
+        ? title.trim()
         : l10n.recordsText;
 
     return FutureBuilder<Map<String, dynamic>>(
@@ -97,18 +100,15 @@ class ViewEventsScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: chips,
-                        ),
+                        child: Wrap(spacing: 8, runSpacing: 4, children: chips),
                       ),
                     ),
                   ),
           );
         }
 
-        if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData ||
+            snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             appBar: buildAppBar(null),
             body: const Center(
@@ -132,16 +132,15 @@ class ViewEventsScreen extends StatelessWidget {
         final data = snapshot.data!;
         final logs = data['logs'] as List<dynamic>;
         final vaccineNamesMap = data['vaccineNames'] as Map<String, String>;
+        final farmNamesMap = data['farmNames'] as Map<String, String>;
+        final livestockNamesMap = data['livestockNames'] as Map<String, String>;
         final totalLogs = logs.length;
 
         if (logs.isEmpty) {
           return Scaffold(
             appBar: buildAppBar(0),
             body: Center(
-              child: Text(
-                l10n.noData,
-                style: theme.textTheme.bodyMedium,
-              ),
+              child: Text(l10n.noData, style: theme.textTheme.bodyMedium),
             ),
           );
         }
@@ -165,6 +164,9 @@ class ViewEventsScreen extends StatelessWidget {
                   log: log,
                   references: logReferences,
                   vaccineNames: vaccineNamesMap,
+                  farmName: farmNamesMap[log.farmUuid],
+                  livestockName: livestockNamesMap[log.livestockUuid],
+                  showContextRows: !_isContextSpecific,
                 ),
               );
             },
@@ -174,9 +176,13 @@ class ViewEventsScreen extends StatelessWidget {
     );
   }
 
-  Future<Map<String, dynamic>> _loadLogsWithReferences(BuildContext context) async {
-    final logReferences =
-        Provider.of<LogAdditionalDataProvider>(context, listen: false);
+  Future<Map<String, dynamic>> _loadLogsWithReferences(
+    BuildContext context,
+  ) async {
+    final logReferences = Provider.of<LogAdditionalDataProvider>(
+      context,
+      listen: false,
+    );
     await logReferences.ensureLoaded();
 
     // Load vaccines for name resolution
@@ -203,26 +209,91 @@ class ViewEventsScreen extends StatelessWidget {
       );
     }
 
+    // Resolve Farm and Livestock names for each log
+    final farmNamesMap = <String, String>{};
+    final livestockNamesMap = <String, String>{};
+
+    for (var log in logs) {
+      // Check for farmUuid
+      if (log.farmUuid != null &&
+          log.farmUuid!.isNotEmpty &&
+          !farmNamesMap.containsKey(log.farmUuid)) {
+        final farm = await database.farmDao.getFarmByUuid(log.farmUuid!);
+        if (farm != null) {
+          farmNamesMap[log.farmUuid!] = farm.name;
+        }
+      }
+
+      // Check for livestockUuid
+      if (log.livestockUuid != null &&
+          log.livestockUuid.isNotEmpty &&
+          !livestockNamesMap.containsKey(log.livestockUuid)) {
+        final livestock = await database.livestockDao.getLivestockByUuid(
+          log.livestockUuid,
+        );
+        if (livestock != null) {
+          // Use LivestockHelper if imported, otherwise just name.
+          // Since we can't easily import LivestockHelper here due to context,
+          // we'll format it manually or rely on a simple string.
+          // Better: Import LivestockHelper at top if possible.
+          // Assuming LivestockHelper is available or we duplicate logic for now.
+          // Since I can't see the imports, I will assume basic name for now,
+          // OR I can try to import LivestockHelper in the next step if missing.
+          // Note: The user requested "name-<...ids??>", so I should try to mimic that.
+
+          String displayName = livestock.name;
+          String? id = livestock.dummyTagId;
+          if (id == null ||
+              id.trim().isEmpty ||
+              id.trim().toLowerCase() == 'null') {
+            id = livestock.rfidTagId;
+          }
+          if (id == null ||
+              id.trim().isEmpty ||
+              id.trim().toLowerCase() == 'null') {
+            id = livestock.barcodeTagId;
+          }
+          if (id == null ||
+              id.trim().isEmpty ||
+              id.trim().toLowerCase() == 'null') {
+            id = livestock.identificationNumber;
+          }
+          if (id != null &&
+              id.trim().isNotEmpty &&
+              id.trim().toLowerCase() != 'null') {
+            displayName = '${livestock.name}-${id.trim()}';
+          }
+          livestockNamesMap[log.livestockUuid] = displayName;
+        }
+      }
+    }
+
     return {
       'logs': logs,
       'vaccineNames': vaccineNamesMap,
+      'farmNames': farmNamesMap,
+      'livestockNames': livestockNamesMap,
     };
   }
-
 }
-
 
 class _EventLogCard extends StatelessWidget {
   final String logType;
   final dynamic log;
   final LogAdditionalDataProvider? references;
   final Map<String, String>? vaccineNames; // Cache of vaccine UUID -> name
+  final String? farmName;
+  final String? livestockName;
+  final bool showContextRows; // Controls whether to show Farm/Livestock rows
 
   const _EventLogCard({
     required this.logType,
     required this.log,
     this.references,
     this.vaccineNames,
+    this.farmName,
+    this.livestockName,
+    this.showContextRows = true,
   });
 
   @override
@@ -234,6 +305,17 @@ class _EventLogCard extends StatelessWidget {
     String title = l10n.comingSoon;
     final rows = <_LogRow>[];
     DateTime? createdDate;
+
+    // Add Farm and Livestock rows if available AND showContextRows is true
+    // This is true when viewing "All Events" and false when viewing events for a specific livestock
+    if (showContextRows) {
+      if (farmName != null && farmName!.isNotEmpty) {
+        rows.add(_LogRow(label: l10n.farm, value: farmName!));
+      }
+      if (livestockName != null && livestockName!.isNotEmpty) {
+        rows.add(_LogRow(label: l10n.livestock, value: livestockName!));
+      }
+    }
 
     void addRow(String label, String? value) {
       if (value == null) return;
@@ -279,14 +361,12 @@ class _EventLogCard extends StatelessWidget {
         icon = Icons.bug_report;
         title = l10n.deworming;
         final medicineName = _resolveMedicineName(deworming.medicineId);
-        final routeName =
-            _resolveAdministrationRouteName(deworming.administrationRouteId);
+        final routeName = _resolveAdministrationRouteName(
+          deworming.administrationRouteId,
+        );
 
         addRow(l10n.medicine, medicineName);
-        addRow(
-          l10n.administrationRoute,
-          routeName,
-        );
+        addRow(l10n.administrationRoute, routeName);
         addRow(l10n.quantity, deworming.quantity);
         addRow(l10n.dose, deworming.dose);
         if (deworming.vetId != null && deworming.vetId!.trim().isNotEmpty) {
@@ -294,10 +374,7 @@ class _EventLogCard extends StatelessWidget {
         }
         if (deworming.extensionOfficerId != null &&
             deworming.extensionOfficerId!.trim().isNotEmpty) {
-          addRow(
-            l10n.extensionOfficerLicense,
-            deworming.extensionOfficerId,
-          );
+          addRow(l10n.extensionOfficerLicense, deworming.extensionOfficerId);
         }
         if (deworming.nextAdministrationDate != null) {
           final nextDate = DateTime.tryParse(deworming.nextAdministrationDate!);
@@ -320,8 +397,8 @@ class _EventLogCard extends StatelessWidget {
         if (startDate != null) {
           addRow(l10n.startDate, dateFormat.format(startDate.toLocal()));
         }
-        final endDate = birthEvent.endDate != null 
-            ? DateTime.tryParse(birthEvent.endDate!) 
+        final endDate = birthEvent.endDate != null
+            ? DateTime.tryParse(birthEvent.endDate!)
             : null;
         if (endDate != null) {
           addRow(l10n.endDate, dateFormat.format(endDate.toLocal()));
@@ -338,9 +415,13 @@ class _EventLogCard extends StatelessWidget {
         }
         // Always show reproductive problem if ID exists (even if lookup fails, show ID)
         if (birthEvent.reproductiveProblemId != null) {
-          final reproductiveProblemName = _resolveReproductiveProblemName(birthEvent.reproductiveProblemId!);
+          final reproductiveProblemName = _resolveReproductiveProblemName(
+            birthEvent.reproductiveProblemId!,
+          );
           // Show the name if found, otherwise show the ID as fallback
-          final displayValue = reproductiveProblemName ?? 'ID: ${birthEvent.reproductiveProblemId}';
+          final displayValue =
+              reproductiveProblemName ??
+              'ID: ${birthEvent.reproductiveProblemId}';
           // Always add the row if ID exists (displayValue will never be empty)
           addRow(l10n.reproductiveProblem, displayValue);
         }
@@ -356,8 +437,11 @@ class _EventLogCard extends StatelessWidget {
         if (abortionDate != null) {
           addRow(l10n.abortionDate, dateFormat.format(abortionDate.toLocal()));
         }
-        final reproductiveProblemName = abortedPregnancy.reproductiveProblemId != null
-            ? _resolveReproductiveProblemName(abortedPregnancy.reproductiveProblemId!)
+        final reproductiveProblemName =
+            abortedPregnancy.reproductiveProblemId != null
+            ? _resolveReproductiveProblemName(
+                abortedPregnancy.reproductiveProblemId!,
+              )
             : null;
         if (reproductiveProblemName != null) {
           addRow(l10n.reproductiveProblem, reproductiveProblemName);
@@ -378,9 +462,14 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.quantity, medication.quantity);
         addRow(l10n.withdrawalPeriod, medication.withdrawalPeriod);
-        final medicationDate = DateTime.tryParse(medication.medicationDate ?? '');
+        final medicationDate = DateTime.tryParse(
+          medication.medicationDate ?? '',
+        );
         if (medicationDate != null) {
-          addRow(l10n.medicationDate, dateFormat.format(medicationDate.toLocal()));
+          addRow(
+            l10n.medicationDate,
+            dateFormat.format(medicationDate.toLocal()),
+          );
         }
         addRow(l10n.remarks, medication.remarks);
         createdDate = DateTime.tryParse(medication.createdAt);
@@ -389,7 +478,8 @@ class _EventLogCard extends StatelessWidget {
         final vaccination = log as VaccinationModel;
         icon = Icons.vaccines_outlined;
         title = l10n.vaccination;
-        if (vaccination.vaccinationNo != null && vaccination.vaccinationNo!.trim().isNotEmpty) {
+        if (vaccination.vaccinationNo != null &&
+            vaccination.vaccinationNo!.trim().isNotEmpty) {
           addRow(l10n.vaccinationNumber, vaccination.vaccinationNo);
         }
         final vaccineName = _resolveVaccineName(vaccination.vaccineUuid);
@@ -403,7 +493,8 @@ class _EventLogCard extends StatelessWidget {
         if (vaccination.vetId != null && vaccination.vetId!.trim().isNotEmpty) {
           addRow(l10n.vetLicense, vaccination.vetId);
         }
-        if (vaccination.extensionOfficerId != null && vaccination.extensionOfficerId!.trim().isNotEmpty) {
+        if (vaccination.extensionOfficerId != null &&
+            vaccination.extensionOfficerId!.trim().isNotEmpty) {
           addRow(l10n.extensionOfficerLicense, vaccination.extensionOfficerId);
         }
         addRow(l10n.status, vaccination.status);
@@ -413,7 +504,9 @@ class _EventLogCard extends StatelessWidget {
         final disposal = log as DisposalModel;
         icon = Icons.delete_sweep_outlined;
         title = l10n.disposal;
-        final disposalTypeName = _resolveDisposalTypeName(disposal.disposalTypeId);
+        final disposalTypeName = _resolveDisposalTypeName(
+          disposal.disposalTypeId,
+        );
         if (disposalTypeName != null) {
           addRow(l10n.disposalTypeId, disposalTypeName);
         }
@@ -426,7 +519,9 @@ class _EventLogCard extends StatelessWidget {
         final milking = log as MilkingModel;
         icon = Icons.water_drop;
         title = l10n.milking;
-        final milkingMethodName = _resolveMilkingMethodName(milking.milkingMethodId);
+        final milkingMethodName = _resolveMilkingMethodName(
+          milking.milkingMethodId,
+        );
         if (milkingMethodName != null) {
           addRow(l10n.milkingMethod, milkingMethodName);
         }
@@ -435,7 +530,10 @@ class _EventLogCard extends StatelessWidget {
         addRow(l10n.solids, milking.solid);
         addRow(l10n.solidNonFat, milking.solidNonFat);
         addRow(l10n.protein, milking.protein);
-        addRow(l10n.correctedLactometerReading, milking.correctedLactometerReading);
+        addRow(
+          l10n.correctedLactometerReading,
+          milking.correctedLactometerReading,
+        );
         addRow(l10n.totalSolids, milking.totalSolids);
         addRow(l10n.colonyFormingUnits, milking.colonyFormingUnits);
         if (milking.acidity != null && milking.acidity!.trim().isNotEmpty) {
@@ -453,7 +551,9 @@ class _EventLogCard extends StatelessWidget {
         if (startDate != null) {
           addRow(l10n.startDate, dateFormat.format(startDate.toLocal()));
         }
-        final endDate = dryoff.endDate != null ? DateTime.tryParse(dryoff.endDate!) : null;
+        final endDate = dryoff.endDate != null
+            ? DateTime.tryParse(dryoff.endDate!)
+            : null;
         if (endDate != null) {
           addRow(l10n.endDate, dateFormat.format(endDate.toLocal()));
         }
@@ -465,31 +565,49 @@ class _EventLogCard extends StatelessWidget {
         final insemination = log as InseminationModel;
         icon = Icons.favorite;
         title = l10n.insemination;
-        final lastHeatDate = insemination.lastHeatDate != null ? DateTime.tryParse(insemination.lastHeatDate!) : null;
+        final lastHeatDate = insemination.lastHeatDate != null
+            ? DateTime.tryParse(insemination.lastHeatDate!)
+            : null;
         if (lastHeatDate != null) {
           addRow(l10n.lastHeatDate, dateFormat.format(lastHeatDate.toLocal()));
         }
-        final heatTypeName = _resolveHeatTypeName(insemination.currentHeatTypeId);
+        final heatTypeName = _resolveHeatTypeName(
+          insemination.currentHeatTypeId,
+        );
         if (heatTypeName != null) {
           addRow(l10n.heatType, heatTypeName);
         }
-        final inseminationServiceName = _resolveInseminationServiceName(insemination.inseminationServiceId);
+        final inseminationServiceName = _resolveInseminationServiceName(
+          insemination.inseminationServiceId,
+        );
         if (inseminationServiceName != null) {
           addRow(l10n.inseminationService, inseminationServiceName);
         }
-        final semenStrawTypeName = _resolveSemenStrawTypeName(insemination.semenStrawTypeId);
+        final semenStrawTypeName = _resolveSemenStrawTypeName(
+          insemination.semenStrawTypeId,
+        );
         if (semenStrawTypeName != null) {
           addRow(l10n.semenStrawType, semenStrawTypeName);
         }
-        final inseminationDate = insemination.inseminationDate != null ? DateTime.tryParse(insemination.inseminationDate!) : null;
+        final inseminationDate = insemination.inseminationDate != null
+            ? DateTime.tryParse(insemination.inseminationDate!)
+            : null;
         if (inseminationDate != null) {
-          addRow(l10n.inseminationDate, dateFormat.format(inseminationDate.toLocal()));
+          addRow(
+            l10n.inseminationDate,
+            dateFormat.format(inseminationDate.toLocal()),
+          );
         }
         addRow(l10n.bullCode, insemination.bullCode);
         addRow(l10n.bullBreed, insemination.bullBreed);
-        final semenProductionDate = insemination.semenProductionDate != null ? DateTime.tryParse(insemination.semenProductionDate!) : null;
+        final semenProductionDate = insemination.semenProductionDate != null
+            ? DateTime.tryParse(insemination.semenProductionDate!)
+            : null;
         if (semenProductionDate != null) {
-          addRow(l10n.semenProductionDate, dateFormat.format(semenProductionDate.toLocal()));
+          addRow(
+            l10n.semenProductionDate,
+            dateFormat.format(semenProductionDate.toLocal()),
+          );
         }
         addRow(l10n.productionCountry, insemination.productionCountry);
         addRow(l10n.semenBatchNumber, insemination.semenBatchNumber);
@@ -507,10 +625,13 @@ class _EventLogCard extends StatelessWidget {
         if (testResultName != null) {
           addRow(l10n.testResult, testResultName);
         }
-        if (pregnancy.noOfMonths != null && pregnancy.noOfMonths!.trim().isNotEmpty) {
+        if (pregnancy.noOfMonths != null &&
+            pregnancy.noOfMonths!.trim().isNotEmpty) {
           addRow(l10n.numberOfMonths, pregnancy.noOfMonths);
         }
-        final testDate = pregnancy.testDate != null ? DateTime.tryParse(pregnancy.testDate!) : null;
+        final testDate = pregnancy.testDate != null
+            ? DateTime.tryParse(pregnancy.testDate!)
+            : null;
         if (testDate != null) {
           addRow(l10n.testDate, dateFormat.format(testDate.toLocal()));
         }
@@ -525,12 +646,16 @@ class _EventLogCard extends StatelessWidget {
         if (transfer.farmName != null && transfer.farmName!.trim().isNotEmpty) {
           addRow(l10n.fromFarmLabel, transfer.farmName);
         }
-        if (transfer.toFarmName != null && transfer.toFarmName!.trim().isNotEmpty) {
+        if (transfer.toFarmName != null &&
+            transfer.toFarmName!.trim().isNotEmpty) {
           addRow(l10n.toFarmLabel, transfer.toFarmName);
         }
         final transferDate = DateTime.tryParse(transfer.transferDate);
         if (transferDate != null) {
-          addRow(l10n.transferDateLabel, dateFormat.format(transferDate.toLocal()));
+          addRow(
+            l10n.transferDateLabel,
+            dateFormat.format(transferDate.toLocal()),
+          );
         }
         addRow(l10n.reason, transfer.reason);
         if (transfer.price != null && transfer.price!.trim().isNotEmpty) {
@@ -851,10 +976,7 @@ class _LogFooter extends StatelessWidget {
   final String title;
   final DateTime date;
 
-  const _LogFooter({
-    required this.title,
-    required this.date,
-  });
+  const _LogFooter({required this.title, required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -890,10 +1012,7 @@ class _ContextChip extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _ContextChip({
-    required this.icon,
-    required this.label,
-  });
+  const _ContextChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -904,10 +1023,14 @@ class _ContextChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.08) : primary.withOpacity(0.08),
+        color: isDark
+            ? Colors.white.withOpacity(0.08)
+            : primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.15) : primary.withOpacity(0.2),
+          color: isDark
+              ? Colors.white.withOpacity(0.15)
+              : primary.withOpacity(0.2),
         ),
       ),
       child: Row(
@@ -931,4 +1054,3 @@ class _ContextChip extends StatelessWidget {
     );
   }
 }
-

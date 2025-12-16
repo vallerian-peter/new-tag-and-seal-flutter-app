@@ -7,6 +7,11 @@ abstract class ExtensionOfficerRepositoryInterface {
 
   /// Create extension officer farm invite
   /// [accessCode] should be generated on the frontend before calling this method.
-  Future<ExtensionOfficerInviteModel> createInvite(String extensionOfficerEmail, String accessCode);
-}
+  Future<ExtensionOfficerInviteModel> createInvite(
+    String extensionOfficerEmail,
+    String accessCode,
+  );
 
+  /// Delete/Cancel invite
+  Future<void> deleteInvite(int inviteId);
+}

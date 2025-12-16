@@ -11,15 +11,18 @@ import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/data/repo
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/provider/extension_officer_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 
 class ExtensionOfficerInviteFormScreen extends StatefulWidget {
   const ExtensionOfficerInviteFormScreen({super.key});
 
   @override
-  State<ExtensionOfficerInviteFormScreen> createState() => _ExtensionOfficerInviteFormScreenState();
+  State<ExtensionOfficerInviteFormScreen> createState() =>
+      _ExtensionOfficerInviteFormScreenState();
 }
 
-class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInviteFormScreen> {
+class _ExtensionOfficerInviteFormScreenState
+    extends State<ExtensionOfficerInviteFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _accessCodeController = TextEditingController();
@@ -52,8 +55,11 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
       return;
     }
 
-    final officer = await provider.searchByEmailWithDialog(context, _emailController.text.trim());
-    
+    final officer = await provider.searchByEmailWithDialog(
+      context,
+      _emailController.text.trim(),
+    );
+
     // Generate and display access code when officer is found
     if (officer != null && mounted) {
       final accessCode = AccessCodeGenerator.generateAccessCode();
@@ -97,12 +103,13 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
 
     // Use the access code that was already generated and displayed
     final accessCode = _accessCodeController.text.trim();
-    
+
     if (accessCode.isEmpty) {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
-        message: 'Access code is required. Please search for the extension officer first.',
+        message:
+            'Access code is required. Please search for the extension officer first.',
         buttonText: l10n.ok,
       );
       return;
@@ -136,7 +143,9 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
 
     return ChangeNotifierProvider<ExtensionOfficerProvider>(
       create: (_) => ExtensionOfficerProvider(
-        repository: ExtensionOfficerRepository(),
+        repository: ExtensionOfficerRepository(
+          Provider.of<AppDatabase>(context, listen: false),
+        ),
       ),
       child: Scaffold(
         backgroundColor: Constants.veryLightGreyColor,
@@ -191,7 +200,8 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
                                 l10n.inviteOfficerText,
                                 style: TextStyle(
                                   fontSize: Constants.textSize,
-                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.7),
                                 ),
                               ),
                             ),
@@ -212,7 +222,9 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
                           if (value == null || value.isEmpty) {
                             return l10n.emailRequired;
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return l10n.validEmailRequired;
                           }
                           return null;
@@ -223,10 +235,14 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
 
                       // Search Button
                       CustomButton(
-                        text: provider.isSearching ? l10n.searching : l10n.search,
+                        text: provider.isSearching
+                            ? l10n.searching
+                            : l10n.search,
                         color: Constants.primaryColor,
                         isLoading: provider.isSearching,
-                        onPressed: provider.isSearching ? null : () => _searchOfficer(provider),
+                        onPressed: provider.isSearching
+                            ? null
+                            : () => _searchOfficer(provider),
                       ),
 
                       // Found Officer Info
@@ -298,8 +314,14 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
                                 ? IconButton(
                                     icon: const Icon(Icons.copy),
                                     onPressed: () {
-                                      Clipboard.setData(ClipboardData(text: _accessCodeController.text));
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: _accessCodeController.text,
+                                        ),
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
                                           content: Text(l10n.accessCodeCopied),
                                           duration: const Duration(seconds: 2),
@@ -319,13 +341,17 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(
-                                color: theme.colorScheme.outline.withOpacity(0.3),
+                                color: theme.colorScheme.outline.withOpacity(
+                                  0.3,
+                                ),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(
-                                color: theme.colorScheme.outline.withOpacity(0.3),
+                                color: theme.colorScheme.outline.withOpacity(
+                                  0.3,
+                                ),
                               ),
                             ),
                           ),
@@ -335,7 +361,9 @@ class _ExtensionOfficerInviteFormScreenState extends State<ExtensionOfficerInvit
 
                         // Invite Button - Only show after officer is found
                         CustomButton(
-                          text: provider.isInviting ? l10n.inviting : l10n.invite,
+                          text: provider.isInviting
+                              ? l10n.inviting
+                              : l10n.invite,
                           color: Constants.successColor,
                           isLoading: provider.isInviting,
                           onPressed: provider.isInviting
