@@ -5,13 +5,13 @@ class MilkingModel {
   final String livestockUuid;
   final int? milkingMethodId;
   final String amount;
-  final String lactometerReading;
-  final String solid;
-  final String solidNonFat;
-  final String protein;
-  final String correctedLactometerReading;
-  final String totalSolids;
-  final String colonyFormingUnits;
+  final String? lactometerReading;
+  final String? solid;
+  final String? solidNonFat;
+  final String? protein;
+  final String? correctedLactometerReading;
+  final String? totalSolids;
+  final String? colonyFormingUnits;
   final String? acidity;
   final String session;
   final String status;
@@ -27,13 +27,13 @@ class MilkingModel {
     required this.livestockUuid,
     this.milkingMethodId,
     required this.amount,
-    required this.lactometerReading,
-    required this.solid,
-    required this.solidNonFat,
-    required this.protein,
-    required this.correctedLactometerReading,
-    required this.totalSolids,
-    required this.colonyFormingUnits,
+    this.lactometerReading,
+    this.solid,
+    this.solidNonFat,
+    this.protein,
+    this.correctedLactometerReading,
+    this.totalSolids,
+    this.colonyFormingUnits,
     this.acidity,
     this.session = 'morning',
     this.status = 'active',
@@ -122,14 +122,13 @@ class MilkingModel {
       livestockUuid: json['livestockUuid'] as String,
       milkingMethodId: json['milkingMethodId'] as int?,
       amount: (json['amount'] as String?) ?? '',
-      lactometerReading: (json['lactometerReading'] as String?) ?? '',
-      solid: (json['solid'] as String?) ?? '',
-      solidNonFat: (json['solidNonFat'] as String?) ?? '',
-      protein: (json['protein'] as String?) ?? '',
-      correctedLactometerReading:
-          (json['correctedLactometerReading'] as String?) ?? '',
-      totalSolids: (json['totalSolids'] as String?) ?? '',
-      colonyFormingUnits: (json['colonyFormingUnits'] as String?) ?? '',
+      lactometerReading: json['lactometerReading'] as String?,
+      solid: json['solid'] as String?,
+      solidNonFat: json['solidNonFat'] as String?,
+      protein: json['protein'] as String?,
+      correctedLactometerReading: json['correctedLactometerReading'] as String?,
+      totalSolids: json['totalSolids'] as String?,
+      colonyFormingUnits: json['colonyFormingUnits'] as String?,
       acidity: json['acidity'] as String?,
       session: json['session'] as String? ?? 'morning',
       status: json['status'] as String? ?? 'active',

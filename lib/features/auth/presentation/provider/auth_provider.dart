@@ -284,7 +284,7 @@ class AuthProvider extends ChangeNotifier {
       }
 
       // Store all data in secure storage (using camelCase keys)
-        if (user != null) {
+      if (user != null) {
         await _authRepository.storeUserData(
           userId: user['id']?.toString() ?? '',
           username: user['username'] ?? '',

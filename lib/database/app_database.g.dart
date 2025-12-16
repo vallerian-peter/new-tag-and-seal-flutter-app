@@ -15681,18 +15681,18 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
       GeneratedColumn<String>(
         'lactometer_reading',
         aliasedName,
-        false,
+        true,
         type: DriftSqlType.string,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
       );
   static const VerificationMeta _solidMeta = const VerificationMeta('solid');
   @override
   late final GeneratedColumn<String> solid = GeneratedColumn<String>(
     'solid',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _solidNonFatMeta = const VerificationMeta(
     'solidNonFat',
@@ -15701,9 +15701,9 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
   late final GeneratedColumn<String> solidNonFat = GeneratedColumn<String>(
     'solid_non_fat',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _proteinMeta = const VerificationMeta(
     'protein',
@@ -15712,9 +15712,9 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
   late final GeneratedColumn<String> protein = GeneratedColumn<String>(
     'protein',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _correctedLactometerReadingMeta =
       const VerificationMeta('correctedLactometerReading');
@@ -15723,9 +15723,9 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
       GeneratedColumn<String>(
         'corrected_lactometer_reading',
         aliasedName,
-        false,
+        true,
         type: DriftSqlType.string,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
       );
   static const VerificationMeta _totalSolidsMeta = const VerificationMeta(
     'totalSolids',
@@ -15734,9 +15734,9 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
   late final GeneratedColumn<String> totalSolids = GeneratedColumn<String>(
     'total_solids',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _colonyFormingUnitsMeta =
       const VerificationMeta('colonyFormingUnits');
@@ -15745,9 +15745,9 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
       GeneratedColumn<String>(
         'colony_forming_units',
         aliasedName,
-        false,
+        true,
         type: DriftSqlType.string,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
       );
   static const VerificationMeta _acidityMeta = const VerificationMeta(
     'acidity',
@@ -15917,16 +15917,12 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
           _lactometerReadingMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_lactometerReadingMeta);
     }
     if (data.containsKey('solid')) {
       context.handle(
         _solidMeta,
         solid.isAcceptableOrUnknown(data['solid']!, _solidMeta),
       );
-    } else if (isInserting) {
-      context.missing(_solidMeta);
     }
     if (data.containsKey('solid_non_fat')) {
       context.handle(
@@ -15936,16 +15932,12 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
           _solidNonFatMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_solidNonFatMeta);
     }
     if (data.containsKey('protein')) {
       context.handle(
         _proteinMeta,
         protein.isAcceptableOrUnknown(data['protein']!, _proteinMeta),
       );
-    } else if (isInserting) {
-      context.missing(_proteinMeta);
     }
     if (data.containsKey('corrected_lactometer_reading')) {
       context.handle(
@@ -15955,8 +15947,6 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
           _correctedLactometerReadingMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_correctedLactometerReadingMeta);
     }
     if (data.containsKey('total_solids')) {
       context.handle(
@@ -15966,8 +15956,6 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
           _totalSolidsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_totalSolidsMeta);
     }
     if (data.containsKey('colony_forming_units')) {
       context.handle(
@@ -15977,8 +15965,6 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
           _colonyFormingUnitsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_colonyFormingUnitsMeta);
     }
     if (data.containsKey('acidity')) {
       context.handle(
@@ -16062,31 +16048,31 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
       lactometerReading: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}lactometer_reading'],
-      )!,
+      ),
       solid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}solid'],
-      )!,
+      ),
       solidNonFat: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}solid_non_fat'],
-      )!,
+      ),
       protein: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}protein'],
-      )!,
+      ),
       correctedLactometerReading: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}corrected_lactometer_reading'],
-      )!,
+      ),
       totalSolids: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}total_solids'],
-      )!,
+      ),
       colonyFormingUnits: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}colony_forming_units'],
-      )!,
+      ),
       acidity: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}acidity'],
@@ -16131,13 +16117,13 @@ class Milking extends DataClass implements Insertable<Milking> {
   final String livestockUuid;
   final int? milkingMethodId;
   final String amount;
-  final String lactometerReading;
-  final String solid;
-  final String solidNonFat;
-  final String protein;
-  final String correctedLactometerReading;
-  final String totalSolids;
-  final String colonyFormingUnits;
+  final String? lactometerReading;
+  final String? solid;
+  final String? solidNonFat;
+  final String? protein;
+  final String? correctedLactometerReading;
+  final String? totalSolids;
+  final String? colonyFormingUnits;
   final String? acidity;
   final String session;
   final String status;
@@ -16152,13 +16138,13 @@ class Milking extends DataClass implements Insertable<Milking> {
     required this.livestockUuid,
     this.milkingMethodId,
     required this.amount,
-    required this.lactometerReading,
-    required this.solid,
-    required this.solidNonFat,
-    required this.protein,
-    required this.correctedLactometerReading,
-    required this.totalSolids,
-    required this.colonyFormingUnits,
+    this.lactometerReading,
+    this.solid,
+    this.solidNonFat,
+    this.protein,
+    this.correctedLactometerReading,
+    this.totalSolids,
+    this.colonyFormingUnits,
     this.acidity,
     required this.session,
     required this.status,
@@ -16182,15 +16168,29 @@ class Milking extends DataClass implements Insertable<Milking> {
       map['milking_method_id'] = Variable<int>(milkingMethodId);
     }
     map['amount'] = Variable<String>(amount);
-    map['lactometer_reading'] = Variable<String>(lactometerReading);
-    map['solid'] = Variable<String>(solid);
-    map['solid_non_fat'] = Variable<String>(solidNonFat);
-    map['protein'] = Variable<String>(protein);
-    map['corrected_lactometer_reading'] = Variable<String>(
-      correctedLactometerReading,
-    );
-    map['total_solids'] = Variable<String>(totalSolids);
-    map['colony_forming_units'] = Variable<String>(colonyFormingUnits);
+    if (!nullToAbsent || lactometerReading != null) {
+      map['lactometer_reading'] = Variable<String>(lactometerReading);
+    }
+    if (!nullToAbsent || solid != null) {
+      map['solid'] = Variable<String>(solid);
+    }
+    if (!nullToAbsent || solidNonFat != null) {
+      map['solid_non_fat'] = Variable<String>(solidNonFat);
+    }
+    if (!nullToAbsent || protein != null) {
+      map['protein'] = Variable<String>(protein);
+    }
+    if (!nullToAbsent || correctedLactometerReading != null) {
+      map['corrected_lactometer_reading'] = Variable<String>(
+        correctedLactometerReading,
+      );
+    }
+    if (!nullToAbsent || totalSolids != null) {
+      map['total_solids'] = Variable<String>(totalSolids);
+    }
+    if (!nullToAbsent || colonyFormingUnits != null) {
+      map['colony_forming_units'] = Variable<String>(colonyFormingUnits);
+    }
     if (!nullToAbsent || acidity != null) {
       map['acidity'] = Variable<String>(acidity);
     }
@@ -16215,13 +16215,28 @@ class Milking extends DataClass implements Insertable<Milking> {
           ? const Value.absent()
           : Value(milkingMethodId),
       amount: Value(amount),
-      lactometerReading: Value(lactometerReading),
-      solid: Value(solid),
-      solidNonFat: Value(solidNonFat),
-      protein: Value(protein),
-      correctedLactometerReading: Value(correctedLactometerReading),
-      totalSolids: Value(totalSolids),
-      colonyFormingUnits: Value(colonyFormingUnits),
+      lactometerReading: lactometerReading == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lactometerReading),
+      solid: solid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(solid),
+      solidNonFat: solidNonFat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(solidNonFat),
+      protein: protein == null && nullToAbsent
+          ? const Value.absent()
+          : Value(protein),
+      correctedLactometerReading:
+          correctedLactometerReading == null && nullToAbsent
+          ? const Value.absent()
+          : Value(correctedLactometerReading),
+      totalSolids: totalSolids == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalSolids),
+      colonyFormingUnits: colonyFormingUnits == null && nullToAbsent
+          ? const Value.absent()
+          : Value(colonyFormingUnits),
       acidity: acidity == null && nullToAbsent
           ? const Value.absent()
           : Value(acidity),
@@ -16246,15 +16261,17 @@ class Milking extends DataClass implements Insertable<Milking> {
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       milkingMethodId: serializer.fromJson<int?>(json['milkingMethodId']),
       amount: serializer.fromJson<String>(json['amount']),
-      lactometerReading: serializer.fromJson<String>(json['lactometerReading']),
-      solid: serializer.fromJson<String>(json['solid']),
-      solidNonFat: serializer.fromJson<String>(json['solidNonFat']),
-      protein: serializer.fromJson<String>(json['protein']),
-      correctedLactometerReading: serializer.fromJson<String>(
+      lactometerReading: serializer.fromJson<String?>(
+        json['lactometerReading'],
+      ),
+      solid: serializer.fromJson<String?>(json['solid']),
+      solidNonFat: serializer.fromJson<String?>(json['solidNonFat']),
+      protein: serializer.fromJson<String?>(json['protein']),
+      correctedLactometerReading: serializer.fromJson<String?>(
         json['correctedLactometerReading'],
       ),
-      totalSolids: serializer.fromJson<String>(json['totalSolids']),
-      colonyFormingUnits: serializer.fromJson<String>(
+      totalSolids: serializer.fromJson<String?>(json['totalSolids']),
+      colonyFormingUnits: serializer.fromJson<String?>(
         json['colonyFormingUnits'],
       ),
       acidity: serializer.fromJson<String?>(json['acidity']),
@@ -16276,15 +16293,15 @@ class Milking extends DataClass implements Insertable<Milking> {
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'milkingMethodId': serializer.toJson<int?>(milkingMethodId),
       'amount': serializer.toJson<String>(amount),
-      'lactometerReading': serializer.toJson<String>(lactometerReading),
-      'solid': serializer.toJson<String>(solid),
-      'solidNonFat': serializer.toJson<String>(solidNonFat),
-      'protein': serializer.toJson<String>(protein),
-      'correctedLactometerReading': serializer.toJson<String>(
+      'lactometerReading': serializer.toJson<String?>(lactometerReading),
+      'solid': serializer.toJson<String?>(solid),
+      'solidNonFat': serializer.toJson<String?>(solidNonFat),
+      'protein': serializer.toJson<String?>(protein),
+      'correctedLactometerReading': serializer.toJson<String?>(
         correctedLactometerReading,
       ),
-      'totalSolids': serializer.toJson<String>(totalSolids),
-      'colonyFormingUnits': serializer.toJson<String>(colonyFormingUnits),
+      'totalSolids': serializer.toJson<String?>(totalSolids),
+      'colonyFormingUnits': serializer.toJson<String?>(colonyFormingUnits),
       'acidity': serializer.toJson<String?>(acidity),
       'session': serializer.toJson<String>(session),
       'status': serializer.toJson<String>(status),
@@ -16302,13 +16319,13 @@ class Milking extends DataClass implements Insertable<Milking> {
     String? livestockUuid,
     Value<int?> milkingMethodId = const Value.absent(),
     String? amount,
-    String? lactometerReading,
-    String? solid,
-    String? solidNonFat,
-    String? protein,
-    String? correctedLactometerReading,
-    String? totalSolids,
-    String? colonyFormingUnits,
+    Value<String?> lactometerReading = const Value.absent(),
+    Value<String?> solid = const Value.absent(),
+    Value<String?> solidNonFat = const Value.absent(),
+    Value<String?> protein = const Value.absent(),
+    Value<String?> correctedLactometerReading = const Value.absent(),
+    Value<String?> totalSolids = const Value.absent(),
+    Value<String?> colonyFormingUnits = const Value.absent(),
     Value<String?> acidity = const Value.absent(),
     String? session,
     String? status,
@@ -16325,14 +16342,19 @@ class Milking extends DataClass implements Insertable<Milking> {
         ? milkingMethodId.value
         : this.milkingMethodId,
     amount: amount ?? this.amount,
-    lactometerReading: lactometerReading ?? this.lactometerReading,
-    solid: solid ?? this.solid,
-    solidNonFat: solidNonFat ?? this.solidNonFat,
-    protein: protein ?? this.protein,
-    correctedLactometerReading:
-        correctedLactometerReading ?? this.correctedLactometerReading,
-    totalSolids: totalSolids ?? this.totalSolids,
-    colonyFormingUnits: colonyFormingUnits ?? this.colonyFormingUnits,
+    lactometerReading: lactometerReading.present
+        ? lactometerReading.value
+        : this.lactometerReading,
+    solid: solid.present ? solid.value : this.solid,
+    solidNonFat: solidNonFat.present ? solidNonFat.value : this.solidNonFat,
+    protein: protein.present ? protein.value : this.protein,
+    correctedLactometerReading: correctedLactometerReading.present
+        ? correctedLactometerReading.value
+        : this.correctedLactometerReading,
+    totalSolids: totalSolids.present ? totalSolids.value : this.totalSolids,
+    colonyFormingUnits: colonyFormingUnits.present
+        ? colonyFormingUnits.value
+        : this.colonyFormingUnits,
     acidity: acidity.present ? acidity.value : this.acidity,
     session: session ?? this.session,
     status: status ?? this.status,
@@ -16465,13 +16487,13 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   final Value<String> livestockUuid;
   final Value<int?> milkingMethodId;
   final Value<String> amount;
-  final Value<String> lactometerReading;
-  final Value<String> solid;
-  final Value<String> solidNonFat;
-  final Value<String> protein;
-  final Value<String> correctedLactometerReading;
-  final Value<String> totalSolids;
-  final Value<String> colonyFormingUnits;
+  final Value<String?> lactometerReading;
+  final Value<String?> solid;
+  final Value<String?> solidNonFat;
+  final Value<String?> protein;
+  final Value<String?> correctedLactometerReading;
+  final Value<String?> totalSolids;
+  final Value<String?> colonyFormingUnits;
   final Value<String?> acidity;
   final Value<String> session;
   final Value<String> status;
@@ -16510,13 +16532,13 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     required String livestockUuid,
     this.milkingMethodId = const Value.absent(),
     required String amount,
-    required String lactometerReading,
-    required String solid,
-    required String solidNonFat,
-    required String protein,
-    required String correctedLactometerReading,
-    required String totalSolids,
-    required String colonyFormingUnits,
+    this.lactometerReading = const Value.absent(),
+    this.solid = const Value.absent(),
+    this.solidNonFat = const Value.absent(),
+    this.protein = const Value.absent(),
+    this.correctedLactometerReading = const Value.absent(),
+    this.totalSolids = const Value.absent(),
+    this.colonyFormingUnits = const Value.absent(),
     this.acidity = const Value.absent(),
     this.session = const Value.absent(),
     this.status = const Value.absent(),
@@ -16528,13 +16550,6 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   }) : uuid = Value(uuid),
        livestockUuid = Value(livestockUuid),
        amount = Value(amount),
-       lactometerReading = Value(lactometerReading),
-       solid = Value(solid),
-       solidNonFat = Value(solidNonFat),
-       protein = Value(protein),
-       correctedLactometerReading = Value(correctedLactometerReading),
-       totalSolids = Value(totalSolids),
-       colonyFormingUnits = Value(colonyFormingUnits),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<Milking> custom({
@@ -16594,13 +16609,13 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     Value<String>? livestockUuid,
     Value<int?>? milkingMethodId,
     Value<String>? amount,
-    Value<String>? lactometerReading,
-    Value<String>? solid,
-    Value<String>? solidNonFat,
-    Value<String>? protein,
-    Value<String>? correctedLactometerReading,
-    Value<String>? totalSolids,
-    Value<String>? colonyFormingUnits,
+    Value<String?>? lactometerReading,
+    Value<String?>? solid,
+    Value<String?>? solidNonFat,
+    Value<String?>? protein,
+    Value<String?>? correctedLactometerReading,
+    Value<String?>? totalSolids,
+    Value<String?>? colonyFormingUnits,
     Value<String?>? acidity,
     Value<String>? session,
     Value<String>? status,
@@ -34713,13 +34728,13 @@ typedef $$MilkingsTableCreateCompanionBuilder =
       required String livestockUuid,
       Value<int?> milkingMethodId,
       required String amount,
-      required String lactometerReading,
-      required String solid,
-      required String solidNonFat,
-      required String protein,
-      required String correctedLactometerReading,
-      required String totalSolids,
-      required String colonyFormingUnits,
+      Value<String?> lactometerReading,
+      Value<String?> solid,
+      Value<String?> solidNonFat,
+      Value<String?> protein,
+      Value<String?> correctedLactometerReading,
+      Value<String?> totalSolids,
+      Value<String?> colonyFormingUnits,
       Value<String?> acidity,
       Value<String> session,
       Value<String> status,
@@ -34737,13 +34752,13 @@ typedef $$MilkingsTableUpdateCompanionBuilder =
       Value<String> livestockUuid,
       Value<int?> milkingMethodId,
       Value<String> amount,
-      Value<String> lactometerReading,
-      Value<String> solid,
-      Value<String> solidNonFat,
-      Value<String> protein,
-      Value<String> correctedLactometerReading,
-      Value<String> totalSolids,
-      Value<String> colonyFormingUnits,
+      Value<String?> lactometerReading,
+      Value<String?> solid,
+      Value<String?> solidNonFat,
+      Value<String?> protein,
+      Value<String?> correctedLactometerReading,
+      Value<String?> totalSolids,
+      Value<String?> colonyFormingUnits,
       Value<String?> acidity,
       Value<String> session,
       Value<String> status,
@@ -35094,13 +35109,14 @@ class $$MilkingsTableTableManager
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int?> milkingMethodId = const Value.absent(),
                 Value<String> amount = const Value.absent(),
-                Value<String> lactometerReading = const Value.absent(),
-                Value<String> solid = const Value.absent(),
-                Value<String> solidNonFat = const Value.absent(),
-                Value<String> protein = const Value.absent(),
-                Value<String> correctedLactometerReading = const Value.absent(),
-                Value<String> totalSolids = const Value.absent(),
-                Value<String> colonyFormingUnits = const Value.absent(),
+                Value<String?> lactometerReading = const Value.absent(),
+                Value<String?> solid = const Value.absent(),
+                Value<String?> solidNonFat = const Value.absent(),
+                Value<String?> protein = const Value.absent(),
+                Value<String?> correctedLactometerReading =
+                    const Value.absent(),
+                Value<String?> totalSolids = const Value.absent(),
+                Value<String?> colonyFormingUnits = const Value.absent(),
                 Value<String?> acidity = const Value.absent(),
                 Value<String> session = const Value.absent(),
                 Value<String> status = const Value.absent(),
@@ -35140,13 +35156,14 @@ class $$MilkingsTableTableManager
                 required String livestockUuid,
                 Value<int?> milkingMethodId = const Value.absent(),
                 required String amount,
-                required String lactometerReading,
-                required String solid,
-                required String solidNonFat,
-                required String protein,
-                required String correctedLactometerReading,
-                required String totalSolids,
-                required String colonyFormingUnits,
+                Value<String?> lactometerReading = const Value.absent(),
+                Value<String?> solid = const Value.absent(),
+                Value<String?> solidNonFat = const Value.absent(),
+                Value<String?> protein = const Value.absent(),
+                Value<String?> correctedLactometerReading =
+                    const Value.absent(),
+                Value<String?> totalSolids = const Value.absent(),
+                Value<String?> colonyFormingUnits = const Value.absent(),
                 Value<String?> acidity = const Value.absent(),
                 Value<String> session = const Value.absent(),
                 Value<String> status = const Value.absent(),

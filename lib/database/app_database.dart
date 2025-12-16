@@ -149,7 +149,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 23; // v23 Added sync columns to InvitedExtensionOfficers
+  int get schemaVersion => 24; // v24: make milking measurement columns nullable and migrate existing rows
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -288,6 +288,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 23) {
         // Version 23: Add sync/audit columns to InvitedExtensionOfficers
         await _migrateInvitedExtensionOfficersColumns(m);
+      }
+      if (from < 24) {
+        // Version 24: Make milking measurement columns nullable and migrate existing data
+        await _migrateMilkingMeasurementColumns(m);
       }
     },
     beforeOpen: (details) async {
@@ -680,6 +684,55 @@ class AppDatabase extends _$AppDatabase {
     } catch (e) {
       // Re-throw with context
       throw Exception('Failed to migrate vaccinations table: $e');
+    }
+  }
+
+  /// Migration helper: recreate milkings table with nullable measurement columns
+  /// and copy data from the old table while converting empty strings to NULL
+  Future<void> _migrateMilkingMeasurementColumns(Migrator m) async {
+    try {
+      final exists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          Variable<String>('milkings'),
+        ],
+      ).get();
+
+      if (exists.isEmpty) return;
+
+      // Rename existing table
+      await customStatement('ALTER TABLE milkings RENAME TO milkings_old');
+
+      // Create new table with current schema (migrator.createTable uses the table definition)
+      await m.createTable(milkings);
+
+      // Copy data from old to new, converting empty strings ('') in measurement columns to NULL
+      await customStatement('''
+        INSERT INTO milkings (
+          id, uuid, farm_uuid, livestock_uuid, milking_method_id, amount,
+          lactometer_reading, solid, solid_non_fat, protein,
+          corrected_lactometer_reading, total_solids, colony_forming_units,
+          acidity, session, status, synced, sync_action, created_at, updated_at
+        )
+        SELECT
+          id, uuid, farm_uuid, livestock_uuid, milking_method_id, amount,
+          CASE WHEN lactometer_reading = '' THEN NULL ELSE lactometer_reading END,
+          CASE WHEN solid = '' THEN NULL ELSE solid END,
+          CASE WHEN solid_non_fat = '' THEN NULL ELSE solid_non_fat END,
+          CASE WHEN protein = '' THEN NULL ELSE protein END,
+          CASE WHEN corrected_lactometer_reading = '' THEN NULL ELSE corrected_lactometer_reading END,
+          CASE WHEN total_solids = '' THEN NULL ELSE total_solids END,
+          CASE WHEN colony_forming_units = '' THEN NULL ELSE colony_forming_units END,
+          CASE WHEN acidity = '' THEN NULL ELSE acidity END,
+          session, status, synced, sync_action, created_at, updated_at
+        FROM milkings_old;
+      ''');
+
+      // Drop old table
+      await customStatement('DROP TABLE milkings_old');
+    } catch (e) {
+      // If something fails, ignore - migration can be retried or handled manually
     }
   }
 

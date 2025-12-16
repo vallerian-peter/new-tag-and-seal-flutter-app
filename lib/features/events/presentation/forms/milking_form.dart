@@ -95,14 +95,14 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
 
     _selectedMilkingMethodId = milking.milkingMethodId;
     _parseAmountWithUnit(milking.amount);
-    _lactometerReadingController.text = milking.lactometerReading;
-    _solidController.text = milking.solid;
-    _solidNonFatController.text = milking.solidNonFat;
-    _proteinController.text = milking.protein;
+    _lactometerReadingController.text = milking.lactometerReading ?? '';
+    _solidController.text = milking.solid ?? '';
+    _solidNonFatController.text = milking.solidNonFat ?? '';
+    _proteinController.text = milking.protein ?? '';
     _correctedLactometerReadingController.text =
-        milking.correctedLactometerReading;
-    _totalSolidsController.text = milking.totalSolids;
-    _colonyFormingUnitsController.text = milking.colonyFormingUnits;
+        milking.correctedLactometerReading ?? '';
+    _totalSolidsController.text = milking.totalSolids ?? '';
+    _colonyFormingUnitsController.text = milking.colonyFormingUnits ?? '';
     _acidityController.text = milking.acidity ?? '';
     _selectedSession = milking.session;
     _selectedStatus = milking.status;
@@ -639,9 +639,7 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
         prefixIcon: Icons.analytics_outlined,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return '$label required';
-          }
+          // Measurements are optional — empty means unknown/null
           return null;
         },
       ),
@@ -851,6 +849,20 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     final acidityText = _acidityController.text.trim();
     final normalizedAcidity = acidityText.isEmpty ? null : acidityText;
 
+    // Normalize optional measurement fields: empty -> null
+    final normalizedLactometerReading = lactometerReading.isEmpty
+        ? null
+        : lactometerReading;
+    final normalizedSolid = solid.isEmpty ? null : solid;
+    final normalizedSolidNonFat = solidNonFat.isEmpty ? null : solidNonFat;
+    final normalizedProtein = protein.isEmpty ? null : protein;
+    final normalizedCorrectedLactometerReading =
+        correctedLactometerReading.isEmpty ? null : correctedLactometerReading;
+    final normalizedTotalSolids = totalSolids.isEmpty ? null : totalSolids;
+    final normalizedColonyFormingUnits = colonyFormingUnits.isEmpty
+        ? null
+        : colonyFormingUnits;
+
     try {
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.milking!;
@@ -859,13 +871,13 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
           livestockUuid: livestockUuids.first,
           milkingMethodId: milkingMethodId,
           amount: amountWithUnit,
-          lactometerReading: lactometerReading,
-          solid: solid,
-          solidNonFat: solidNonFat,
-          protein: protein,
-          correctedLactometerReading: correctedLactometerReading,
-          totalSolids: totalSolids,
-          colonyFormingUnits: colonyFormingUnits,
+          lactometerReading: normalizedLactometerReading,
+          solid: normalizedSolid,
+          solidNonFat: normalizedSolidNonFat,
+          protein: normalizedProtein,
+          correctedLactometerReading: normalizedCorrectedLactometerReading,
+          totalSolids: normalizedTotalSolids,
+          colonyFormingUnits: normalizedColonyFormingUnits,
           acidity: normalizedAcidity,
           session: _selectedSession,
           status: _selectedStatus,
@@ -886,13 +898,13 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
           livestockUuids: livestockUuids,
           milkingMethodId: milkingMethodId,
           amount: amountWithUnit,
-          lactometerReading: lactometerReading,
-          solid: solid,
-          solidNonFat: solidNonFat,
-          protein: protein,
-          correctedLactometerReading: correctedLactometerReading,
-          totalSolids: totalSolids,
-          colonyFormingUnits: colonyFormingUnits,
+          lactometerReading: normalizedLactometerReading,
+          solid: normalizedSolid,
+          solidNonFat: normalizedSolidNonFat,
+          protein: normalizedProtein,
+          correctedLactometerReading: normalizedCorrectedLactometerReading,
+          totalSolids: normalizedTotalSolids,
+          colonyFormingUnits: normalizedColonyFormingUnits,
           acidity: normalizedAcidity,
           session: _selectedSession,
           status: _selectedStatus,
@@ -911,13 +923,13 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
           livestockUuid: livestockUuids.first,
           milkingMethodId: milkingMethodId,
           amount: amountWithUnit,
-          lactometerReading: lactometerReading,
-          solid: solid,
-          solidNonFat: solidNonFat,
-          protein: protein,
-          correctedLactometerReading: correctedLactometerReading,
-          totalSolids: totalSolids,
-          colonyFormingUnits: colonyFormingUnits,
+          lactometerReading: normalizedLactometerReading,
+          solid: normalizedSolid,
+          solidNonFat: normalizedSolidNonFat,
+          protein: normalizedProtein,
+          correctedLactometerReading: normalizedCorrectedLactometerReading,
+          totalSolids: normalizedTotalSolids,
+          colonyFormingUnits: normalizedColonyFormingUnits,
           acidity: normalizedAcidity,
           session: _selectedSession,
           status: _selectedStatus,

@@ -43,13 +43,14 @@ class EventsRepository implements EventsRepositoryInterface {
     final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
     final disposalsCount = (logs['disposals'] as List?)?.length ?? 0;
     final birthEventsCount = (logs['birthEvents'] as List?)?.length ?? 0;
-    final abortedPregnanciesCount = (logs['abortedPregnancies'] as List?)?.length ?? 0;
+    final abortedPregnanciesCount =
+        (logs['abortedPregnancies'] as List?)?.length ?? 0;
     final milkingsCount = (logs['milkings'] as List?)?.length ?? 0;
     final pregnanciesCount = (logs['pregnancies'] as List?)?.length ?? 0;
     final inseminationsCount = (logs['inseminations'] as List?)?.length ?? 0;
     final dryoffsCount = (logs['dryoffs'] as List?)?.length ?? 0;
     final transfersCount = (logs['transfers'] as List?)?.length ?? 0;
-    
+
     log(
       '🔄 Syncing event logs (feedings: $feedingsCount, weightChanges: $weightChangesCount, '
       'dewormings: $dewormingsCount, medications: $medicationsCount, '
@@ -81,10 +82,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = FeedingModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = FeedingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getFeedingByUuid(remote.uuid);
@@ -94,7 +94,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertFeeding(_toFeedingCompanion(updated));
           }
         }
@@ -113,10 +116,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = WeightChangeModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = WeightChangeModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getWeightChangeByUuid(remote.uuid);
@@ -126,8 +128,13 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
-            await _eventDao.upsertWeightChange(_toWeightChangeCompanion(updated));
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
+            await _eventDao.upsertWeightChange(
+              _toWeightChangeCompanion(updated),
+            );
           }
         }
       } catch (e) {
@@ -145,10 +152,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = DewormingModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = DewormingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getDewormingByUuid(remote.uuid);
@@ -158,7 +164,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertDeworming(_toDewormingCompanion(updated));
           }
         }
@@ -177,10 +186,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = MedicationModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = MedicationModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getMedicationByUuid(remote.uuid);
@@ -190,7 +198,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertMedication(_toMedicationCompanion(updated));
           }
         }
@@ -215,12 +226,15 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in vaccinations) {
       try {
-        log('💉 Processing vaccination from server: ${raw['uuid']}, vaccineUuid: ${raw['vaccineUuid']}');
-        final remote = VaccinationModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
+        log(
+          '💉 Processing vaccination from server: ${raw['uuid']}, vaccineUuid: ${raw['vaccineUuid']}',
         );
-        log('💉 Parsed vaccination model: uuid=${remote.uuid}, vaccineUuid=${remote.vaccineUuid}');
+        final remote = VaccinationModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        log(
+          '💉 Parsed vaccination model: uuid=${remote.uuid}, vaccineUuid=${remote.vaccineUuid}',
+        );
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getVaccinationByUuid(remote.uuid);
@@ -231,7 +245,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertVaccination(_toVaccinationCompanion(updated));
             log('  ✅ Updated vaccination: ${remote.uuid}');
           } else {
@@ -244,7 +261,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     await _eventDao.deleteServerVaccinationsNotIn(remoteUuids);
-    log('✅ Vaccination sync complete - Processed ${remoteUuids.length} vaccination(s)');
+    log(
+      '✅ Vaccination sync complete - Processed ${remoteUuids.length} vaccination(s)',
+    );
   }
 
   Future<void> _syncDisposals(dynamic payload) async {
@@ -254,10 +273,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = DisposalModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = DisposalModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getDisposalByUuid(remote.uuid);
@@ -267,7 +285,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertDisposal(_toDisposalCompanion(updated));
           }
         }
@@ -286,10 +307,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = BirthEventModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = BirthEventModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getBirthEventByUuid(remote.uuid);
@@ -299,7 +319,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertBirthEvent(_toBirthEventCompanion(updated));
           }
         }
@@ -319,21 +342,27 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = AbortedPregnancyModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = AbortedPregnancyModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getAbortedPregnancyByUuid(remote.uuid);
         if (existing == null) {
-          await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(remote));
+          await _eventDao.upsertAbortedPregnancy(
+            _toAbortedPregnancyCompanion(remote),
+          );
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
-            await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(updated));
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
+            await _eventDao.upsertAbortedPregnancy(
+              _toAbortedPregnancyCompanion(updated),
+            );
           }
         }
       } catch (e) {
@@ -352,10 +381,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = MilkingModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = MilkingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getMilkingByUuid(remote.uuid);
@@ -365,7 +393,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertMilking(_toMilkingCompanion(updated));
           }
         }
@@ -384,10 +415,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = PregnancyModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = PregnancyModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getPregnancyByUuid(remote.uuid);
@@ -397,7 +427,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertPregnancy(_toPregnancyCompanion(updated));
           }
         }
@@ -416,10 +449,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = InseminationModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = InseminationModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getInseminationByUuid(remote.uuid);
@@ -429,8 +461,13 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
-            await _eventDao.upsertInsemination(_toInseminationCompanion(updated));
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
+            await _eventDao.upsertInsemination(
+              _toInseminationCompanion(updated),
+            );
           }
         }
       } catch (e) {
@@ -448,10 +485,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = DryoffModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = DryoffModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getDryoffByUuid(remote.uuid);
@@ -461,7 +497,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertDryoff(_toDryoffCompanion(updated));
           }
         }
@@ -480,10 +519,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = TransferModel.fromJson(raw).copyWith(
-          synced: true,
-          syncAction: 'server-create',
-        );
+        final remote = TransferModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getTransferByUuid(remote.uuid);
@@ -493,7 +531,10 @@ class EventsRepository implements EventsRepositoryInterface {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
           if (serverUpdated.isAfter(localUpdated)) {
-            final updated = remote.copyWith(id: existing.id, syncAction: 'server-update');
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
             await _eventDao.upsertTransfer(_toTransferCompanion(updated));
           }
         }
@@ -520,7 +561,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertFeeding(_toFeedingCompanion(localModel));
+    final inserted = await _eventDao.upsertFeeding(
+      _toFeedingCompanion(localModel),
+    );
     return _mapFeedingEntity(inserted);
   }
 
@@ -532,12 +575,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertFeeding(_toFeedingCompanion(localModel));
+    final updated = await _eventDao.upsertFeeding(
+      _toFeedingCompanion(localModel),
+    );
     return _mapFeedingEntity(updated);
   }
 
@@ -552,24 +597,30 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertWeightChange(_toWeightChangeCompanion(localModel));
+    final inserted = await _eventDao.upsertWeightChange(
+      _toWeightChangeCompanion(localModel),
+    );
     return _mapWeightChangeEntity(inserted);
   }
 
   @override
-  Future<WeightChangeModel> updateWeightChangeLocally(WeightChangeModel model) async {
+  Future<WeightChangeModel> updateWeightChangeLocally(
+    WeightChangeModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertWeightChange(_toWeightChangeCompanion(localModel));
+    final updated = await _eventDao.upsertWeightChange(
+      _toWeightChangeCompanion(localModel),
+    );
     return _mapWeightChangeEntity(updated);
   }
 
@@ -584,7 +635,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertDeworming(_toDewormingCompanion(localModel));
+    final inserted = await _eventDao.upsertDeworming(
+      _toDewormingCompanion(localModel),
+    );
     return _mapDewormingEntity(inserted);
   }
 
@@ -596,12 +649,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertDeworming(_toDewormingCompanion(localModel));
+    final updated = await _eventDao.upsertDeworming(
+      _toDewormingCompanion(localModel),
+    );
     return _mapDewormingEntity(updated);
   }
 
@@ -616,7 +671,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertMedication(_toMedicationCompanion(localModel));
+    final inserted = await _eventDao.upsertMedication(
+      _toMedicationCompanion(localModel),
+    );
     return _mapMedicationEntity(inserted);
   }
 
@@ -628,12 +685,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertMedication(_toMedicationCompanion(localModel));
+    final updated = await _eventDao.upsertMedication(
+      _toMedicationCompanion(localModel),
+    );
     return _mapMedicationEntity(updated);
   }
 
@@ -641,7 +700,9 @@ class EventsRepository implements EventsRepositoryInterface {
   Future<VaccinationModel> createVaccination(VaccinationModel model) async {
     final now = DateTime.now().toIso8601String();
     log('📝 Creating vaccination log locally: ${model.uuid}');
-    log('💉 Vaccination model: farmUuid=${model.farmUuid}, livestockUuid=${model.livestockUuid}, vaccineUuid=${model.vaccineUuid}');
+    log(
+      '💉 Vaccination model: farmUuid=${model.farmUuid}, livestockUuid=${model.livestockUuid}, vaccineUuid=${model.vaccineUuid}',
+    );
     final localModel = model.copyWith(
       createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
       updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
@@ -651,11 +712,17 @@ class EventsRepository implements EventsRepositoryInterface {
 
     try {
       final companion = _toVaccinationCompanion(localModel);
-      log('💉 Vaccination companion: vaccineUuid=${companion.vaccineUuid.value}, vetId=${companion.vetId.value}, extensionOfficerId=${companion.extensionOfficerId.value}');
+      log(
+        '💉 Vaccination companion: vaccineUuid=${companion.vaccineUuid.value}, vetId=${companion.vetId.value}, extensionOfficerId=${companion.extensionOfficerId.value}',
+      );
       final inserted = await _eventDao.upsertVaccination(companion);
-      log('✅ Vaccination inserted successfully: uuid=${inserted.uuid}, vaccineUuid=${inserted.vaccineUuid}');
+      log(
+        '✅ Vaccination inserted successfully: uuid=${inserted.uuid}, vaccineUuid=${inserted.vaccineUuid}',
+      );
       final mapped = _mapVaccinationEntity(inserted);
-      log('✅ Vaccination mapped: uuid=${mapped.uuid}, vaccineUuid=${mapped.vaccineUuid}');
+      log(
+        '✅ Vaccination mapped: uuid=${mapped.uuid}, vaccineUuid=${mapped.vaccineUuid}',
+      );
       return mapped;
     } catch (e, stackTrace) {
       log('❌ Error inserting vaccination: $e', stackTrace: stackTrace);
@@ -664,19 +731,23 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<VaccinationModel> updateVaccinationLocally(VaccinationModel model) async {
+  Future<VaccinationModel> updateVaccinationLocally(
+    VaccinationModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertVaccination(_toVaccinationCompanion(localModel));
+    final updated = await _eventDao.upsertVaccination(
+      _toVaccinationCompanion(localModel),
+    );
     return _mapVaccinationEntity(updated);
   }
 
@@ -691,14 +762,16 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertDisposal(_toDisposalCompanion(localModel));
-    
+    final inserted = await _eventDao.upsertDisposal(
+      _toDisposalCompanion(localModel),
+    );
+
     // Update livestock status to 'notActive' if disposal type exists
     // All disposal types (Dead, Slaughtered, Lost, Culled) mean livestock is no longer active
     if (model.disposalTypeId != null) {
       await _updateLivestockStatusForDisposal(model.livestockUuid, 'notActive');
     }
-    
+
     return _mapDisposalEntity(inserted);
   }
 
@@ -710,12 +783,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertDisposal(_toDisposalCompanion(localModel));
+    final updated = await _eventDao.upsertDisposal(
+      _toDisposalCompanion(localModel),
+    );
     return _mapDisposalEntity(updated);
   }
 
@@ -730,7 +805,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertMilking(_toMilkingCompanion(localModel));
+    final inserted = await _eventDao.upsertMilking(
+      _toMilkingCompanion(localModel),
+    );
     return _mapMilkingEntity(inserted);
   }
 
@@ -742,12 +819,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertMilking(_toMilkingCompanion(localModel));
+    final updated = await _eventDao.upsertMilking(
+      _toMilkingCompanion(localModel),
+    );
     return _mapMilkingEntity(updated);
   }
 
@@ -762,7 +841,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertPregnancy(_toPregnancyCompanion(localModel));
+    final inserted = await _eventDao.upsertPregnancy(
+      _toPregnancyCompanion(localModel),
+    );
     return _mapPregnancyEntity(inserted);
   }
 
@@ -774,12 +855,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertPregnancy(_toPregnancyCompanion(localModel));
+    final updated = await _eventDao.upsertPregnancy(
+      _toPregnancyCompanion(localModel),
+    );
     return _mapPregnancyEntity(updated);
   }
 
@@ -794,24 +877,30 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertInsemination(_toInseminationCompanion(localModel));
+    final inserted = await _eventDao.upsertInsemination(
+      _toInseminationCompanion(localModel),
+    );
     return _mapInseminationEntity(inserted);
   }
 
   @override
-  Future<InseminationModel> updateInseminationLocally(InseminationModel model) async {
+  Future<InseminationModel> updateInseminationLocally(
+    InseminationModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertInsemination(_toInseminationCompanion(localModel));
+    final updated = await _eventDao.upsertInsemination(
+      _toInseminationCompanion(localModel),
+    );
     return _mapInseminationEntity(updated);
   }
 
@@ -826,7 +915,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertDryoff(_toDryoffCompanion(localModel));
+    final inserted = await _eventDao.upsertDryoff(
+      _toDryoffCompanion(localModel),
+    );
     return _mapDryoffEntity(inserted);
   }
 
@@ -838,12 +929,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertDryoff(_toDryoffCompanion(localModel));
+    final updated = await _eventDao.upsertDryoff(
+      _toDryoffCompanion(localModel),
+    );
     return _mapDryoffEntity(updated);
   }
 
@@ -858,7 +951,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertTransfer(_toTransferCompanion(localModel));
+    final inserted = await _eventDao.upsertTransfer(
+      _toTransferCompanion(localModel),
+    );
     return _mapTransferEntity(inserted);
   }
 
@@ -870,12 +965,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertTransfer(_toTransferCompanion(localModel));
+    final updated = await _eventDao.upsertTransfer(
+      _toTransferCompanion(localModel),
+    );
     return _mapTransferEntity(updated);
   }
 
@@ -884,46 +981,90 @@ class EventsRepository implements EventsRepositoryInterface {
   // ===========================================================================
 
   @override
-  Future<List<FeedingModel>> getFeedings({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getFeedings(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<FeedingModel>> getFeedings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getFeedings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapFeedingEntity).toList();
   }
 
   @override
-  Future<List<WeightChangeModel>> getWeightChanges({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getWeightChanges(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<WeightChangeModel>> getWeightChanges({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getWeightChanges(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapWeightChangeEntity).toList();
   }
 
   @override
-  Future<List<DewormingModel>> getDewormings({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getDewormings(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<DewormingModel>> getDewormings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getDewormings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapDewormingEntity).toList();
   }
 
   @override
-  Future<List<MedicationModel>> getMedications({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getMedications(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<MedicationModel>> getMedications({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getMedications(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapMedicationEntity).toList();
   }
 
   @override
-  Future<List<VaccinationModel>> getVaccinations({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getVaccinations(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<VaccinationModel>> getVaccinations({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getVaccinations(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     final models = rows.map(_mapVaccinationEntity).toList();
-    log('💉 Repository: Retrieved ${models.length} vaccination(s) from local DB (farmUuid: $farmUuid, livestockUuid: $livestockUuid)');
+    log(
+      '💉 Repository: Retrieved ${models.length} vaccination(s) from local DB (farmUuid: $farmUuid, livestockUuid: $livestockUuid)',
+    );
     return models;
   }
 
   @override
-  Future<List<DisposalModel>> getDisposals({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getDisposals(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<DisposalModel>> getDisposals({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getDisposals(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapDisposalEntity).toList();
   }
 
   @override
-  Future<List<MilkingModel>> getMilkings({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getMilkings(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<MilkingModel>> getMilkings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getMilkings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows
         .map(_mapMilkingEntity)
         .where((model) => model.syncAction != 'deleted')
@@ -931,8 +1072,14 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<PregnancyModel>> getPregnancies({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getPregnancies(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<PregnancyModel>> getPregnancies({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getPregnancies(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows
         .map(_mapPregnancyEntity)
         .where((model) => model.syncAction != 'deleted')
@@ -940,8 +1087,14 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<InseminationModel>> getInseminations({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getInseminations(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<InseminationModel>> getInseminations({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getInseminations(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows
         .map(_mapInseminationEntity)
         .where((model) => model.syncAction != 'deleted')
@@ -949,8 +1102,14 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<DryoffModel>> getDryoffs({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getDryoffs(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<DryoffModel>> getDryoffs({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getDryoffs(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows
         .map(_mapDryoffEntity)
         .where((model) => model.syncAction != 'deleted')
@@ -958,8 +1117,14 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<TransferModel>> getTransfers({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getTransfers(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<TransferModel>> getTransfers({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getTransfers(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows
         .map(_mapTransferEntity)
         .where((model) => model.syncAction != 'deleted')
@@ -1055,8 +1220,12 @@ class EventsRepository implements EventsRepositoryInterface {
     );
 
     // Count calving and farrowing separately
-    final calvingCount = birthEvents.where((e) => e.eventType == EventLogTypes.calving).length;
-    final farrowingCount = birthEvents.where((e) => e.eventType == EventLogTypes.farrowing).length;
+    final calvingCount = birthEvents
+        .where((e) => e.eventType == EventLogTypes.calving)
+        .length;
+    final farrowingCount = birthEvents
+        .where((e) => e.eventType == EventLogTypes.farrowing)
+        .length;
 
     return {
       EventLogTypes.feeding: feedings.length,
@@ -1075,7 +1244,7 @@ class EventsRepository implements EventsRepositoryInterface {
       EventLogTypes.transfer: transfers.length,
     };
   }
-  
+
   @override
   Future<EventSummary> getEventSummary() async {
     final feedingsCount = (await getFeedings()).length;
@@ -1093,8 +1262,12 @@ class EventsRepository implements EventsRepositoryInterface {
     final transfersCount = (await getTransfers()).length;
 
     // Count calving and farrowing separately from birthEvents
-    final calvingCount = birthEvents.where((e) => e.eventType == EventLogTypes.calving).length;
-    final farrowingCount = birthEvents.where((e) => e.eventType == EventLogTypes.farrowing).length;
+    final calvingCount = birthEvents
+        .where((e) => e.eventType == EventLogTypes.calving)
+        .length;
+    final farrowingCount = birthEvents
+        .where((e) => e.eventType == EventLogTypes.farrowing)
+        .length;
 
     return EventSummary(
       byType: {
@@ -1176,7 +1349,9 @@ class EventsRepository implements EventsRepositoryInterface {
     final apiData = rows.map((row) {
       final model = _mapVaccinationEntity(row);
       final json = model.toApiJson();
-      log('  💉 Vaccination for sync: uuid=${json['uuid']}, vaccineUuid=${json['vaccineUuid']}, farmUuid=${json['farmUuid']}, livestockUuid=${json['livestockUuid']}');
+      log(
+        '  💉 Vaccination for sync: uuid=${json['uuid']}, vaccineUuid=${json['vaccineUuid']}, farmUuid=${json['farmUuid']}, livestockUuid=${json['livestockUuid']}',
+      );
       return json;
     }).toList();
     return apiData;
@@ -1208,10 +1383,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteFeedingByUuid(uuid);
         log('🗑️ Removed feeding log after synced delete: $uuid');
       } else {
-        final model = _mapFeedingEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapFeedingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertFeeding(_toFeedingCompanion(model));
         log('✅ Marked feeding log as synced: $uuid');
       }
@@ -1232,10 +1406,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteWeightChangeByUuid(uuid);
         log('🗑️ Removed weight change log after synced delete: $uuid');
       } else {
-        final model = _mapWeightChangeEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapWeightChangeEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertWeightChange(_toWeightChangeCompanion(model));
         log('✅ Marked weight change log as synced: $uuid');
       }
@@ -1256,10 +1429,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteDewormingByUuid(uuid);
         log('🗑️ Removed deworming log after synced delete: $uuid');
       } else {
-        final model = _mapDewormingEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapDewormingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertDeworming(_toDewormingCompanion(model));
         log('✅ Marked deworming log as synced: $uuid');
       }
@@ -1280,10 +1452,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteMedicationByUuid(uuid);
         log('🗑️ Removed medication log after synced delete: $uuid');
       } else {
-        final model = _mapMedicationEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapMedicationEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertMedication(_toMedicationCompanion(model));
         log('✅ Marked medication log as synced: $uuid');
       }
@@ -1304,10 +1475,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteVaccinationByUuid(uuid);
         log('🗑️ Removed vaccination log after synced delete: $uuid');
       } else {
-        final model = _mapVaccinationEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapVaccinationEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertVaccination(_toVaccinationCompanion(model));
         log('✅ Marked vaccination log as synced: $uuid');
       }
@@ -1328,10 +1498,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteDisposalByUuid(uuid);
         log('🗑️ Removed disposal log after synced delete: $uuid');
       } else {
-        final model = _mapDisposalEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapDisposalEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertDisposal(_toDisposalCompanion(model));
         log('✅ Marked disposal log as synced: $uuid');
       }
@@ -1345,46 +1514,53 @@ class EventsRepository implements EventsRepositoryInterface {
       await markFeedingAsDeleted(log.uuid);
     }
 
-    final weightChanges =
-        await _eventDao.getWeightChanges(livestockUuid: livestockUuid);
+    final weightChanges = await _eventDao.getWeightChanges(
+      livestockUuid: livestockUuid,
+    );
     for (final log in weightChanges) {
       await markWeightChangeAsDeleted(log.uuid);
     }
 
-    final dewormings =
-        await _eventDao.getDewormings(livestockUuid: livestockUuid);
+    final dewormings = await _eventDao.getDewormings(
+      livestockUuid: livestockUuid,
+    );
     for (final log in dewormings) {
       await markDewormingAsDeleted(log.uuid);
     }
 
-    final medications =
-        await _eventDao.getMedications(livestockUuid: livestockUuid);
+    final medications = await _eventDao.getMedications(
+      livestockUuid: livestockUuid,
+    );
     for (final log in medications) {
       await markMedicationAsDeleted(log.uuid);
     }
 
-    final vaccinations =
-        await _eventDao.getVaccinations(livestockUuid: livestockUuid);
+    final vaccinations = await _eventDao.getVaccinations(
+      livestockUuid: livestockUuid,
+    );
     for (final log in vaccinations) {
       await markVaccinationAsDeleted(log.uuid);
     }
 
-    final disposals =
-        await _eventDao.getDisposals(livestockUuid: livestockUuid);
+    final disposals = await _eventDao.getDisposals(
+      livestockUuid: livestockUuid,
+    );
     for (final log in disposals) {
       await markDisposalAsDeleted(log.uuid);
     }
 
     // Birth events (calving / farrowing)
-    final birthEvents =
-        await _eventDao.getBirthEvents(livestockUuid: livestockUuid);
+    final birthEvents = await _eventDao.getBirthEvents(
+      livestockUuid: livestockUuid,
+    );
     for (final log in birthEvents) {
       await markBirthEventAsDeleted(log.uuid);
     }
 
     // Aborted pregnancies
-    final abortedPregnancies =
-        await _eventDao.getAbortedPregnancies(livestockUuid: livestockUuid);
+    final abortedPregnancies = await _eventDao.getAbortedPregnancies(
+      livestockUuid: livestockUuid,
+    );
     for (final log in abortedPregnancies) {
       await markAbortedPregnancyAsDeleted(log.uuid);
     }
@@ -1393,35 +1569,33 @@ class EventsRepository implements EventsRepositoryInterface {
     final milkings = await _eventDao.getMilkings(livestockUuid: livestockUuid);
     for (final log in milkings) {
       final now = DateTime.now().toIso8601String();
-      final model = _mapMilkingEntity(log).copyWith(
-        synced: false,
-        syncAction: 'deleted',
-        updatedAt: now,
-      );
+      final model = _mapMilkingEntity(
+        log,
+      ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertMilking(_toMilkingCompanion(model));
     }
 
     // Pregnancy logs
-    final pregnancies = await _eventDao.getPregnancies(livestockUuid: livestockUuid);
+    final pregnancies = await _eventDao.getPregnancies(
+      livestockUuid: livestockUuid,
+    );
     for (final log in pregnancies) {
       final now = DateTime.now().toIso8601String();
-      final model = _mapPregnancyEntity(log).copyWith(
-        synced: false,
-        syncAction: 'deleted',
-        updatedAt: now,
-      );
+      final model = _mapPregnancyEntity(
+        log,
+      ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertPregnancy(_toPregnancyCompanion(model));
     }
 
     // Insemination logs
-    final inseminations = await _eventDao.getInseminations(livestockUuid: livestockUuid);
+    final inseminations = await _eventDao.getInseminations(
+      livestockUuid: livestockUuid,
+    );
     for (final log in inseminations) {
       final now = DateTime.now().toIso8601String();
-      final model = _mapInseminationEntity(log).copyWith(
-        synced: false,
-        syncAction: 'deleted',
-        updatedAt: now,
-      );
+      final model = _mapInseminationEntity(
+        log,
+      ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertInsemination(_toInseminationCompanion(model));
     }
 
@@ -1429,23 +1603,21 @@ class EventsRepository implements EventsRepositoryInterface {
     final dryoffs = await _eventDao.getDryoffs(livestockUuid: livestockUuid);
     for (final log in dryoffs) {
       final now = DateTime.now().toIso8601String();
-      final model = _mapDryoffEntity(log).copyWith(
-        synced: false,
-        syncAction: 'deleted',
-        updatedAt: now,
-      );
+      final model = _mapDryoffEntity(
+        log,
+      ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertDryoff(_toDryoffCompanion(model));
     }
 
     // Transfer logs
-    final transfers = await _eventDao.getTransfers(livestockUuid: livestockUuid);
+    final transfers = await _eventDao.getTransfers(
+      livestockUuid: livestockUuid,
+    );
     for (final log in transfers) {
       final now = DateTime.now().toIso8601String();
-      final model = _mapTransferEntity(log).copyWith(
-        synced: false,
-        syncAction: 'deleted',
-        updatedAt: now,
-      );
+      final model = _mapTransferEntity(
+        log,
+      ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertTransfer(_toTransferCompanion(model));
     }
   }
@@ -1459,11 +1631,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapFeedingEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapFeedingEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertFeeding(_toFeedingCompanion(model));
     log('🗑️ Marked feeding log as deleted (pending sync): $uuid');
     return true;
@@ -1478,11 +1648,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapWeightChangeEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapWeightChangeEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertWeightChange(_toWeightChangeCompanion(model));
     log('🗑️ Marked weight change log as deleted (pending sync): $uuid');
     return true;
@@ -1497,11 +1665,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapDewormingEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapDewormingEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertDeworming(_toDewormingCompanion(model));
     log('🗑️ Marked deworming log as deleted (pending sync): $uuid');
     return true;
@@ -1516,11 +1682,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapMedicationEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapMedicationEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertMedication(_toMedicationCompanion(model));
     log('🗑️ Marked medication log as deleted (pending sync): $uuid');
     return true;
@@ -1535,11 +1699,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapVaccinationEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapVaccinationEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertVaccination(_toVaccinationCompanion(model));
     log('🗑️ Marked vaccination log as deleted (pending sync): $uuid');
     return true;
@@ -1554,11 +1716,9 @@ class EventsRepository implements EventsRepositoryInterface {
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapDisposalEntity(existing).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final model = _mapDisposalEntity(
+      existing,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertDisposal(_toDisposalCompanion(model));
     log('🗑️ Marked disposal log as deleted (pending sync): $uuid');
     return true;
@@ -1577,7 +1737,9 @@ class EventsRepository implements EventsRepositoryInterface {
       livestockUuid: Value(model.livestockUuid),
       nextFeedingTime: Value(model.nextFeedingTime),
       amount: Value(model.amount),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -1591,9 +1753,13 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: Value(model.uuid),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      oldWeight: model.oldWeight != null ? Value(model.oldWeight!) : const Value.absent(),
+      oldWeight: model.oldWeight != null
+          ? Value(model.oldWeight!)
+          : const Value.absent(),
       newWeight: Value(model.newWeight),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -1610,12 +1776,16 @@ class EventsRepository implements EventsRepositoryInterface {
       administrationRouteId: model.administrationRouteId != null
           ? Value(model.administrationRouteId!)
           : const Value.absent(),
-      medicineId: model.medicineId != null ? Value(model.medicineId!) : const Value.absent(),
+      medicineId: model.medicineId != null
+          ? Value(model.medicineId!)
+          : const Value.absent(),
       vetId: model.vetId != null ? Value(model.vetId!) : const Value.absent(),
       extensionOfficerId: model.extensionOfficerId != null
           ? Value(model.extensionOfficerId!)
           : const Value.absent(),
-      quantity: model.quantity != null ? Value(model.quantity!) : const Value.absent(),
+      quantity: model.quantity != null
+          ? Value(model.quantity!)
+          : const Value.absent(),
       dose: model.dose != null ? Value(model.dose!) : const Value.absent(),
       nextAdministrationDate: model.nextAdministrationDate != null
           ? Value(model.nextAdministrationDate!)
@@ -1633,14 +1803,24 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: Value(model.uuid),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      diseaseId: model.diseaseId != null ? Value(model.diseaseId!) : const Value.absent(),
-      medicineId: model.medicineId != null ? Value(model.medicineId!) : const Value.absent(),
-      quantity: model.quantity != null ? Value(model.quantity!) : const Value.absent(),
-      withdrawalPeriod:
-          model.withdrawalPeriod != null ? Value(model.withdrawalPeriod!) : const Value.absent(),
-      medicationDate:
-          model.medicationDate != null ? Value(model.medicationDate!) : const Value.absent(),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      diseaseId: model.diseaseId != null
+          ? Value(model.diseaseId!)
+          : const Value.absent(),
+      medicineId: model.medicineId != null
+          ? Value(model.medicineId!)
+          : const Value.absent(),
+      quantity: model.quantity != null
+          ? Value(model.quantity!)
+          : const Value.absent(),
+      withdrawalPeriod: model.withdrawalPeriod != null
+          ? Value(model.withdrawalPeriod!)
+          : const Value.absent(),
+      medicationDate: model.medicationDate != null
+          ? Value(model.medicationDate!)
+          : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -1649,16 +1829,23 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   VaccinationsCompanion _toVaccinationCompanion(VaccinationModel model) {
-    log('💉 Creating VaccinationsCompanion: uuid=${model.uuid}, vaccineUuid=${model.vaccineUuid}, vetId=${model.vetId}, extensionOfficerId=${model.extensionOfficerId}');
+    log(
+      '💉 Creating VaccinationsCompanion: uuid=${model.uuid}, vaccineUuid=${model.vaccineUuid}, vetId=${model.vetId}, extensionOfficerId=${model.extensionOfficerId}',
+    );
     return VaccinationsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
-      vaccinationNo:
-          model.vaccinationNo != null ? Value(model.vaccinationNo!) : const Value.absent(),
+      vaccinationNo: model.vaccinationNo != null
+          ? Value(model.vaccinationNo!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      vaccineUuid: model.vaccineUuid != null ? Value(model.vaccineUuid!) : const Value.absent(),
-      diseaseId: model.diseaseId != null ? Value(model.diseaseId!) : const Value.absent(),
+      vaccineUuid: model.vaccineUuid != null
+          ? Value(model.vaccineUuid!)
+          : const Value.absent(),
+      diseaseId: model.diseaseId != null
+          ? Value(model.diseaseId!)
+          : const Value.absent(),
       vetId: model.vetId != null ? Value(model.vetId!) : const Value.absent(),
       extensionOfficerId: model.extensionOfficerId != null
           ? Value(model.extensionOfficerId!)
@@ -1677,10 +1864,13 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: Value(model.uuid),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      disposalTypeId:
-          model.disposalTypeId != null ? Value(model.disposalTypeId!) : const Value.absent(),
+      disposalTypeId: model.disposalTypeId != null
+          ? Value(model.disposalTypeId!)
+          : const Value.absent(),
       reasons: Value(model.reasons),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       status: Value(model.status),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -1812,7 +2002,9 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertBirthEvent(_toBirthEventCompanion(localModel));
+    final inserted = await _eventDao.upsertBirthEvent(
+      _toBirthEventCompanion(localModel),
+    );
     return _mapBirthEventEntity(inserted);
   }
 
@@ -1825,19 +2017,27 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertBirthEvent(_toBirthEventCompanion(localModel));
+    final updated = await _eventDao.upsertBirthEvent(
+      _toBirthEventCompanion(localModel),
+    );
     log('✅ Birth event updated locally: ${updated.uuid}');
     return _mapBirthEventEntity(updated);
   }
 
   @override
-  Future<List<BirthEventModel>> getBirthEvents({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getBirthEvents(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<BirthEventModel>> getBirthEvents({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getBirthEvents(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapBirthEventEntity).toList();
   }
 
@@ -1864,10 +2064,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteBirthEventByUuid(uuid);
         log('🗑️ Removed birth event after synced delete: $uuid');
       } else {
-        final model = _mapBirthEventEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapBirthEventEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertBirthEvent(_toBirthEventCompanion(model));
         log('✅ Marked birth event as synced: $uuid');
       }
@@ -1880,11 +2079,9 @@ class EventsRepository implements EventsRepositoryInterface {
     if (event == null) return false;
 
     final now = DateTime.now().toIso8601String();
-    final deleted = _mapBirthEventEntity(event).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
-    );
+    final deleted = _mapBirthEventEntity(
+      event,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertBirthEvent(_toBirthEventCompanion(deleted));
     return true;
   }
@@ -1897,11 +2094,19 @@ class EventsRepository implements EventsRepositoryInterface {
       livestockUuid: Value(model.livestockUuid),
       eventType: Value(model.eventType),
       startDate: Value(model.startDate),
-      endDate: model.endDate != null ? Value(model.endDate!) : const Value.absent(),
+      endDate: model.endDate != null
+          ? Value(model.endDate!)
+          : const Value.absent(),
       birthTypeId: Value(model.birthTypeId),
-      birthProblemsId: model.birthProblemsId != null ? Value(model.birthProblemsId!) : const Value.absent(),
-      reproductiveProblemId: model.reproductiveProblemId != null ? Value(model.reproductiveProblemId!) : const Value.absent(),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      birthProblemsId: model.birthProblemsId != null
+          ? Value(model.birthProblemsId!)
+          : const Value.absent(),
+      reproductiveProblemId: model.reproductiveProblemId != null
+          ? Value(model.reproductiveProblemId!)
+          : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       status: Value(model.status),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -1936,7 +2141,9 @@ class EventsRepository implements EventsRepositoryInterface {
   // ===========================================================================
 
   @override
-  Future<AbortedPregnancyModel> createAbortedPregnancy(AbortedPregnancyModel model) async {
+  Future<AbortedPregnancyModel> createAbortedPregnancy(
+    AbortedPregnancyModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     log('📝 Creating aborted pregnancy locally: ${model.uuid}');
     final localModel = model.copyWith(
@@ -1946,12 +2153,16 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(localModel));
+    final inserted = await _eventDao.upsertAbortedPregnancy(
+      _toAbortedPregnancyCompanion(localModel),
+    );
     return _mapAbortedPregnancyEntity(inserted);
   }
 
   @override
-  Future<AbortedPregnancyModel> updateAbortedPregnancyLocally(AbortedPregnancyModel model) async {
+  Future<AbortedPregnancyModel> updateAbortedPregnancyLocally(
+    AbortedPregnancyModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     log('📝 Updating aborted pregnancy locally: ${model.uuid}');
     final localModel = model.copyWith(
@@ -1959,29 +2170,41 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(localModel));
+    final updated = await _eventDao.upsertAbortedPregnancy(
+      _toAbortedPregnancyCompanion(localModel),
+    );
     log('✅ Aborted pregnancy updated locally: ${updated.uuid}');
     return _mapAbortedPregnancyEntity(updated);
   }
 
   @override
-  Future<List<AbortedPregnancyModel>> getAbortedPregnancies({String? farmUuid, String? livestockUuid}) async {
-    final rows = await _eventDao.getAbortedPregnancies(farmUuid: farmUuid, livestockUuid: livestockUuid);
+  Future<List<AbortedPregnancyModel>> getAbortedPregnancies({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getAbortedPregnancies(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
     return rows.map(_mapAbortedPregnancyEntity).toList();
   }
 
   @override
-  Future<List<AbortedPregnancyModel>> getAllAbortedPregnancies() => getAbortedPregnancies();
+  Future<List<AbortedPregnancyModel>> getAllAbortedPregnancies() =>
+      getAbortedPregnancies();
 
   @override
-  Future<List<Map<String, dynamic>>> getUnsyncedAbortedPregnanciesForApi() async {
+  Future<List<Map<String, dynamic>>>
+  getUnsyncedAbortedPregnanciesForApi() async {
     final pregnancies = await _eventDao.getUnsyncedAbortedPregnancies();
-    return pregnancies.map((p) => _mapAbortedPregnancyEntity(p).toApiJson()).toList();
+    return pregnancies
+        .map((p) => _mapAbortedPregnancyEntity(p).toApiJson())
+        .toList();
   }
 
   @override
@@ -1998,11 +2221,12 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteAbortedPregnancyByUuid(uuid);
         log('🗑️ Removed aborted pregnancy after synced delete: $uuid');
       } else {
-        final model = _mapAbortedPregnancyEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
+        final model = _mapAbortedPregnancyEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertAbortedPregnancy(
+          _toAbortedPregnancyCompanion(model),
         );
-        await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(model));
         log('✅ Marked aborted pregnancy as synced: $uuid');
       }
     }
@@ -2014,24 +2238,30 @@ class EventsRepository implements EventsRepositoryInterface {
     if (pregnancy == null) return false;
 
     final now = DateTime.now().toIso8601String();
-    final deleted = _mapAbortedPregnancyEntity(pregnancy).copyWith(
-      synced: false,
-      syncAction: 'deleted',
-      updatedAt: now,
+    final deleted = _mapAbortedPregnancyEntity(
+      pregnancy,
+    ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
+    await _eventDao.upsertAbortedPregnancy(
+      _toAbortedPregnancyCompanion(deleted),
     );
-    await _eventDao.upsertAbortedPregnancy(_toAbortedPregnancyCompanion(deleted));
     return true;
   }
 
-  AbortedPregnanciesCompanion _toAbortedPregnancyCompanion(AbortedPregnancyModel model) {
+  AbortedPregnanciesCompanion _toAbortedPregnancyCompanion(
+    AbortedPregnancyModel model,
+  ) {
     return AbortedPregnanciesCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       abortionDate: Value(model.abortionDate),
-      reproductiveProblemId: model.reproductiveProblemId != null ? Value(model.reproductiveProblemId!) : const Value.absent(),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      reproductiveProblemId: model.reproductiveProblemId != null
+          ? Value(model.reproductiveProblemId!)
+          : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       status: Value(model.status),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -2086,18 +2316,36 @@ class EventsRepository implements EventsRepositoryInterface {
     return MilkingsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
-      farmUuid: model.farmUuid != null ? Value(model.farmUuid!) : const Value.absent(),
+      farmUuid: model.farmUuid != null
+          ? Value(model.farmUuid!)
+          : const Value.absent(),
       livestockUuid: Value(model.livestockUuid),
-      milkingMethodId: model.milkingMethodId != null ? Value(model.milkingMethodId!) : const Value.absent(),
+      milkingMethodId: model.milkingMethodId != null
+          ? Value(model.milkingMethodId!)
+          : const Value.absent(),
       amount: Value(model.amount),
-      lactometerReading: Value(model.lactometerReading),
-      solid: Value(model.solid),
-      solidNonFat: Value(model.solidNonFat),
-      protein: Value(model.protein),
-      correctedLactometerReading: Value(model.correctedLactometerReading),
-      totalSolids: Value(model.totalSolids),
-      colonyFormingUnits: Value(model.colonyFormingUnits),
-      acidity: model.acidity != null ? Value(model.acidity!) : const Value.absent(),
+      lactometerReading: model.lactometerReading != null
+          ? Value(model.lactometerReading!)
+          : const Value.absent(),
+      solid: model.solid != null ? Value(model.solid!) : const Value.absent(),
+      solidNonFat: model.solidNonFat != null
+          ? Value(model.solidNonFat!)
+          : const Value.absent(),
+      protein: model.protein != null
+          ? Value(model.protein!)
+          : const Value.absent(),
+      correctedLactometerReading: model.correctedLactometerReading != null
+          ? Value(model.correctedLactometerReading!)
+          : const Value.absent(),
+      totalSolids: model.totalSolids != null
+          ? Value(model.totalSolids!)
+          : const Value.absent(),
+      colonyFormingUnits: model.colonyFormingUnits != null
+          ? Value(model.colonyFormingUnits!)
+          : const Value.absent(),
+      acidity: model.acidity != null
+          ? Value(model.acidity!)
+          : const Value.absent(),
       session: Value(model.session),
       status: Value(model.status),
       synced: Value(model.synced),
@@ -2132,10 +2380,16 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       testResultId: Value(model.testResultId),
-      noOfMonths: model.noOfMonths != null ? Value(model.noOfMonths!) : const Value.absent(),
-      testDate: model.testDate != null ? Value(model.testDate!) : const Value.absent(),
+      noOfMonths: model.noOfMonths != null
+          ? Value(model.noOfMonths!)
+          : const Value.absent(),
+      testDate: model.testDate != null
+          ? Value(model.testDate!)
+          : const Value.absent(),
       status: Value(model.status),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -2174,22 +2428,46 @@ class EventsRepository implements EventsRepositoryInterface {
     return InseminationsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
-      farmUuid: model.farmUuid != null ? Value(model.farmUuid!) : const Value.absent(),
+      farmUuid: model.farmUuid != null
+          ? Value(model.farmUuid!)
+          : const Value.absent(),
       livestockUuid: Value(model.livestockUuid),
-      lastHeatDate: model.lastHeatDate != null ? Value(model.lastHeatDate!) : const Value.absent(),
+      lastHeatDate: model.lastHeatDate != null
+          ? Value(model.lastHeatDate!)
+          : const Value.absent(),
       currentHeatTypeId: Value(model.currentHeatTypeId),
       inseminationServiceId: Value(model.inseminationServiceId),
       semenStrawTypeId: Value(model.semenStrawTypeId),
-      inseminationDate: model.inseminationDate != null ? Value(model.inseminationDate!) : const Value.absent(),
-      bullCode: model.bullCode != null ? Value(model.bullCode!) : const Value.absent(),
-      bullBreed: model.bullBreed != null ? Value(model.bullBreed!) : const Value.absent(),
-      semenProductionDate: model.semenProductionDate != null ? Value(model.semenProductionDate!) : const Value.absent(),
-      productionCountry: model.productionCountry != null ? Value(model.productionCountry!) : const Value.absent(),
-      semenBatchNumber: model.semenBatchNumber != null ? Value(model.semenBatchNumber!) : const Value.absent(),
-      internationalId: model.internationalId != null ? Value(model.internationalId!) : const Value.absent(),
-      aiCode: model.aiCode != null ? Value(model.aiCode!) : const Value.absent(),
-      manufacturerName: model.manufacturerName != null ? Value(model.manufacturerName!) : const Value.absent(),
-      semenSupplier: model.semenSupplier != null ? Value(model.semenSupplier!) : const Value.absent(),
+      inseminationDate: model.inseminationDate != null
+          ? Value(model.inseminationDate!)
+          : const Value.absent(),
+      bullCode: model.bullCode != null
+          ? Value(model.bullCode!)
+          : const Value.absent(),
+      bullBreed: model.bullBreed != null
+          ? Value(model.bullBreed!)
+          : const Value.absent(),
+      semenProductionDate: model.semenProductionDate != null
+          ? Value(model.semenProductionDate!)
+          : const Value.absent(),
+      productionCountry: model.productionCountry != null
+          ? Value(model.productionCountry!)
+          : const Value.absent(),
+      semenBatchNumber: model.semenBatchNumber != null
+          ? Value(model.semenBatchNumber!)
+          : const Value.absent(),
+      internationalId: model.internationalId != null
+          ? Value(model.internationalId!)
+          : const Value.absent(),
+      aiCode: model.aiCode != null
+          ? Value(model.aiCode!)
+          : const Value.absent(),
+      manufacturerName: model.manufacturerName != null
+          ? Value(model.manufacturerName!)
+          : const Value.absent(),
+      semenSupplier: model.semenSupplier != null
+          ? Value(model.semenSupplier!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -2221,9 +2499,15 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       startDate: Value(model.startDate),
-      endDate: model.endDate != null ? Value(model.endDate!) : const Value.absent(),
-      reason: model.reason != null ? Value(model.reason!) : const Value.absent(),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
+      endDate: model.endDate != null
+          ? Value(model.endDate!)
+          : const Value.absent(),
+      reason: model.reason != null
+          ? Value(model.reason!)
+          : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -2257,13 +2541,23 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: Value(model.uuid),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      toFarmUuid: model.toFarmUuid != null ? Value(model.toFarmUuid!) : const Value.absent(),
-      transporterId: model.transporterId != null ? Value(model.transporterId!) : const Value.absent(),
-      reason: model.reason != null ? Value(model.reason!) : const Value.absent(),
+      toFarmUuid: model.toFarmUuid != null
+          ? Value(model.toFarmUuid!)
+          : const Value.absent(),
+      transporterId: model.transporterId != null
+          ? Value(model.transporterId!)
+          : const Value.absent(),
+      reason: model.reason != null
+          ? Value(model.reason!)
+          : const Value.absent(),
       price: model.price != null ? Value(model.price!) : const Value.absent(),
       transferDate: Value(model.transferDate),
-      remarks: model.remarks != null ? Value(model.remarks!) : const Value.absent(),
-      status: model.status != null ? Value(model.status!) : const Value.absent(),
+      remarks: model.remarks != null
+          ? Value(model.remarks!)
+          : const Value.absent(),
+      status: model.status != null
+          ? Value(model.status!)
+          : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
       createdAt: Value(model.createdAt),
@@ -2301,10 +2595,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteMilkingByUuid(uuid);
         log('🗑️ Removed milking log after synced delete: $uuid');
       } else {
-        final model = _mapMilkingEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapMilkingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertMilking(_toMilkingCompanion(model));
         log('✅ Marked milking log as synced: $uuid');
       }
@@ -2341,10 +2634,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deletePregnancyByUuid(uuid);
         log('🗑️ Removed pregnancy log after synced delete: $uuid');
       } else {
-        final model = _mapPregnancyEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapPregnancyEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertPregnancy(_toPregnancyCompanion(model));
         log('✅ Marked pregnancy log as synced: $uuid');
       }
@@ -2381,10 +2673,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteInseminationByUuid(uuid);
         log('🗑️ Removed insemination log after synced delete: $uuid');
       } else {
-        final model = _mapInseminationEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapInseminationEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertInsemination(_toInseminationCompanion(model));
         log('✅ Marked insemination log as synced: $uuid');
       }
@@ -2421,10 +2712,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteDryoffByUuid(uuid);
         log('🗑️ Removed dryoff log after synced delete: $uuid');
       } else {
-        final model = _mapDryoffEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapDryoffEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertDryoff(_toDryoffCompanion(model));
         log('✅ Marked dryoff log as synced: $uuid');
       }
@@ -2461,10 +2751,9 @@ class EventsRepository implements EventsRepositoryInterface {
         await _eventDao.deleteTransferByUuid(uuid);
         log('🗑️ Removed transfer log after synced delete: $uuid');
       } else {
-        final model = _mapTransferEntity(existing).copyWith(
-          synced: true,
-          syncAction: existing.syncAction,
-        );
+        final model = _mapTransferEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
         await _eventDao.upsertTransfer(_toTransferCompanion(model));
         log('✅ Marked transfer log as synced: $uuid');
       }
@@ -2472,23 +2761,30 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   /// Update livestock status to 'notActive' when a disposal is created.
-  /// 
+  ///
   /// All disposal types (Dead, Slaughtered, Lost, Culled) indicate that the livestock
   /// is no longer active in the farm, so the status should be updated to 'notActive'.
-  /// 
+  ///
   /// **Parameters:**
   /// - `livestockUuid`: UUID of the livestock to update
   /// - `newStatus`: New status to set (default: 'notActive')
-  /// 
+  ///
   /// **Returns:**
   /// - `true` if update was successful, `false` otherwise
-  Future<bool> _updateLivestockStatusForDisposal(String livestockUuid, String newStatus) async {
+  Future<bool> _updateLivestockStatusForDisposal(
+    String livestockUuid,
+    String newStatus,
+  ) async {
     try {
       // Get livestock from database
-      final livestock = await _database.livestockDao.getLivestockByUuid(livestockUuid);
-      
+      final livestock = await _database.livestockDao.getLivestockByUuid(
+        livestockUuid,
+      );
+
       if (livestock == null) {
-        log('⚠️ Livestock not found for disposal status update: UUID $livestockUuid');
+        log(
+          '⚠️ Livestock not found for disposal status update: UUID $livestockUuid',
+        );
         return false;
       }
 
@@ -2519,26 +2815,34 @@ class EventsRepository implements EventsRepositoryInterface {
         livestockObtainedMethodId: livestock.livestockObtainedMethodId,
         dateFirstEnteredToFarm: livestock.dateFirstEnteredToFarm,
         weightAsOnRegistration: livestock.weightAsOnRegistration,
-        synced: false, // Mark as unsynced so status update gets synced to server
+        synced:
+            false, // Mark as unsynced so status update gets synced to server
         syncAction: 'update', // Mark sync action as update
         createdAt: livestock.createdAt,
         updatedAt: DateTime.now().toIso8601String(), // Update timestamp
       );
 
-      final success = await _database.livestockDao.updateLivestock(updatedLivestock);
-      
+      final success = await _database.livestockDao.updateLivestock(
+        updatedLivestock,
+      );
+
       if (success) {
-        log('✅ Livestock status updated to $newStatus for disposal: UUID $livestockUuid');
+        log(
+          '✅ Livestock status updated to $newStatus for disposal: UUID $livestockUuid',
+        );
       } else {
-        log('⚠️ Failed to update livestock status for disposal: UUID $livestockUuid');
+        log(
+          '⚠️ Failed to update livestock status for disposal: UUID $livestockUuid',
+        );
       }
-      
+
       return success;
     } catch (e, stackTrace) {
-      log('❌ Error updating livestock status for disposal: $e', stackTrace: stackTrace);
+      log(
+        '❌ Error updating livestock status for disposal: $e',
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }
 }
-
-

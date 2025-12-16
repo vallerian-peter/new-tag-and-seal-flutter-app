@@ -64,15 +64,18 @@ class _EventsScreenState extends State<EventsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final eventsProvider = context.watch<EventsProvider>();
 
-  final eventTypes = _eventTypesConfig(l10n);
-  // If current user is an extension officer, filter to technical event types only
-  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-  final filteredEventTypes = authProvider.isExtensionOfficer
-    ? eventTypes.where((cfg) => authProvider.hasAccessToLogType(cfg.logType)).toList()
-    : eventTypes;
+    final eventTypes = _eventTypesConfig(l10n);
+    // If current user is an extension officer, filter to technical event types only
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final filteredEventTypes = authProvider.isExtensionOfficer
+        ? eventTypes
+              .where((cfg) => authProvider.hasAccessToLogType(cfg.logType))
+              .toList()
+        : eventTypes;
     final totalLogs = filteredEventTypes.fold<int>(
       0,
-      (acc, config) => acc + _logsForType(eventsProvider, config.logType).length,
+      (acc, config) =>
+          acc + _logsForType(eventsProvider, config.logType).length,
     );
 
     return Scaffold(
@@ -82,20 +85,22 @@ class _EventsScreenState extends State<EventsScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.allEvents,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                )),
+            Text(
+              l10n.allEvents,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             Text(
               l10n.eventsScreenSubtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
-          ),
+              ),
             ),
           ],
         ),
-        backgroundColor:  theme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
@@ -112,7 +117,6 @@ class _EventsScreenState extends State<EventsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           
             const SizedBox(height: 16),
 
             _buildSummaryRow(context, totalLogs, eventTypes.length),
@@ -121,8 +125,8 @@ class _EventsScreenState extends State<EventsScreen> {
               LinearProgressIndicator(
                 color: theme.colorScheme.primary,
                 backgroundColor: theme.colorScheme.primary.withOpacity(0.15),
-                ),
-              ],
+              ),
+            ],
             const SizedBox(height: 24),
             Text(
               l10n.recordsText,
@@ -156,11 +160,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildSummaryRow(
-    BuildContext context,
-    int totalLogs,
-    int typeCount,
-  ) {
+  Widget _buildSummaryRow(BuildContext context, int totalLogs, int typeCount) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Row(
@@ -191,8 +191,8 @@ class _EventsScreenState extends State<EventsScreen> {
             value: _isUnsyncedLoading
                 ? '...'
                 : _unsyncedError != null
-                    ? '--'
-                    : _unsyncedSummary.totalPending.toString(),
+                ? '--'
+                : _unsyncedSummary.totalPending.toString(),
           ),
         ),
       ],
@@ -388,34 +388,34 @@ class _EventTypeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
             color: surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                  color: config.color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-                child: Icon(config.icon, color: config.color),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: config.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(config.icon, color: config.color),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       config.title,
                       style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
                     Text(
                       '${AppLocalizations.of(context)!.recordsText}: $count',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -425,11 +425,13 @@ class _EventTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4)),
-              ],
-            ),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withOpacity(0.4),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
