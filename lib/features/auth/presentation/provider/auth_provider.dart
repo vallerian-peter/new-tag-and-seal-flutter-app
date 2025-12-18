@@ -80,30 +80,116 @@ class AuthProvider extends ChangeNotifier {
 
   /// Check if the current user (extension officer) has access to a given log type
   /// Only technical event log types are allowed for extension officers.
-  /// Currently: medication, vaccination, deworming.
+  /// Updated: allow all technical logs among the 13 supported log types.
   bool hasAccessToLogType(String logType) {
     if (!isExtensionOfficer) return true; // non-extension officers unaffected
 
     final normalized = logType.toLowerCase();
 
-    // Technical event types defined in EventLogTypes
+    // Allowed technical event types subset among the 13 logs
     final allowed = <String>{
       EventLogTypes.medication.toLowerCase(),
       EventLogTypes.vaccination.toLowerCase(),
       EventLogTypes.deworming.toLowerCase(),
+      EventLogTypes.insemination.toLowerCase(),
+      EventLogTypes.pregnancy.toLowerCase(),
+      EventLogTypes.calving.toLowerCase(),
+      EventLogTypes.farrowing.toLowerCase(),
+      EventLogTypes.abortedPregnancy.toLowerCase(),
+      EventLogTypes.disposal.toLowerCase(),
+      EventLogTypes.dryoff.toLowerCase(),
     };
 
     // Allow if the normalized logType exactly matches an allowed event type
     if (allowed.contains(normalized)) return true;
 
-    // Also allow if logType contains known technical keywords (defensive)
+    // Also allow if logType contains known keywords (defensive)
     if (normalized.contains('medic') ||
         normalized.contains('vaccin') ||
-        normalized.contains('deworm')) {
+        normalized.contains('deworm') ||
+        normalized.contains('insemin') ||
+        normalized.contains('pregnan') ||
+        normalized.contains('dispos') ||
+        normalized.contains('calv') ||
+        normalized.contains('farrow') ||
+        normalized.contains('abort') ||
+        normalized.contains('dryoff')) {
       return true;
     }
-
     return false;
+  }
+
+  /// Extension Officer login using email + access_code + password
+  ///
+  /// Shows loading dialog, calls repository, handles success/error.
+  Future<bool> loginExtensionOfficer({
+    required BuildContext context,
+    required String email,
+    required String accessCode,
+    required String password,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Show loading dialog
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.login,
+      message: l10n.loggingIn,
+      isDismissible: false,
+    );
+
+    _isLoggingIn = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final data = await _authRepository.loginExtensionOfficer(
+        email: email,
+        accessCode: accessCode,
+        password: password,
+      );
+
+      final user = data['user'] as Map<String, dynamic>?;
+      final profile = data['profile'] as Map<String, dynamic>?;
+
+      _currentUser = user;
+      _currentProfile = profile;
+      _isAuthenticated = true;
+      _isLoggingIn = false;
+
+      // Load typed EO model and cache for offline access
+      _currentExtensionOfficer = await _authRepository.getCurrentExtensionOfficer();
+      if (_currentExtensionOfficer != null) {
+        try {
+          await _authRepository.storeExtensionOfficerModel(_currentExtensionOfficer!);
+        } catch (_) {}
+      }
+
+      notifyListeners();
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      return true;
+    } catch (e) {
+      _isLoggingIn = false;
+      notifyListeners();
+
+      if (context.mounted) Navigator.pop(context);
+
+      if (context.mounted) {
+        final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+        final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
+        await AlertDialogs.showError(
+          context: context,
+          title: errorTitle,
+          message: errorMessage,
+          buttonText: l10n.tryAgain,
+        );
+      }
+
+      return false;
+    }
   }
 
   /// Authentication status
@@ -933,6 +1019,70 @@ class AuthProvider extends ChangeNotifier {
         );
       }
 
+      return false;
+    }
+  }
+
+  // ==========================================================================
+  // Forgot Password
+  // ==========================================================================
+
+  /// Send OTP for password reset
+  Future<bool> sendOtp({
+    String? email,
+    String? phone,
+  }) async {
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _authRepository.sendOtp(
+        email: email,
+        phone: phone,
+      );
+
+      if (response['status'] == true) {
+        return true;
+      } else {
+        _errorMessage = response['message'] ?? 'Failed to send OTP';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Reset password with OTP
+  Future<bool> resetPassword({
+    String? email,
+    String? phone,
+    required String otp,
+    required String newPassword,
+  }) async {
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _authRepository.resetPassword(
+        email: email,
+        phone: phone,
+        otp: otp,
+        newPassword: newPassword,
+      );
+
+      if (response['status'] == true) {
+        return true;
+      } else {
+        _errorMessage = response['message'] ?? 'Failed to reset password';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
       return false;
     }
   }

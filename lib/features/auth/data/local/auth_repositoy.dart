@@ -46,6 +46,71 @@ class AuthRepository implements AuthRepositoryInterface {
     _prefs ??= await SharedPreferences.getInstance();
   }
 
+  @override
+  Future<Map<String, dynamic>> loginExtensionOfficer({
+    required String email,
+    required String accessCode,
+    required String password,
+  }) async {
+    try {
+      final response = await AuthService.loginExtensionOfficer(
+        email: email,
+        accessCode: accessCode,
+        password: password,
+      );
+
+      final data = response['data'] as Map<String, dynamic>;
+      final token = data['accessToken'] as String;
+      final userData = data['user'] as Map<String, dynamic>;
+      final profile = data['profile'];
+      final invite = data['invite'] as Map<String, dynamic>?;
+
+      await saveToken(token);
+      await saveCredentials(username: email, password: password);
+      await _saveUserData(userData);
+      await _setLoggedInStatus(true);
+
+      if (userData.isNotEmpty) {
+        await storeUserData(
+          userId: userData['id']?.toString() ?? '',
+          username: userData['username'] ?? '',
+          email: userData['email'] ?? '',
+          role: userData['role'] ?? '',
+          roleId: userData['roleId']?.toString() ?? '1',
+          firstname: userData['firstname'] ?? '',
+          surname: userData['surname'] ?? '',
+          phone1: userData['phone1'] ?? '',
+          physicalAddress: userData['physicalAddress'] ?? '',
+          dateOfBirth: userData['dateOfBirth'] ?? '',
+          gender: userData['gender'] ?? '',
+          accessToken: token,
+          tokenType: 'Bearer',
+          password: password,
+          profile: profile,
+        );
+      }
+
+      if (invite != null) {
+        await _secureStorage.write(
+          key: 'extensionOfficerInviteId',
+          value: invite['inviteId']?.toString() ?? invite['id']?.toString(),
+        );
+        await _secureStorage.write(
+          key: 'extensionOfficerFarmerId',
+          value: invite['farmerId']?.toString() ?? '',
+        );
+        await _secureStorage.write(
+          key: 'extensionOfficerAccessCode',
+          value: invite['access_code']?.toString() ?? '',
+        );
+      }
+
+      return data;
+    } catch (e) {
+      throw Exception('Repository: Failed to login extension officer - $e');
+    }
+  }
+
   // ==========================================================================
   // Registration
   // ==========================================================================
@@ -765,5 +830,34 @@ class AuthRepository implements AuthRepositoryInterface {
     } catch (e) {
       throw Exception('Failed to set logged in status: $e');
     }
+  }
+
+  // ==========================================================================
+  // Forgot Password
+  // ==========================================================================
+
+  /// Send OTP for password reset
+  Future<Map<String, dynamic>> sendOtp({
+    String? email,
+    String? phone,
+  }) async {
+    await _initPrefs();
+    return await AuthService.sendOtp(email: email, phone: phone);
+  }
+
+  /// Reset password with OTP
+  Future<Map<String, dynamic>> resetPassword({
+    String? email,
+    String? phone,
+    required String otp,
+    required String newPassword,
+  }) async {
+    await _initPrefs();
+    return await AuthService.resetPassword(
+      email: email,
+      phone: phone,
+      otp: otp,
+      newPassword: newPassword,
+    );
   }
 }

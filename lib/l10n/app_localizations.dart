@@ -2402,6 +2402,120 @@ abstract class AppLocalizations {
   /// **'Recover via Phone'**
   String get recoverViaPhone;
 
+  /// No description provided for @enterYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Your Email'**
+  String get enterYourEmail;
+
+  /// No description provided for @enterYourPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Your Phone Number'**
+  String get enterYourPhone;
+
+  /// No description provided for @otpWillBeSentToEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send a 6-digit OTP code to your email address'**
+  String get otpWillBeSentToEmail;
+
+  /// No description provided for @otpWillBeSentToPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send a 6-digit OTP code to your phone number'**
+  String get otpWillBeSentToPhone;
+
+  /// No description provided for @sendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send OTP'**
+  String get sendOtp;
+
+  /// No description provided for @otpExpiresIn10Minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP code expires in 10 minutes'**
+  String get otpExpiresIn10Minutes;
+
+  /// No description provided for @verifyOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify OTP'**
+  String get verifyOtp;
+
+  /// No description provided for @enterOtpCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter OTP Code'**
+  String get enterOtpCode;
+
+  /// No description provided for @otpSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP sent to'**
+  String get otpSentTo;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// No description provided for @resendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend OTP'**
+  String get resendOtp;
+
+  /// No description provided for @pleaseEnterCompleteOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter complete 6-digit OTP'**
+  String get pleaseEnterCompleteOtp;
+
+  /// No description provided for @otpResentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP resent successfully'**
+  String get otpResentSuccessfully;
+
+  /// No description provided for @failedToResendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to resend OTP'**
+  String get failedToResendOtp;
+
+  /// No description provided for @failedToSendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send OTP'**
+  String get failedToSendOtp;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// No description provided for @createNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Password'**
+  String get createNewPassword;
+
+  /// No description provided for @passwordResetSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset successfully! You can now login with your new password.'**
+  String get passwordResetSuccessfully;
+
+  /// No description provided for @failedToResetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reset password'**
+  String get failedToResetPassword;
+
   /// No description provided for @user.
   ///
   /// In en, this message translates to:
@@ -2647,6 +2761,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Extension Officer'**
   String get addExtensionOfficerText;
+
+  /// Title for the invited extension officers list screen
+  ///
+  /// In en, this message translates to:
+  /// **'Invited Extension Officers'**
+  String get invitedExtensionOfficers;
 
   /// No description provided for @farmsText.
   ///
@@ -4922,7 +5042,7 @@ abstract class AppLocalizations {
   /// **'Select'**
   String get select;
 
-  /// No description provided for @status.
+  /// Generic status label
   ///
   /// In en, this message translates to:
   /// **'Status'**
@@ -6140,6 +6260,12 @@ abstract class AppLocalizations {
   /// **'Specialization'**
   String get specialization;
 
+  /// No description provided for @verified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get verified;
+
   /// Message shown when access code is copied
   ///
   /// In en, this message translates to:
@@ -6169,6 +6295,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter farmer access number'**
   String get pleaseEnterFarmerAccessNumber;
+
+  /// Bills list title
+  ///
+  /// In en, this message translates to:
+  /// **'Bills'**
+  String get bills;
+
+  /// Singular bill label
+  ///
+  /// In en, this message translates to:
+  /// **'Bill'**
+  String get bill;
+
+  /// Empty state for bills screen
+  ///
+  /// In en, this message translates to:
+  /// **'No bills found'**
+  String get noBillsFound;
+
+  /// Formatted bill number
+  ///
+  /// In en, this message translates to:
+  /// **'Bill #{number}'**
+  String billNumber(String number);
+
+  /// Generic notes label
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// Short quantity format
+  ///
+  /// In en, this message translates to:
+  /// **'x{count}'**
+  String quantityShort(int count);
+
+  /// Bill subject type label
+  ///
+  /// In en, this message translates to:
+  /// **'Subject type'**
+  String get subjectType;
+
+  /// Bill subject label
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subject;
+
+  /// Dialog title for creating a bill
+  ///
+  /// In en, this message translates to:
+  /// **'Create Bill'**
+  String get createBill;
+
+  /// Number of livestock included in the bill
+  ///
+  /// In en, this message translates to:
+  /// **'Number of livestock'**
+  String get numberOfLivestock;
+
+  /// Snack message after bill created
+  ///
+  /// In en, this message translates to:
+  /// **'Bill created successfully'**
+  String get billCreatedSuccessfully;
+
+  /// Hint text for number input
+  ///
+  /// In en, this message translates to:
+  /// **'Enter number'**
+  String get enterNumber;
+
+  /// Hint text for optional notes field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter notes (optional)'**
+  String get enterNotesOptional;
+
+  /// Error message when bill creation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Bill creation failed'**
+  String get billCreationFailed;
+
+  /// Label for bill details section in dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Details'**
+  String get billDetails;
+
+  /// Title for payment confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Payment'**
+  String get confirmPayment;
+
+  /// Confirmation message for marking bill as paid
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to mark this bill as paid?'**
+  String get markBillAsPaidConfirmation;
+
+  /// Button text to mark bill as paid
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Paid'**
+  String get markAsPaid;
+
+  /// Success message after marking bill as paid
+  ///
+  /// In en, this message translates to:
+  /// **'Bill marked as paid successfully'**
+  String get billMarkedAsPaid;
 }
 
 class _AppLocalizationsDelegate

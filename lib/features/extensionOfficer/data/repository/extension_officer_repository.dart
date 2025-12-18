@@ -60,6 +60,12 @@ class ExtensionOfficerRepository
             email: Value(invite.extensionOfficer.email),
             phone: Value(invite.extensionOfficer.phone),
             specialization: Value(invite.extensionOfficer.specialization),
+            organization: Value(invite.extensionOfficer.organization),
+            countryId: Value(invite.extensionOfficer.countryId),
+            regionId: Value(invite.extensionOfficer.regionId),
+            districtId: Value(invite.extensionOfficer.districtId),
+            wardId: Value(invite.extensionOfficer.wardId),
+            isVerified: Value(invite.extensionOfficer.isVerified),
             inviteDate: Value(DateTime.now()),
             status: const Value('pending'),
             synced: const Value(true),
@@ -96,6 +102,20 @@ class ExtensionOfficerRepository
       );
       // We don't rethrow here because it might be a local-only issue
       // allowing the UI to optimistically update or retry later via sync
+    }
+  }
+
+  @override
+  Future<List<InvitedExtensionOfficer>> getAllLocalInvitedOfficers() async {
+    try {
+      return await _dao.getAllInvitedOfficers();
+    } catch (e, st) {
+      log(
+        '❌ Error loading local invited extension officers: $e',
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
     }
   }
 }

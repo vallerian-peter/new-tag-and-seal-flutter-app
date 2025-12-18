@@ -17,8 +17,11 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
 class InseminationFormScreen extends StatefulWidget {
   final InseminationModel? insemination;
@@ -957,12 +960,38 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           updatedAt: nowIso,
         );
 
-        final updated = await eventsProvider.updateInseminationWithDialog(
-          context,
-          updatedModel,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (updated != null && mounted) {
-          Navigator.pop(context, updated);
+        
+        final updated = await eventsProvider.updateInsemination(updatedModel);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.insemination,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: updated.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: '${l10n.success}!',
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, updated);
+            }
+          }
         }
       } else {
         final uuid =
@@ -1010,12 +1039,38 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           updatedAt: nowIso,
         );
 
-        final created = await eventsProvider.addInseminationWithDialog(
-          context,
-          newModel,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (created != null && mounted) {
-          Navigator.pop(context, created);
+        
+        final created = await eventsProvider.addInsemination(newModel);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.insemination,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: '${l10n.success}!',
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, created);
+            }
+          }
         }
       }
     } catch (e) {

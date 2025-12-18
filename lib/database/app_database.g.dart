@@ -21172,6 +21172,909 @@ class VaccinesCompanion extends UpdateCompanion<Vaccine> {
   }
 }
 
+class $BillsTable extends Bills with TableInfo<$BillsTable, Bill> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BillsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _billNoMeta = const VerificationMeta('billNo');
+  @override
+  late final GeneratedColumn<String> billNo = GeneratedColumn<String>(
+    'bill_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _extensionOfficerIdMeta =
+      const VerificationMeta('extensionOfficerId');
+  @override
+  late final GeneratedColumn<int> extensionOfficerId = GeneratedColumn<int>(
+    'extension_officer_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _farmerIdMeta = const VerificationMeta(
+    'farmerId',
+  );
+  @override
+  late final GeneratedColumn<int> farmerId = GeneratedColumn<int>(
+    'farmer_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _subjectTypeMeta = const VerificationMeta(
+    'subjectType',
+  );
+  @override
+  late final GeneratedColumn<String> subjectType = GeneratedColumn<String>(
+    'subject_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _subjectUuidMeta = const VerificationMeta(
+    'subjectUuid',
+  );
+  @override
+  late final GeneratedColumn<String> subjectUuid = GeneratedColumn<String>(
+    'subject_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<int>(1),
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<String> amount = GeneratedColumn<String>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('pending'),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant<bool>(true),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('server-create'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    billNo,
+    farmUuid,
+    extensionOfficerId,
+    farmerId,
+    subjectType,
+    subjectUuid,
+    quantity,
+    amount,
+    status,
+    notes,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bills';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Bill> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('bill_no')) {
+      context.handle(
+        _billNoMeta,
+        billNo.isAcceptableOrUnknown(data['bill_no']!, _billNoMeta),
+      );
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    }
+    if (data.containsKey('extension_officer_id')) {
+      context.handle(
+        _extensionOfficerIdMeta,
+        extensionOfficerId.isAcceptableOrUnknown(
+          data['extension_officer_id']!,
+          _extensionOfficerIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('farmer_id')) {
+      context.handle(
+        _farmerIdMeta,
+        farmerId.isAcceptableOrUnknown(data['farmer_id']!, _farmerIdMeta),
+      );
+    }
+    if (data.containsKey('subject_type')) {
+      context.handle(
+        _subjectTypeMeta,
+        subjectType.isAcceptableOrUnknown(
+          data['subject_type']!,
+          _subjectTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('subject_uuid')) {
+      context.handle(
+        _subjectUuidMeta,
+        subjectUuid.isAcceptableOrUnknown(
+          data['subject_uuid']!,
+          _subjectUuidMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  Bill map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Bill(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      billNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bill_no'],
+      ),
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      ),
+      extensionOfficerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}extension_officer_id'],
+      ),
+      farmerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}farmer_id'],
+      ),
+      subjectType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject_type'],
+      ),
+      subjectUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject_uuid'],
+      ),
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}amount'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BillsTable createAlias(String alias) {
+    return $BillsTable(attachedDatabase, alias);
+  }
+}
+
+class Bill extends DataClass implements Insertable<Bill> {
+  final int? id;
+  final String uuid;
+  final String? billNo;
+  final String? farmUuid;
+  final int? extensionOfficerId;
+  final int? farmerId;
+  final String? subjectType;
+  final String? subjectUuid;
+  final int quantity;
+  final String amount;
+  final String status;
+  final String? notes;
+  final bool synced;
+  final String syncAction;
+  final String createdAt;
+  final String updatedAt;
+  const Bill({
+    this.id,
+    required this.uuid,
+    this.billNo,
+    this.farmUuid,
+    this.extensionOfficerId,
+    this.farmerId,
+    this.subjectType,
+    this.subjectUuid,
+    required this.quantity,
+    required this.amount,
+    required this.status,
+    this.notes,
+    required this.synced,
+    required this.syncAction,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || billNo != null) {
+      map['bill_no'] = Variable<String>(billNo);
+    }
+    if (!nullToAbsent || farmUuid != null) {
+      map['farm_uuid'] = Variable<String>(farmUuid);
+    }
+    if (!nullToAbsent || extensionOfficerId != null) {
+      map['extension_officer_id'] = Variable<int>(extensionOfficerId);
+    }
+    if (!nullToAbsent || farmerId != null) {
+      map['farmer_id'] = Variable<int>(farmerId);
+    }
+    if (!nullToAbsent || subjectType != null) {
+      map['subject_type'] = Variable<String>(subjectType);
+    }
+    if (!nullToAbsent || subjectUuid != null) {
+      map['subject_uuid'] = Variable<String>(subjectUuid);
+    }
+    map['quantity'] = Variable<int>(quantity);
+    map['amount'] = Variable<String>(amount);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  BillsCompanion toCompanion(bool nullToAbsent) {
+    return BillsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      billNo: billNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billNo),
+      farmUuid: farmUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmUuid),
+      extensionOfficerId: extensionOfficerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extensionOfficerId),
+      farmerId: farmerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmerId),
+      subjectType: subjectType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subjectType),
+      subjectUuid: subjectUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subjectUuid),
+      quantity: Value(quantity),
+      amount: Value(amount),
+      status: Value(status),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Bill.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Bill(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      billNo: serializer.fromJson<String?>(json['billNo']),
+      farmUuid: serializer.fromJson<String?>(json['farmUuid']),
+      extensionOfficerId: serializer.fromJson<int?>(json['extensionOfficerId']),
+      farmerId: serializer.fromJson<int?>(json['farmerId']),
+      subjectType: serializer.fromJson<String?>(json['subjectType']),
+      subjectUuid: serializer.fromJson<String?>(json['subjectUuid']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      amount: serializer.fromJson<String>(json['amount']),
+      status: serializer.fromJson<String>(json['status']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'billNo': serializer.toJson<String?>(billNo),
+      'farmUuid': serializer.toJson<String?>(farmUuid),
+      'extensionOfficerId': serializer.toJson<int?>(extensionOfficerId),
+      'farmerId': serializer.toJson<int?>(farmerId),
+      'subjectType': serializer.toJson<String?>(subjectType),
+      'subjectUuid': serializer.toJson<String?>(subjectUuid),
+      'quantity': serializer.toJson<int>(quantity),
+      'amount': serializer.toJson<String>(amount),
+      'status': serializer.toJson<String>(status),
+      'notes': serializer.toJson<String?>(notes),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  Bill copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    Value<String?> billNo = const Value.absent(),
+    Value<String?> farmUuid = const Value.absent(),
+    Value<int?> extensionOfficerId = const Value.absent(),
+    Value<int?> farmerId = const Value.absent(),
+    Value<String?> subjectType = const Value.absent(),
+    Value<String?> subjectUuid = const Value.absent(),
+    int? quantity,
+    String? amount,
+    String? status,
+    Value<String?> notes = const Value.absent(),
+    bool? synced,
+    String? syncAction,
+    String? createdAt,
+    String? updatedAt,
+  }) => Bill(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    billNo: billNo.present ? billNo.value : this.billNo,
+    farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
+    extensionOfficerId: extensionOfficerId.present
+        ? extensionOfficerId.value
+        : this.extensionOfficerId,
+    farmerId: farmerId.present ? farmerId.value : this.farmerId,
+    subjectType: subjectType.present ? subjectType.value : this.subjectType,
+    subjectUuid: subjectUuid.present ? subjectUuid.value : this.subjectUuid,
+    quantity: quantity ?? this.quantity,
+    amount: amount ?? this.amount,
+    status: status ?? this.status,
+    notes: notes.present ? notes.value : this.notes,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Bill copyWithCompanion(BillsCompanion data) {
+    return Bill(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      billNo: data.billNo.present ? data.billNo.value : this.billNo,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      extensionOfficerId: data.extensionOfficerId.present
+          ? data.extensionOfficerId.value
+          : this.extensionOfficerId,
+      farmerId: data.farmerId.present ? data.farmerId.value : this.farmerId,
+      subjectType: data.subjectType.present
+          ? data.subjectType.value
+          : this.subjectType,
+      subjectUuid: data.subjectUuid.present
+          ? data.subjectUuid.value
+          : this.subjectUuid,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      status: data.status.present ? data.status.value : this.status,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Bill(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('billNo: $billNo, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('extensionOfficerId: $extensionOfficerId, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('subjectType: $subjectType, ')
+          ..write('subjectUuid: $subjectUuid, ')
+          ..write('quantity: $quantity, ')
+          ..write('amount: $amount, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    billNo,
+    farmUuid,
+    extensionOfficerId,
+    farmerId,
+    subjectType,
+    subjectUuid,
+    quantity,
+    amount,
+    status,
+    notes,
+    synced,
+    syncAction,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Bill &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.billNo == this.billNo &&
+          other.farmUuid == this.farmUuid &&
+          other.extensionOfficerId == this.extensionOfficerId &&
+          other.farmerId == this.farmerId &&
+          other.subjectType == this.subjectType &&
+          other.subjectUuid == this.subjectUuid &&
+          other.quantity == this.quantity &&
+          other.amount == this.amount &&
+          other.status == this.status &&
+          other.notes == this.notes &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BillsCompanion extends UpdateCompanion<Bill> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String?> billNo;
+  final Value<String?> farmUuid;
+  final Value<int?> extensionOfficerId;
+  final Value<int?> farmerId;
+  final Value<String?> subjectType;
+  final Value<String?> subjectUuid;
+  final Value<int> quantity;
+  final Value<String> amount;
+  final Value<String> status;
+  final Value<String?> notes;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const BillsCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.billNo = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.extensionOfficerId = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.subjectType = const Value.absent(),
+    this.subjectUuid = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BillsCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    this.billNo = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.extensionOfficerId = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.subjectType = const Value.absent(),
+    this.subjectUuid = const Value.absent(),
+    this.quantity = const Value.absent(),
+    required String amount,
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       amount = Value(amount),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Bill> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? billNo,
+    Expression<String>? farmUuid,
+    Expression<int>? extensionOfficerId,
+    Expression<int>? farmerId,
+    Expression<String>? subjectType,
+    Expression<String>? subjectUuid,
+    Expression<int>? quantity,
+    Expression<String>? amount,
+    Expression<String>? status,
+    Expression<String>? notes,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (billNo != null) 'bill_no': billNo,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (extensionOfficerId != null)
+        'extension_officer_id': extensionOfficerId,
+      if (farmerId != null) 'farmer_id': farmerId,
+      if (subjectType != null) 'subject_type': subjectType,
+      if (subjectUuid != null) 'subject_uuid': subjectUuid,
+      if (quantity != null) 'quantity': quantity,
+      if (amount != null) 'amount': amount,
+      if (status != null) 'status': status,
+      if (notes != null) 'notes': notes,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BillsCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String?>? billNo,
+    Value<String?>? farmUuid,
+    Value<int?>? extensionOfficerId,
+    Value<int?>? farmerId,
+    Value<String?>? subjectType,
+    Value<String?>? subjectUuid,
+    Value<int>? quantity,
+    Value<String>? amount,
+    Value<String>? status,
+    Value<String?>? notes,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BillsCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      billNo: billNo ?? this.billNo,
+      farmUuid: farmUuid ?? this.farmUuid,
+      extensionOfficerId: extensionOfficerId ?? this.extensionOfficerId,
+      farmerId: farmerId ?? this.farmerId,
+      subjectType: subjectType ?? this.subjectType,
+      subjectUuid: subjectUuid ?? this.subjectUuid,
+      quantity: quantity ?? this.quantity,
+      amount: amount ?? this.amount,
+      status: status ?? this.status,
+      notes: notes ?? this.notes,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (billNo.present) {
+      map['bill_no'] = Variable<String>(billNo.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (extensionOfficerId.present) {
+      map['extension_officer_id'] = Variable<int>(extensionOfficerId.value);
+    }
+    if (farmerId.present) {
+      map['farmer_id'] = Variable<int>(farmerId.value);
+    }
+    if (subjectType.present) {
+      map['subject_type'] = Variable<String>(subjectType.value);
+    }
+    if (subjectUuid.present) {
+      map['subject_uuid'] = Variable<String>(subjectUuid.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<String>(amount.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BillsCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('billNo: $billNo, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('extensionOfficerId: $extensionOfficerId, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('subjectType: $subjectType, ')
+          ..write('subjectUuid: $subjectUuid, ')
+          ..write('quantity: $quantity, ')
+          ..write('amount: $amount, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $FarmUsersTable extends FarmUsers
     with TableInfo<$FarmUsersTable, FarmUser> {
   @override
@@ -23144,6 +24047,73 @@ class $InvitedExtensionOfficersTable extends InvitedExtensionOfficers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _organizationMeta = const VerificationMeta(
+    'organization',
+  );
+  @override
+  late final GeneratedColumn<String> organization = GeneratedColumn<String>(
+    'organization',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _countryIdMeta = const VerificationMeta(
+    'countryId',
+  );
+  @override
+  late final GeneratedColumn<int> countryId = GeneratedColumn<int>(
+    'country_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _regionIdMeta = const VerificationMeta(
+    'regionId',
+  );
+  @override
+  late final GeneratedColumn<int> regionId = GeneratedColumn<int>(
+    'region_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _districtIdMeta = const VerificationMeta(
+    'districtId',
+  );
+  @override
+  late final GeneratedColumn<int> districtId = GeneratedColumn<int>(
+    'district_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _wardIdMeta = const VerificationMeta('wardId');
+  @override
+  late final GeneratedColumn<int> wardId = GeneratedColumn<int>(
+    'ward_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isVerifiedMeta = const VerificationMeta(
+    'isVerified',
+  );
+  @override
+  late final GeneratedColumn<bool> isVerified = GeneratedColumn<bool>(
+    'is_verified',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_verified" IN (0, 1))',
+    ),
+  );
   static const VerificationMeta _inviteDateMeta = const VerificationMeta(
     'inviteDate',
   );
@@ -23224,6 +24194,12 @@ class $InvitedExtensionOfficersTable extends InvitedExtensionOfficers
     email,
     phone,
     specialization,
+    organization,
+    countryId,
+    regionId,
+    districtId,
+    wardId,
+    isVerified,
     inviteDate,
     status,
     synced,
@@ -23315,6 +24291,45 @@ class $InvitedExtensionOfficersTable extends InvitedExtensionOfficers
         ),
       );
     }
+    if (data.containsKey('organization')) {
+      context.handle(
+        _organizationMeta,
+        organization.isAcceptableOrUnknown(
+          data['organization']!,
+          _organizationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('country_id')) {
+      context.handle(
+        _countryIdMeta,
+        countryId.isAcceptableOrUnknown(data['country_id']!, _countryIdMeta),
+      );
+    }
+    if (data.containsKey('region_id')) {
+      context.handle(
+        _regionIdMeta,
+        regionId.isAcceptableOrUnknown(data['region_id']!, _regionIdMeta),
+      );
+    }
+    if (data.containsKey('district_id')) {
+      context.handle(
+        _districtIdMeta,
+        districtId.isAcceptableOrUnknown(data['district_id']!, _districtIdMeta),
+      );
+    }
+    if (data.containsKey('ward_id')) {
+      context.handle(
+        _wardIdMeta,
+        wardId.isAcceptableOrUnknown(data['ward_id']!, _wardIdMeta),
+      );
+    }
+    if (data.containsKey('is_verified')) {
+      context.handle(
+        _isVerifiedMeta,
+        isVerified.isAcceptableOrUnknown(data['is_verified']!, _isVerifiedMeta),
+      );
+    }
     if (data.containsKey('invite_date')) {
       context.handle(
         _inviteDateMeta,
@@ -23403,6 +24418,30 @@ class $InvitedExtensionOfficersTable extends InvitedExtensionOfficers
         DriftSqlType.string,
         data['${effectivePrefix}specialization'],
       ),
+      organization: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}organization'],
+      ),
+      countryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}country_id'],
+      ),
+      regionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}region_id'],
+      ),
+      districtId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}district_id'],
+      ),
+      wardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ward_id'],
+      ),
+      isVerified: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_verified'],
+      ),
       inviteDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}invite_date'],
@@ -23448,6 +24487,12 @@ class InvitedExtensionOfficer extends DataClass
   final String email;
   final String? phone;
   final String? specialization;
+  final String? organization;
+  final int? countryId;
+  final int? regionId;
+  final int? districtId;
+  final int? wardId;
+  final bool? isVerified;
   final DateTime? inviteDate;
   final String status;
   final bool synced;
@@ -23465,6 +24510,12 @@ class InvitedExtensionOfficer extends DataClass
     required this.email,
     this.phone,
     this.specialization,
+    this.organization,
+    this.countryId,
+    this.regionId,
+    this.districtId,
+    this.wardId,
+    this.isVerified,
     this.inviteDate,
     required this.status,
     required this.synced,
@@ -23490,6 +24541,24 @@ class InvitedExtensionOfficer extends DataClass
     }
     if (!nullToAbsent || specialization != null) {
       map['specialization'] = Variable<String>(specialization);
+    }
+    if (!nullToAbsent || organization != null) {
+      map['organization'] = Variable<String>(organization);
+    }
+    if (!nullToAbsent || countryId != null) {
+      map['country_id'] = Variable<int>(countryId);
+    }
+    if (!nullToAbsent || regionId != null) {
+      map['region_id'] = Variable<int>(regionId);
+    }
+    if (!nullToAbsent || districtId != null) {
+      map['district_id'] = Variable<int>(districtId);
+    }
+    if (!nullToAbsent || wardId != null) {
+      map['ward_id'] = Variable<int>(wardId);
+    }
+    if (!nullToAbsent || isVerified != null) {
+      map['is_verified'] = Variable<bool>(isVerified);
     }
     if (!nullToAbsent || inviteDate != null) {
       map['invite_date'] = Variable<DateTime>(inviteDate);
@@ -23524,6 +24593,24 @@ class InvitedExtensionOfficer extends DataClass
       specialization: specialization == null && nullToAbsent
           ? const Value.absent()
           : Value(specialization),
+      organization: organization == null && nullToAbsent
+          ? const Value.absent()
+          : Value(organization),
+      countryId: countryId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(countryId),
+      regionId: regionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(regionId),
+      districtId: districtId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(districtId),
+      wardId: wardId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wardId),
+      isVerified: isVerified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isVerified),
       inviteDate: inviteDate == null && nullToAbsent
           ? const Value.absent()
           : Value(inviteDate),
@@ -23555,6 +24642,12 @@ class InvitedExtensionOfficer extends DataClass
       email: serializer.fromJson<String>(json['email']),
       phone: serializer.fromJson<String?>(json['phone']),
       specialization: serializer.fromJson<String?>(json['specialization']),
+      organization: serializer.fromJson<String?>(json['organization']),
+      countryId: serializer.fromJson<int?>(json['countryId']),
+      regionId: serializer.fromJson<int?>(json['regionId']),
+      districtId: serializer.fromJson<int?>(json['districtId']),
+      wardId: serializer.fromJson<int?>(json['wardId']),
+      isVerified: serializer.fromJson<bool?>(json['isVerified']),
       inviteDate: serializer.fromJson<DateTime?>(json['inviteDate']),
       status: serializer.fromJson<String>(json['status']),
       synced: serializer.fromJson<bool>(json['synced']),
@@ -23577,6 +24670,12 @@ class InvitedExtensionOfficer extends DataClass
       'email': serializer.toJson<String>(email),
       'phone': serializer.toJson<String?>(phone),
       'specialization': serializer.toJson<String?>(specialization),
+      'organization': serializer.toJson<String?>(organization),
+      'countryId': serializer.toJson<int?>(countryId),
+      'regionId': serializer.toJson<int?>(regionId),
+      'districtId': serializer.toJson<int?>(districtId),
+      'wardId': serializer.toJson<int?>(wardId),
+      'isVerified': serializer.toJson<bool?>(isVerified),
       'inviteDate': serializer.toJson<DateTime?>(inviteDate),
       'status': serializer.toJson<String>(status),
       'synced': serializer.toJson<bool>(synced),
@@ -23597,6 +24696,12 @@ class InvitedExtensionOfficer extends DataClass
     String? email,
     Value<String?> phone = const Value.absent(),
     Value<String?> specialization = const Value.absent(),
+    Value<String?> organization = const Value.absent(),
+    Value<int?> countryId = const Value.absent(),
+    Value<int?> regionId = const Value.absent(),
+    Value<int?> districtId = const Value.absent(),
+    Value<int?> wardId = const Value.absent(),
+    Value<bool?> isVerified = const Value.absent(),
     Value<DateTime?> inviteDate = const Value.absent(),
     String? status,
     bool? synced,
@@ -23616,6 +24721,12 @@ class InvitedExtensionOfficer extends DataClass
     specialization: specialization.present
         ? specialization.value
         : this.specialization,
+    organization: organization.present ? organization.value : this.organization,
+    countryId: countryId.present ? countryId.value : this.countryId,
+    regionId: regionId.present ? regionId.value : this.regionId,
+    districtId: districtId.present ? districtId.value : this.districtId,
+    wardId: wardId.present ? wardId.value : this.wardId,
+    isVerified: isVerified.present ? isVerified.value : this.isVerified,
     inviteDate: inviteDate.present ? inviteDate.value : this.inviteDate,
     status: status ?? this.status,
     synced: synced ?? this.synced,
@@ -23643,6 +24754,18 @@ class InvitedExtensionOfficer extends DataClass
       specialization: data.specialization.present
           ? data.specialization.value
           : this.specialization,
+      organization: data.organization.present
+          ? data.organization.value
+          : this.organization,
+      countryId: data.countryId.present ? data.countryId.value : this.countryId,
+      regionId: data.regionId.present ? data.regionId.value : this.regionId,
+      districtId: data.districtId.present
+          ? data.districtId.value
+          : this.districtId,
+      wardId: data.wardId.present ? data.wardId.value : this.wardId,
+      isVerified: data.isVerified.present
+          ? data.isVerified.value
+          : this.isVerified,
       inviteDate: data.inviteDate.present
           ? data.inviteDate.value
           : this.inviteDate,
@@ -23669,6 +24792,12 @@ class InvitedExtensionOfficer extends DataClass
           ..write('email: $email, ')
           ..write('phone: $phone, ')
           ..write('specialization: $specialization, ')
+          ..write('organization: $organization, ')
+          ..write('countryId: $countryId, ')
+          ..write('regionId: $regionId, ')
+          ..write('districtId: $districtId, ')
+          ..write('wardId: $wardId, ')
+          ..write('isVerified: $isVerified, ')
           ..write('inviteDate: $inviteDate, ')
           ..write('status: $status, ')
           ..write('synced: $synced, ')
@@ -23680,7 +24809,7 @@ class InvitedExtensionOfficer extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     inviteId,
     accessCode,
@@ -23691,13 +24820,19 @@ class InvitedExtensionOfficer extends DataClass
     email,
     phone,
     specialization,
+    organization,
+    countryId,
+    regionId,
+    districtId,
+    wardId,
+    isVerified,
     inviteDate,
     status,
     synced,
     syncAction,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -23712,6 +24847,12 @@ class InvitedExtensionOfficer extends DataClass
           other.email == this.email &&
           other.phone == this.phone &&
           other.specialization == this.specialization &&
+          other.organization == this.organization &&
+          other.countryId == this.countryId &&
+          other.regionId == this.regionId &&
+          other.districtId == this.districtId &&
+          other.wardId == this.wardId &&
+          other.isVerified == this.isVerified &&
           other.inviteDate == this.inviteDate &&
           other.status == this.status &&
           other.synced == this.synced &&
@@ -23732,6 +24873,12 @@ class InvitedExtensionOfficersCompanion
   final Value<String> email;
   final Value<String?> phone;
   final Value<String?> specialization;
+  final Value<String?> organization;
+  final Value<int?> countryId;
+  final Value<int?> regionId;
+  final Value<int?> districtId;
+  final Value<int?> wardId;
+  final Value<bool?> isVerified;
   final Value<DateTime?> inviteDate;
   final Value<String> status;
   final Value<bool> synced;
@@ -23749,6 +24896,12 @@ class InvitedExtensionOfficersCompanion
     this.email = const Value.absent(),
     this.phone = const Value.absent(),
     this.specialization = const Value.absent(),
+    this.organization = const Value.absent(),
+    this.countryId = const Value.absent(),
+    this.regionId = const Value.absent(),
+    this.districtId = const Value.absent(),
+    this.wardId = const Value.absent(),
+    this.isVerified = const Value.absent(),
     this.inviteDate = const Value.absent(),
     this.status = const Value.absent(),
     this.synced = const Value.absent(),
@@ -23767,6 +24920,12 @@ class InvitedExtensionOfficersCompanion
     required String email,
     this.phone = const Value.absent(),
     this.specialization = const Value.absent(),
+    this.organization = const Value.absent(),
+    this.countryId = const Value.absent(),
+    this.regionId = const Value.absent(),
+    this.districtId = const Value.absent(),
+    this.wardId = const Value.absent(),
+    this.isVerified = const Value.absent(),
     this.inviteDate = const Value.absent(),
     this.status = const Value.absent(),
     this.synced = const Value.absent(),
@@ -23790,6 +24949,12 @@ class InvitedExtensionOfficersCompanion
     Expression<String>? email,
     Expression<String>? phone,
     Expression<String>? specialization,
+    Expression<String>? organization,
+    Expression<int>? countryId,
+    Expression<int>? regionId,
+    Expression<int>? districtId,
+    Expression<int>? wardId,
+    Expression<bool>? isVerified,
     Expression<DateTime>? inviteDate,
     Expression<String>? status,
     Expression<bool>? synced,
@@ -23808,6 +24973,12 @@ class InvitedExtensionOfficersCompanion
       if (email != null) 'email': email,
       if (phone != null) 'phone': phone,
       if (specialization != null) 'specialization': specialization,
+      if (organization != null) 'organization': organization,
+      if (countryId != null) 'country_id': countryId,
+      if (regionId != null) 'region_id': regionId,
+      if (districtId != null) 'district_id': districtId,
+      if (wardId != null) 'ward_id': wardId,
+      if (isVerified != null) 'is_verified': isVerified,
       if (inviteDate != null) 'invite_date': inviteDate,
       if (status != null) 'status': status,
       if (synced != null) 'synced': synced,
@@ -23828,6 +24999,12 @@ class InvitedExtensionOfficersCompanion
     Value<String>? email,
     Value<String?>? phone,
     Value<String?>? specialization,
+    Value<String?>? organization,
+    Value<int?>? countryId,
+    Value<int?>? regionId,
+    Value<int?>? districtId,
+    Value<int?>? wardId,
+    Value<bool?>? isVerified,
     Value<DateTime?>? inviteDate,
     Value<String>? status,
     Value<bool>? synced,
@@ -23846,6 +25023,12 @@ class InvitedExtensionOfficersCompanion
       email: email ?? this.email,
       phone: phone ?? this.phone,
       specialization: specialization ?? this.specialization,
+      organization: organization ?? this.organization,
+      countryId: countryId ?? this.countryId,
+      regionId: regionId ?? this.regionId,
+      districtId: districtId ?? this.districtId,
+      wardId: wardId ?? this.wardId,
+      isVerified: isVerified ?? this.isVerified,
       inviteDate: inviteDate ?? this.inviteDate,
       status: status ?? this.status,
       synced: synced ?? this.synced,
@@ -23888,6 +25071,24 @@ class InvitedExtensionOfficersCompanion
     if (specialization.present) {
       map['specialization'] = Variable<String>(specialization.value);
     }
+    if (organization.present) {
+      map['organization'] = Variable<String>(organization.value);
+    }
+    if (countryId.present) {
+      map['country_id'] = Variable<int>(countryId.value);
+    }
+    if (regionId.present) {
+      map['region_id'] = Variable<int>(regionId.value);
+    }
+    if (districtId.present) {
+      map['district_id'] = Variable<int>(districtId.value);
+    }
+    if (wardId.present) {
+      map['ward_id'] = Variable<int>(wardId.value);
+    }
+    if (isVerified.present) {
+      map['is_verified'] = Variable<bool>(isVerified.value);
+    }
     if (inviteDate.present) {
       map['invite_date'] = Variable<DateTime>(inviteDate.value);
     }
@@ -23922,6 +25123,12 @@ class InvitedExtensionOfficersCompanion
           ..write('email: $email, ')
           ..write('phone: $phone, ')
           ..write('specialization: $specialization, ')
+          ..write('organization: $organization, ')
+          ..write('countryId: $countryId, ')
+          ..write('regionId: $regionId, ')
+          ..write('districtId: $districtId, ')
+          ..write('wardId: $wardId, ')
+          ..write('isVerified: $isVerified, ')
           ..write('inviteDate: $inviteDate, ')
           ..write('status: $status, ')
           ..write('synced: $synced, ')
@@ -23993,6 +25200,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DryoffsTable dryoffs = $DryoffsTable(this);
   late final $TransfersTable transfers = $TransfersTable(this);
   late final $VaccinesTable vaccines = $VaccinesTable(this);
+  late final $BillsTable bills = $BillsTable(this);
   late final $FarmUsersTable farmUsers = $FarmUsersTable(this);
   late final $NotificationEntriesTable notificationEntries =
       $NotificationEntriesTable(this);
@@ -24012,6 +25220,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(
     this as AppDatabase,
   );
+  late final BillDao billDao = BillDao(this as AppDatabase);
   late final NotificationDao notificationDao = NotificationDao(
     this as AppDatabase,
   );
@@ -24071,6 +25280,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dryoffs,
     transfers,
     vaccines,
+    bills,
     farmUsers,
     notificationEntries,
     invitedExtensionOfficers,
@@ -37221,6 +38431,416 @@ typedef $$VaccinesTableProcessedTableManager =
       Vaccine,
       PrefetchHooks Function()
     >;
+typedef $$BillsTableCreateCompanionBuilder =
+    BillsCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      Value<String?> billNo,
+      Value<String?> farmUuid,
+      Value<int?> extensionOfficerId,
+      Value<int?> farmerId,
+      Value<String?> subjectType,
+      Value<String?> subjectUuid,
+      Value<int> quantity,
+      required String amount,
+      Value<String> status,
+      Value<String?> notes,
+      Value<bool> synced,
+      Value<String> syncAction,
+      required String createdAt,
+      required String updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BillsTableUpdateCompanionBuilder =
+    BillsCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String?> billNo,
+      Value<String?> farmUuid,
+      Value<int?> extensionOfficerId,
+      Value<int?> farmerId,
+      Value<String?> subjectType,
+      Value<String?> subjectUuid,
+      Value<int> quantity,
+      Value<String> amount,
+      Value<String> status,
+      Value<String?> notes,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BillsTableFilterComposer extends Composer<_$AppDatabase, $BillsTable> {
+  $$BillsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get billNo => $composableBuilder(
+    column: $table.billNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get extensionOfficerId => $composableBuilder(
+    column: $table.extensionOfficerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subjectUuid => $composableBuilder(
+    column: $table.subjectUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BillsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BillsTable> {
+  $$BillsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get billNo => $composableBuilder(
+    column: $table.billNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get extensionOfficerId => $composableBuilder(
+    column: $table.extensionOfficerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subjectUuid => $composableBuilder(
+    column: $table.subjectUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BillsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BillsTable> {
+  $$BillsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get billNo =>
+      $composableBuilder(column: $table.billNo, builder: (column) => column);
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<int> get extensionOfficerId => $composableBuilder(
+    column: $table.extensionOfficerId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get farmerId =>
+      $composableBuilder(column: $table.farmerId, builder: (column) => column);
+
+  GeneratedColumn<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subjectUuid => $composableBuilder(
+    column: $table.subjectUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BillsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BillsTable,
+          Bill,
+          $$BillsTableFilterComposer,
+          $$BillsTableOrderingComposer,
+          $$BillsTableAnnotationComposer,
+          $$BillsTableCreateCompanionBuilder,
+          $$BillsTableUpdateCompanionBuilder,
+          (Bill, BaseReferences<_$AppDatabase, $BillsTable, Bill>),
+          Bill,
+          PrefetchHooks Function()
+        > {
+  $$BillsTableTableManager(_$AppDatabase db, $BillsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BillsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BillsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BillsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String?> billNo = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<int?> extensionOfficerId = const Value.absent(),
+                Value<int?> farmerId = const Value.absent(),
+                Value<String?> subjectType = const Value.absent(),
+                Value<String?> subjectUuid = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<String> amount = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BillsCompanion(
+                id: id,
+                uuid: uuid,
+                billNo: billNo,
+                farmUuid: farmUuid,
+                extensionOfficerId: extensionOfficerId,
+                farmerId: farmerId,
+                subjectType: subjectType,
+                subjectUuid: subjectUuid,
+                quantity: quantity,
+                amount: amount,
+                status: status,
+                notes: notes,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                Value<String?> billNo = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<int?> extensionOfficerId = const Value.absent(),
+                Value<int?> farmerId = const Value.absent(),
+                Value<String?> subjectType = const Value.absent(),
+                Value<String?> subjectUuid = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                required String amount,
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BillsCompanion.insert(
+                id: id,
+                uuid: uuid,
+                billNo: billNo,
+                farmUuid: farmUuid,
+                extensionOfficerId: extensionOfficerId,
+                farmerId: farmerId,
+                subjectType: subjectType,
+                subjectUuid: subjectUuid,
+                quantity: quantity,
+                amount: amount,
+                status: status,
+                notes: notes,
+                synced: synced,
+                syncAction: syncAction,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BillsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BillsTable,
+      Bill,
+      $$BillsTableFilterComposer,
+      $$BillsTableOrderingComposer,
+      $$BillsTableAnnotationComposer,
+      $$BillsTableCreateCompanionBuilder,
+      $$BillsTableUpdateCompanionBuilder,
+      (Bill, BaseReferences<_$AppDatabase, $BillsTable, Bill>),
+      Bill,
+      PrefetchHooks Function()
+    >;
 typedef $$FarmUsersTableCreateCompanionBuilder =
     FarmUsersCompanion Function({
       Value<int?> id,
@@ -38092,6 +39712,12 @@ typedef $$InvitedExtensionOfficersTableCreateCompanionBuilder =
       required String email,
       Value<String?> phone,
       Value<String?> specialization,
+      Value<String?> organization,
+      Value<int?> countryId,
+      Value<int?> regionId,
+      Value<int?> districtId,
+      Value<int?> wardId,
+      Value<bool?> isVerified,
       Value<DateTime?> inviteDate,
       Value<String> status,
       Value<bool> synced,
@@ -38111,6 +39737,12 @@ typedef $$InvitedExtensionOfficersTableUpdateCompanionBuilder =
       Value<String> email,
       Value<String?> phone,
       Value<String?> specialization,
+      Value<String?> organization,
+      Value<int?> countryId,
+      Value<int?> regionId,
+      Value<int?> districtId,
+      Value<int?> wardId,
+      Value<bool?> isVerified,
       Value<DateTime?> inviteDate,
       Value<String> status,
       Value<bool> synced,
@@ -38175,6 +39807,36 @@ class $$InvitedExtensionOfficersTableFilterComposer
 
   ColumnFilters<String> get specialization => $composableBuilder(
     column: $table.specialization,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get organization => $composableBuilder(
+    column: $table.organization,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get countryId => $composableBuilder(
+    column: $table.countryId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get regionId => $composableBuilder(
+    column: $table.regionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get districtId => $composableBuilder(
+    column: $table.districtId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wardId => $composableBuilder(
+    column: $table.wardId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -38268,6 +39930,36 @@ class $$InvitedExtensionOfficersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get organization => $composableBuilder(
+    column: $table.organization,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get countryId => $composableBuilder(
+    column: $table.countryId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get regionId => $composableBuilder(
+    column: $table.regionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get districtId => $composableBuilder(
+    column: $table.districtId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get wardId => $composableBuilder(
+    column: $table.wardId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get inviteDate => $composableBuilder(
     column: $table.inviteDate,
     builder: (column) => ColumnOrderings(column),
@@ -38341,6 +40033,30 @@ class $$InvitedExtensionOfficersTableAnnotationComposer
 
   GeneratedColumn<String> get specialization => $composableBuilder(
     column: $table.specialization,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get organization => $composableBuilder(
+    column: $table.organization,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get countryId =>
+      $composableBuilder(column: $table.countryId, builder: (column) => column);
+
+  GeneratedColumn<int> get regionId =>
+      $composableBuilder(column: $table.regionId, builder: (column) => column);
+
+  GeneratedColumn<int> get districtId => $composableBuilder(
+    column: $table.districtId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get wardId =>
+      $composableBuilder(column: $table.wardId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
     builder: (column) => column,
   );
 
@@ -38423,6 +40139,12 @@ class $$InvitedExtensionOfficersTableTableManager
                 Value<String> email = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> specialization = const Value.absent(),
+                Value<String?> organization = const Value.absent(),
+                Value<int?> countryId = const Value.absent(),
+                Value<int?> regionId = const Value.absent(),
+                Value<int?> districtId = const Value.absent(),
+                Value<int?> wardId = const Value.absent(),
+                Value<bool?> isVerified = const Value.absent(),
                 Value<DateTime?> inviteDate = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
@@ -38440,6 +40162,12 @@ class $$InvitedExtensionOfficersTableTableManager
                 email: email,
                 phone: phone,
                 specialization: specialization,
+                organization: organization,
+                countryId: countryId,
+                regionId: regionId,
+                districtId: districtId,
+                wardId: wardId,
+                isVerified: isVerified,
                 inviteDate: inviteDate,
                 status: status,
                 synced: synced,
@@ -38459,6 +40187,12 @@ class $$InvitedExtensionOfficersTableTableManager
                 required String email,
                 Value<String?> phone = const Value.absent(),
                 Value<String?> specialization = const Value.absent(),
+                Value<String?> organization = const Value.absent(),
+                Value<int?> countryId = const Value.absent(),
+                Value<int?> regionId = const Value.absent(),
+                Value<int?> districtId = const Value.absent(),
+                Value<int?> wardId = const Value.absent(),
+                Value<bool?> isVerified = const Value.absent(),
                 Value<DateTime?> inviteDate = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
@@ -38476,6 +40210,12 @@ class $$InvitedExtensionOfficersTableTableManager
                 email: email,
                 phone: phone,
                 specialization: specialization,
+                organization: organization,
+                countryId: countryId,
+                regionId: regionId,
+                districtId: districtId,
+                wardId: wardId,
+                isVerified: isVerified,
                 inviteDate: inviteDate,
                 status: status,
                 synced: synced,
@@ -38613,6 +40353,8 @@ class $AppDatabaseManager {
       $$TransfersTableTableManager(_db, _db.transfers);
   $$VaccinesTableTableManager get vaccines =>
       $$VaccinesTableTableManager(_db, _db.vaccines);
+  $$BillsTableTableManager get bills =>
+      $$BillsTableTableManager(_db, _db.bills);
   $$FarmUsersTableTableManager get farmUsers =>
       $$FarmUsersTableTableManager(_db, _db.farmUsers);
   $$NotificationEntriesTableTableManager get notificationEntries =>

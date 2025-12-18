@@ -55,6 +55,9 @@ class ApiEndpoints {
   /// Login with username/email and password (POST request)
   static String get login => '$authBase/login';
 
+  /// Extension Officer login with email, access_code and password (POST request)
+  static String get extensionOfficerLogin => '$authBase/extension-officer/login';
+
   // ----------------------------------------------------------------------------
   // Sync Endpoints (Public)
   // ----------------------------------------------------------------------------
@@ -84,6 +87,12 @@ class ApiEndpoints {
   
   /// Change user password (POST request, requires auth)
   static String get changePassword => '$authBase/change-password';
+
+  /// Send OTP for password reset (POST request, no auth required)
+  static String get sendOtp => '$authBase/forgot-password/send-otp';
+
+  /// Reset password with OTP (POST request, no auth required)
+  static String get resetPassword => '$authBase/forgot-password/reset-password';
 
   // ----------------------------------------------------------------------------
   // User Endpoints

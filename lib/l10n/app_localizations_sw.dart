@@ -1216,6 +1216,66 @@ class AppLocalizationsSw extends AppLocalizations {
   String get recoverViaPhone => 'Rejesha kwa Simu';
 
   @override
+  String get enterYourEmail => 'Enter Your Email';
+
+  @override
+  String get enterYourPhone => 'Enter Your Phone Number';
+
+  @override
+  String get otpWillBeSentToEmail =>
+      'We\'ll send a 6-digit OTP code to your email address';
+
+  @override
+  String get otpWillBeSentToPhone =>
+      'We\'ll send a 6-digit OTP code to your phone number';
+
+  @override
+  String get sendOtp => 'Send OTP';
+
+  @override
+  String get otpExpiresIn10Minutes => 'OTP code expires in 10 minutes';
+
+  @override
+  String get verifyOtp => 'Verify OTP';
+
+  @override
+  String get enterOtpCode => 'Enter OTP Code';
+
+  @override
+  String get otpSentTo => 'OTP sent to';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get resendOtp => 'Resend OTP';
+
+  @override
+  String get pleaseEnterCompleteOtp => 'Please enter complete 6-digit OTP';
+
+  @override
+  String get otpResentSuccessfully => 'OTP resent successfully';
+
+  @override
+  String get failedToResendOtp => 'Failed to resend OTP';
+
+  @override
+  String get failedToSendOtp => 'Failed to send OTP';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get createNewPassword => 'Create New Password';
+
+  @override
+  String get passwordResetSuccessfully =>
+      'Password reset successfully! You can now login with your new password.';
+
+  @override
+  String get failedToResetPassword => 'Failed to reset password';
+
+  @override
   String get user => 'Mhusika';
 
   @override
@@ -1340,6 +1400,9 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get addExtensionOfficerText => 'Ongeza Bwana Shamba';
+
+  @override
+  String get invitedExtensionOfficers => 'Mofisa Waliotumizwa';
 
   @override
   String get farmsText => 'Mashamba';
@@ -3225,6 +3288,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get specialization => 'Utambuzi Maalum';
 
   @override
+  String get verified => 'Imehakikiwa';
+
+  @override
   String get accessCodeCopied =>
       'Nambari ya ufikiaji imenakiliwa kwenye ubao wa kunakili';
 
@@ -3240,4 +3306,66 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get pleaseEnterFarmerAccessNumber =>
       'Tafadhali ingiza nambari ya ufikiaji wa mkulima';
+
+  @override
+  String get bills => 'Ankara';
+
+  @override
+  String get bill => 'Ankara';
+
+  @override
+  String get noBillsFound => 'Hakuna ankara zilizopatikana';
+
+  @override
+  String billNumber(String number) {
+    return 'Ankara #$number';
+  }
+
+  @override
+  String get notes => 'Maelezo';
+
+  @override
+  String quantityShort(int count) {
+    return 'x$count';
+  }
+
+  @override
+  String get subjectType => 'Aina ya somo';
+
+  @override
+  String get subject => 'Mada';
+
+  @override
+  String get createBill => 'Unda Bili';
+
+  @override
+  String get numberOfLivestock => 'Idadi ya mifugo';
+
+  @override
+  String get billCreatedSuccessfully => 'Bili imeundwa';
+
+  @override
+  String get enterNumber => 'Weka nambari';
+
+  @override
+  String get enterNotesOptional => 'Weka maelezo (si lazima)';
+
+  @override
+  String get billCreationFailed => 'Kuunda bili kumeshindwa';
+
+  @override
+  String get billDetails => 'Maelezo ya Bili';
+
+  @override
+  String get confirmPayment => 'Thibitisha Malipo';
+
+  @override
+  String get markBillAsPaidConfirmation =>
+      'Je, una uhakika unataka kuweka bili hii kama imelipwa?';
+
+  @override
+  String get markAsPaid => 'Weka Imelipwa';
+
+  @override
+  String get billMarkedAsPaid => 'Bili imewekwa kama imelipwa';
 }

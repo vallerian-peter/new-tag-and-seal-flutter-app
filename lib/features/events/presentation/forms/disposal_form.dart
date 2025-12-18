@@ -11,13 +11,16 @@ import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_selector_page.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
-import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
 class DisposalFormScreen extends StatefulWidget {
   final DisposalModel? disposal;
@@ -133,12 +136,12 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
     String? livestockUuid = _selectedLivestockUuid;
     if (!_isBulk) {
-    if (livestockUuid != null &&
-        livestock.every((item) => item.uuid != livestockUuid)) {
-      livestockUuid = null;
-    }
-    if (livestockUuid == null && livestock.isNotEmpty) {
-      livestockUuid = livestock.first.uuid;
+      if (livestockUuid != null &&
+          livestock.every((item) => item.uuid != livestockUuid)) {
+        livestockUuid = null;
+      }
+      if (livestockUuid == null && livestock.isNotEmpty) {
+        livestockUuid = livestock.first.uuid;
       }
     }
 
@@ -638,47 +641,93 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           updatedAt: DateTime.now().toIso8601String(),
         );
 
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
+        );
+        
         final updated = await eventsProvider.updateDisposal(updatedModel);
 
         if (mounted) {
-          // Show success dialog (same pattern as Farm form)
-          await AlertDialogs.showSuccess(
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
             context: context,
-            title: l10n.success,
-            message: l10n.disposalLogSaved,
-            buttonText: l10n.ok,
-            onPressed: () {
-              // Close the form screen
-              Navigator.of(context).pop();
-              // Trigger the onCompleted callback to refresh livestock list
-              widget.onCompleted?.call();
-            },
+            logType: EventLogTypes.disposal,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: updated.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
           );
-
-          // Navigate back after success dialog is dismissed (same pattern as Farm form)
+          
           if (mounted) {
-            Navigator.pop(context, updated);
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: '${l10n.success}!',
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, updated);
+            }
           }
         }
       } else if (_isBulk) {
         // Bulk creation - keep existing dialog-based flow
-        await eventsProvider.addDisposalBatchWithDialog(
+        AlertDialogs.showLoading(
           context: context,
-          farmUuid: selectedFarmUuid,
-          livestockUuids: livestockUuids,
-          disposalTypeId: disposalTypeId,
-          reasons: reasons,
-          remarks: remarks,
-          status: _selectedStatus,
-          onSuccess: () {
-            // Close the form screen
+          title: l10n.save,
+          message: l10n.bulkOperationInProgress,
+          isDismissible: false,
+        );
+        
+        final created = <DisposalModel>[];
+        for (final animalUuid in livestockUuids) {
+          final now = DateTime.now().toIso8601String();
+          final uuid = 'disposal-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final model = DisposalModel(
+            uuid: uuid,
+            farmUuid: selectedFarmUuid,
+            livestockUuid: animalUuid,
+            disposalTypeId: disposalTypeId,
+            reasons: reasons,
+            remarks: remarks,
+            status: _selectedStatus,
+            synced: false,
+            syncAction: 'create',
+            createdAt: now,
+            updatedAt: now,
+          );
+          created.add(await eventsProvider.addDisposal(model));
+        }
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.disposal,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.first.uuid,
+            quantity: 1,
+            numberOfLivestock: livestockUuids.length,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: '${l10n.success}!',
+              buttonText: l10n.ok,
+            );
             if (mounted) {
               Navigator.pop(context, true);
+              widget.onCompleted?.call();
             }
-            // Trigger the onCompleted callback to refresh livestock list
-            widget.onCompleted?.call();
-          },
-        );
+          }
+        }
       } else {
         // Create new disposal - keep existing dialog-based flow
         final now = DateTime.now().toIso8601String();
@@ -699,18 +748,40 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           updatedAt: now,
         );
 
-        await eventsProvider.addDisposalWithDialog(
-          context,
-          newModel,
-          onSuccess: () {
-            // Close the form screen
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
+        );
+        
+        final created = await eventsProvider.addDisposal(newModel);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.disposal,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: '${l10n.success}!',
+              buttonText: l10n.ok,
+            );
             if (mounted) {
               Navigator.pop(context, true);
+              widget.onCompleted?.call();
             }
-            // Trigger the onCompleted callback to refresh livestock list
-            widget.onCompleted?.call();
-          },
-        );
+          }
+        }
       }
     } catch (e, stackTrace) {
       log('❌ Failed to save disposal log: $e', stackTrace: stackTrace);

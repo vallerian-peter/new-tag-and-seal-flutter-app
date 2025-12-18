@@ -33,6 +33,7 @@ import '../features/events/data/tables/insemination_table.dart';
 import '../features/events/data/tables/dryoff_table.dart';
 import '../features/events/data/tables/transfer_table.dart';
 import '../features/vaccines/data/tables/vaccine_table.dart';
+import '../features/bills/data/tables/bill_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/feeding_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/administration_route_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/medicine_type_table.dart';
@@ -70,6 +71,7 @@ import 'daos/event_dao.dart';
 import 'daos/log_reference_dao.dart';
 import 'daos/vaccine_dao.dart';
 import 'daos/vaccine_type_dao.dart';
+import 'daos/bill_dao.dart';
 import '../features/notifications/data/dao/notification_dao.dart';
 import 'daos/farm_user_dao.dart';
 import '../features/extensionOfficer/data/dao/extension_officer_dao.dart';
@@ -128,6 +130,7 @@ part 'app_database.g.dart';
     Transfers,
     // Other feature tables
     Vaccines,
+    Bills,
     FarmUsers,
     NotificationEntries,
     InvitedExtensionOfficers,
@@ -140,6 +143,7 @@ part 'app_database.g.dart';
     LogReferenceDao,
     VaccineDao,
     VaccineTypeDao,
+    BillDao,
     NotificationDao,
     FarmUserDao,
     ExtensionOfficerDao,
@@ -149,7 +153,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 24; // v24: make milking measurement columns nullable and migrate existing rows
+  int get schemaVersion => 26; // v26: add bills table
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -293,6 +297,14 @@ class AppDatabase extends _$AppDatabase {
         // Version 24: Make milking measurement columns nullable and migrate existing data
         await _migrateMilkingMeasurementColumns(m);
       }
+      if (from < 25) {
+        // Version 25: Add organization and location fields to invited_extension_officers
+        await _migrateInvitedExtensionOfficersAddMetadata(m);
+      }
+      if (from < 26) {
+        // Version 26: Add Bills table
+        await _createTableIfMissing(m, bills);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
@@ -396,6 +408,7 @@ class AppDatabase extends _$AppDatabase {
   late final LogReferenceDao logReferenceDao = LogReferenceDao(this);
   late final VaccineDao vaccineDao = VaccineDao(this);
   late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(this);
+  late final BillDao billDao = BillDao(this);
   late final NotificationDao notificationDao = NotificationDao(this);
   late final ExtensionOfficerDao extensionOfficerDao = ExtensionOfficerDao(
     this,
@@ -891,6 +904,61 @@ class AppDatabase extends _$AppDatabase {
         invitedExtensionOfficers,
         invitedExtensionOfficers.updatedAt,
       );
+    }
+  }
+
+  /// Migration helper: add organization and location metadata columns to invited_extension_officers
+  Future<void> _migrateInvitedExtensionOfficersAddMetadata(Migrator m) async {
+    try {
+      final tableExists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          Variable<String>('invited_extension_officers'),
+        ],
+      ).get();
+
+      if (tableExists.isEmpty) return;
+
+      final tableInfo = await customSelect(
+        'PRAGMA table_info(invited_extension_officers)',
+      ).get();
+
+      bool hasColumn(String name) =>
+          tableInfo.any((row) => row.data['name'] == name);
+
+      if (!hasColumn('organization')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN organization TEXT',
+        );
+      }
+      if (!hasColumn('country_id')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN country_id INTEGER',
+        );
+      }
+      if (!hasColumn('region_id')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN region_id INTEGER',
+        );
+      }
+      if (!hasColumn('district_id')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN district_id INTEGER',
+        );
+      }
+      if (!hasColumn('ward_id')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN ward_id INTEGER',
+        );
+      }
+      if (!hasColumn('is_verified')) {
+        await customStatement(
+          'ALTER TABLE invited_extension_officers ADD COLUMN is_verified INTEGER',
+        );
+      }
+    } catch (e) {
+      // ignore migration errors - can be retried
     }
   }
 }

@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/extension_officer_lists_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/provider/extension_officer_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/data/repository/extension_officer_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm_user_list_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bills_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 
 class DashboardDrawer extends StatelessWidget {
   final String userName;
   final String userEmail;
   final String? roleTitle;
   final VoidCallback? onLogout;
+  final bool showFarmUsersLink;
+  final bool showExtensionsLink;
+  final bool showBillsLink;
 
   const DashboardDrawer({
     super.key,
@@ -19,6 +28,9 @@ class DashboardDrawer extends StatelessWidget {
     required this.userEmail,
     this.roleTitle,
     this.onLogout,
+    this.showFarmUsersLink = true,
+    this.showExtensionsLink = true,
+    this.showBillsLink = false,
   });
 
   @override
@@ -26,19 +38,30 @@ class DashboardDrawer extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
-    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    String displayRole = roleTitle ?? '';
+    if (displayRole.isEmpty) {
+      if (authProvider.isExtensionOfficer) {
+        displayRole = 'Extension Officer';
+      } else if (authProvider.isFarmer) {
+        displayRole = l10n.farmer;
+      } else if (authProvider.isFarmUser) {
+        final rt = authProvider.currentProfile?['roleTitle'] as String?;
+        displayRole = (rt != null && rt.isNotEmpty) ? rt : 'Farm User';
+      } else {
+        final raw = (authProvider.userRole ?? '').replaceAll(RegExp(r'[ _-]+'), ' ');
+        displayRole = raw.isNotEmpty ? raw : 'User';
+      }
+    }
+
     return Drawer(
-      backgroundColor: isDark
-          ? theme.scaffoldBackgroundColor
-          : Colors.white,
+      backgroundColor: isDark ? theme.scaffoldBackgroundColor : Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(10),
-        ),
+        borderRadius: BorderRadius.only(topRight: Radius.circular(10)),
       ),
       child: Column(
         children: [
-
           // Header with logo and user info
           Container(
             decoration: BoxDecoration(
@@ -46,8 +69,14 @@ class DashboardDrawer extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [Constants.primaryColor.withValues(alpha: 0.8), Constants.primaryColor]
-                    : [Constants.primaryColor, Constants.primaryColor.withValues(alpha: 0.8)],
+                    ? [
+                        Constants.primaryColor.withValues(alpha: 0.8),
+                        Constants.primaryColor,
+                      ]
+                    : [
+                        Constants.primaryColor,
+                        Constants.primaryColor.withValues(alpha: 0.8),
+                      ],
               ),
             ),
             child: SafeArea(
@@ -56,9 +85,8 @@ class DashboardDrawer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     const SizedBox(height: 12),
-                    
+
                     // Logo placeholder
                     Center(
                       child: Container(
@@ -76,7 +104,7 @@ class DashboardDrawer extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 12),
-                    
+
                     // User info - simplified to prevent overflow
                     Center(
                       child: Column(
@@ -93,7 +121,7 @@ class DashboardDrawer extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            roleTitle ?? l10n.farmer,
+                            displayRole,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.white.withValues(alpha: 0.8),
@@ -108,7 +136,7 @@ class DashboardDrawer extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Menu items
           Expanded(
             child: ListView(
@@ -122,7 +150,7 @@ class DashboardDrawer extends StatelessWidget {
                     Navigator.pop(context);
                   },
                 ),
-                
+
                 _buildDrawerItem(
                   context: context,
                   icon: Icons.vaccines_outlined,
@@ -130,39 +158,65 @@ class DashboardDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const VaccineScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const VaccineScreen()),
                     );
                   },
                 ),
-                
-                _buildDrawerItem(
-                  context: context,
-                  icon: Iconsax.people_outline,
-                  title: l10n.invitedUsersText,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const FarmUserListScreen(),
-                      ),
-                    );
-                  },
-                ),
-                
-                _buildDrawerItem(
-                  context: context,
-                  icon: Iconsax.user_tick_outline,
-                  title: l10n.invitedOfficersText,
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigate to invited officers
-                  },
-                ),
-                
+
+                if (showBillsLink)
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.receipt_long_outlined,
+                    title: l10n.bills,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const BillsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                if (showFarmUsersLink)
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Iconsax.people_outline,
+                    title: l10n.invitedUsersText,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const FarmUserListScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                if (showExtensionsLink)
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Iconsax.user_tick_outline,
+                    title: l10n.invitedOfficersText,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (routeCtx) => ChangeNotifierProvider(
+                            create: (_) => ExtensionOfficerProvider(
+                              repository: ExtensionOfficerRepository(
+                                Provider.of<AppDatabase>(context, listen: false),
+                              ),
+                            ),
+                            child: const ExtensionOfficerListScreen(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
                 Divider(color: isDark ? Colors.grey[600] : Colors.grey[300]),
-                
+
                 _buildDrawerItem(
                   context: context,
                   icon: Iconsax.logout_outline,
@@ -176,7 +230,7 @@ class DashboardDrawer extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Theme toggle
           Container(
             padding: const EdgeInsets.all(20),
@@ -198,8 +252,9 @@ class DashboardDrawer extends StatelessWidget {
                         themeProvider.toggleTheme();
                       },
                       activeThumbColor: Constants.primaryColor,
-                      activeTrackColor:
-                          Constants.primaryColor.withValues(alpha: 0.3),
+                      activeTrackColor: Constants.primaryColor.withValues(
+                        alpha: 0.3,
+                      ),
                       inactiveTrackColor: Colors.grey.shade200,
                       inactiveThumbColor: Colors.grey.shade600,
                     );
@@ -208,7 +263,7 @@ class DashboardDrawer extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 15),
         ],
       ),
@@ -224,7 +279,7 @@ class DashboardDrawer extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
@@ -256,9 +311,7 @@ class DashboardDrawer extends StatelessWidget {
           ),
         ),
         onTap: onTap,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         hoverColor: isLogout
             ? Colors.red.withValues(alpha: 0.1)
             : Constants.primaryColor.withValues(alpha: 0.1),

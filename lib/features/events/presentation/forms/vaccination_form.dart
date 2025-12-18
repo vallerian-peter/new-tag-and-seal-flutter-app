@@ -20,6 +20,8 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/models/vac
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
 class VaccinationFormScreen extends StatefulWidget {
   final VaccinationModel? vaccination;
@@ -847,28 +849,92 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           updatedAt: DateTime.now().toIso8601String(),
         );
 
-        final updated = await eventsProvider.updateVaccinationWithDialog(
-          context,
-          updatedModel,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (updated != null && mounted) {
-          Navigator.pop(context, updated);
+        
+        final updated = await eventsProvider.updateVaccination(updatedModel);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.vaccination,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: updated.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.vaccinationLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, updated);
+            }
+          }
         }
       } else if (_isBulk) {
-        final created = await eventsProvider.addVaccinationBatchWithDialog(
+        AlertDialogs.showLoading(
           context: context,
-          farmUuid: selectedFarmUuid,
-          livestockUuids: livestockUuids,
-          vaccinationNo: vaccinationNumber,
-          vaccineUuid: _selectedVaccineUuid,
-          diseaseId: _selectedDiseaseId,
-          vetId: vetId,
-          extensionOfficerId: extensionOfficerId,
-          status: _selectedStatus,
+          title: l10n.save,
+          message: l10n.bulkOperationInProgress,
+          isDismissible: false,
         );
+        
+        final created = <VaccinationModel>[];
+        for (final animalUuid in livestockUuids) {
+          final now = DateTime.now().toIso8601String();
+          final uuid = 'vaccination-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final model = VaccinationModel(
+            uuid: uuid,
+            vaccinationNo: vaccinationNumber,
+            farmUuid: selectedFarmUuid,
+            livestockUuid: animalUuid,
+            vaccineUuid: _selectedVaccineUuid,
+            diseaseId: _selectedDiseaseId,
+            vetId: vetId,
+            extensionOfficerId: extensionOfficerId,
+            status: _selectedStatus,
+            synced: false,
+            syncAction: 'create',
+            createdAt: now,
+            updatedAt: now,
+          );
+          created.add(await eventsProvider.addVaccination(model));
+        }
 
-        if (created.isNotEmpty && mounted) {
-          Navigator.pop(context, true);
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.vaccination,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.first.uuid,
+            quantity: 1,
+            numberOfLivestock: livestockUuids.length,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.vaccinationLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, true);
+            }
+          }
         }
       } else {
         final now = DateTime.now().toIso8601String();
@@ -891,12 +957,38 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           updatedAt: now,
         );
 
-        final created = await eventsProvider.addVaccinationWithDialog(
-          context,
-          newModel,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (created != null && mounted) {
-          Navigator.pop(context, created);
+        
+        final created = await eventsProvider.addVaccination(newModel);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.vaccination,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.vaccinationLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, created);
+            }
+          }
         }
       }
     } catch (e, stackTrace) {

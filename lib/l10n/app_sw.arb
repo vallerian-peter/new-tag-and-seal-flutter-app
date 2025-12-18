@@ -425,6 +425,11 @@
   "collaborateText": "Shirikiana",
   "setNewFarmText": "Weka Shamba Jipya",
   "addExtensionOfficerText": "Ongeza Bwana Shamba",
+
+  "invitedExtensionOfficers": "Mofisa Waliotumizwa",
+  "@invitedExtensionOfficers": {
+    "description": "Title for the invited extension officers list screen (Swahili)"
+  },
   "farmsText": "Mashamba",
   "welcomeText": "Karibu",
   "darkModeText": "Mandhari ya Giza",
@@ -1203,6 +1208,7 @@
     "description": "Lebo ya uga wa simu"
   },
   "specialization": "Utambuzi Maalum",
+  "verified": "Imehakikiwa",
   "@specialization": {
     "description": "Lebo ya uga wa utambuzi maalum"
   },
@@ -1216,6 +1222,51 @@
   },
   "farmerAccessNumber": "Nambari ya Ufikiaji wa Mkulima",
   "enterFarmerAccessNumber": "Ingiza nambari ya ufikiaji wa mkulima",
-  "pleaseEnterFarmerAccessNumber": "Tafadhali ingiza nambari ya ufikiaji wa mkulima"
+  "pleaseEnterFarmerAccessNumber": "Tafadhali ingiza nambari ya ufikiaji wa mkulima",
+  "bills": "Ankara",
+  "@bills": {"description": "Kichwa cha orodha ya ankara"},
+  "bill": "Ankara",
+  "@bill": {"description": "Lebo ya ankara (umoja)"},
+  "noBillsFound": "Hakuna ankara zilizopatikana",
+  "@noBillsFound": {"description": "Hali tupu kwenye skrini ya ankara"},
+  "billNumber": "Ankara #{number}",
+  "@billNumber": {
+    "description": "Namba ya ankara yenye muundo",
+    "placeholders": {"number": {"type": "String"}}
+  },
+  "status": "Hali",
+  "@status": {"description": "Lebo ya hali ya jumla"},
+  "notes": "Maelezo",
+  "@notes": {"description": "Lebo ya maelezo ya jumla"},
+  "quantityShort": "x{count}",
+  "@quantityShort": {
+    "description": "Muundo mfupi wa kiasi",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "subjectType": "Aina ya somo",
+  "@subjectType": {"description": "Lebo ya aina ya somo kwa ankara"},
+  "subject": "Mada",
+  "@subject": {"description": "Lebo ya somo kwa ankara"},
+  "createBill": "Unda Bili",
+  "@createBill": {"description": "Kichwa cha dialog ya kuunda bili"},
+  "numberOfLivestock": "Idadi ya mifugo",
+  "@numberOfLivestock": {"description": "Nambari ya mifugo iliyowekwa kwenye bili"},
+  "billCreatedSuccessfully": "Bili imeundwa",
+  "@billCreatedSuccessfully": {"description": "Ujumbe wa mafanikio baada ya kuunda bili"},
+  "enterNumber": "Weka nambari",
+  "@enterNumber": {"description": "Maelezo ya kuingiza nambari"},
+  "enterNotesOptional": "Weka maelezo (si lazima)",
+  "@enterNotesOptional": {"description": "Maelezo ya kuingiza maelezo yasiyo lazima"},
+  "billCreationFailed": "Kuunda bili kumeshindwa",
+  "@billCreationFailed": {"description": "Ujumbe wa hitilafu wakati kuunda bili kumeshindwa"},
+  "billDetails": "Maelezo ya Bili",
+  "@billDetails": {"description": "Lebo ya sehemu ya maelezo ya bili kwenye dialog"},
+  "confirmPayment": "Thibitisha Malipo",
+  "@confirmPayment": {"description": "Kichwa cha mazungumzo ya kuthibitisha malipo"},
+  "markBillAsPaidConfirmation": "Je, una uhakika unataka kuweka bili hii kama imelipwa?",
+  "@markBillAsPaidConfirmation": {"description": "Ujumbe wa kuthibitisha kuweka bili kama imelipwa"},
+  "markAsPaid": "Weka Imelipwa",
+  "@markAsPaid": {"description": "Maandishi ya kitufe cha kuweka bili kama imelipwa"},
+  "billMarkedAsPaid": "Bili imewekwa kama imelipwa",
+  "@billMarkedAsPaid": {"description": "Ujumbe wa mafanikio baada ya kuweka bili kama imelipwa"}
 }
-

@@ -18,6 +18,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/calvin
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
 class CalvingFormScreen extends StatefulWidget {
   final CalvingModel? calving;
@@ -726,7 +728,17 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
           updatedModel,
         );
         if (updated != null && mounted) {
-          Navigator.pop(context, updated);
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.calving,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: updated.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          if (mounted) {
+            Navigator.pop(context, updated);
+          }
         }
       } else {
         final uuid =
@@ -756,7 +768,17 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
           newModel,
         );
         if (created != null && mounted) {
-          Navigator.pop(context, created);
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.calving,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          if (mounted) {
+            Navigator.pop(context, created);
+          }
         }
       }
     } catch (e) {

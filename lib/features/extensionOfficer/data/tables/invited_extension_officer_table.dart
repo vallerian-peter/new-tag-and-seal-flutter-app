@@ -18,6 +18,14 @@ class InvitedExtensionOfficers extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get specialization => text().nullable()();
 
+  // Additional officer metadata returned by the server
+  TextColumn get organization => text().nullable()();
+  IntColumn get countryId => integer().nullable()();
+  IntColumn get regionId => integer().nullable()();
+  IntColumn get districtId => integer().nullable()();
+  IntColumn get wardId => integer().nullable()();
+  BoolColumn get isVerified => boolean().nullable()();
+
   // Tracking
   DateTimeColumn get inviteDate =>
       dateTime().nullable()(); // created_at of the invite

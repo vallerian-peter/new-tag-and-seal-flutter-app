@@ -85,10 +85,11 @@ class _ExtensionOfficerLoginFormScreenState
           await authProvider.storeExtensionOfficerAccessNumber(accessNumber);
         }
 
-        // Call auth provider login method
-        final success = await authProvider.login(
+        // Call dedicated Extension Officer login (email + access_code + password)
+        final success = await authProvider.loginExtensionOfficer(
           context: context,
-          username: _emailController.text,
+          email: _emailController.text.trim(),
+          accessCode: accessNumber,
           password: _passwordController.text,
         );
 

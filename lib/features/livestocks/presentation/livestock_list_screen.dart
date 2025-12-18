@@ -510,7 +510,8 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 80),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {

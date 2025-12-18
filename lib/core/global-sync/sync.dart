@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/farm_user_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/data/repository/bills_repository.dart';
 
 /// Global synchronization service for the application
 ///
@@ -221,12 +222,43 @@ class Sync {
     String token,
   ) async {
     try {
+      // Prepare headers and optional query params for extension officers
+      final storage = const FlutterSecureStorage();
+      final role = (await storage.read(key: 'role')) ?? '';
+
+      final headers = <String, String>{
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      };
+
+      final qp = <String, String>{};
+
+      final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
+      if (normalizedRole == 'extensionofficer') {
+        final farmerId = await storage.read(key: 'extensionOfficerFarmerId');
+        final inviteId = await storage.read(key: 'extensionOfficerInviteId');
+        final accessCode = await storage.read(key: 'extensionOfficerAccessCode');
+
+        if (farmerId != null && farmerId.isNotEmpty) {
+          qp['farmerId'] = farmerId;
+          headers['X-ExtensionOfficer-Farmer-Id'] = farmerId;
+        }
+        if (inviteId != null && inviteId.isNotEmpty) {
+          headers['X-ExtensionOfficer-Invite-Id'] = inviteId;
+        }
+        if (accessCode != null && accessCode.isNotEmpty) {
+          // Include for server-side selection hint compatibility
+          qp['access_code'] = accessCode;
+          headers['X-ExtensionOfficer-Access-Code'] = accessCode;
+        }
+      }
+
+      final base = Uri.parse('${ApiEndpoints.splashSyncAll}/$userId');
+      final uri = qp.isEmpty ? base : base.replace(queryParameters: qp);
+
       final response = await http.get(
-        Uri.parse('${ApiEndpoints.splashSyncAll}/$userId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+        uri,
+        headers: headers,
       );
 
       return _handleSyncResponse(response, 'splash sync');
@@ -291,6 +323,7 @@ class Sync {
     final eventsRepository = EventsRepository(database);
     final vaccinesRepository = VaccinesRepository(database);
     final farmUserRepository = FarmUserRepository(database);
+    final billsRepository = BillsRepository(database);
 
     log('📤 Fetching unsynced farms for API...');
     final unsyncedFarms = await farmRepository.getUnsyncedFarmsForApi();
@@ -364,6 +397,9 @@ class Sync {
     final unsyncedFarmUsers = await farmUserRepository
         .getUnsyncedFarmUsersForApi();
 
+    log('📤 Fetching unsynced bills for API...');
+    final unsyncedBills = await billsRepository.getUnsyncedBillsForApi();
+
     // TODO: Add other repositories as they're implemented
     // final vaccineRepository = VaccineRepository(database);
     // final unsyncedVaccines = await vaccineRepository.getUnsyncedVaccinesForApi();
@@ -387,6 +423,7 @@ class Sync {
     log('  ✅ Logs - Transfers: ${unsyncedTransfers.length}');
     log('  ✅ Vaccines: ${unsyncedVaccines.length}');
     log('  ✅ FarmUsers: ${unsyncedFarmUsers.length}');
+    log('  ✅ Bills: ${unsyncedBills.length}');
 
     // Count total log types (now all 13 unique types are synced)
     final totalLogCount =
@@ -435,6 +472,7 @@ class Sync {
         'transfers': unsyncedTransfers,
       },
       'vaccines': unsyncedVaccines,
+      'bills': unsyncedBills,
       'farmUsers': unsyncedFarmUsers,
       // TODO: Add other collections here
       // 'vaccines': unsyncedVaccines,
@@ -496,6 +534,14 @@ class Sync {
 
     log('📊 [PHASE 2] Aggregating summary counts...');
     // Phase 2: Create summary with all log types
+    // Count calving and farrowing separately by filtering birthEvents
+    final calvingCount = birthEvents
+        .where((e) => (e['eventType'] ?? '') == EventLogTypes.calving)
+        .length;
+    final farrowingCount = birthEvents
+        .where((e) => (e['eventType'] ?? '') == EventLogTypes.farrowing)
+        .length;
+
     final logCounts = <String, int>{
       EventLogTypes.feeding: feedings.length,
       EventLogTypes.pregnancy: pregnancies.length,
@@ -505,10 +551,8 @@ class Sync {
       EventLogTypes.medication: medications.length,
       EventLogTypes.vaccination: vaccinations.length,
       EventLogTypes.disposal: disposals.length,
-      EventLogTypes.calving:
-          birthEvents.length, // Count calvings and farrowings together
-      EventLogTypes.farrowing:
-          birthEvents.length, // Count calvings and farrowings together
+      EventLogTypes.calving: calvingCount,
+      EventLogTypes.farrowing: farrowingCount,
       EventLogTypes.abortedPregnancy: abortedPregnancies.length,
       EventLogTypes.milking: milkings.length,
       EventLogTypes.dryoff: dryoffs.length,
@@ -535,6 +579,7 @@ class Sync {
     final logs = (payload['logs'] as Map<String, dynamic>?) ?? {};
     final vaccines = payload['vaccines'] as List? ?? [];
     final farmUsers = payload['farmUsers'] as List? ?? [];
+    final bills = payload['bills'] as List? ?? [];
 
     bool logsEmpty = true;
     if (logs.isNotEmpty) {
@@ -552,7 +597,8 @@ class Sync {
         livestock.isEmpty &&
         logsEmpty &&
         vaccines.isEmpty &&
-        farmUsers.isEmpty;
+        farmUsers.isEmpty &&
+        bills.isEmpty;
   }
 
   // OLD VERSION - COMMENTED OUT (had bug: double extraction of data['data'])
@@ -804,6 +850,18 @@ class Sync {
       log('  ✅ Marked ${syncedVaccineUuids.length} vaccines as synced');
     }
 
+    // Mark bills as synced (if backend returns them)
+    final syncedBillUuids =
+        (syncedData['syncedBills'] as List<dynamic>?)
+            ?.map((item) => item['uuid'] as String)
+            .toList() ??
+        [];
+    if (syncedBillUuids.isNotEmpty) {
+      final billsRepository = BillsRepository(database);
+      await billsRepository.markBillsAsSynced(syncedBillUuids);
+      log('  ✅ Marked ${syncedBillUuids.length} bills as synced');
+    }
+
     // Mark farm users as synced (if backend returns them)
     final syncedFarmUserUuids =
         (syncedData['syncedFarmUsers'] as List<dynamic>?)
@@ -979,6 +1037,14 @@ class Sync {
           const <Map<String, dynamic>>[];
       await VaccinesRepository(database).syncVaccines(vaccines);
 
+      // Store bills
+      final bills =
+          (userSpecificData['bills'] as List?)
+              ?.cast<Map<String, dynamic>>() ??
+          const <Map<String, dynamic>>[];
+      await BillsRepository(database).syncBills(bills);
+
+
       final farmUsers =
           (userSpecificData['farmUsers'] as List?)
               ?.cast<Map<String, dynamic>>() ??
@@ -1026,6 +1092,7 @@ class Sync {
       final birthEventsCount = _safeGetLogCount('birthEvents');
       final abortedPregnanciesCount = _safeGetLogCount('abortedPregnancies');
       final vaccinesCount = vaccines.length;
+      final billsCount = bills.length;
       final farmUsersCount = farmUsers.length;
       final invitedOfficersCount = invitedExtensionOfficers.length;
       log(
@@ -1034,7 +1101,7 @@ class Sync {
         'Dewormings: $dewormingsCount, Medications: $medicationsCount, '
         'Vaccinations: $vaccinationsCount, Disposals: $disposalsCount, '
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
-        'Vaccines: $vaccinesCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
+        'Vaccines: $vaccinesCount, Bills: $billsCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
       );
     } else if (userType == 'field_worker') {
       log(
@@ -1083,6 +1150,12 @@ class Sync {
               ?.cast<Map<String, dynamic>>() ??
           const <Map<String, dynamic>>[];
       await VaccinesRepository(database).syncVaccines(vaccines);
+
+      // Store bills
+      final bills = (userSpecificData['bills'] as List?)
+              ?.cast<Map<String, dynamic>>() ??
+          const <Map<String, dynamic>>[];
+      await BillsRepository(database).syncBills(bills);
 
       // Store farm user profile info (optional - for reference)
       final farmUserData =
@@ -1148,6 +1221,7 @@ class Sync {
       final farmsCount = userSpecificData['farmsCount'] ?? 0;
       final livestockCount = userSpecificData['livestockCount'] ?? 0;
       final vaccinesCount = vaccines.length;
+      final billsCount = bills.length;
 
       log(
         '  ✅ Field worker data stored (Farms: $farmsCount, Livestock: $livestockCount, '
@@ -1157,7 +1231,7 @@ class Sync {
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
         'Milkings: $milkingsCount, Pregnancies: $pregnanciesCount, '
         'Inseminations: $inseminationsCount, Dryoffs: $dryoffsCount, '
-        'Transfers: $transfersCount, Vaccines: $vaccinesCount)',
+        'Transfers: $transfersCount, Vaccines: $vaccinesCount, Bills: $billsCount)',
       );
     } else if (userType == 'system_user') {
       log(

@@ -461,6 +461,14 @@ class LivestockDetailsModal {
         )
         .toList();
 
+    // If current user is an extension officer, show only technical logs they are allowed to access
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final visibleLogs = authProvider.isExtensionOfficer
+        ? applicableLogs
+            .where((log) => authProvider.hasAccessToLogType(log.logType))
+            .toList()
+        : applicableLogs;
+
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
 
     return FutureBuilder<Map<String, int>>(
@@ -522,16 +530,16 @@ class LivestockDetailsModal {
                 ),
               ),
             ],
-            for (int i = 0; i < applicableLogs.length; i++) ...[
+            for (int i = 0; i < visibleLogs.length; i++) ...[
               _buildLogButton(
                 context: context,
-                config: applicableLogs[i],
+                config: visibleLogs[i],
                 isDark: isDark,
-                count: counts[applicableLogs[i].logType] ?? 0,
+                count: counts[visibleLogs[i].logType] ?? 0,
                 fromScanner: fromScanner,
                 isNotActive: isNotActive,
               ),
-              if (i != applicableLogs.length - 1) const SizedBox(height: 12),
+              if (i != visibleLogs.length - 1) const SizedBox(height: 12),
             ],
           ],
         );

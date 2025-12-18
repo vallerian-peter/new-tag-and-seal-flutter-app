@@ -1209,6 +1209,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoverViaPhone => 'Recover via Phone';
 
   @override
+  String get enterYourEmail => 'Enter Your Email';
+
+  @override
+  String get enterYourPhone => 'Enter Your Phone Number';
+
+  @override
+  String get otpWillBeSentToEmail =>
+      'We\'ll send a 6-digit OTP code to your email address';
+
+  @override
+  String get otpWillBeSentToPhone =>
+      'We\'ll send a 6-digit OTP code to your phone number';
+
+  @override
+  String get sendOtp => 'Send OTP';
+
+  @override
+  String get otpExpiresIn10Minutes => 'OTP code expires in 10 minutes';
+
+  @override
+  String get verifyOtp => 'Verify OTP';
+
+  @override
+  String get enterOtpCode => 'Enter OTP Code';
+
+  @override
+  String get otpSentTo => 'OTP sent to';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get resendOtp => 'Resend OTP';
+
+  @override
+  String get pleaseEnterCompleteOtp => 'Please enter complete 6-digit OTP';
+
+  @override
+  String get otpResentSuccessfully => 'OTP resent successfully';
+
+  @override
+  String get failedToResendOtp => 'Failed to resend OTP';
+
+  @override
+  String get failedToSendOtp => 'Failed to send OTP';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get createNewPassword => 'Create New Password';
+
+  @override
+  String get passwordResetSuccessfully =>
+      'Password reset successfully! You can now login with your new password.';
+
+  @override
+  String get failedToResetPassword => 'Failed to reset password';
+
+  @override
   String get user => 'User';
 
   @override
@@ -1334,6 +1394,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addExtensionOfficerText => 'Add Extension Officer';
+
+  @override
+  String get invitedExtensionOfficers => 'Invited Extension Officers';
 
   @override
   String get farmsText => 'Farms';
@@ -3210,6 +3273,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get specialization => 'Specialization';
 
   @override
+  String get verified => 'Verified';
+
+  @override
   String get accessCodeCopied => 'Access code copied to clipboard';
 
   @override
@@ -3224,4 +3290,66 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pleaseEnterFarmerAccessNumber =>
       'Please enter farmer access number';
+
+  @override
+  String get bills => 'Bills';
+
+  @override
+  String get bill => 'Bill';
+
+  @override
+  String get noBillsFound => 'No bills found';
+
+  @override
+  String billNumber(String number) {
+    return 'Bill #$number';
+  }
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String quantityShort(int count) {
+    return 'x$count';
+  }
+
+  @override
+  String get subjectType => 'Subject type';
+
+  @override
+  String get subject => 'Subject';
+
+  @override
+  String get createBill => 'Create Bill';
+
+  @override
+  String get numberOfLivestock => 'Number of livestock';
+
+  @override
+  String get billCreatedSuccessfully => 'Bill created successfully';
+
+  @override
+  String get enterNumber => 'Enter number';
+
+  @override
+  String get enterNotesOptional => 'Enter notes (optional)';
+
+  @override
+  String get billCreationFailed => 'Bill creation failed';
+
+  @override
+  String get billDetails => 'Bill Details';
+
+  @override
+  String get confirmPayment => 'Confirm Payment';
+
+  @override
+  String get markBillAsPaidConfirmation =>
+      'Are you sure you want to mark this bill as paid?';
+
+  @override
+  String get markAsPaid => 'Mark as Paid';
+
+  @override
+  String get billMarkedAsPaid => 'Bill marked as paid successfully';
 }

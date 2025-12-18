@@ -18,6 +18,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widget
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
 class DewormingFormScreen extends StatefulWidget {
   final DewormingModel? deworming;
@@ -828,28 +830,93 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           updatedAt: DateTime.now().toIso8601String(),
         );
 
-        final saved = await eventsProvider.updateDewormingWithDialog(
-          context,
-          updated,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (saved != null && mounted) {
-          Navigator.pop(context, saved);
+        
+        final saved = await eventsProvider.updateDeworming(updated);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.deworming,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: saved.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.dewormingLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, saved);
+            }
+          }
         }
       } else if (_isBulk) {
-        await eventsProvider.addDewormingBatchWithDialog(
+        AlertDialogs.showLoading(
           context: context,
-          farmUuid: selectedFarmUuid,
-          livestockUuids: bulkLivestockUuids,
-          administrationRouteId: _selectedAdministrationRouteId,
-          medicineId: _selectedMedicineId,
-          quantity: _quantityController.text.trim(),
-          dose: _doseController.text.trim(),
-          nextAdministrationDate: nextAdministrationIso,
-          vetId: vetId,
-          extensionOfficerId: extensionOfficerId,
+          title: l10n.save,
+          message: l10n.bulkOperationInProgress,
+          isDismissible: false,
         );
+        
+        final created = <DewormingModel>[];
+        for (final animalUuid in bulkLivestockUuids) {
+          final now = DateTime.now().toIso8601String();
+          final uuid = '${DateTime.now().millisecondsSinceEpoch}-${animalUuid.hashCode}-deworming';
+          final model = DewormingModel(
+            uuid: uuid,
+            farmUuid: selectedFarmUuid,
+            livestockUuid: animalUuid,
+            administrationRouteId: _selectedAdministrationRouteId,
+            medicineId: _selectedMedicineId,
+            vetId: vetId,
+            extensionOfficerId: extensionOfficerId,
+            quantity: _quantityController.text.trim(),
+            dose: _doseController.text.trim(),
+            nextAdministrationDate: nextAdministrationIso,
+            synced: false,
+            syncAction: 'create',
+            createdAt: now,
+            updatedAt: now,
+          );
+          created.add(await eventsProvider.addDeworming(model));
+        }
+        
         if (mounted) {
-          Navigator.pop(context, true);
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.deworming,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: created.first.uuid,
+            quantity: 1,
+            numberOfLivestock: bulkLivestockUuids.length,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.dewormingLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, true);
+            }
+          }
         }
       } else {
         final now = DateTime.now().toIso8601String();
@@ -873,12 +940,38 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           updatedAt: now,
         );
 
-        final saved = await eventsProvider.addDewormingWithDialog(
-          context,
-          model,
+        AlertDialogs.showLoading(
+          context: context,
+          title: l10n.save,
+          message: '',
+          isDismissible: false,
         );
-        if (saved != null && mounted) {
-          Navigator.pop(context, saved);
+        
+        final saved = await eventsProvider.addDeworming(model);
+        
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          await BillCreationHelper.maybeCreateBillForLog(
+            context: context,
+            logType: EventLogTypes.deworming,
+            farmUuid: selectedFarmUuid,
+            subjectUuid: saved.uuid,
+            quantity: 1,
+            numberOfLivestock: 1,
+          );
+          
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.dewormingLogSaved,
+              buttonText: l10n.ok,
+            );
+            if (mounted) {
+              Navigator.pop(context, saved);
+            }
+          }
         }
       }
     } catch (e) {

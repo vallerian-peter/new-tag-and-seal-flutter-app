@@ -697,6 +697,26 @@
   "recoverViaPhone": "Recover via Phone",
   "cancel": "Cancel",
 
+  "enterYourEmail": "Enter Your Email",
+  "enterYourPhone": "Enter Your Phone Number",
+  "otpWillBeSentToEmail": "We'll send a 6-digit OTP code to your email address",
+  "otpWillBeSentToPhone": "We'll send a 6-digit OTP code to your phone number",
+  "sendOtp": "Send OTP",
+  "otpExpiresIn10Minutes": "OTP code expires in 10 minutes",
+  "verifyOtp": "Verify OTP",
+  "enterOtpCode": "Enter OTP Code",
+  "otpSentTo": "OTP sent to",
+  "verify": "Verify",
+  "resendOtp": "Resend OTP",
+  "pleaseEnterCompleteOtp": "Please enter complete 6-digit OTP",
+  "otpResentSuccessfully": "OTP resent successfully",
+  "failedToResendOtp": "Failed to resend OTP",
+  "failedToSendOtp": "Failed to send OTP",
+  "resetPassword": "Reset Password",
+  "createNewPassword": "Create New Password",
+  "passwordResetSuccessfully": "Password reset successfully! You can now login with your new password.",
+  "failedToResetPassword": "Failed to reset password",
+
   "user": "User",
   
   "noInternetConnection": "No Internet Connection",
@@ -748,6 +768,11 @@
   "collaborateText": "Collaborate",
   "setNewFarmText": "Set New Farm",
   "addExtensionOfficerText": "Add Extension Officer",
+
+  "invitedExtensionOfficers": "Invited Extension Officers",
+  "@invitedExtensionOfficers": {
+    "description": "Title for the invited extension officers list screen"
+  },
   "farmsText": "Farms",
   "welcomeText": "Welcome",
   "darkModeText": "Dark Mode",
@@ -1515,6 +1540,7 @@
     "description": "Phone field label"
   },
   "specialization": "Specialization",
+  "verified": "Verified",
   "@specialization": {
     "description": "Specialization field label"
   },
@@ -1538,5 +1564,51 @@
   "@pleaseEnterFarmerAccessNumber": {
     "description": "Farmer Access Number validation error"
   }
+  ,
+  "bills": "Bills",
+  "@bills": {"description": "Bills list title"},
+  "bill": "Bill",
+  "@bill": {"description": "Singular bill label"},
+  "noBillsFound": "No bills found",
+  "@noBillsFound": {"description": "Empty state for bills screen"},
+  "billNumber": "Bill #{number}",
+  "@billNumber": {
+    "description": "Formatted bill number",
+    "placeholders": {"number": {"type": "String"}}
+  },
+  "status": "Status",
+  "@status": {"description": "Generic status label"},
+  "notes": "Notes",
+  "@notes": {"description": "Generic notes label"},
+  "quantityShort": "x{count}",
+  "@quantityShort": {
+    "description": "Short quantity format",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "subjectType": "Subject type",
+  "@subjectType": {"description": "Bill subject type label"},
+  "subject": "Subject",
+  "@subject": {"description": "Bill subject label"},
+  "createBill": "Create Bill",
+  "@createBill": {"description": "Dialog title for creating a bill"},
+  "numberOfLivestock": "Number of livestock",
+  "@numberOfLivestock": {"description": "Number of livestock included in the bill"},
+  "billCreatedSuccessfully": "Bill created successfully",
+  "@billCreatedSuccessfully": {"description": "Snack message after bill created"},
+  "enterNumber": "Enter number",
+  "@enterNumber": {"description": "Hint text for number input"},
+  "enterNotesOptional": "Enter notes (optional)",
+  "@enterNotesOptional": {"description": "Hint text for optional notes field"},
+  "billCreationFailed": "Bill creation failed",
+  "@billCreationFailed": {"description": "Error message when bill creation fails"},
+  "billDetails": "Bill Details",
+  "@billDetails": {"description": "Label for bill details section in dialog"},
+  "confirmPayment": "Confirm Payment",
+  "@confirmPayment": {"description": "Title for payment confirmation dialog"},
+  "markBillAsPaidConfirmation": "Are you sure you want to mark this bill as paid?",
+  "@markBillAsPaidConfirmation": {"description": "Confirmation message for marking bill as paid"},
+  "markAsPaid": "Mark as Paid",
+  "@markAsPaid": {"description": "Button text to mark bill as paid"},
+  "billMarkedAsPaid": "Bill marked as paid successfully",
+  "@billMarkedAsPaid": {"description": "Success message after marking bill as paid"}
 }
-

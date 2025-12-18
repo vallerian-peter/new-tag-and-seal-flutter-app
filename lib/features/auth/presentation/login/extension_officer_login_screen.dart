@@ -10,6 +10,8 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/home/presentation/home_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/widgets/forgot_password_bottom_sheet.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/forgot_password/forgot_password_input_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 
 class ExtensionOfficerLoginScreen extends StatefulWidget {
@@ -335,6 +337,40 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 }
                                 return null;
                               },
+                            ),
+                            
+                            const SizedBox(height: 8),
+                            
+                            // Forgot Password
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final recoveryMethod = await ForgotPasswordBottomSheet.show(context);
+                                  if (recoveryMethod != null && mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ForgotPasswordInputScreen(
+                                          recoveryMethod: recoveryMethod,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  child: Text(
+                                    l10n.forgotPassword,
+                                    style: TextStyle(
+                                      color: Constants.primaryColor,
+                                      fontSize: Constants.textSize,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                             
                             const SizedBox(height: 20),

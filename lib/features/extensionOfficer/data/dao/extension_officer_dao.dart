@@ -16,6 +16,15 @@ class ExtensionOfficerDao extends DatabaseAccessor<AppDatabase>
     await into(invitedExtensionOfficers).insertOnConflictUpdate(entry);
   }
 
+bool? _toBool(dynamic v) {
+  if (v == null) return null;
+  if (v is bool) return v;
+  final s = v.toString().toLowerCase().trim();
+  if (s == '1' || s == 'true') return true;
+  if (s == '0' || s == 'false') return false;
+  return null;
+}
+
   // Get all invited officers (excluding deleted)
   Future<List<InvitedExtensionOfficer>> getAllInvitedOfficers() {
     return (select(
@@ -58,6 +67,36 @@ class ExtensionOfficerDao extends DatabaseAccessor<AppDatabase>
             lastName: Value(item['lastName'] ?? ''),
             email: Value(item['email'] ?? ''),
             phone: Value(item['phone']),
+            organization: Value(item['organization']),
+            countryId: Value(
+              item['countryId'] is int
+                  ? item['countryId']
+                  : (item['countryId'] != null
+                        ? int.tryParse(item['countryId'].toString())
+                        : null),
+            ),
+            regionId: Value(
+              item['regionId'] is int
+                  ? item['regionId']
+                  : (item['regionId'] != null
+                        ? int.tryParse(item['regionId'].toString())
+                        : null),
+            ),
+            districtId: Value(
+              item['districtId'] is int
+                  ? item['districtId']
+                  : (item['districtId'] != null
+                        ? int.tryParse(item['districtId'].toString())
+                        : null),
+            ),
+            wardId: Value(
+              item['wardId'] is int
+                  ? item['wardId']
+                  : (item['wardId'] != null
+                        ? int.tryParse(item['wardId'].toString())
+                        : null),
+            ),
+            isVerified: Value(_toBool(item['isVerified'])),
             specialization: Value(item['specialization']),
             inviteDate: Value(
               item['inviteDate'] != null

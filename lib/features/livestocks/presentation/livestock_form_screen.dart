@@ -15,6 +15,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/color_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'dart:developer';
 import 'package:new_tag_and_seal_flutter_app/features/scanner/presentation/scanner_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
@@ -661,7 +662,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
       if (isEditMode) {
         // Update existing livestock
-        final success = await livestockProvider.updateLivestock(
+        final updatedLivestock = await livestockProvider.updateLivestock(
           widget.livestock!.id,
           livestockData,
         );
@@ -669,17 +670,27 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         // Close loading dialog
         if (mounted) Navigator.of(context).pop();
 
-        if (success) {
+        if (updatedLivestock != null) {
           log('✅ Livestock updated successfully');
 
-          // Show success dialog
-          if (!mounted) return;
-          await AlertDialogs.showSuccess(
-            context: context,
-            title: l10n.success,
-            message: l10n.livestockUpdatedSuccessfully,
-            buttonText: l10n.ok,
-          );
+          // Trigger bill creation for extension officers BEFORE success dialog
+          if (mounted) {
+            await BillCreationHelper.maybeCreateBillForLivestock(
+              context: context,
+              farmUuid: _selectedFarmUuid!,
+              livestockUuid: uuid,
+            );
+          }
+
+          // Show success dialog AFTER bill creation
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.livestockUpdatedSuccessfully,
+              buttonText: l10n.ok,
+            );
+          }
 
           // Navigate back
           if (mounted) {
@@ -700,14 +711,24 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         if (createdLivestock != null) {
           log('✅ Livestock registered successfully');
 
-          // Show success dialog
-          if (!mounted) return;
-          await AlertDialogs.showSuccess(
-            context: context,
-            title: l10n.success,
-            message: l10n.livestockRegisteredSuccessfully,
-            buttonText: l10n.ok,
-          );
+          // Trigger bill creation for extension officers BEFORE success dialog
+          if (mounted) {
+            await BillCreationHelper.maybeCreateBillForLivestock(
+              context: context,
+              farmUuid: _selectedFarmUuid!,
+              livestockUuid: uuid,
+            );
+          }
+
+          // Show success dialog AFTER bill creation
+          if (mounted) {
+            await AlertDialogs.showSuccess(
+              context: context,
+              title: l10n.success,
+              message: l10n.livestockRegisteredSuccessfully,
+              buttonText: l10n.ok,
+            );
+          }
 
           // Navigate back
           if (mounted) {

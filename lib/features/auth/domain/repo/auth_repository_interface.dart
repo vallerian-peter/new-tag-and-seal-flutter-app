@@ -10,6 +10,13 @@ abstract class AuthRepositoryInterface {
     required String password,
   });
 
+  /// Extension Officer login using email + access_code + password
+  Future<Map<String, dynamic>> loginExtensionOfficer({
+    required String email,
+    required String accessCode,
+    required String password,
+  });
+
   Future<bool> logout();
 
   Future<bool> isAuthenticated();

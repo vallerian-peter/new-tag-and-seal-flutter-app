@@ -136,7 +136,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Check persistent flag in shared preferences so we don't show this prompt repeatedly
     final prefs = await SharedPreferences.getInstance();
-    final storedFlag = prefs.getBool(_syncPromptStorageKey) ?? false;
+    // Build a per-user, per-role storage key so different users/roles still see the prompt once
+    final userId = await _secureStorage.read(key: 'userId') ?? '';
+    final role = await _secureStorage.read(key: 'role') ?? '';
+    final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
+    final syncKey = '${_syncPromptStorageKey}_${userId}_${normalizedRole}';
+
+    bool storedFlag = prefs.getBool(syncKey) ?? false;
     if (storedFlag) {
       _syncPromptShown = true;
       return;
@@ -146,7 +152,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_syncPromptShown || !mounted) return;
 
     _syncPromptShown = true;
-    await prefs.setBool(_syncPromptStorageKey, true);
+    await prefs.setBool(syncKey, true);
 
     final l10n = AppLocalizations.of(context)!;
     // Use dialogContext for Navigator to avoid using a disposed context
@@ -234,6 +240,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final l10n = AppLocalizations.of(context)!;
     final authProvider = context.read<AuthProvider>();
     final isFarmer = authProvider.isFarmer;
+    final isExtensionOfficer = authProvider.isExtensionOfficer;
+    final isFarmManager = authProvider.isFarmUser
+        ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
+                .toLowerCase()
+                .trim() ==
+            'farm-manager')
+        : false;
+    final isVaccinationFarmUser = authProvider.isFarmUser
+        ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
+                .toLowerCase()
+                .trim() ==
+            'vaccination-user')
+        : false;
+    final hasDrawerAccess =
+        isFarmer || isFarmManager || isExtensionOfficer || isVaccinationFarmUser;
 
     // ignore: deprecated_member_use
     return WillPopScope(
@@ -244,17 +265,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        drawer: isFarmer ? Consumer<AuthProvider>(
+        drawer: hasDrawerAccess ? Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
-            // Only show drawer if user is a farmer
-            if (!authProvider.isFarmer) {
-              return const SizedBox.shrink(); // Hide drawer for non-farmers
+            final localIsFarmer = authProvider.isFarmer;
+            final localIsExtensionOfficer = authProvider.isExtensionOfficer;
+            final localIsFarmManager = authProvider.isFarmUser
+                ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
+                        .toLowerCase()
+                        .trim() ==
+                    'farm-manager')
+                : false;
+            final localIsVaccinationFarmUser = authProvider.isFarmUser
+                ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
+                        .toLowerCase()
+                        .trim() ==
+                    'vaccination-user')
+                : false;
+            if (!(localIsFarmer || localIsFarmManager || localIsExtensionOfficer || localIsVaccinationFarmUser)) {
+              return const SizedBox.shrink();
             }
             return DashboardDrawer(
               userName: _userName,
               userEmail: _userEmail,
               roleTitle: _roleTitle,
               onLogout: _onLogoutPressed,
+              showFarmUsersLink: localIsFarmer,
+              showExtensionsLink: localIsFarmer,
+              showBillsLink: localIsFarmer || localIsExtensionOfficer,
             );
           },
         ) : null,
@@ -266,12 +303,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               : const Icon(Iconsax.refresh_outline, color: Colors.white,),
         ),
         appBar: AppBar(
-        centerTitle: isFarmer,
+        centerTitle: hasDrawerAccess,
         automaticallyImplyLeading: false,
-        leadingWidth: isFarmer ? null : 0,
-        titleSpacing: isFarmer ? null : 0,
+        leadingWidth: hasDrawerAccess ? null : 0,
+        titleSpacing: hasDrawerAccess ? null : 0,
         toolbarHeight: kToolbarHeight,
-        title: isFarmer
+        title: hasDrawerAccess
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -329,7 +366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leading: isFarmer
+        leading: hasDrawerAccess
             ? Align(
                 alignment: Alignment.bottomRight,
                 child: IconButton(
@@ -388,7 +425,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           await _loadEventSummary();
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -668,9 +705,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _syncPromptShown = false;
     });
 
-    // Clear sync prompt flag so it's shown again next time user logs in
+    // Clear sync prompt flag so it's shown again next time user logs in (per user+role and legacy)
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_syncPromptStorageKey);
+    final userId = await _secureStorage.read(key: 'userId') ?? '';
+    final role = await _secureStorage.read(key: 'role') ?? '';
+    final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
+    final syncKey = '${_syncPromptStorageKey}_${userId}_${normalizedRole}';
+    await prefs.remove(syncKey);
+    await prefs.remove(_syncPromptStorageKey); // legacy cleanup
 
     ScaffoldMessenger.of(context).clearSnackBars();
 

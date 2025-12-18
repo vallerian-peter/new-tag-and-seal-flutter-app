@@ -11,6 +11,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/signup/register_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/widgets/forgot_password_bottom_sheet.dart';
+import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/forgot_password/forgot_password_input_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/login/extension_officer_login_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/home/presentation/home_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
@@ -346,20 +347,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () async {
-                                  if (!mounted) return;
-                                  final navigatorContext = context;
-                                  final result = await ForgotPasswordBottomSheet.show(context);
-                                  if (result != null && mounted) {
-                                    ScaffoldMessenger.of(navigatorContext).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          result == 'email'
-                                              ? 'Password reset link will be sent to your email'
-                                              : 'Password reset code will be sent to your phone',
+                                  final recoveryMethod = await ForgotPasswordBottomSheet.show(context);
+                                  if (recoveryMethod != null && mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ForgotPasswordInputScreen(
+                                          recoveryMethod: recoveryMethod,
                                         ),
-                                        backgroundColor: Constants.successColor,
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: const Duration(seconds: 3),
                                       ),
                                     );
                                   }

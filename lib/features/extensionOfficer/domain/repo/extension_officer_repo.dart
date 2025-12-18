@@ -1,5 +1,6 @@
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/models/extension_officer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/models/extension_officer_invite_model.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 
 abstract class ExtensionOfficerRepositoryInterface {
   /// Search for extension officer by email
@@ -14,4 +15,7 @@ abstract class ExtensionOfficerRepositoryInterface {
 
   /// Delete/Cancel invite
   Future<void> deleteInvite(int inviteId);
+
+  /// Get all locally stored invited extension officers (may be used to render lists)
+  Future<List<InvitedExtensionOfficer>> getAllLocalInvitedOfficers();
 }

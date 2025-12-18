@@ -82,6 +82,11 @@ class RoleHelper {
       return true;
     }
 
+    
+    if (authProvider.isExtensionOfficer) {
+      return true;
+    }
+
     // Check if user is a farm user with roleTitle = 'farm-manager'
     if (authProvider.isFarmUser) {
       final profile = authProvider.currentProfile;
@@ -247,18 +252,20 @@ class RoleHelper {
       }
     }
 
-    // If user is an extension officer, apply additional restriction: only technical logs allowed
+    // If user is an extension officer, allow only technical logs defined in AuthProvider
     if (authProvider.isExtensionOfficer) {
-      if (!authProvider.hasAccessToLogType(logType)) {
-        final logTypeName = logType.isNotEmpty
-            ? '${logType[0].toUpperCase()}${logType.substring(1)}'
-            : logType;
-        ToastAlerts.showError(
-          context,
-          message: customErrorMessage ?? l10n.logTypeAccessDenied(logTypeName),
-        );
-        return false;
+      if (authProvider.hasAccessToLogType(logType)) {
+        return true;
       }
+
+      final logTypeName = logType.isNotEmpty
+          ? '${logType[0].toUpperCase()}${logType.substring(1)}'
+          : logType;
+      ToastAlerts.showError(
+        context,
+        message: customErrorMessage ?? l10n.logTypeAccessDenied(logTypeName),
+      );
+      return false;
     }
 
     // User doesn't have permission

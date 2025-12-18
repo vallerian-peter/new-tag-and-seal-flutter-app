@@ -32,6 +32,66 @@ class AuthService {
     }
   }
 
+  /// Extension Officer login with email, access_code and password
+  ///
+  /// Sends 3-field credentials to the backend dedicated endpoint.
+  /// Returns the complete API response including user, profile, invite and token.
+  static Future<Map<String, dynamic>> loginExtensionOfficer({
+    required String email,
+    required String accessCode,
+    required String password,
+  }) async {
+    try {
+      // Build headers
+      final headers = await _buildHeaders();
+
+      final body = {
+        'email': email,
+        'access_code': accessCode,
+        'password': password,
+      };
+
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.extensionOfficerLogin),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      log('🔐 DEBUG: Extension officer login response: ${response.body}');
+
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        if (responseData['status'] == true) {
+          return responseData;
+        } else {
+          final message = responseData['message'] ?? 'Login failed';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 401) {
+        final message = responseData['message'] ?? 'Invalid credentials or invite not found';
+        throw Exception(message);
+      } else if (response.statusCode == 422) {
+        final errors = responseData['errors'];
+        if (errors != null && errors is Map) {
+          final errorMessages = <String>[];
+          errors.forEach((key, value) {
+            if (value is List) errorMessages.addAll(value.cast<String>());
+          });
+          throw Exception('Validation failed: ${errorMessages.join(', ')}');
+        }
+        throw Exception('Validation failed');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Login failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Failed to login extension officer: $e');
+    }
+  }
+
   /// Build HTTP headers with authentication
   static Future<Map<String, String>> _buildHeaders() async {
     final token = await _getAuthToken();
@@ -418,6 +478,126 @@ class AuthService {
         rethrow;
       }
       throw Exception('Failed to change password: $e');
+    }
+  }
+
+  /// Send OTP for password reset
+  static Future<Map<String, dynamic>> sendOtp({
+    String? email,
+    String? phone,
+  }) async {
+    try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      final body = <String, dynamic>{};
+      if (email != null) body['email'] = email;
+      if (phone != null) body['phone'] = phone;
+
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.sendOtp),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      log('🔐 DEBUG: Send OTP response: ${response.body}');
+
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        if (responseData['status'] == true) {
+          return responseData;
+        } else {
+          final message = responseData['message'] ?? 'Failed to send OTP';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 404) {
+        final message = responseData['message'] ?? 'Account not found';
+        throw Exception(message);
+      } else if (response.statusCode == 422) {
+        final errors = responseData['errors'];
+        if (errors != null && errors is Map) {
+          final errorMessages = <String>[];
+          errors.forEach((key, value) {
+            if (value is List) errorMessages.addAll(value.cast<String>());
+          });
+          throw Exception('Validation failed: ${errorMessages.join(', ')}');
+        }
+        throw Exception('Validation failed');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Failed to send OTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Failed to send OTP: $e');
+    }
+  }
+
+  /// Reset password with OTP
+  static Future<Map<String, dynamic>> resetPassword({
+    String? email,
+    String? phone,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      final body = <String, dynamic>{
+        'otp': otp,
+        'newPassword': newPassword,
+      };
+      if (email != null) body['email'] = email;
+      if (phone != null) body['phone'] = phone;
+
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.resetPassword),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      log('🔐 DEBUG: Reset password response: ${response.body}');
+
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        if (responseData['status'] == true) {
+          return responseData;
+        } else {
+          final message = responseData['message'] ?? 'Failed to reset password';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 401) {
+        final message = responseData['message'] ?? 'Invalid or expired OTP';
+        throw Exception(message);
+      } else if (response.statusCode == 404) {
+        final message = responseData['message'] ?? 'Account not found';
+        throw Exception(message);
+      } else if (response.statusCode == 422) {
+        final errors = responseData['errors'];
+        if (errors != null && errors is Map) {
+          final errorMessages = <String>[];
+          errors.forEach((key, value) {
+            if (value is List) errorMessages.addAll(value.cast<String>());
+          });
+          throw Exception('Validation failed: ${errorMessages.join(', ')}');
+        }
+        throw Exception('Validation failed');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Failed to reset password: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Failed to reset password: $e');
     }
   }
 }

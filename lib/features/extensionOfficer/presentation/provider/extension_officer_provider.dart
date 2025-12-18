@@ -5,24 +5,30 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/models/extension_officer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/models/extension_officer_invite_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/domain/repo/extension_officer_repo.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 
 class ExtensionOfficerProvider extends ChangeNotifier {
   final ExtensionOfficerRepositoryInterface _repository;
 
-  ExtensionOfficerProvider({required ExtensionOfficerRepositoryInterface repository})
-      : _repository = repository;
+  ExtensionOfficerProvider({
+    required ExtensionOfficerRepositoryInterface repository,
+  }) : _repository = repository;
 
   bool _isSearching = false;
   bool _isInviting = false;
   ExtensionOfficerModel? _foundOfficer;
   ExtensionOfficerInviteModel? _createdInvite;
+  List<InvitedExtensionOfficer> _officers = [];
+  bool _isLoading = false;
   String? _error;
 
   bool get isSearching => _isSearching;
   bool get isInviting => _isInviting;
   ExtensionOfficerModel? get foundOfficer => _foundOfficer;
   ExtensionOfficerInviteModel? get createdInvite => _createdInvite;
+  List<InvitedExtensionOfficer> get officers => _officers;
+  bool get isLoading => _isLoading;
   String? get error => _error;
 
   /// Search for extension officer by email
@@ -39,7 +45,11 @@ class ExtensionOfficerProvider extends ChangeNotifier {
       notifyListeners();
       return officer;
     } catch (e, stackTrace) {
-      log('❌ Error searching extension officer: $e', error: e, stackTrace: stackTrace);
+      log(
+        '❌ Error searching extension officer: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       _error = e.toString();
       _isSearching = false;
       _foundOfficer = null;
@@ -48,21 +58,72 @@ class ExtensionOfficerProvider extends ChangeNotifier {
     }
   }
 
+  /// Load locally stored invited extension officers
+  Future<void> loadInvitedExtensionOfficers() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final items = await _repository.getAllLocalInvitedOfficers();
+      _officers = items;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e, st) {
+      log(
+        '❌ Error loading invited extension officers: $e',
+        error: e,
+        stackTrace: st,
+      );
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// Mark invite as deleted with a confirmation dialog flow
+  Future<void> markInvitedExtensionOfficerAsDeletedWithDialog(
+    BuildContext context,
+    int inviteId,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await _repository.deleteInvite(inviteId);
+      await loadInvitedExtensionOfficers();
+    } catch (e) {
+      final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+      await AlertDialogs.showError(
+        context: context,
+        title: l10n.error,
+        message: errorMessage,
+        buttonText: l10n.ok,
+      );
+    }
+  }
+
   /// Create extension officer farm invite
   /// [accessCode] should be generated on the frontend before calling this method.
-  Future<ExtensionOfficerInviteModel> createInvite(String extensionOfficerEmail, String accessCode) async {
+  Future<ExtensionOfficerInviteModel> createInvite(
+    String extensionOfficerEmail,
+    String accessCode,
+  ) async {
     _isInviting = true;
     _error = null;
     notifyListeners();
 
     try {
-      final invite = await _repository.createInvite(extensionOfficerEmail, accessCode);
+      final invite = await _repository.createInvite(
+        extensionOfficerEmail,
+        accessCode,
+      );
       _createdInvite = invite;
       _isInviting = false;
       notifyListeners();
       return invite;
     } catch (e, stackTrace) {
-      log('❌ Error creating extension officer invite: $e', error: e, stackTrace: stackTrace);
+      log(
+        '❌ Error creating extension officer invite: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       _error = e.toString();
       _isInviting = false;
       notifyListeners();
@@ -158,4 +219,3 @@ class ExtensionOfficerProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

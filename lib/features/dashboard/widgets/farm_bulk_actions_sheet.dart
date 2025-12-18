@@ -21,6 +21,27 @@ class FarmBulkActionsSheet extends StatelessWidget {
     final farmLocation = (farm['location'] ?? l10n.location).toString();
 
     final actions = _buildActions(l10n);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final filteredActions = actions.where((a) {
+      final logType = a.logType;
+      if (logType == null) return false;
+      // Farmer: allowed all
+      if (authProvider.isFarmer) return true;
+      // Extension Officer: allow only technical logs defined in AuthProvider
+      if (authProvider.isExtensionOfficer) {
+        return authProvider.hasAccessToLogType(logType);
+      }
+      // Farm invited user: allow farm-manager or specific role title mapped to logType
+      if (authProvider.isFarmUser) {
+        final profile = authProvider.currentProfile;
+        final roleTitle = (profile?["roleTitle"] as String?)?.toLowerCase().trim();
+        if (roleTitle == null || roleTitle.isEmpty) return false;
+        if (roleTitle == 'farm-manager') return true;
+        final requiredRole = _roleTitleForLogType(logType);
+        return requiredRole != null && roleTitle == requiredRole;
+      }
+      return false;
+    }).toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -59,11 +80,11 @@ class FarmBulkActionsSheet extends StatelessWidget {
             const SizedBox(height: 16),
             _buildFarmInfoCard(theme, farmName, farmLocation),
             const SizedBox(height: 20),
-            ...List.generate(actions.length, (index) {
-              final action = actions[index];
+            ...List.generate(filteredActions.length, (index) {
+              final action = filteredActions[index];
               return Padding(
-                padding:
-                    EdgeInsets.only(bottom: index == actions.length - 1 ? 0 : 12),
+                padding: EdgeInsets.only(
+                    bottom: index == filteredActions.length - 1 ? 0 : 12),
                 child: _BulkActionButton(
                   config: action,
                   onTap: () => _handleActionTap(context, action, l10n),
@@ -75,6 +96,42 @@ class FarmBulkActionsSheet extends StatelessWidget {
       ),
     );
   }
+
+
+// Map event log types to their required farm user roleTitle
+String? _roleTitleForLogType(String logType) {
+  switch (logType.toLowerCase()) {
+    case 'feeding':
+      return 'feeding-user';
+    case 'weightchange':
+      return 'weight-change-user';
+    case 'deworming':
+      return 'deworming-user';
+    case 'medication':
+      return 'medication-user';
+    case 'vaccination':
+      return 'vaccination-user';
+    case 'disposal':
+      return 'disposal-user';
+    case 'calving':
+    case 'farrowing':
+      return 'birth-event-user';
+    case 'abortedpregnancy':
+      return 'aborted-pregnancy-user';
+    case 'dryoff':
+      return 'dryoff-user';
+    case 'insemination':
+      return 'insemination-user';
+    case 'pregnancy':
+      return 'pregnancy-user';
+    case 'milking':
+      return 'milking-user';
+    case 'transfer':
+      return 'transfer-user';
+    default:
+      return null;
+  }
+}
 
   void _handleActionTap(
     BuildContext context,
