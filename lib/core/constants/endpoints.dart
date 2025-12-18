@@ -3,7 +3,6 @@
 // Base URL should be configured based on environment (development, staging, production).
 
 import 'dart:io';
-
 class ApiEndpoints {
   // Private constructor to prevent instantiation
   ApiEndpoints._();
