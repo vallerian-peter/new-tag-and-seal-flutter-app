@@ -109,7 +109,7 @@ class LivestockCard extends StatelessWidget {
               border: Border.all(
                 color: isNotActive
                     ? Colors.red.withOpacity(0.5)
-                    : (isDarkMode ? Colors.grey[700]! : Colors.grey[200]!),
+                    : (isDarkMode ? Colors.grey[800]! : Colors.grey[200]!),
                 width: isNotActive ? 2 : 1,
               ),
             ),
@@ -277,6 +277,7 @@ class LivestockCard extends StatelessWidget {
                                       icon: Iconsax.cake_outline,
                                     ),
                                   ),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: _DetailItem(
                                       label: l10n.weight,
@@ -308,6 +309,7 @@ class LivestockCard extends StatelessWidget {
                                       },
                                     ),
                                   ),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: FutureBuilder<String>(
                                       future: _getBreedName(

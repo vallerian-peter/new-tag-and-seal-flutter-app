@@ -22,7 +22,7 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
 
-class ViewEventsScreen extends StatelessWidget {
+class ViewEventsScreen extends StatefulWidget {
   final String title;
   final String logType;
   final String? farmUuid;
@@ -44,35 +44,42 @@ class ViewEventsScreen extends StatelessWidget {
     this.initialLogs,
   });
 
+  @override
+  State<ViewEventsScreen> createState() => _ViewEventsScreenState();
+}
+
+class _ViewEventsScreenState extends State<ViewEventsScreen> {
+  String _selectedFilter = 'all'; // 'all', 'today', or 'thisWeek'
+
   bool get _isContextSpecific =>
-      livestockUuid != null && livestockUuid!.isNotEmpty;
+      widget.livestockUuid != null && widget.livestockUuid!.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final chips = <Widget>[];
-    if (farmName != null && farmName!.trim().isNotEmpty) {
+    if (widget.farmName != null && widget.farmName!.trim().isNotEmpty) {
       chips.add(
         _ContextChip(
           icon: Icons.agriculture,
-          label: '${l10n.farm}: ${farmName!.trim()}',
+          label: '${l10n.farm}: ${widget.farmName!.trim()}',
         ),
       );
     }
-    if (livestockName != null && livestockName!.trim().isNotEmpty) {
+    if (widget.livestockName != null && widget.livestockName!.trim().isNotEmpty) {
       chips.add(
         _ContextChip(
           icon: Icons.pets_rounded,
-          label: '${l10n.livestock}: ${livestockName!.trim()}',
+          label: '${l10n.livestock}: ${widget.livestockName!.trim()}',
         ),
       );
     }
 
     // Use the title directly (already includes "Calving" or "Farrowing" from livestock details modal)
     // Add "Records" only if title is empty
-    final displayTitle = title.trim().isNotEmpty
-        ? title.trim()
+    final displayTitle = widget.title.trim().isNotEmpty
+        ? widget.title.trim()
         : l10n.recordsText;
 
     return FutureBuilder<Map<String, dynamic>>(
@@ -80,6 +87,7 @@ class ViewEventsScreen extends StatelessWidget {
       builder: (context, snapshot) {
         PreferredSizeWidget buildAppBar(int? total) {
           return AppBar(
+            backgroundColor: theme.scaffoldBackgroundColor,
             title: Text(displayTitle),
             actions: [
               Padding(
@@ -130,13 +138,16 @@ class ViewEventsScreen extends StatelessWidget {
         }
 
         final data = snapshot.data!;
-        final logs = data['logs'] as List<dynamic>;
+        final allLogs = data['logs'] as List<dynamic>;
         final vaccineNamesMap = data['vaccineNames'] as Map<String, String>;
         final farmNamesMap = data['farmNames'] as Map<String, String>;
         final livestockNamesMap = data['livestockNames'] as Map<String, String>;
-        final totalLogs = logs.length;
+        
+        // Filter logs based on selected filter
+        final filteredLogs = _filterLogs(allLogs);
+        final totalLogs = filteredLogs.length;
 
-        if (logs.isEmpty) {
+        if (allLogs.isEmpty) {
           return Scaffold(
             appBar: buildAppBar(0),
             body: Center(
@@ -150,29 +161,190 @@ class ViewEventsScreen extends StatelessWidget {
           listen: false,
         );
 
+        // Check if this is milking events to show summary
+        final isMilking = widget.logType == EventLogTypes.milking;
+        final milkingLogs = isMilking ? allLogs.cast<MilkingModel>() : <MilkingModel>[];
+
         return Scaffold(
           appBar: buildAppBar(totalLogs),
-          body: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: logs.length,
-            itemBuilder: (context, index) {
-              final log = logs[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _EventLogCard(
-                  logType: logType,
-                  log: log,
-                  references: logReferences,
-                  vaccineNames: vaccineNamesMap,
-                  farmName: farmNamesMap[log.farmUuid],
-                  livestockName: livestockNamesMap[log.livestockUuid],
-                  showContextRows: !_isContextSpecific,
-                ),
-              );
-            },
+          body: Column(
+            children: [
+              if (isMilking && milkingLogs.isNotEmpty) ...[
+                _buildMilkingSummary(context, milkingLogs),
+                const SizedBox(height: 8),
+              ],
+              Expanded(
+                child: filteredLogs.isEmpty
+                    ? Center(
+                        child: Text(
+                          l10n.noData,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredLogs.length,
+                        itemBuilder: (context, index) {
+                          final log = filteredLogs[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _EventLogCard(
+                              logType: widget.logType,
+                              log: log,
+                              references: logReferences,
+                              vaccineNames: vaccineNamesMap,
+                              farmName: farmNamesMap[log.farmUuid],
+                              livestockName: livestockNamesMap[log.livestockUuid],
+                              showContextRows: !_isContextSpecific,
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
         );
       },
+    );
+  }
+
+  List<dynamic> _filterLogs(List<dynamic> logs) {
+    if (_selectedFilter == 'all') return logs;
+    
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final todayEnd = todayStart.add(const Duration(days: 1));
+    final weekStart = todayStart.subtract(Duration(days: now.weekday - 1));
+    
+    return logs.where((log) {
+      if (widget.logType != EventLogTypes.milking) {
+        // For non-milking logs, check createdAt
+        final createdAt = DateTime.tryParse(log.createdAt);
+        if (createdAt == null) return false;
+        final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
+        
+        if (_selectedFilter == 'today') {
+          return logDate.isAtSameMomentAs(todayStart) || 
+                 (logDate.isAfter(todayStart.subtract(const Duration(milliseconds: 1))) &&
+                  logDate.isBefore(todayEnd));
+        } else if (_selectedFilter == 'thisWeek') {
+          return logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
+                 logDate.isBefore(now.add(const Duration(days: 1)));
+        }
+        return true;
+      }
+      
+      // For milking logs
+      if (log is! MilkingModel) return false;
+      final createdAt = DateTime.tryParse(log.createdAt);
+      if (createdAt == null) return false;
+      
+      final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
+      
+      if (_selectedFilter == 'today') {
+        return logDate.year == todayStart.year &&
+               logDate.month == todayStart.month &&
+               logDate.day == todayStart.day;
+      } else if (_selectedFilter == 'thisWeek') {
+        return logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
+               logDate.isBefore(now.add(const Duration(days: 1)));
+      }
+      return true;
+    }).toList();
+  }
+
+  Widget _buildMilkingSummary(BuildContext context, List<MilkingModel> milkingLogs) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final weekStart = todayStart.subtract(Duration(days: now.weekday - 1));
+    
+    double totalLitres = 0;
+    double todayLitres = 0;
+    double thisWeekLitres = 0;
+    
+    for (final milking in milkingLogs) {
+      final createdAt = DateTime.tryParse(milking.createdAt);
+      if (createdAt == null) continue;
+      
+      final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
+      final amount = double.tryParse(milking.amount) ?? 0;
+      
+      totalLitres += amount;
+      
+      if (logDate.year == todayStart.year &&
+          logDate.month == todayStart.month &&
+          logDate.day == todayStart.day) {
+        todayLitres += amount;
+      }
+      
+      if (logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
+          logDate.isBefore(now.add(const Duration(days: 1)))) {
+        thisWeekLitres += amount;
+      }
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Text(
+          //   l10n.milkingSummary,
+          //   style: theme.textTheme.titleLarge?.copyWith(
+          //     fontWeight: FontWeight.w700,
+          //   ),
+          // ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _MilkingSummaryCard(
+                  title: l10n.allText,
+                  value: totalLitres.toStringAsFixed(1),
+                  unit: l10n.litres,
+                  isSelected: _selectedFilter == 'all',
+                  onTap: () {
+                    setState(() {
+                      _selectedFilter = 'all';
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MilkingSummaryCard(
+                  title: l10n.upcomingToday,
+                  value: todayLitres.toStringAsFixed(1),
+                  unit: l10n.litres,
+                  isSelected: _selectedFilter == 'today',
+                  onTap: () {
+                    setState(() {
+                      _selectedFilter = _selectedFilter == 'today' ? 'all' : 'today';
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MilkingSummaryCard(
+                  title: l10n.thisWeek,
+                  value: thisWeekLitres.toStringAsFixed(1),
+                  unit: l10n.litres,
+                  isSelected: _selectedFilter == 'thisWeek',
+                  onTap: () {
+                    setState(() {
+                      _selectedFilter = _selectedFilter == 'thisWeek' ? 'all' : 'thisWeek';
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -186,6 +358,7 @@ class ViewEventsScreen extends StatelessWidget {
     await logReferences.ensureLoaded();
 
     // Load vaccines for name resolution
+    if (!mounted) return {'logs': <dynamic>[], 'vaccineNames': <String, String>{}, 'farmNames': <String, String>{}, 'livestockNames': <String, String>{}};
     final database = Provider.of<AppDatabase>(context, listen: false);
     final vaccinesRepo = VaccinesRepository(database);
     final vaccines = await vaccinesRepo.getVaccines();
@@ -197,15 +370,15 @@ class ViewEventsScreen extends StatelessWidget {
     }
 
     List<dynamic> logs;
-    if (initialLogs != null) {
-      logs = initialLogs!;
-    } else if (livestockUuid == null || livestockUuid!.isEmpty) {
+    if (widget.initialLogs != null) {
+      logs = widget.initialLogs!;
+    } else if (widget.livestockUuid == null || widget.livestockUuid!.isEmpty) {
       logs = const [];
     } else {
-      logs = await eventsProvider.loadLogsForType(
-        farmUuid: farmUuid,
-        livestockUuid: livestockUuid!,
-        logType: logType,
+      logs = await widget.eventsProvider.loadLogsForType(
+        farmUuid: widget.farmUuid,
+        livestockUuid: widget.livestockUuid!,
+        logType: widget.logType,
       );
     }
 
@@ -1004,6 +1177,89 @@ class _LogFooter extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MilkingSummaryCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String unit;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MilkingSummaryCard({
+    required this.title,
+    required this.value,
+    required this.unit,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final surface = theme.brightness == Brightness.dark
+        ? Colors.grey.shade800
+        : Colors.white;
+    final borderColor = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withOpacity(0.15);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.1)
+              : surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: borderColor,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    unit,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

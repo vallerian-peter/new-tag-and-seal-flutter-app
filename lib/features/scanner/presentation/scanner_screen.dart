@@ -7,6 +7,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/camera_allow_permission_alert.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_details_modal.dart';
@@ -465,9 +466,12 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => _startScan(selectedConfig),
-                icon: Icon(selectedConfig.startIcon, size: 18),
-                label: Text(l10n.scanStartButton),
+                icon: Icon(selectedConfig.startIcon, color: whiteColor, size: 18),
+                label: Text(l10n.scanStartButton, style: TextStyle(
+                  color: whiteColor,
+                ),),
                 style: ElevatedButton.styleFrom(
+                  elevation: 0,
                   backgroundColor: Constants.primaryColor,
                   foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -601,7 +605,7 @@ class _CameraPermissionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: Colors.black.withOpacity(0.04),
@@ -692,6 +696,7 @@ class _ScanModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Wrap(
       spacing: 12,
       runSpacing: 12,
@@ -709,7 +714,7 @@ class _ScanModeSelector extends StatelessWidget {
           selected: isSelected,
           label: Text(config.title),
           onSelected: (_) => onModeSelected(config.mode),
-          backgroundColor: theme.colorScheme.surface,
+          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800] : theme.colorScheme.surface,
           selectedColor: config.accentColor,
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
             color: isSelected ? Colors.white : theme.colorScheme.onSurface,

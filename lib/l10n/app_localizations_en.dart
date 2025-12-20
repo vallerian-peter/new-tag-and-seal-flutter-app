@@ -562,6 +562,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get howItWorks => 'How It Works';
 
   @override
+  String get howItWorksTitle => 'How It Works';
+
+  @override
   String get keyFeatures => 'Key Features';
 
   @override
@@ -577,7 +580,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analytics => 'Analytics & Reports';
 
   @override
+  String get analyticsReports => 'Analytics & Reports';
+
+  @override
   String get offlineCapability => 'Offline Capability';
+
+  @override
+  String get livestockTraceabilitySystemText => 'Livestock Traceability System';
+
+  @override
+  String get purposeText => 'Purpose';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get systemTitle => 'Tag & Seal Livestock System';
+
+  @override
+  String get systemSubtitle =>
+      'A comprehensive digital solution for livestock management';
+
+  @override
+  String get digitalTaggingDesc =>
+      'Tag your livestock with unique identifiers for easy tracking and management';
+
+  @override
+  String get healthRecordsDesc =>
+      'Maintain detailed health records including vaccinations, medications, treatments, and medical history';
+
+  @override
+  String get analyticsReportsDesc =>
+      'Get insights into your farm performance with detailed analytics and reports';
+
+  @override
+  String get offlineCapabilityDesc =>
+      'Work offline and sync your data automatically when internet is available';
+
+  @override
+  String get registerFarm => 'Register Your Farm';
+
+  @override
+  String get registerFarmDesc =>
+      'Create your farm profile with location details and farm information';
+
+  @override
+  String get addLivestockDesc =>
+      'Register your animals with digital tags and basic information';
+
+  @override
+  String get trackManage => 'Track & Manage';
+
+  @override
+  String get trackManageDesc =>
+      'Record health events, breeding, feeding, and other activities';
+
+  @override
+  String get syncAnalyze => 'Sync & Analyze';
+
+  @override
+  String get syncAnalyzeDesc =>
+      'Sync your data to the cloud and view analytics on your farm performance';
+
+  @override
+  String get gotIt => 'Got It!';
 
   @override
   String get manageAndTrackLivestockText =>
@@ -691,63 +757,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get squareKilometers => 'Square Kilometers';
-
-  @override
-  String get howItWorksTitle => 'How It Works';
-
-  @override
-  String get systemTitle => 'Tag & Seal Livestock System';
-
-  @override
-  String get systemSubtitle =>
-      'A comprehensive digital solution for livestock management';
-
-  @override
-  String get digitalTaggingDesc =>
-      'Tag your livestock with unique identifiers for easy tracking and management';
-
-  @override
-  String get healthRecordsDesc =>
-      'Maintain complete health records including vaccinations, medications, and treatments';
-
-  @override
-  String get analyticsReports => 'Analytics & Reports';
-
-  @override
-  String get analyticsReportsDesc =>
-      'Get insights into your farm performance with detailed analytics and reports';
-
-  @override
-  String get offlineCapabilityDesc =>
-      'Work offline and sync your data automatically when internet is available';
-
-  @override
-  String get registerFarm => 'Register Your Farm';
-
-  @override
-  String get registerFarmDesc =>
-      'Create your farm profile with location details and farm information';
-
-  @override
-  String get addLivestockDesc =>
-      'Register your animals with digital tags and basic information';
-
-  @override
-  String get trackManage => 'Track & Manage';
-
-  @override
-  String get trackManageDesc =>
-      'Record health events, breeding, feeding, and other activities';
-
-  @override
-  String get syncAnalyze => 'Sync & Analyze';
-
-  @override
-  String get syncAnalyzeDesc =>
-      'Sync your data to the cloud and view analytics on your farm performance';
-
-  @override
-  String get gotIt => 'Got It!';
 
   @override
   String get enterCredentialsToContinue => 'Enter your credentials to continue';
@@ -2895,6 +2904,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationChipUpcoming => 'Upcoming';
 
   @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get litres => 'Litres';
+
+  @override
+  String get milkingSummary => 'Milking Summary';
+
+  @override
   String get markCompleted => 'Mark completed';
 
   @override
@@ -3342,6 +3360,224 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmPayment => 'Confirm Payment';
+
+  @override
+  String get aboutUs => 'About Us';
+
+  @override
+  String get appVersion => 'App Version';
+
+  @override
+  String get lastUpdated => 'Last Updated';
+
+  @override
+  String get appPurpose =>
+      'Tag & Seal is a comprehensive livestock traceability and management system designed to help farmers efficiently track, manage, and monitor their livestock operations. Our platform enables digital tagging, health record management, and real-time analytics for better farm decision-making.';
+
+  @override
+  String get developedBy => 'Developed By';
+
+  @override
+  String get companyName => 'Climb Up Limited';
+
+  @override
+  String get managingDirector => 'Managing Director';
+
+  @override
+  String get directorName => 'Emmanuel Ngallah';
+
+  @override
+  String get companyDescription =>
+      'Climb Up Limited is a technology company empowering agriculture, utilities, and enterprise ecosystems through transformative ICT solutions built for Africa\'s realities and tomorrow\'s challenges. We specialize in livestock traceability, agricultural value chains, and utility management, delivering innovative platforms that optimize operations in real-time while advancing environmental stewardship.';
+
+  @override
+  String get compliance => 'Compliance';
+
+  @override
+  String get livestockAct => 'Livestock Act Compliance';
+
+  @override
+  String get traceabilityRegulations => 'Traceability Regulations';
+
+  @override
+  String get isoStandards => 'ISO Standards';
+
+  @override
+  String get farmRegistration => 'Farm Registration';
+
+  @override
+  String get farmRegistrationDesc =>
+      'Register and manage multiple farms with detailed information and location tracking';
+
+  @override
+  String get animalTracking => 'Animal Tracking';
+
+  @override
+  String get animalTrackingDesc =>
+      'Track individual animals with digital tags, RFID, barcodes, and comprehensive identification';
+
+  @override
+  String get reportsAnalyticsDesc =>
+      'Generate comprehensive reports and analytics for better farm management and decision-making';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get contactUs => 'Contact Us';
+
+  @override
+  String get supportEmail => 'info@climbup.co.tz';
+
+  @override
+  String get supportPhone => '+255 652 433 633 | +255 739 633 433';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get companyAddress => '55 Ally Sykes, Kawe Beach, Kinondoni';
+
+  @override
+  String get workingHours => 'Working Hours';
+
+  @override
+  String get workingHoursValue => '8.00am - 5.00pm';
+
+  @override
+  String get frequentlyAskedQuestions => 'Frequently Asked Questions';
+
+  @override
+  String get faq1 => 'How do I register my farm?';
+
+  @override
+  String get faq1Answer =>
+      'Go to Dashboard, tap \'Create New Farm\', fill in your farm details, and submit. Your farm will be registered and ready to use.';
+
+  @override
+  String get faq2 => 'How do I add livestock?';
+
+  @override
+  String get faq2Answer =>
+      'Navigate to Livestock tab, tap the \'+\' button, fill in livestock details including tag ID, name, breed, and other information, then save.';
+
+  @override
+  String get faq3 => 'How does offline mode work?';
+
+  @override
+  String get faq3Answer =>
+      'The app works offline. All data is stored locally and automatically syncs when you have internet connection. Tap the sync button to manually sync data.';
+
+  @override
+  String get faq4 => 'How do I sync my data?';
+
+  @override
+  String get faq4Answer =>
+      'Tap the sync button (refresh icon) in the Dashboard. The app will upload local changes and download updates from the server.';
+
+  @override
+  String get needMoreHelp => 'Need More Help?';
+
+  @override
+  String get contactSupportMessage =>
+      'If you have any questions or need assistance, please contact our support team.';
+
+  @override
+  String get privacyPolicyLastUpdated => 'Last Updated: January 2024';
+
+  @override
+  String get privacyPolicyIntroduction => 'Introduction';
+
+  @override
+  String get privacyPolicyIntroductionText =>
+      'Tag & Seal respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.';
+
+  @override
+  String get privacyPolicyInformationWeCollect => 'Information We Collect';
+
+  @override
+  String get privacyPolicyInformationWeCollectText =>
+      'We collect information that you provide directly to us, including farm details, livestock data, health records, and user account information. We also collect device information, location data (with your permission), and usage statistics to improve our services.';
+
+  @override
+  String get privacyPolicyHowWeUseInformation => 'How We Use Your Information';
+
+  @override
+  String get privacyPolicyHowWeUseInformationText =>
+      'We use the collected information to provide, maintain, and improve our services, process your requests, send you notifications, and ensure compliance with livestock regulations. We do not sell your personal information to third parties.';
+
+  @override
+  String get privacyPolicyDataSecurity => 'Data Security';
+
+  @override
+  String get privacyPolicyDataSecurityText =>
+      'We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Your data is encrypted both in transit and at rest, and we regularly review our security practices.';
+
+  @override
+  String get privacyPolicyYourRights => 'Your Rights';
+
+  @override
+  String get privacyPolicyYourRightsText =>
+      'You have the right to access, update, or delete your personal information at any time. You can also request a copy of your data or withdraw consent for data processing. To exercise these rights, please contact us using the information provided below.';
+
+  @override
+  String get privacyPolicyContactUs => 'Contact Us';
+
+  @override
+  String get privacyPolicyContactUsText =>
+      'If you have any questions about this Privacy Policy, please contact us at info@climbup.co.tz or through the app\'s support section.';
+
+  @override
+  String get termsOfServiceLastUpdated => 'Last Updated: January 2024';
+
+  @override
+  String get termsOfServiceIntroduction => 'Introduction';
+
+  @override
+  String get termsOfServiceIntroductionText =>
+      'Welcome to Tag & Seal. These Terms of Service govern your use of our mobile application and services. By accessing or using our app, you agree to be bound by these terms.';
+
+  @override
+  String get termsOfServiceAcceptance => 'Acceptance of Terms';
+
+  @override
+  String get termsOfServiceAcceptanceText =>
+      'By downloading, installing, or using Tag & Seal, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use our services.';
+
+  @override
+  String get termsOfServiceUserAccounts => 'User Accounts';
+
+  @override
+  String get termsOfServiceUserAccountsText =>
+      'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account. We reserve the right to suspend or terminate accounts that violate these terms.';
+
+  @override
+  String get termsOfServiceUseOfService => 'Use of Service';
+
+  @override
+  String get termsOfServiceUseOfServiceText =>
+      'You agree to use Tag & Seal only for lawful purposes and in accordance with these Terms. You may not use the service to violate any laws, infringe on others\' rights, transmit harmful code, or interfere with the operation of the service.';
+
+  @override
+  String get termsOfServiceIntellectualProperty => 'Intellectual Property';
+
+  @override
+  String get termsOfServiceIntellectualPropertyText =>
+      'All content, features, and functionality of Tag & Seal, including but not limited to text, graphics, logos, and software, are owned by CLIMB UP LTD and are protected by copyright, trademark, and other intellectual property laws.';
+
+  @override
+  String get termsOfServiceLimitationOfLiability => 'Limitation of Liability';
+
+  @override
+  String get termsOfServiceLimitationOfLiabilityText =>
+      'Tag & Seal is provided \'as is\' without warranties of any kind. We are not liable for any damages arising from your use of the service, including but not limited to data loss, business interruption, or indirect damages.';
+
+  @override
+  String get termsOfServiceChangesToTerms => 'Changes to Terms';
+
+  @override
+  String get termsOfServiceChangesToTermsText =>
+      'We reserve the right to modify these Terms of Service at any time. We will notify users of significant changes through the app or via email. Continued use of the service after changes constitutes acceptance of the new terms.';
 
   @override
   String get markBillAsPaidConfirmation =>

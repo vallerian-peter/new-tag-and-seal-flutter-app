@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
 import 'package:new_tag_and_seal_flutter_app/features/profile/presentation/edit_profile_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/settings/presentation/settings_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/home/presentation/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -485,59 +486,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: isDark ? null : LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.05),
-            color.withValues(alpha: 0.02),
+    // Determine navigation target based on title
+    int? targetTabIndex;
+    if (title == l10n.livestock) {
+      targetTabIndex = 1; // Livestock tab - navigates to LivestockListScreen
+    } else if (title == l10n.events) {
+      targetTabIndex = 3; // Events tab - navigates to EventsScreen
+    } else if (title == l10n.farms) {
+      targetTabIndex = 0; // Dashboard tab - navigates to DashboardScreen
+    }
+    
+    return InkWell(
+      onTap: () {
+        if (targetTabIndex != null) {
+          // Find HomeScreen state and change tab to navigate to the target screen
+          final homeState = context.findAncestorStateOfType<HomeScreenState>();
+          if (homeState != null) {
+            // For Farms, this will navigate to DashboardScreen (tab index 0)
+            homeState.changeTab(targetTabIndex);
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: isDark ? null : LinearGradient(
+            colors: [
+              color.withValues(alpha: 0.05),
+              color.withValues(alpha: 0.02),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          color: isDark ? Colors.grey[800] : null,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark 
+                ? theme.colorScheme.outline.withValues(alpha: 0.2)
+                : color.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
         ),
-        color: isDark ? Colors.grey[800] : null,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark 
-              ? theme.colorScheme.outline.withValues(alpha: 0.2)
-              : color.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/change_password/change_password_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/about/presentation/about_us_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/support/presentation/support_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/legal/presentation/privacy_policy_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/legal/presentation/terms_of_service_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/main.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
@@ -190,7 +194,12 @@ class SettingsScreen extends StatelessWidget {
                   title: l10n.about,
                   subtitle: l10n.settingsAboutSubtitle,
                   onTap: () {
-                    _showAboutDialog(context, l10n);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutUsScreen(),
+                      ),
+                    );
                   },
                 ),
 
@@ -200,7 +209,12 @@ class SettingsScreen extends StatelessWidget {
                   title: l10n.helpSupport,
                   subtitle: l10n.settingsHelpSubtitle,
                   onTap: () {
-                    // Handle help and support
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SupportScreen(),
+                      ),
+                    );
                   },
                 ),
 
@@ -210,7 +224,12 @@ class SettingsScreen extends StatelessWidget {
                   title: l10n.privacyPolicy,
                   subtitle: l10n.privacyPolicySubtitle,
                   onTap: () {
-                    // Handle privacy policy
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyPolicyScreen(),
+                      ),
+                    );
                   },
                 ),
 
@@ -220,7 +239,12 @@ class SettingsScreen extends StatelessWidget {
                   title: l10n.termsOfService,
                   subtitle: l10n.termsOfServiceSubtitle,
                   onTap: () {
-                    // Handle terms of service
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TermsOfServiceScreen(),
+                      ),
+                    );
                   },
                 ),
 
@@ -347,40 +371,6 @@ class SettingsScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(l10n.about),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Tag & Seal'),
-              const SizedBox(height: 8),
-              Text(l10n.settingsVersionLabel('1.0.0')),
-              const SizedBox(height: 8),
-              Text(l10n.settingsAppDescription),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(l10n.ok),
-            ),
-          ],
-        );
-      },
     );
   }
 

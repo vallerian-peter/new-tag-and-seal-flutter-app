@@ -494,7 +494,7 @@ abstract class AppLocalizations {
   /// **'Username'**
   String get username;
 
-  /// No description provided for @email.
+  /// Email label
   ///
   /// In en, this message translates to:
   /// **'Email'**
@@ -1136,6 +1136,12 @@ abstract class AppLocalizations {
   /// **'How It Works'**
   String get howItWorks;
 
+  /// No description provided for @howItWorksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How It Works'**
+  String get howItWorksTitle;
+
   /// No description provided for @keyFeatures.
   ///
   /// In en, this message translates to:
@@ -1166,11 +1172,119 @@ abstract class AppLocalizations {
   /// **'Analytics & Reports'**
   String get analytics;
 
+  /// No description provided for @analyticsReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics & Reports'**
+  String get analyticsReports;
+
   /// No description provided for @offlineCapability.
   ///
   /// In en, this message translates to:
   /// **'Offline Capability'**
   String get offlineCapability;
+
+  /// No description provided for @livestockTraceabilitySystemText.
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock Traceability System'**
+  String get livestockTraceabilitySystemText;
+
+  /// No description provided for @purposeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Purpose'**
+  String get purposeText;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @systemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag & Seal Livestock System'**
+  String get systemTitle;
+
+  /// No description provided for @systemSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A comprehensive digital solution for livestock management'**
+  String get systemSubtitle;
+
+  /// No description provided for @digitalTaggingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag your livestock with unique identifiers for easy tracking and management'**
+  String get digitalTaggingDesc;
+
+  /// Health records description
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain detailed health records including vaccinations, medications, treatments, and medical history'**
+  String get healthRecordsDesc;
+
+  /// No description provided for @analyticsReportsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get insights into your farm performance with detailed analytics and reports'**
+  String get analyticsReportsDesc;
+
+  /// No description provided for @offlineCapabilityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Work offline and sync your data automatically when internet is available'**
+  String get offlineCapabilityDesc;
+
+  /// No description provided for @registerFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Your Farm'**
+  String get registerFarm;
+
+  /// No description provided for @registerFarmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your farm profile with location details and farm information'**
+  String get registerFarmDesc;
+
+  /// No description provided for @addLivestockDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register your animals with digital tags and basic information'**
+  String get addLivestockDesc;
+
+  /// No description provided for @trackManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Track & Manage'**
+  String get trackManage;
+
+  /// No description provided for @trackManageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record health events, breeding, feeding, and other activities'**
+  String get trackManageDesc;
+
+  /// No description provided for @syncAnalyze.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync & Analyze'**
+  String get syncAnalyze;
+
+  /// No description provided for @syncAnalyzeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync your data to the cloud and view analytics on your farm performance'**
+  String get syncAnalyzeDesc;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got It!'**
+  String get gotIt;
 
   /// No description provided for @manageAndTrackLivestockText.
   ///
@@ -1393,102 +1507,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Square Kilometers'**
   String get squareKilometers;
-
-  /// No description provided for @howItWorksTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'How It Works'**
-  String get howItWorksTitle;
-
-  /// No description provided for @systemTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Tag & Seal Livestock System'**
-  String get systemTitle;
-
-  /// No description provided for @systemSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'A comprehensive digital solution for livestock management'**
-  String get systemSubtitle;
-
-  /// No description provided for @digitalTaggingDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Tag your livestock with unique identifiers for easy tracking and management'**
-  String get digitalTaggingDesc;
-
-  /// No description provided for @healthRecordsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Maintain complete health records including vaccinations, medications, and treatments'**
-  String get healthRecordsDesc;
-
-  /// No description provided for @analyticsReports.
-  ///
-  /// In en, this message translates to:
-  /// **'Analytics & Reports'**
-  String get analyticsReports;
-
-  /// No description provided for @analyticsReportsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Get insights into your farm performance with detailed analytics and reports'**
-  String get analyticsReportsDesc;
-
-  /// No description provided for @offlineCapabilityDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Work offline and sync your data automatically when internet is available'**
-  String get offlineCapabilityDesc;
-
-  /// No description provided for @registerFarm.
-  ///
-  /// In en, this message translates to:
-  /// **'Register Your Farm'**
-  String get registerFarm;
-
-  /// No description provided for @registerFarmDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Create your farm profile with location details and farm information'**
-  String get registerFarmDesc;
-
-  /// No description provided for @addLivestockDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Register your animals with digital tags and basic information'**
-  String get addLivestockDesc;
-
-  /// No description provided for @trackManage.
-  ///
-  /// In en, this message translates to:
-  /// **'Track & Manage'**
-  String get trackManage;
-
-  /// No description provided for @trackManageDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Record health events, breeding, feeding, and other activities'**
-  String get trackManageDesc;
-
-  /// No description provided for @syncAnalyze.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync & Analyze'**
-  String get syncAnalyze;
-
-  /// No description provided for @syncAnalyzeDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync your data to the cloud and view analytics on your farm performance'**
-  String get syncAnalyzeDesc;
-
-  /// No description provided for @gotIt.
-  ///
-  /// In en, this message translates to:
-  /// **'Got It!'**
-  String get gotIt;
 
   /// No description provided for @enterCredentialsToContinue.
   ///
@@ -5576,6 +5594,24 @@ abstract class AppLocalizations {
   /// **'Upcoming'**
   String get notificationChipUpcoming;
 
+  /// Label for this week time period
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// Unit for volume measurement
+  ///
+  /// In en, this message translates to:
+  /// **'Litres'**
+  String get litres;
+
+  /// Title for milking summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Milking Summary'**
+  String get milkingSummary;
+
   /// No description provided for @markCompleted.
   ///
   /// In en, this message translates to:
@@ -6248,7 +6284,7 @@ abstract class AppLocalizations {
   /// **'Invite'**
   String get invite;
 
-  /// Phone field label
+  /// Phone label
   ///
   /// In en, this message translates to:
   /// **'Phone'**
@@ -6391,6 +6427,396 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm Payment'**
   String get confirmPayment;
+
+  /// About Us page title
+  ///
+  /// In en, this message translates to:
+  /// **'About Us'**
+  String get aboutUs;
+
+  /// App version label
+  ///
+  /// In en, this message translates to:
+  /// **'App Version'**
+  String get appVersion;
+
+  /// Last updated label
+  ///
+  /// In en, this message translates to:
+  /// **'Last Updated'**
+  String get lastUpdated;
+
+  /// App purpose description
+  ///
+  /// In en, this message translates to:
+  /// **'Tag & Seal is a comprehensive livestock traceability and management system designed to help farmers efficiently track, manage, and monitor their livestock operations. Our platform enables digital tagging, health record management, and real-time analytics for better farm decision-making.'**
+  String get appPurpose;
+
+  /// Developed by label
+  ///
+  /// In en, this message translates to:
+  /// **'Developed By'**
+  String get developedBy;
+
+  /// Company name
+  ///
+  /// In en, this message translates to:
+  /// **'Climb Up Limited'**
+  String get companyName;
+
+  /// Managing director label
+  ///
+  /// In en, this message translates to:
+  /// **'Managing Director'**
+  String get managingDirector;
+
+  /// Director name
+  ///
+  /// In en, this message translates to:
+  /// **'Emmanuel Ngallah'**
+  String get directorName;
+
+  /// Company description
+  ///
+  /// In en, this message translates to:
+  /// **'Climb Up Limited is a technology company empowering agriculture, utilities, and enterprise ecosystems through transformative ICT solutions built for Africa\'s realities and tomorrow\'s challenges. We specialize in livestock traceability, agricultural value chains, and utility management, delivering innovative platforms that optimize operations in real-time while advancing environmental stewardship.'**
+  String get companyDescription;
+
+  /// Compliance section title
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance'**
+  String get compliance;
+
+  /// Livestock Act compliance text
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock Act Compliance'**
+  String get livestockAct;
+
+  /// Traceability regulations text
+  ///
+  /// In en, this message translates to:
+  /// **'Traceability Regulations'**
+  String get traceabilityRegulations;
+
+  /// ISO standards text
+  ///
+  /// In en, this message translates to:
+  /// **'ISO Standards'**
+  String get isoStandards;
+
+  /// Farm registration feature
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Registration'**
+  String get farmRegistration;
+
+  /// Farm registration description
+  ///
+  /// In en, this message translates to:
+  /// **'Register and manage multiple farms with detailed information and location tracking'**
+  String get farmRegistrationDesc;
+
+  /// Animal tracking feature
+  ///
+  /// In en, this message translates to:
+  /// **'Animal Tracking'**
+  String get animalTracking;
+
+  /// Animal tracking description
+  ///
+  /// In en, this message translates to:
+  /// **'Track individual animals with digital tags, RFID, barcodes, and comprehensive identification'**
+  String get animalTrackingDesc;
+
+  /// Reports and analytics description
+  ///
+  /// In en, this message translates to:
+  /// **'Generate comprehensive reports and analytics for better farm management and decision-making'**
+  String get reportsAnalyticsDesc;
+
+  /// Support page title
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// Contact us label
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get contactUs;
+
+  /// Support email address
+  ///
+  /// In en, this message translates to:
+  /// **'info@climbup.co.tz'**
+  String get supportEmail;
+
+  /// Support phone number
+  ///
+  /// In en, this message translates to:
+  /// **'+255 652 433 633 | +255 739 633 433'**
+  String get supportPhone;
+
+  /// Address label
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// Company address
+  ///
+  /// In en, this message translates to:
+  /// **'55 Ally Sykes, Kawe Beach, Kinondoni'**
+  String get companyAddress;
+
+  /// Working hours label
+  ///
+  /// In en, this message translates to:
+  /// **'Working Hours'**
+  String get workingHours;
+
+  /// Working hours value
+  ///
+  /// In en, this message translates to:
+  /// **'8.00am - 5.00pm'**
+  String get workingHoursValue;
+
+  /// FAQ section title
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Asked Questions'**
+  String get frequentlyAskedQuestions;
+
+  /// FAQ question 1
+  ///
+  /// In en, this message translates to:
+  /// **'How do I register my farm?'**
+  String get faq1;
+
+  /// FAQ answer 1
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Dashboard, tap \'Create New Farm\', fill in your farm details, and submit. Your farm will be registered and ready to use.'**
+  String get faq1Answer;
+
+  /// FAQ question 2
+  ///
+  /// In en, this message translates to:
+  /// **'How do I add livestock?'**
+  String get faq2;
+
+  /// FAQ answer 2
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate to Livestock tab, tap the \'+\' button, fill in livestock details including tag ID, name, breed, and other information, then save.'**
+  String get faq2Answer;
+
+  /// FAQ question 3
+  ///
+  /// In en, this message translates to:
+  /// **'How does offline mode work?'**
+  String get faq3;
+
+  /// FAQ answer 3
+  ///
+  /// In en, this message translates to:
+  /// **'The app works offline. All data is stored locally and automatically syncs when you have internet connection. Tap the sync button to manually sync data.'**
+  String get faq3Answer;
+
+  /// FAQ question 4
+  ///
+  /// In en, this message translates to:
+  /// **'How do I sync my data?'**
+  String get faq4;
+
+  /// FAQ answer 4
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the sync button (refresh icon) in the Dashboard. The app will upload local changes and download updates from the server.'**
+  String get faq4Answer;
+
+  /// Need more help text
+  ///
+  /// In en, this message translates to:
+  /// **'Need More Help?'**
+  String get needMoreHelp;
+
+  /// Contact support message
+  ///
+  /// In en, this message translates to:
+  /// **'If you have any questions or need assistance, please contact our support team.'**
+  String get contactSupportMessage;
+
+  /// Privacy policy last updated date
+  ///
+  /// In en, this message translates to:
+  /// **'Last Updated: January 2024'**
+  String get privacyPolicyLastUpdated;
+
+  /// Privacy policy introduction section
+  ///
+  /// In en, this message translates to:
+  /// **'Introduction'**
+  String get privacyPolicyIntroduction;
+
+  /// Privacy policy introduction text
+  ///
+  /// In en, this message translates to:
+  /// **'Tag & Seal respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.'**
+  String get privacyPolicyIntroductionText;
+
+  /// Privacy policy information we collect section
+  ///
+  /// In en, this message translates to:
+  /// **'Information We Collect'**
+  String get privacyPolicyInformationWeCollect;
+
+  /// Privacy policy information we collect text
+  ///
+  /// In en, this message translates to:
+  /// **'We collect information that you provide directly to us, including farm details, livestock data, health records, and user account information. We also collect device information, location data (with your permission), and usage statistics to improve our services.'**
+  String get privacyPolicyInformationWeCollectText;
+
+  /// Privacy policy how we use information section
+  ///
+  /// In en, this message translates to:
+  /// **'How We Use Your Information'**
+  String get privacyPolicyHowWeUseInformation;
+
+  /// Privacy policy how we use information text
+  ///
+  /// In en, this message translates to:
+  /// **'We use the collected information to provide, maintain, and improve our services, process your requests, send you notifications, and ensure compliance with livestock regulations. We do not sell your personal information to third parties.'**
+  String get privacyPolicyHowWeUseInformationText;
+
+  /// Privacy policy data security section
+  ///
+  /// In en, this message translates to:
+  /// **'Data Security'**
+  String get privacyPolicyDataSecurity;
+
+  /// Privacy policy data security text
+  ///
+  /// In en, this message translates to:
+  /// **'We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Your data is encrypted both in transit and at rest, and we regularly review our security practices.'**
+  String get privacyPolicyDataSecurityText;
+
+  /// Privacy policy your rights section
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rights'**
+  String get privacyPolicyYourRights;
+
+  /// Privacy policy your rights text
+  ///
+  /// In en, this message translates to:
+  /// **'You have the right to access, update, or delete your personal information at any time. You can also request a copy of your data or withdraw consent for data processing. To exercise these rights, please contact us using the information provided below.'**
+  String get privacyPolicyYourRightsText;
+
+  /// Privacy policy contact us section
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get privacyPolicyContactUs;
+
+  /// Privacy policy contact us text
+  ///
+  /// In en, this message translates to:
+  /// **'If you have any questions about this Privacy Policy, please contact us at info@climbup.co.tz or through the app\'s support section.'**
+  String get privacyPolicyContactUsText;
+
+  /// Terms of service last updated date
+  ///
+  /// In en, this message translates to:
+  /// **'Last Updated: January 2024'**
+  String get termsOfServiceLastUpdated;
+
+  /// Terms of service introduction section
+  ///
+  /// In en, this message translates to:
+  /// **'Introduction'**
+  String get termsOfServiceIntroduction;
+
+  /// Terms of service introduction text
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Tag & Seal. These Terms of Service govern your use of our mobile application and services. By accessing or using our app, you agree to be bound by these terms.'**
+  String get termsOfServiceIntroductionText;
+
+  /// Terms of service acceptance section
+  ///
+  /// In en, this message translates to:
+  /// **'Acceptance of Terms'**
+  String get termsOfServiceAcceptance;
+
+  /// Terms of service acceptance text
+  ///
+  /// In en, this message translates to:
+  /// **'By downloading, installing, or using Tag & Seal, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use our services.'**
+  String get termsOfServiceAcceptanceText;
+
+  /// Terms of service user accounts section
+  ///
+  /// In en, this message translates to:
+  /// **'User Accounts'**
+  String get termsOfServiceUserAccounts;
+
+  /// Terms of service user accounts text
+  ///
+  /// In en, this message translates to:
+  /// **'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account. We reserve the right to suspend or terminate accounts that violate these terms.'**
+  String get termsOfServiceUserAccountsText;
+
+  /// Terms of service use of service section
+  ///
+  /// In en, this message translates to:
+  /// **'Use of Service'**
+  String get termsOfServiceUseOfService;
+
+  /// Terms of service use of service text
+  ///
+  /// In en, this message translates to:
+  /// **'You agree to use Tag & Seal only for lawful purposes and in accordance with these Terms. You may not use the service to violate any laws, infringe on others\' rights, transmit harmful code, or interfere with the operation of the service.'**
+  String get termsOfServiceUseOfServiceText;
+
+  /// Terms of service intellectual property section
+  ///
+  /// In en, this message translates to:
+  /// **'Intellectual Property'**
+  String get termsOfServiceIntellectualProperty;
+
+  /// Terms of service intellectual property text
+  ///
+  /// In en, this message translates to:
+  /// **'All content, features, and functionality of Tag & Seal, including but not limited to text, graphics, logos, and software, are owned by CLIMB UP LTD and are protected by copyright, trademark, and other intellectual property laws.'**
+  String get termsOfServiceIntellectualPropertyText;
+
+  /// Terms of service limitation of liability section
+  ///
+  /// In en, this message translates to:
+  /// **'Limitation of Liability'**
+  String get termsOfServiceLimitationOfLiability;
+
+  /// Terms of service limitation of liability text
+  ///
+  /// In en, this message translates to:
+  /// **'Tag & Seal is provided \'as is\' without warranties of any kind. We are not liable for any damages arising from your use of the service, including but not limited to data loss, business interruption, or indirect damages.'**
+  String get termsOfServiceLimitationOfLiabilityText;
+
+  /// Terms of service changes to terms section
+  ///
+  /// In en, this message translates to:
+  /// **'Changes to Terms'**
+  String get termsOfServiceChangesToTerms;
+
+  /// Terms of service changes to terms text
+  ///
+  /// In en, this message translates to:
+  /// **'We reserve the right to modify these Terms of Service at any time. We will notify users of significant changes through the app or via email. Continued use of the service after changes constitutes acceptance of the new terms.'**
+  String get termsOfServiceChangesToTermsText;
 
   /// Confirmation message for marking bill as paid
   ///

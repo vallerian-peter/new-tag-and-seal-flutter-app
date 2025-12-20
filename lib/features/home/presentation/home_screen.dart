@@ -17,13 +17,37 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   Key _dashboardKey = UniqueKey();
   Key _profileKey = UniqueKey();
+  
+  /// Change the selected tab index programmatically
+  void changeTab(int index) {
+    if (index == 2) {
+      _handleScannerAction();
+      return;
+    }
+    
+    setState(() {
+      if (index == 0) {
+        _dashboardKey = UniqueKey();
+      } else if (index == 4) {
+        _profileKey = UniqueKey();
+      }
+      _selectedIndex = index;
+    });
+    
+    // Auto-refresh data when entering specific tabs
+    if (index == 1) {
+      _refreshLivestockTab();
+    } else if (index == 3) {
+      _refreshEventsTab();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

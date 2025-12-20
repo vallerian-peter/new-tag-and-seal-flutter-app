@@ -197,6 +197,17 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   value: '${livestockProvider.totalCount}',
                                   icon: Iconsax.pet_outline,
                                   color: Constants.primaryColor,
+                                  isSelected: _selectedGenderFilter == 'All' && 
+                                             _selectedStatusFilter == 'All' && 
+                                             _selectedLivestockTypeId == null,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = 'All';
+                                      _selectedStatusFilter = 'All';
+                                      _selectedLivestockTypeId = null;
+                                    });
+                                    _applyFilters();
+                                  },
                                 ),
                               ),
                               
@@ -208,6 +219,13 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   value: '${livestockProvider.maleCount}',
                                   icon: Bootstrap.gender_male,
                                   color: Colors.blue,
+                                  isSelected: _selectedGenderFilter == 'Male',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = _selectedGenderFilter == 'Male' ? 'All' : 'Male';
+                                    });
+                                    _applyFilters();
+                                  },
                                 ),
                               ),
 
@@ -219,6 +237,13 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   value: '${livestockProvider.femaleCount}',
                                   icon: Bootstrap.gender_female,
                                   color: Colors.pink,
+                                  isSelected: _selectedGenderFilter == 'Female',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGenderFilter = _selectedGenderFilter == 'Female' ? 'All' : 'Female';
+                                    });
+                                    _applyFilters();
+                                  },
                                 ),
                               ),
                             ],
@@ -572,6 +597,20 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     final isDarkMode = theme.brightness == Brightness.dark;
     
     return PopupMenuButton<int?>(
+      onSelected: (value) {
+        _onLivestockTypeFilterSelected(value);
+      },
+      itemBuilder: (context) => [
+        for (var type in _livestockTypes)
+          PopupMenuItem<int?>(
+            value: type.id,
+            child: Text(
+              type.name,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+      ],
+      color: isDarkMode ? Colors.grey[700] : Colors.white,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -609,20 +648,6 @@ class _LivestockListScreenState extends State<LivestockListScreen>
           ],
         ),
       ),
-      onSelected: (value) {
-        _onLivestockTypeFilterSelected(value);
-      },
-      itemBuilder: (context) => [
-        for (var type in _livestockTypes)
-          PopupMenuItem<int?>(
-            value: type.id,
-            child: Text(
-              type.name,
-              style: const TextStyle(fontSize: 12),
-            ),
-          ),
-      ],
-      color: isDarkMode ? Colors.grey[700] : Colors.white,
     );
   }
 }

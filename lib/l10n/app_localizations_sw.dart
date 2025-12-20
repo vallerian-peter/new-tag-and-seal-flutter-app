@@ -566,6 +566,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get howItWorks => 'Jinsi Inavyofanya Kazi';
 
   @override
+  String get howItWorksTitle => 'Jinsi Inavyofanya Kazi';
+
+  @override
   String get keyFeatures => 'Vipengele Muhimu';
 
   @override
@@ -581,7 +584,70 @@ class AppLocalizationsSw extends AppLocalizations {
   String get analytics => 'Uchambuzi na Ripoti';
 
   @override
+  String get analyticsReports => 'Uchambuzi na Ripoti';
+
+  @override
   String get offlineCapability => 'Uwezo wa Kufanya Kazi Bila Mtandao';
+
+  @override
+  String get livestockTraceabilitySystemText => 'Mfumo wa Kufuatilia Mifugo';
+
+  @override
+  String get purposeText => 'Lengo';
+
+  @override
+  String get version => 'Toleo';
+
+  @override
+  String get systemTitle => 'Mfumo wa Tag & Seal wa Mifugo';
+
+  @override
+  String get systemSubtitle =>
+      'Suluhisho la kidijitali la kukamilika la usimamizi wa mifugo';
+
+  @override
+  String get digitalTaggingDesc =>
+      'Weka alama za mifugo yako kwa vitambulisho vya kipekee kwa ufuatiliaji rahisi na usimamizi';
+
+  @override
+  String get healthRecordsDesc =>
+      'Weka rekodi za kina za afya pamoja na chanjo, dawa, matibabu, na historia ya matibabu';
+
+  @override
+  String get analyticsReportsDesc =>
+      'Pata maarifa juu ya utendaji wa shamba lako kwa uchambuzi wa kina na ripoti';
+
+  @override
+  String get offlineCapabilityDesc =>
+      'Fanya kazi bila mtandao na sawazisha data yako kiotomatiki wakati mtandao unapatikana';
+
+  @override
+  String get registerFarm => 'Sajili Shamba Lako';
+
+  @override
+  String get registerFarmDesc =>
+      'Unda wasifu wa shamba lako na maelezo ya eneo na taarifa za shamba';
+
+  @override
+  String get addLivestockDesc =>
+      'Sajili wanyama wako kwa alama za kidijitali na taarifa za msingi';
+
+  @override
+  String get trackManage => 'Fuatilia na Simamia';
+
+  @override
+  String get trackManageDesc =>
+      'Rekodi matukio ya afya, uzalishaji, kulisha, na shughuli zingine';
+
+  @override
+  String get syncAnalyze => 'Sawazisha na Chambua';
+
+  @override
+  String get syncAnalyzeDesc =>
+      'Sawazisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
+
+  @override
+  String get gotIt => 'Nimeelewa!';
 
   @override
   String get manageAndTrackLivestockText => 'Simamia na hariri mifugo wote';
@@ -695,63 +761,6 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get squareKilometers => 'Kilomita za Mraba';
-
-  @override
-  String get howItWorksTitle => 'Jinsi Inavyofanya Kazi';
-
-  @override
-  String get systemTitle => 'Mfumo wa Tag & Seal wa Mifugo';
-
-  @override
-  String get systemSubtitle =>
-      'Suluhisho la kidijitali la kukamilika la usimamizi wa mifugo';
-
-  @override
-  String get digitalTaggingDesc =>
-      'Weka alama za mifugo yako kwa vitambulisho vya kipekee kwa ufuatiliaji rahisi na usimamizi';
-
-  @override
-  String get healthRecordsDesc =>
-      'Hifadhi rekodi kamili za afya pamoja na chanjo, dawa, na matibabu';
-
-  @override
-  String get analyticsReports => 'Uchambuzi na Ripoti';
-
-  @override
-  String get analyticsReportsDesc =>
-      'Pata maarifa juu ya utendaji wa shamba lako kwa uchambuzi wa kina na ripoti';
-
-  @override
-  String get offlineCapabilityDesc =>
-      'Fanya kazi bila mtandao na sawazisha data yako kiotomatiki wakati mtandao unapatikana';
-
-  @override
-  String get registerFarm => 'Sajili Shamba Lako';
-
-  @override
-  String get registerFarmDesc =>
-      'Unda wasifu wa shamba lako na maelezo ya eneo na taarifa za shamba';
-
-  @override
-  String get addLivestockDesc =>
-      'Sajili wanyama wako kwa alama za kidijitali na taarifa za msingi';
-
-  @override
-  String get trackManage => 'Fuatilia na Simamia';
-
-  @override
-  String get trackManageDesc =>
-      'Rekodi matukio ya afya, uzalishaji, kulisha, na shughuli zingine';
-
-  @override
-  String get syncAnalyze => 'Sawazisha na Chambua';
-
-  @override
-  String get syncAnalyzeDesc =>
-      'Sawazisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
-
-  @override
-  String get gotIt => 'Nimeelewa!';
 
   @override
   String get enterCredentialsToContinue => 'Ingiza taarifa zako ili kuendelea';
@@ -1216,64 +1225,66 @@ class AppLocalizationsSw extends AppLocalizations {
   String get recoverViaPhone => 'Rejesha kwa Simu';
 
   @override
-  String get enterYourEmail => 'Enter Your Email';
+  String get enterYourEmail => 'Ingiza Barua Pepe Yako';
 
   @override
-  String get enterYourPhone => 'Enter Your Phone Number';
+  String get enterYourPhone => 'Ingiza Namba Yako ya Simu';
 
   @override
   String get otpWillBeSentToEmail =>
-      'We\'ll send a 6-digit OTP code to your email address';
+      'Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye anwani yako ya barua pepe';
 
   @override
   String get otpWillBeSentToPhone =>
-      'We\'ll send a 6-digit OTP code to your phone number';
+      'Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye namba yako ya simu';
 
   @override
-  String get sendOtp => 'Send OTP';
+  String get sendOtp => 'Tuma OTP';
 
   @override
-  String get otpExpiresIn10Minutes => 'OTP code expires in 10 minutes';
+  String get otpExpiresIn10Minutes =>
+      'Msimbo wa OTP unaisha muda baada ya dakika 10';
 
   @override
-  String get verifyOtp => 'Verify OTP';
+  String get verifyOtp => 'Thibitisha OTP';
 
   @override
-  String get enterOtpCode => 'Enter OTP Code';
+  String get enterOtpCode => 'Ingiza Msimbo wa OTP';
 
   @override
-  String get otpSentTo => 'OTP sent to';
+  String get otpSentTo => 'OTP imetumwa kwa';
 
   @override
-  String get verify => 'Verify';
+  String get verify => 'Thibitisha';
 
   @override
-  String get resendOtp => 'Resend OTP';
+  String get resendOtp => 'Tuma OTP Tena';
 
   @override
-  String get pleaseEnterCompleteOtp => 'Please enter complete 6-digit OTP';
+  String get pleaseEnterCompleteOtp =>
+      'Tafadhali ingiza msimbo kamili wa OTP wa tarakimu 6';
 
   @override
-  String get otpResentSuccessfully => 'OTP resent successfully';
+  String get otpResentSuccessfully => 'OTP imetumwa tena kwa mafanikio';
 
   @override
-  String get failedToResendOtp => 'Failed to resend OTP';
+  String get failedToResendOtp => 'Imeshindwa kutuma OTP tena';
 
   @override
-  String get failedToSendOtp => 'Failed to send OTP';
+  String get failedToSendOtp => 'Imeshindwa kutuma OTP';
 
   @override
-  String get resetPassword => 'Reset Password';
+  String get resetPassword => 'Weka Upya Nenosiri';
 
   @override
-  String get createNewPassword => 'Create New Password';
+  String get createNewPassword => 'Tengeneza Nenosiri Jipya';
 
   @override
   String get passwordResetSuccessfully =>
-      'Password reset successfully! You can now login with your new password.';
+      'Nenosiri limewekwa upya kwa mafanikio! Sasa unaweza kuingia kwa nenosiri lako jipya.';
 
   @override
-  String get failedToResetPassword => 'Failed to reset password';
+  String get failedToResetPassword => 'Imeshindwa kuweka upya nenosiri';
 
   @override
   String get user => 'Mhusika';
@@ -2910,6 +2921,15 @@ class AppLocalizationsSw extends AppLocalizations {
   String get notificationChipUpcoming => 'Zijazo';
 
   @override
+  String get thisWeek => 'Wiki Hii';
+
+  @override
+  String get litres => 'Lita';
+
+  @override
+  String get milkingSummary => 'Muhtasari wa Kukamua';
+
+  @override
   String get markCompleted => 'Weka kuwa imekamilika';
 
   @override
@@ -3358,6 +3378,225 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get confirmPayment => 'Thibitisha Malipo';
+
+  @override
+  String get aboutUs => 'Kuhusu Sisi';
+
+  @override
+  String get appVersion => 'Toleo la Programu';
+
+  @override
+  String get lastUpdated => 'Imesasishwa Mwisho';
+
+  @override
+  String get appPurpose =>
+      'Tag & Seal ni mfumo wa kufuatilia na kusimamia mifugo unaokusudiwa kuwasaidia wakulima kufuatilia, kusimamia, na kufuatilia shughuli zao za mifugo kwa ufanisi. Jukwaa letu linawezesha kuweka lebo za dijitali, usimamizi wa rekodi za afya, na uchambuzi wa wakati halisi kwa ajili ya kufanya maamuzi bora zaidi katika shamba.';
+
+  @override
+  String get developedBy => 'Imetengenezwa Na';
+
+  @override
+  String get companyName => 'Climb Up Limited';
+
+  @override
+  String get managingDirector => 'Mkurugenzi Mkuu';
+
+  @override
+  String get directorName => 'Emmanuel Ngallah';
+
+  @override
+  String get companyDescription =>
+      'Climb Up Limited ni kampuni ya teknolojia inayowapa nguvu kilimo, huduma za maji, na mifumo ya biashara kupitia suluhisho za ICT zinazobadilisha zilizojengwa kwa ajili ya ukweli wa Afrika na changamoto za kesho. Tunajishughulisha na ufuatiliaji wa mifugo, mnyororo wa thamani ya kilimo, na usimamizi wa huduma za maji, tukitoa jukwaa za ubunifu zinazoongeza ufanisi wa shughuli kwa wakati halisi huku tukipanua ulinzi wa mazingira.';
+
+  @override
+  String get compliance => 'Uzingatiaji';
+
+  @override
+  String get livestockAct => 'Uzingatiaji wa Sheria ya Mifugo';
+
+  @override
+  String get traceabilityRegulations => 'Kanuni za Kufuatilia';
+
+  @override
+  String get isoStandards => 'Viashiria vya ISO';
+
+  @override
+  String get farmRegistration => 'Usajili wa Shamba';
+
+  @override
+  String get farmRegistrationDesc =>
+      'Sajili na simamia mashamba mengi na taarifa za kina na ufuatiliaji wa eneo';
+
+  @override
+  String get animalTracking => 'Ufuatiliaji wa Wanyama';
+
+  @override
+  String get animalTrackingDesc =>
+      'Fuatilia wanyama binafsi na lebo za dijitali, RFID, msimbo wa mstari, na utambulisho kamili';
+
+  @override
+  String get reportsAnalyticsDesc =>
+      'Tengeneza ripoti kamili na uchambuzi kwa ajili ya usimamizi bora wa shamba na kufanya maamuzi';
+
+  @override
+  String get support => 'Msaada';
+
+  @override
+  String get contactUs => 'Wasiliana Nasi';
+
+  @override
+  String get supportEmail => 'info@climbup.co.tz';
+
+  @override
+  String get supportPhone => '+255 652 433 633 | +255 739 633 433';
+
+  @override
+  String get address => 'Anwani';
+
+  @override
+  String get companyAddress => '55 Ally Sykes, Kawe Beach, Kinondoni';
+
+  @override
+  String get workingHours => 'Masaa ya Kazi';
+
+  @override
+  String get workingHoursValue => '8.00am - 5.00pm';
+
+  @override
+  String get frequentlyAskedQuestions => 'Maswali Yanayoulizwa Mara kwa Mara';
+
+  @override
+  String get faq1 => 'Ninawezaje kusajili shamba langu?';
+
+  @override
+  String get faq1Answer =>
+      'Nenda kwenye Dashibodi, bonyeza \'Tengeneza Shamba Jipya\', jaza maelezo ya shamba lako, na wasilisha. Shamba lako litasajiliwa na kuwa tayari kutumika.';
+
+  @override
+  String get faq2 => 'Ninawezaje kuongeza mifugo?';
+
+  @override
+  String get faq2Answer =>
+      'Nenda kwenye kichupo cha Mifugo, bonyeza kitufe cha \'+\', jaza maelezo ya mifugo pamoja na kitambulisho cha lebo, jina, aina, na taarifa zingine, kisha hifadhi.';
+
+  @override
+  String get faq3 => 'Hali ya nje ya mtandao inafanya kazi vipi?';
+
+  @override
+  String get faq3Answer =>
+      'Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinasawazishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kusawazisha ili kusawazisha data kwa mikono.';
+
+  @override
+  String get faq4 => 'Ninawezaje kusawazisha data zangu?';
+
+  @override
+  String get faq4Answer =>
+      'Bonyeza kitufe cha kusawazisha (ikoni ya kusasisha) kwenye Dashibodi. Programu itapakia mabadiliko ya ndani na kupakua sasisho kutoka kwa seva.';
+
+  @override
+  String get needMoreHelp => 'Unahitaji Msaada Zaidi?';
+
+  @override
+  String get contactSupportMessage =>
+      'Ikiwa una maswali yoyote au unahitaji msaada, tafadhali wasiliana na timu yetu ya msaada.';
+
+  @override
+  String get privacyPolicyLastUpdated => 'Imesasishwa Mwisho: Januari 2024';
+
+  @override
+  String get privacyPolicyIntroduction => 'Utangulizi';
+
+  @override
+  String get privacyPolicyIntroductionText =>
+      'Tag & Seal inaheshimu faragha yako na inaahidi kulinda taarifa zako za kibinafsi. Sera hii ya Faragha inaeleza jinsi tunavyokusanya, kutumia, kufichua, na kulinda taarifa zako unapotumia programu yetu ya simu.';
+
+  @override
+  String get privacyPolicyInformationWeCollect => 'Taarifa Tunazokusanya';
+
+  @override
+  String get privacyPolicyInformationWeCollectText =>
+      'Tunakusanya taarifa unazotoa moja kwa moja, pamoja na maelezo ya shamba, data ya mifugo, rekodi za afya, na taarifa za akaunti ya mtumiaji. Pia tunakusanya taarifa za kifaa, data ya eneo (kwa idhini yako), na takwimu za matumizi ili kuboresha huduma zetu.';
+
+  @override
+  String get privacyPolicyHowWeUseInformation =>
+      'Jinsi Tunavyotumia Taarifa Zako';
+
+  @override
+  String get privacyPolicyHowWeUseInformationText =>
+      'Tunatumia taarifa zilizokusanywa kutoa, kudumisha, na kuboresha huduma zetu, kushughulikia maombi yako, kukutuma arifa, na kuhakikisha utii wa kanuni za mifugo. Hatauza taarifa zako za kibinafsi kwa watu wa tatu.';
+
+  @override
+  String get privacyPolicyDataSecurity => 'Usalama wa Data';
+
+  @override
+  String get privacyPolicyDataSecurityText =>
+      'Tunatekeleza hatua za kiufundi na za kikundi zinazofaa kulinda taarifa zako za kibinafsi dhidi ya ufikiaji usioidhinishwa, mabadiliko, ufichuaji, au uharibifu. Data yako imesimbwa wakati wa usafiri na wakati wa kuhifadhiwa, na tunachunguza mara kwa mara mazoea yetu ya usalama.';
+
+  @override
+  String get privacyPolicyYourRights => 'Haki Zako';
+
+  @override
+  String get privacyPolicyYourRightsText =>
+      'Una haki ya kufikia, kusasisha, au kufuta taarifa zako za kibinafsi wakati wowote. Unaweza pia kuomba nakala ya data yako au kujiondoa kwa idhini ya usindikaji wa data. Ili kutekeleza haki hizi, tafadhali wasiliana nasi kwa kutumia taarifa zilizotolewa hapa chini.';
+
+  @override
+  String get privacyPolicyContactUs => 'Wasiliana Nasi';
+
+  @override
+  String get privacyPolicyContactUsText =>
+      'Ikiwa una maswali yoyote kuhusu Sera hii ya Faragha, tafadhali wasiliana nasi kwa info@climbup.co.tz au kupitia sehemu ya msaada ya programu.';
+
+  @override
+  String get termsOfServiceLastUpdated => 'Imesasishwa Mwisho: Januari 2024';
+
+  @override
+  String get termsOfServiceIntroduction => 'Utangulizi';
+
+  @override
+  String get termsOfServiceIntroductionText =>
+      'Karibu kwenye Tag & Seal. Masharti haya ya Huduma yanatawala matumizi yako ya programu yetu ya simu na huduma. Kwa kufikia au kutumia programu yetu, unakubali kufungamana na masharti haya.';
+
+  @override
+  String get termsOfServiceAcceptance => 'Kukubali Masharti';
+
+  @override
+  String get termsOfServiceAcceptanceText =>
+      'Kwa kupakua, kusanidi, au kutumia Tag & Seal, unakubali kuwa umesoma, umeelewa, na unakubali kufungamana na Masharti haya ya Huduma na Sera yetu ya Faragha. Ikiwa hukubali, tafadhali usitumie huduma zetu.';
+
+  @override
+  String get termsOfServiceUserAccounts => 'Akaunti za Watumiaji';
+
+  @override
+  String get termsOfServiceUserAccountsText =>
+      'Una jukumu la kudumisha siri ya hati zako za akaunti na shughuli zote zinazotokea chini ya akaunti yako. Unakubali kutujulisha mara moja kuhusu matumizi yoyote yasiyoidhinishwa ya akaunti yako. Tunahifadhi haki ya kusimamisha au kukomesha akaunti zinazokiuka masharti haya.';
+
+  @override
+  String get termsOfServiceUseOfService => 'Matumizi ya Huduma';
+
+  @override
+  String get termsOfServiceUseOfServiceText =>
+      'Unakubali kutumia Tag & Seal kwa madhumuni ya kisheria tu na kwa mujibu wa Masharti haya. Hunaweza kutumia huduma kukiuka sheria zozote, kukiuka haki za wengine, kutuma msimbo unaoua, au kuingilia uendeshaji wa huduma.';
+
+  @override
+  String get termsOfServiceIntellectualProperty => 'Mali ya Akili';
+
+  @override
+  String get termsOfServiceIntellectualPropertyText =>
+      'Maudhui yote, vipengele, na utendakazi wa Tag & Seal, pamoja na lakini si tu maandishi, picha, nembo, na programu, ni mali ya Climb Up Limited na yanalindwa na hakimiliki, alama ya biashara, na sheria zingine za mali ya akili.';
+
+  @override
+  String get termsOfServiceLimitationOfLiability => 'Kikomo cha Wajibu';
+
+  @override
+  String get termsOfServiceLimitationOfLiabilityText =>
+      'Tag & Seal inatolewa \'kama ilivyo\' bila dhamana ya aina yoyote. Hatuna wajibu kwa uharibifu wowote unaotokana na matumizi yako ya huduma, pamoja na lakini si tu kupoteza data, kukatika kwa biashara, au uharibifu wa moja kwa moja.';
+
+  @override
+  String get termsOfServiceChangesToTerms => 'Mabadiliko ya Masharti';
+
+  @override
+  String get termsOfServiceChangesToTermsText =>
+      'Tunahifadhi haki ya kubadilisha Masharti haya ya Huduma wakati wowote. Tutawajulisha watumiaji kuhusu mabadiliko makubwa kupitia programu au kupitia barua pepe. Kuendelea kutumia huduma baada ya mabadiliko kunamaanisha kukubali masharti mapya.';
 
   @override
   String get markBillAsPaidConfirmation =>
