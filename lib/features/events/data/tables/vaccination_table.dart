@@ -5,6 +5,8 @@ class Vaccinations extends Table {
 
   TextColumn get uuid => text()();
 
+  TextColumn get eventDate => text().nullable()();
+
   TextColumn get vaccinationNo => text().nullable()();
 
   TextColumn get farmUuid => text()();

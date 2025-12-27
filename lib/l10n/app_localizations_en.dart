@@ -1873,6 +1873,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeToDewormLivestock => 'Time to deworm livestock';
 
   @override
+  String get treatmentReminder => 'Treatment Reminder';
+
+  @override
+  String get timeToTreatLivestock => 'Time to treat livestock';
+
+  @override
   String get weightChange => 'Weight Change';
 
   @override
@@ -1910,6 +1916,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get medication => 'Medication';
+
+  @override
+  String get treatment => 'Treatment';
+
+  @override
+  String get addTreatment => 'Add treatment log';
+
+  @override
+  String get nextMedicationDate => 'Next medication date';
+
+  @override
+  String get selectNextMedicationDate => 'Select next medication date';
+
+  @override
+  String get treatmentLogSaved => 'Treatment log saved successfully';
+
+  @override
+  String get treatmentLogSaveFailed =>
+      'Failed to save treatment log. Please try again.';
 
   @override
   String get milking => 'Milking';
@@ -1998,6 +2023,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectDisease => 'Select disease';
 
   @override
+  String get eventDate => 'Event Date';
+
+  @override
+  String get selectEventDate => 'Select when the event occurred';
+
+  @override
   String get medicationDate => 'Medication date';
 
   @override
@@ -2012,6 +2043,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmSaveMedication => 'Save medication record?';
+
+  @override
+  String get confirmUpdateTreatment => 'Update treatment record?';
+
+  @override
+  String get confirmSaveTreatment => 'Save treatment record?';
 
   @override
   String get quantityUnitMl => 'ml';
@@ -3042,6 +3079,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanManualConfirm => 'Confirm tag';
 
   @override
+  String get scanBluetoothRfidScannerTitle => 'Bluetooth RFID Scanner';
+
+  @override
+  String get scanConnectBluetoothRfidScanner =>
+      'Connect Bluetooth RFID Scanner';
+
+  @override
+  String get scanBluetoothRfidScannerDescription =>
+      'Connect your Bluetooth RFID scanner to scan tags';
+
+  @override
   String get vaccineSavedSuccessfully => 'Vaccine saved successfully';
 
   @override
@@ -3588,4 +3636,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get billMarkedAsPaid => 'Bill marked as paid successfully';
+
+  @override
+  String get milkingTrend => 'Milking Trend';
+
+  @override
+  String get milkingTrendByFarm => 'Milking Trend by Farm';
+
+  @override
+  String get last6Months => 'Last 6 Months';
+
+  @override
+  String get lastYear => 'This Year';
+
+  @override
+  String get average => 'Average';
+
+  @override
+  String get maximum => 'Maximum';
 }

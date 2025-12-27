@@ -680,6 +680,8 @@
   "ensureDewormingDetailsAccuracy": "Hakikisha taarifa za dawa za minyoo ni sahihi kabla ya kuhifadhi.",
   "dewormingReminder": "Ukumbusho wa Dawa za Minyoo",
   "timeToDewormLivestock": "Ni wakati wa kutoa dawa za minyoo kwa mifugo",
+  "treatmentReminder": "Ukumbusho wa Matibabu",
+  "timeToTreatLivestock": "Ni wakati wa kutibu mifugo",
   "weightChange": "Mabadiliko ya Uzito",
   "disposalTransfer": "Uhamisho/Uuzaji",
   "calving": "Kuzaa",
@@ -693,6 +695,12 @@
   "vaccination": "Chanjo",
   "dryoff": "Kuacha Kunyonyesha",
   "medication": "Matibabu",
+  "treatment": "Matibabu",
+  "addTreatment": "Ongeza rekodi ya matibabu",
+  "nextMedicationDate": "Tarehe ya matibabu yanayofuata",
+  "selectNextMedicationDate": "Chagua tarehe ya matibabu yanayofuata",
+  "treatmentLogSaved": "Rekodi ya matibabu imehifadhiwa kikamilifu",
+  "treatmentLogSaveFailed": "Imeshindwa kuhifadhi rekodi ya matibabu. Tafadhali jaribu tena.",
   "milking": "Kukamua",
   "comingSoon": "Inakuja hivi karibuni",
   "logContextMissing": "Haiwezekani kufungua rekodi hii kwa sababu taarifa za shamba au mnyama hazikupatikana.",
@@ -719,11 +727,21 @@
   "diseaseOptionsMissing": "Hakuna magonjwa. Sawazisha data ya marejeo kwanza.",
   "diseaseId": "Ugonjwa",
   "selectDisease": "Chagua ugonjwa",
+  "eventDate": "Tarehe ya Tukio",
+  "@eventDate": {
+    "description": "Tarehe ambayo tukio lilitokea kweli"
+  },
+  "selectEventDate": "Chagua wakati tukio lilitokea",
+  "@selectEventDate": {
+    "description": "Nakala ya kidokezo kwa kichaguzi cha tarehe ya tukio"
+  },
   "medicationDate": "Tarehe ya matibabu",
   "selectMedicationDate": "Chagua tarehe ya matibabu",
   "medicationNotesInfo": "Ongeza maelezo yoyote kuhusu matibabu haya.",
   "confirmUpdateMedication": "Sasisha rekodi ya matibabu?",
   "confirmSaveMedication": "Hifadhi rekodi ya matibabu?",
+  "confirmUpdateTreatment": "Sasisha rekodi ya matibabu?",
+  "confirmSaveTreatment": "Hifadhi rekodi ya matibabu?",
   "quantityUnitMl": "ml",
   "quantityUnitL": "L",
   "quantityUnitMg": "mg",
@@ -1126,6 +1144,9 @@
   "scanRfidPlaceholder": "Ingiza namba ya RFID",
   "scanManualPlaceholder": "Ingiza lebo kwa mkono",
   "scanManualConfirm": "Thibitisha lebo",
+  "scanBluetoothRfidScannerTitle": "Kisomaji cha RFID cha Bluetooth",
+  "scanConnectBluetoothRfidScanner": "Unganisha Kisomaji cha RFID cha Bluetooth",
+  "scanBluetoothRfidScannerDescription": "Unganisha kisomaji chako cha RFID cha Bluetooth ili kusoma lebo",
 
   "vaccineSavedSuccessfully": "Chanjo imehifadhiwa kikamilifu",
   "vaccineSaveFailed": "Imeshindwa kuhifadhi chanjo. Jaribu tena.",
@@ -1467,5 +1488,18 @@
   "markAsPaid": "Weka Imelipwa",
   "@markAsPaid": {"description": "Maandishi ya kitufe cha kuweka bili kama imelipwa"},
   "billMarkedAsPaid": "Bili imewekwa kama imelipwa",
-  "@billMarkedAsPaid": {"description": "Ujumbe wa mafanikio baada ya kuweka bili kama imelipwa"}
+  "@billMarkedAsPaid": {"description": "Ujumbe wa mafanikio baada ya kuweka bili kama imelipwa"},
+  
+  "milkingTrend": "Mwelekeo wa Kukamua",
+  "@milkingTrend": {"description": "Kichwa cha grafu ya mwelekeo wa kukamua"},
+  "milkingTrendByFarm": "Mwelekeo wa Kukamua kwa Shamba",
+  "@milkingTrendByFarm": {"description": "Kichwa cha grafu ya mwelekeo wa kukamua kwa shamba nyingi"},
+  "last6Months": "Miezi 6 Iliyopita",
+  "@last6Months": {"description": "Kichujio cha kipindi cha miezi 6 iliyopita"},
+  "lastYear": "Mwaka Huu",
+  "@lastYear": {"description": "Kichujio cha kipindi cha mwaka uliopita"},
+  "average": "Wastani",
+  "@average": {"description": "Lebo ya thamani ya wastani"},
+  "maximum": "Kiwango cha Juu",
+  "@maximum": {"description": "Lebo ya thamani ya juu"}
 }

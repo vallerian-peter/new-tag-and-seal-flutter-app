@@ -9,6 +9,7 @@ class VaccinationModel {
   final String? vetId;
   final String? extensionOfficerId;
   final String status;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -25,6 +26,7 @@ class VaccinationModel {
     this.vetId,
     this.extensionOfficerId,
     this.status = 'completed',
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -41,6 +43,7 @@ class VaccinationModel {
     String? vetId,
     String? extensionOfficerId,
     String? status,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -57,6 +60,7 @@ class VaccinationModel {
       vetId: vetId ?? this.vetId,
       extensionOfficerId: extensionOfficerId ?? this.extensionOfficerId,
       status: status ?? this.status,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -76,6 +80,7 @@ class VaccinationModel {
       'vetId': vetId,
       'extensionOfficerId': extensionOfficerId,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -95,6 +100,7 @@ class VaccinationModel {
       vetId: json['vetId'] as String?,
       extensionOfficerId: json['extensionOfficerId'] as String?,
       status: (json['status'] as String?) ?? 'completed',
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -113,6 +119,7 @@ class VaccinationModel {
       'vetId': vetId,
       'extensionOfficerId': extensionOfficerId,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

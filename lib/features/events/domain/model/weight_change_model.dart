@@ -8,6 +8,7 @@ class WeightChangeModel {
   final String? oldWeight;
     final String newWeight;
   final String? remarks;
+  final String? eventDate;
     final bool synced;
     final String syncAction;
     final String createdAt;
@@ -21,6 +22,7 @@ class WeightChangeModel {
     this.oldWeight,
       required this.newWeight,
     this.remarks,
+    this.eventDate,
       this.synced = false,
       this.syncAction = 'create',
       required this.createdAt,
@@ -34,6 +36,7 @@ class WeightChangeModel {
     String? oldWeight,
     String? newWeight,
     String? remarks,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -47,6 +50,7 @@ class WeightChangeModel {
       oldWeight: oldWeight ?? this.oldWeight,
       newWeight: newWeight ?? this.newWeight,
       remarks: remarks ?? this.remarks,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -63,6 +67,7 @@ class WeightChangeModel {
       oldWeight: json['oldWeight'] as String?,
         newWeight: json['newWeight'] as String,
       remarks: json['remarks'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
         createdAt: json['createdAt'] as String,
@@ -79,6 +84,7 @@ class WeightChangeModel {
         'oldWeight': oldWeight,
         'newWeight': newWeight,
         'remarks': remarks,
+        'eventDate': eventDate,
         'synced': synced,
         'syncAction': syncAction,
         'createdAt': createdAt,
@@ -94,6 +100,7 @@ class WeightChangeModel {
       'oldWeight': oldWeight,
       'newWeight': newWeight,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

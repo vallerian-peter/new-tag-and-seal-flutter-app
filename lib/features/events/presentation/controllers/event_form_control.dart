@@ -5,7 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/ev
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/feeding_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/weight_change_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/deworming_form.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/medication_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/treatment_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/vaccination_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/disposal_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/birth_event_form.dart';
@@ -101,10 +101,10 @@ class EventFormControl {
         }
         return;
 
-      case EventLogTypes.medication:
+      case EventLogTypes.treatment:
         final result = await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => MedicationFormScreen(
+            builder: (_) => TreatmentFormScreen(
               farmUuid: farmUuid,
               livestockUuid: livestockUuid,
               isBulk: isBulk,

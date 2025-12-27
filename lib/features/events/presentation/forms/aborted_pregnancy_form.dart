@@ -46,6 +46,7 @@ class _AbortedPregnancyFormScreenState
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _remarksController = TextEditingController();
   final _abortionDateController = TextEditingController();
 
@@ -60,6 +61,7 @@ class _AbortedPregnancyFormScreenState
 
   int? _selectedReproductiveProblemId;
   String _selectedStatus = 'active';
+  DateTime? _selectedEventDate;
   DateTime? _abortionDate;
 
   List<DropdownItem<int>> _reproductiveProblemItems = const [];
@@ -82,6 +84,13 @@ class _AbortedPregnancyFormScreenState
 
     if (abortedPregnancy == null) return;
 
+    if (abortedPregnancy.eventDate != null && abortedPregnancy.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(abortedPregnancy.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _selectedReproductiveProblemId = abortedPregnancy.reproductiveProblemId;
     _selectedStatus = abortedPregnancy.status;
     _remarksController.text = abortedPregnancy.remarks ?? '';
@@ -228,6 +237,7 @@ class _AbortedPregnancyFormScreenState
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _remarksController.dispose();
     _abortionDateController.dispose();
     super.dispose();
@@ -373,6 +383,15 @@ class _AbortedPregnancyFormScreenState
         ],
         _buildSectionTitle(l10n.abortedPregnancy),
         const SizedBox(height: 20),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         CustomTextField(
           controller: _abortionDateController,
           label: l10n.abortionDate,
@@ -531,6 +550,104 @@ class _AbortedPregnancyFormScreenState
   }
 
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Future<void> _pickAbortionDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -648,9 +765,11 @@ class _AbortedPregnancyFormScreenState
     try {
       if (widget.isEditMode) {
         final existing = widget.abortedPregnancy!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso ?? existing.eventDate,
           abortionDate: abortionDateIso,
           reproductiveProblemId: _selectedReproductiveProblemId,
           remarks: _remarksController.text.trim().isEmpty
@@ -697,10 +816,12 @@ class _AbortedPregnancyFormScreenState
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-${_abortionDate!.millisecondsSinceEpoch}';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = AbortedPregnancyModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso,
           abortionDate: abortionDateIso,
           reproductiveProblemId: _selectedReproductiveProblemId,
           remarks: _remarksController.text.trim().isEmpty

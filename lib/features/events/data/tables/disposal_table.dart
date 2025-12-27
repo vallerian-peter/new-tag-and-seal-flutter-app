@@ -6,6 +6,8 @@ class Disposals extends Table {
   // Primary key (see primaryKey override below) - no extra UNIQUE needed
   TextColumn get uuid => text()();
 
+  TextColumn get eventDate => text().nullable()();
+
   TextColumn get farmUuid => text()();
 
   TextColumn get livestockUuid => text()();

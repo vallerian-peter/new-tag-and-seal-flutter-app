@@ -11,6 +11,7 @@ class BirthEventModel {
   final int? reproductiveProblemId;
   final String? remarks;
   final String status;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -29,6 +30,7 @@ class BirthEventModel {
     this.reproductiveProblemId,
     this.remarks,
     this.status = 'active',
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -57,6 +59,7 @@ class BirthEventModel {
     int? reproductiveProblemId,
     String? remarks,
     String? status,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -76,6 +79,7 @@ class BirthEventModel {
           reproductiveProblemId ?? this.reproductiveProblemId,
       remarks: remarks ?? this.remarks,
       status: status ?? this.status,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -97,6 +101,7 @@ class BirthEventModel {
       'reproductiveProblemId': reproductiveProblemId,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -121,6 +126,7 @@ class BirthEventModel {
       reproductiveProblemId: json['reproductiveProblemId'] as int?,
       remarks: json['remarks'] as String?,
       status: json['status'] as String? ?? 'active',
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -141,6 +147,7 @@ class BirthEventModel {
       'reproductiveProblemId': reproductiveProblemId,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

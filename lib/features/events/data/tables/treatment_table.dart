@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 
-class Medications extends Table {
+class Treatments extends Table {
   IntColumn get id => integer().nullable()();
 
   // Primary key (see primaryKey override below) - no extra UNIQUE needed
   TextColumn get uuid => text()();
+
+  TextColumn get eventDate => text().nullable()();
 
   TextColumn get farmUuid => text()();
 
@@ -19,6 +21,8 @@ class Medications extends Table {
   TextColumn get withdrawalPeriod => text().nullable()();
 
   TextColumn get medicationDate => text().nullable()();
+
+  TextColumn get nextMedicationDate => text().nullable()();
 
   TextColumn get remarks => text().nullable()();
 

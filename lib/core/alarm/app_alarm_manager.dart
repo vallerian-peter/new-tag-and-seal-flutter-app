@@ -177,6 +177,10 @@ class AppAlarmManager {
         return l10n.dewormingReminder;
       case 'time_to_deworm_livestock':
         return l10n.timeToDewormLivestock;
+      case 'treatment_reminder':
+        return l10n.treatmentReminder;
+      case 'time_to_treat_livestock':
+        return l10n.timeToTreatLivestock;
       default:
         return text; // Return as-is if not a known key
     }

@@ -18,6 +18,9 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widget
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 class MilkingFormScreen extends StatefulWidget {
   final MilkingModel? milking;
@@ -45,6 +48,7 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _amountController = TextEditingController();
   final _lactometerReadingController = TextEditingController();
   final _solidController = TextEditingController();
@@ -66,6 +70,7 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
   bool _isLoadingLivestock = false;
 
   int? _selectedMilkingMethodId;
+  DateTime? _selectedEventDate;
   String _selectedSession = 'morning';
   String _selectedStatus = 'active';
   String _selectedAmountUnit = 'l';
@@ -93,6 +98,13 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
 
     if (milking == null) return;
 
+    if (milking.eventDate != null && milking.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(milking.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _selectedMilkingMethodId = milking.milkingMethodId;
     _parseAmountWithUnit(milking.amount);
     _lactometerReadingController.text = milking.lactometerReading ?? '';
@@ -304,6 +316,7 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _amountController.dispose();
     _lactometerReadingController.dispose();
     _solidController.dispose();
@@ -460,6 +473,15 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
         ],
         _buildSectionTitle(l10n.milking),
         const SizedBox(height: 20),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         CustomDropdown<int>(
           label: l10n.milkingMethod,
           hint: l10n.milkingMethod,
@@ -702,6 +724,104 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     return '$amount$_selectedAmountUnit';
   }
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -866,10 +986,12 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
     try {
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.milking!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
           milkingMethodId: milkingMethodId,
+          eventDate: eventDateIso ?? existing.eventDate,
           amount: amountWithUnit,
           lactometerReading: normalizedLactometerReading,
           solid: normalizedSolid,
@@ -917,11 +1039,13 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${livestockUuids.first.hashCode}-$milkingMethodId';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = MilkingModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
           milkingMethodId: milkingMethodId,
+          eventDate: eventDateIso,
           amount: amountWithUnit,
           lactometerReading: normalizedLactometerReading,
           solid: normalizedSolid,

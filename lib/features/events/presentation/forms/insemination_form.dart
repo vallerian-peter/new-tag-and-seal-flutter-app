@@ -45,6 +45,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _bullCodeController = TextEditingController();
   final _bullBreedController = TextEditingController();
   final _semenProductionDateController = TextEditingController();
@@ -64,6 +65,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
 
+  DateTime? _selectedEventDate;
   DateTime? _lastHeatDate;
   DateTime? _inseminationDate;
   DateTime? _semenProductionDate;
@@ -99,6 +101,13 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
 
     if (insemination == null) return;
 
+    if (insemination.eventDate != null && insemination.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(insemination.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _selectedHeatTypeId = insemination.currentHeatTypeId;
     _selectedInseminationServiceId = insemination.inseminationServiceId;
     _selectedSemenStrawTypeId = insemination.semenStrawTypeId;
@@ -380,6 +389,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _bullCodeController.dispose();
     _bullBreedController.dispose();
     _semenProductionDateController.dispose();
@@ -534,6 +544,15 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
         ],
         _buildSectionTitle(l10n.insemination),
         const SizedBox(height: 20),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         CustomTextField(
           controller: _lastHeatDateController,
           label: l10n.lastHeatDate,
@@ -784,6 +803,104 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     );
   }
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Future<void> _pickDate(DateField field) async {
     final theme = Theme.of(context);
     DateTime initial = DateTime.now();
@@ -921,9 +1038,11 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     try {
       if (widget.isEditMode) {
         final existing = widget.insemination!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso ?? existing.eventDate,
           lastHeatDate: lastHeatDateIso ?? existing.lastHeatDate,
           currentHeatTypeId: heatTypeId,
           inseminationServiceId: serviceId,
@@ -997,10 +1116,12 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-insemination';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = InseminationModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso,
           lastHeatDate: lastHeatDateIso,
           currentHeatTypeId: heatTypeId,
           inseminationServiceId: serviceId,

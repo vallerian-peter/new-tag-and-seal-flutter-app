@@ -479,18 +479,26 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       child: Row(
         children: [
           // Animal image
-          Container(
+          FutureBuilder<String>(
+            future: _getLivestockTypeName(context, animal.livestockTypeId),
+            builder: (context, snapshot) {
+              final livestockTypeName = snapshot.data;
+              final imagePath = LivestockImageHelper.getPlaceholderForLivestock(
+                animal,
+                livestockTypeName: livestockTypeName,
+              );
+              return Container(
             width: 50,
             height: 50,
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.contain,
                 scale: 6.0,
-                image: AssetImage(
-                  LivestockImageHelper.getPlaceholderForLivestock(animal),
+                    image: AssetImage(imagePath),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
 
           const SizedBox(width: 16),
@@ -665,6 +673,22 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       return name;
     } catch (e) {
       print('Error fetching breed: $e');
+      return '---';
+    }
+  }
+
+  Future<String> _getLivestockTypeName(
+    BuildContext context,
+    int livestockTypeId,
+  ) async {
+    try {
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
+      return await provider.getLivestockTypeNameById(livestockTypeId);
+    } catch (e) {
+      print('Error fetching livestock type: $e');
       return '---';
     }
   }

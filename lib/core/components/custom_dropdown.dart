@@ -100,15 +100,14 @@ class CustomDropdown<T> extends StatelessWidget {
         const SizedBox(height: 8),
         Theme(
           data: Theme.of(context).copyWith(
-            canvasColor: theme.brightness == Brightness.dark 
-                ? theme.colorScheme.surface 
-                : Colors.white,
-            cardColor: theme.brightness == Brightness.dark 
-                ? theme.colorScheme.surface 
-                : Colors.white,
-            dialogBackgroundColor: theme.brightness == Brightness.dark 
-                ? theme.colorScheme.surface 
-                : Colors.white,
+            canvasColor: theme.scaffoldBackgroundColor,
+            cardColor: theme.scaffoldBackgroundColor,
+            dialogBackgroundColor: theme.scaffoldBackgroundColor,
+            dropdownMenuTheme: DropdownMenuThemeData(
+              menuStyle: MenuStyle(
+                backgroundColor: WidgetStateProperty.all(theme.scaffoldBackgroundColor),
+              ),
+            ),
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -118,9 +117,7 @@ class CustomDropdown<T> extends StatelessWidget {
             child: DropdownButtonFormField<T>(
             value: value,
             isExpanded: true,
-            dropdownColor: theme.brightness == Brightness.dark 
-                ? theme.colorScheme.surface 
-                : Colors.white,
+            dropdownColor: theme.scaffoldBackgroundColor,
             onChanged: enabled ? onChanged : null,
             decoration: InputDecoration(
               hintText: hint,

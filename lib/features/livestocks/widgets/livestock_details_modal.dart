@@ -125,20 +125,28 @@ class LivestockDetailsModal {
     return Row(
       children: [
         // Livestock image
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: isDark ? Colors.grey[800] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            image: DecorationImage(
-              fit: BoxFit.contain,
-              scale: 6.0,
-              image: AssetImage(
-                LivestockImageHelper.getPlaceholderForLivestock(livestock),
+        FutureBuilder<String>(
+          future: _getLivestockTypeName(context, livestock.livestockTypeId),
+          builder: (context, snapshot) {
+            final livestockTypeName = snapshot.data;
+            final imagePath = LivestockImageHelper.getPlaceholderForLivestock(
+              livestock,
+              livestockTypeName: livestockTypeName,
+            );
+            return Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[800] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  fit: BoxFit.contain,
+                  scale: 6.0,
+                  image: AssetImage(imagePath),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
         const SizedBox(width: 16),
 
@@ -746,18 +754,18 @@ class LivestockDetailsModal {
         ),
       ),
       _LogConfig(
-        logType: EventLogTypes.medication,
-        title: l10n.medication,
+        logType: EventLogTypes.treatment,
+        title: l10n.treatment,
         icon: Icons.medical_services_outlined,
         color: Colors.purple,
         supportsMale: true,
         supportsFemale: true,
         onAdd: wrapWithRoleCheck(
-          EventLogTypes.medication,
+          EventLogTypes.treatment,
           (ctx) => EventFormControl.open(
             context: context,
-            logType: EventLogTypes.medication,
-            title: l10n.medication,
+            logType: EventLogTypes.treatment,
+            title: l10n.treatment,
             farmUuid: farmUuid,
             livestockUuid: livestockUuid,
             onCompleted: () {
@@ -769,8 +777,8 @@ class LivestockDetailsModal {
         ),
         onView: (ctx) => EventsViewControl.openLogs(
           context: ctx,
-          logType: EventLogTypes.medication,
-          title: l10n.medication,
+          logType: EventLogTypes.treatment,
+          title: l10n.treatment,
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
           farmName: farmName,
@@ -1222,6 +1230,22 @@ class LivestockDetailsModal {
       return await provider.getBreedNameById(breedId);
     } catch (e) {
       log('Error fetching breed: $e');
+      return '---';
+    }
+  }
+
+  static Future<String> _getLivestockTypeName(
+    BuildContext context,
+    int livestockTypeId,
+  ) async {
+    try {
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
+      return await provider.getLivestockTypeNameById(livestockTypeId);
+    } catch (e) {
+      log('Error fetching livestock type: $e');
       return '---';
     }
   }

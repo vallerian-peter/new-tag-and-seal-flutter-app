@@ -17,6 +17,7 @@ class InseminationModel {
   final String? aiCode;
   final String? manufacturerName;
   final String? semenSupplier;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -41,6 +42,7 @@ class InseminationModel {
     this.aiCode,
     this.manufacturerName,
     this.semenSupplier,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -65,6 +67,7 @@ class InseminationModel {
     String? aiCode,
     String? manufacturerName,
     String? semenSupplier,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -90,6 +93,7 @@ class InseminationModel {
       aiCode: aiCode ?? this.aiCode,
       manufacturerName: manufacturerName ?? this.manufacturerName,
       semenSupplier: semenSupplier ?? this.semenSupplier,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -117,6 +121,7 @@ class InseminationModel {
       'aiCode': aiCode,
       'manufacturerName': manufacturerName,
       'semenSupplier': semenSupplier,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -144,6 +149,7 @@ class InseminationModel {
       aiCode: json['aiCode'] as String?,
       manufacturerName: json['manufacturerName'] as String?,
       semenSupplier: json['semenSupplier'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -170,6 +176,7 @@ class InseminationModel {
       'aiCode': aiCode,
       'manufacturerName': manufacturerName,
       'semenSupplier': semenSupplier,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

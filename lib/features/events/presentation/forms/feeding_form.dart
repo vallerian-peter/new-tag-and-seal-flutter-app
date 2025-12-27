@@ -50,6 +50,7 @@ class FeedingFormScreen extends StatefulWidget {
 class _FeedingFormScreenState extends State<FeedingFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
+  final _eventDateController = TextEditingController();
   final _amountController = TextEditingController();
   final _nextFeedingTimeController = TextEditingController();
   final _remarksController = TextEditingController();
@@ -64,6 +65,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
   bool _isLoadingLivestock = false;
+  DateTime? _selectedEventDate;
   DateTime? _selectedNextFeedingTime;
   static const List<DropdownItem<String>> _unitItems = [
     DropdownItem<String>(value: 'g', label: 'g'),
@@ -96,6 +98,13 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     _amountController.text = parsedAmount.$1;
     if (_unitItems.any((item) => item.value == parsedAmount.$2)) {
       _selectedUnit = parsedAmount.$2;
+    }
+    if (feeding.eventDate != null && feeding.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(feeding.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = _formatDisplayDateTime(parsed);
+      }
     }
     _selectedNextFeedingTime = DateTime.tryParse(feeding.nextFeedingTime);
     if (_selectedNextFeedingTime != null) {
@@ -320,6 +329,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _amountController.dispose();
     _nextFeedingTimeController.dispose();
     _remarksController.dispose();
@@ -551,6 +561,15 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         ),
         const SizedBox(height: 16),
         CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
           controller: _nextFeedingTimeController,
           label: l10n.nextFeedingTime,
           hintText: l10n.enterNextFeedingTime,
@@ -664,6 +683,100 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickEventDate() async {
+    final initialDate = _selectedEventDate ?? DateTime.now();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (date == null) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialDate),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = _formatDisplayDateTime(combined);
+    });
   }
 
   Future<void> _pickNextFeedingDateTime() async {
@@ -846,10 +959,12 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         final existing = widget.feeding!;
         final effectiveNextFeedingTime =
             nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : existing.nextFeedingTime;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           feedingTypeId: feedingTypeId,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
+          eventDate: eventDateIso ?? existing.eventDate,
           nextFeedingTime: effectiveNextFeedingTime,
           amount: amountWithUnit,
           remarks: remarks,
@@ -883,11 +998,13 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-$feedingTypeId';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = FeedingModel(
           uuid: uuid,
           feedingTypeId: feedingTypeId,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
+          eventDate: eventDateIso,
           nextFeedingTime: effectiveNextFeedingTime,
           amount: amountWithUnit,
           remarks: remarks,

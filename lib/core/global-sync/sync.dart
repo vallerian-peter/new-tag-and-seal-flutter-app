@@ -14,6 +14,7 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/v
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/farm_user_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/data/repository/bills_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 
 /// Global synchronization service for the application
 ///
@@ -64,8 +65,13 @@ class Sync {
   /// **Usage:**
   /// ```dart
   /// await Sync.splashSync(database);
+  /// // Or with NotificationProvider for automatic notification creation:
+  /// await Sync.splashSync(database, notificationProvider: notificationProvider);
   /// ```
-  static Future<void> splashSync(AppDatabase database) async {
+  static Future<void> splashSync(
+    AppDatabase database, {
+    NotificationProvider? notificationProvider,
+  }) async {
     try {
       // 1. Validate authentication
       final authData = await _validateAuthentication();
@@ -84,7 +90,7 @@ class Sync {
       );
 
       // 4. Store all data locally with conflict resolution
-      await _storeAllSyncData(database, data);
+      await _storeAllSyncData(database, data, notificationProvider: notificationProvider);
 
       log('✅ Splash sync completed successfully');
     } catch (e) {
@@ -282,10 +288,11 @@ class Sync {
   /// - Prevents overwriting recent local changes with stale server data
   static Future<void> _storeAllSyncData(
     AppDatabase database,
-    Map<String, dynamic> data,
-  ) async {
+    Map<String, dynamic> data, {
+    NotificationProvider? notificationProvider,
+  }) async {
     await _storeLocationAndReferenceData(database, data);
-    await _storeUserSpecificData(database, data);
+    await _storeUserSpecificData(database, data, notificationProvider: notificationProvider);
   }
 
   // ============================================================================
@@ -343,9 +350,9 @@ class Sync {
     final unsyncedDewormings = await eventsRepository
         .getUnsyncedDewormingsForApi();
 
-    log('📤 Fetching unsynced medications for API...');
-    final unsyncedMedications = await eventsRepository
-        .getUnsyncedMedicationsForApi();
+    log('📤 Fetching unsynced treatments for API...');
+    final unsyncedTreatments = await eventsRepository
+        .getUnsyncedTreatmentsForApi();
 
     log('📤 Fetching unsynced vaccinations for API...');
     final unsyncedVaccinations = await eventsRepository
@@ -411,7 +418,7 @@ class Sync {
     log('  ✅ Logs - Feedings: ${unsyncedFeedings.length}');
     log('  ✅ Logs - WeightChanges: ${unsyncedWeightChanges.length}');
     log('  ✅ Logs - Dewormings: ${unsyncedDewormings.length}');
-    log('  ✅ Logs - Medications: ${unsyncedMedications.length}');
+    log('  ✅ Logs - Treatments: ${unsyncedTreatments.length}');
     log('  ✅ Logs - Vaccinations: ${unsyncedVaccinations.length}');
     log('  ✅ Logs - Disposals: ${unsyncedDisposals.length}');
     log('  ✅ Logs - BirthEvents: ${unsyncedBirthEvents.length}');
@@ -430,7 +437,7 @@ class Sync {
         unsyncedFeedings.length +
         unsyncedWeightChanges.length +
         unsyncedDewormings.length +
-        unsyncedMedications.length +
+        unsyncedTreatments.length +
         unsyncedVaccinations.length +
         unsyncedDisposals.length +
         unsyncedBirthEvents.length +
@@ -460,7 +467,7 @@ class Sync {
         'feedings': unsyncedFeedings,
         'weightChanges': unsyncedWeightChanges,
         'dewormings': unsyncedDewormings,
-        'medications': unsyncedMedications,
+        'treatments': unsyncedTreatments,
         'vaccinations': unsyncedVaccinations,
         'disposals': unsyncedDisposals,
         'birthEvents': unsyncedBirthEvents,
@@ -513,7 +520,7 @@ class Sync {
     final weightChanges = await eventsRepository
         .getUnsyncedWeightChangesForApi();
     final dewormings = await eventsRepository.getUnsyncedDewormingsForApi();
-    final medications = await eventsRepository.getUnsyncedMedicationsForApi();
+    final treatments = await eventsRepository.getUnsyncedTreatmentsForApi();
     final vaccinations = await eventsRepository.getUnsyncedVaccinationsForApi();
     final disposals = await eventsRepository.getUnsyncedDisposalsForApi();
     final birthEvents = await eventsRepository.getUnsyncedBirthEventsForApi();
@@ -548,7 +555,7 @@ class Sync {
       EventLogTypes.insemination: inseminations.length,
       EventLogTypes.deworming: dewormings.length,
       EventLogTypes.weightChange: weightChanges.length,
-      EventLogTypes.medication: medications.length,
+      EventLogTypes.treatment: treatments.length,
       EventLogTypes.vaccination: vaccinations.length,
       EventLogTypes.disposal: disposals.length,
       EventLogTypes.calving: calvingCount,
@@ -771,10 +778,10 @@ class Sync {
         log('  ✅ Marked ${syncedDewormings.length} dewormings as synced');
       }
 
-      final syncedMedications = _extractUuids(syncedLogs['medications']);
-      if (syncedMedications.isNotEmpty) {
-        await eventsRepository.markMedicationsAsSynced(syncedMedications);
-        log('  ✅ Marked ${syncedMedications.length} medications as synced');
+      final syncedTreatments = _extractUuids(syncedLogs['treatments']);
+      if (syncedTreatments.isNotEmpty) {
+        await eventsRepository.markTreatmentsAsSynced(syncedTreatments);
+        log('  ✅ Marked ${syncedTreatments.length} treatments as synced');
       }
 
       final syncedVaccinations = _extractUuids(syncedLogs['vaccinations']);
@@ -971,8 +978,9 @@ class Sync {
   /// **Performance:** Sequential calls to avoid database conflicts
   static Future<void> _storeUserSpecificData(
     AppDatabase database,
-    Map<String, dynamic> data,
-  ) async {
+    Map<String, dynamic> data, {
+    NotificationProvider? notificationProvider,
+  }) async {
     // Safely extract userSpecificData - handle both Map and unexpected types
     Map<String, dynamic> userSpecificData = const {};
     try {
@@ -1029,7 +1037,10 @@ class Sync {
         );
         logs = const {};
       }
-      await EventsRepository(database).syncLogs(logs.isEmpty ? null : logs);
+      await EventsRepository(
+        database,
+        notificationProvider: notificationProvider,
+      ).syncLogs(logs.isEmpty ? null : logs);
 
       final vaccines =
           (userSpecificData['vaccines'] as List?)
@@ -1086,7 +1097,7 @@ class Sync {
       final feedingsCount = _safeGetLogCount('feedings');
       final weightChangesCount = _safeGetLogCount('weightChanges');
       final dewormingsCount = _safeGetLogCount('dewormings');
-      final medicationsCount = _safeGetLogCount('medications');
+      final treatmentsCount = _safeGetLogCount('treatments');
       final vaccinationsCount = _safeGetLogCount('vaccinations');
       final disposalsCount = _safeGetLogCount('disposals');
       final birthEventsCount = _safeGetLogCount('birthEvents');
@@ -1098,7 +1109,7 @@ class Sync {
       log(
         '  ✅ Farmer data stored (Farms: $farmsCount, Livestock: $livestockCount, '
         'Feedings: $feedingsCount, WeightChanges: $weightChangesCount, '
-        'Dewormings: $dewormingsCount, Medications: $medicationsCount, '
+        'Dewormings: $dewormingsCount, Treatments: $treatmentsCount, '
         'Vaccinations: $vaccinationsCount, Disposals: $disposalsCount, '
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
         'Vaccines: $vaccinesCount, Bills: $billsCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
@@ -1138,7 +1149,10 @@ class Sync {
       }
 
       try {
-        await EventsRepository(database).syncLogs(logs.isEmpty ? null : logs);
+        await EventsRepository(
+        database,
+        notificationProvider: notificationProvider,
+      ).syncLogs(logs.isEmpty ? null : logs);
       } catch (e, stackTrace) {
         log('⚠️ Error syncing logs: $e\n$stackTrace');
         rethrow;
@@ -1207,7 +1221,7 @@ class Sync {
       final feedingsCount = _safeGetLogCount('feedings');
       final weightChangesCount = _safeGetLogCount('weightChanges');
       final dewormingsCount = _safeGetLogCount('dewormings');
-      final medicationsCount = _safeGetLogCount('medications');
+      final treatmentsCount = _safeGetLogCount('treatments');
       final vaccinationsCount = _safeGetLogCount('vaccinations');
       final disposalsCount = _safeGetLogCount('disposals');
       final birthEventsCount = _safeGetLogCount('birthEvents');
@@ -1226,7 +1240,7 @@ class Sync {
       log(
         '  ✅ Field worker data stored (Farms: $farmsCount, Livestock: $livestockCount, '
         'Feedings: $feedingsCount, WeightChanges: $weightChangesCount, '
-        'Dewormings: $dewormingsCount, Medications: $medicationsCount, '
+        'Dewormings: $dewormingsCount, Treatments: $treatmentsCount, '
         'Vaccinations: $vaccinationsCount, Disposals: $disposalsCount, '
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
         'Milkings: $milkingsCount, Pregnancies: $pregnanciesCount, '

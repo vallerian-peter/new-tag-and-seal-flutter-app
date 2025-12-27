@@ -10,6 +10,7 @@ class DewormingModel {
   final String? quantity;
   final String? dose;
   final String? nextAdministrationDate;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -27,6 +28,7 @@ class DewormingModel {
     this.quantity,
     this.dose,
     this.nextAdministrationDate,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -44,6 +46,7 @@ class DewormingModel {
     String? quantity,
     String? dose,
     String? nextAdministrationDate,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -61,6 +64,7 @@ class DewormingModel {
       quantity: quantity ?? this.quantity,
       dose: dose ?? this.dose,
       nextAdministrationDate: nextAdministrationDate ?? this.nextAdministrationDate,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -81,6 +85,7 @@ class DewormingModel {
       quantity: json['quantity'] as String?,
       dose: json['dose'] as String?,
       nextAdministrationDate: json['nextAdministrationDate'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -101,6 +106,7 @@ class DewormingModel {
       'quantity': quantity,
       'dose': dose,
       'nextAdministrationDate': nextAdministrationDate,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -120,6 +126,7 @@ class DewormingModel {
       'quantity': quantity,
       'dose': dose,
       'nextAdministrationDate': nextAdministrationDate,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

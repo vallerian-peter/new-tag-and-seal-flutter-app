@@ -15,6 +15,7 @@ class MilkingModel {
   final String? acidity;
   final String session;
   final String status;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -37,6 +38,7 @@ class MilkingModel {
     this.acidity,
     this.session = 'morning',
     this.status = 'active',
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -59,6 +61,7 @@ class MilkingModel {
     String? acidity,
     String? session,
     String? status,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -82,6 +85,7 @@ class MilkingModel {
       acidity: acidity ?? this.acidity,
       session: session ?? this.session,
       status: status ?? this.status,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -107,6 +111,7 @@ class MilkingModel {
       'acidity': acidity,
       'session': session,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -132,6 +137,7 @@ class MilkingModel {
       acidity: json['acidity'] as String?,
       session: json['session'] as String? ?? 'morning',
       status: json['status'] as String? ?? 'active',
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -156,6 +162,7 @@ class MilkingModel {
       'acidity': acidity,
       'session': session,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

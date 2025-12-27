@@ -22,6 +22,8 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
+import 'package:intl/intl.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 
 class VaccinationFormScreen extends StatefulWidget {
   final VaccinationModel? vaccination;
@@ -48,6 +50,7 @@ class VaccinationFormScreen extends StatefulWidget {
 class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   static const String _vaccinationNumberPrefix = 'VAC-';
   final _formKey = GlobalKey<FormState>();
+  final _eventDateController = TextEditingController();
   final _vaccinationNoController = TextEditingController();
   final _medicalLicenseController = TextEditingController();
 
@@ -68,6 +71,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   List<Livestock> _selectedBulkLivestock = [];
   String? _selectedVaccineUuid;
   int? _selectedDiseaseId;
+  DateTime? _selectedEventDate;
   _TreatmentProviderType _selectedProviderType = _TreatmentProviderType.none;
   String _selectedStatus = 'completed';
 
@@ -114,6 +118,13 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     _selectedVaccineUuid = vaccination.vaccineUuid;
     if (vaccination.status.isNotEmpty) {
       _selectedStatus = vaccination.status;
+    }
+    if (vaccination.eventDate != null && vaccination.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(vaccination.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
     }
   }
 
@@ -436,6 +447,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _vaccinationNoController.dispose();
     _medicalLicenseController.dispose();
     super.dispose();
@@ -602,6 +614,15 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
         ],
         const SizedBox(height: 24),
         _buildSectionTitle(l10n.vaccinationDetails, theme),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
         const SizedBox(height: 16),
         CustomTextField(
           controller: _vaccinationNoController,
@@ -835,12 +856,14 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.vaccination!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           vaccinationNo: vaccinationNumber,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
           vaccineUuid: _selectedVaccineUuid,
           diseaseId: _selectedDiseaseId,
+          eventDate: eventDateIso ?? existing.eventDate,
           vetId: vetId,
           extensionOfficerId: extensionOfficerId,
           status: _selectedStatus,
@@ -894,6 +917,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
           final uuid = 'vaccination-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = VaccinationModel(
             uuid: uuid,
             vaccinationNo: vaccinationNumber,
@@ -901,6 +925,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             livestockUuid: animalUuid,
             vaccineUuid: _selectedVaccineUuid,
             diseaseId: _selectedDiseaseId,
+            eventDate: eventDateIso,
             vetId: vetId,
             extensionOfficerId: extensionOfficerId,
             status: _selectedStatus,
@@ -941,6 +966,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
         final uuid =
             'vaccination-${DateTime.now().microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = VaccinationModel(
           uuid: uuid,
           vaccinationNo: vaccinationNumber,
@@ -948,6 +974,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           livestockUuid: livestockUuids.first,
           vaccineUuid: _selectedVaccineUuid,
           diseaseId: _selectedDiseaseId,
+          eventDate: eventDateIso,
           vetId: vetId,
           extensionOfficerId: extensionOfficerId,
           status: _selectedStatus,
@@ -1002,6 +1029,104 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
         onPressed: () => Navigator.of(context).pop(),
       );
     }
+  }
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
   }
 
   List<DropdownItem<String>> _statusItems(AppLocalizations l10n) => [

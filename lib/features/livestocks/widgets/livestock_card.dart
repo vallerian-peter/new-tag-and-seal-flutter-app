@@ -80,6 +80,19 @@ class LivestockCard extends StatelessWidget {
     }
   }
 
+  Future<String> _getLivestockTypeName(BuildContext context, int livestockTypeId) async {
+    try {
+      final provider = Provider.of<AdditionalDataProvider>(
+        context,
+        listen: false,
+      );
+      return await provider.getLivestockTypeNameById(livestockTypeId);
+    } catch (e) {
+      log('Error fetching livestock type: $e');
+      return '---';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -234,7 +247,15 @@ class LivestockCard extends StatelessWidget {
                     Row(
                       children: [
                         // Livestock Image
-                        Container(
+                        FutureBuilder<String>(
+                          future: _getLivestockTypeName(context, livestock.livestockTypeId),
+                          builder: (context, snapshot) {
+                            final livestockTypeName = snapshot.data;
+                            final imagePath = LivestockImageHelper.getPlaceholderForLivestock(
+                              livestock,
+                              livestockTypeName: livestockTypeName,
+                            );
+                            return Container(
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
@@ -252,13 +273,11 @@ class LivestockCard extends StatelessWidget {
                             image: DecorationImage(
                               fit: BoxFit.contain,
                               scale: 6.0,
-                              image: AssetImage(
-                                LivestockImageHelper.getPlaceholderForLivestock(
-                                  livestock,
+                                  image: AssetImage(imagePath),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
 
                         const SizedBox(width: 16),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 class CustomStepper extends StatelessWidget {
@@ -174,15 +175,15 @@ class CustomStepper extends StatelessWidget {
         child: isCompleted
             ? Icon(
                 Icons.check,
-                color: onPrimary,
+                color: whiteColor,
                 size: 20,
               )
             : Icon(
                 icon,
                 color: isActive 
-                    ? onPrimary 
+                    ? const Color(0xFFBEBEBE) 
                     : isCompleted 
-                        ? onPrimary 
+                        ? whiteColor 
                         : primary,
                 size: 18,
               ),
@@ -222,7 +223,7 @@ class CustomStepper extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: isDark ? Color.fromARGB(255, 85, 85, 85) : cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: shadow,
       ),
@@ -234,7 +235,9 @@ class CustomStepper extends StatelessWidget {
                 onPressed: onStepCancel,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: BorderSide(color: primary.withValues(alpha: 0.3)),
+                  side: BorderSide(
+                    color: isDark ? Colors.grey : primary.withValues(alpha: 0.3)
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

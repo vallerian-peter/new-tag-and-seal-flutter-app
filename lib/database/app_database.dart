@@ -24,7 +24,7 @@ import '../features/all.additional.data/data/local/tables/livestock_obtained_met
 import '../features/events/data/tables/feeding_table.dart';
 import '../features/events/data/tables/weight_change_table.dart';
 import '../features/events/data/tables/deworming_table.dart';
-import '../features/events/data/tables/medication_table.dart';
+import '../features/events/data/tables/treatment_table.dart';
 import '../features/events/data/tables/vaccination_table.dart';
 import '../features/events/data/tables/disposal_table.dart';
 import '../features/events/data/tables/milking_table.dart';
@@ -120,7 +120,7 @@ part 'app_database.g.dart';
     Feedings,
     WeightChanges,
     Dewormings,
-    Medications,
+    Treatments,
     Vaccinations,
     Disposals,
     Milkings,
@@ -153,7 +153,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 26; // v26: add bills table
+  int get schemaVersion => 28; // v28: add eventDate column to all log tables
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -216,7 +216,7 @@ class AppDatabase extends _$AppDatabase {
         await _createTableIfMissing(m, vaccines);
       }
       if (from < 10) {
-        await _createTableIfMissing(m, medications);
+        await _createTableIfMissing(m, treatments);
         await _createTableIfMissing(m, vaccinations);
         await _createTableIfMissing(m, disposals);
       }
@@ -304,6 +304,14 @@ class AppDatabase extends _$AppDatabase {
       if (from < 26) {
         // Version 26: Add Bills table
         await _createTableIfMissing(m, bills);
+      }
+      if (from < 27) {
+        // Version 27: Rename medications table to treatments and add nextMedicationDate column
+        await _migrateMedicationsToTreatments(m);
+      }
+      if (from < 28) {
+        // Version 28: Add eventDate column to all log tables
+        await _migrateAddEventDateToLogTables(m);
       }
     },
     beforeOpen: (details) async {
@@ -959,6 +967,117 @@ class AppDatabase extends _$AppDatabase {
       }
     } catch (e) {
       // ignore migration errors - can be retried
+    }
+  }
+
+  /// Migration to version 27: Rename medications table to treatments and add nextMedicationDate column
+  Future<void> _migrateMedicationsToTreatments(Migrator m) async {
+    try {
+      // Check if medications table exists
+      final medicationsExists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('medications'),
+        ],
+      ).get();
+
+      if (medicationsExists.isNotEmpty) {
+        // Step 1: Rename medications table to treatments
+        await customStatement('ALTER TABLE medications RENAME TO treatments');
+
+        // Step 2: Check if nextMedicationDate column already exists
+        final tableInfo = await customSelect(
+          'PRAGMA table_info(treatments)',
+        ).get();
+        final hasNextMedicationDate = tableInfo.any(
+          (row) => row.data['name'] == 'nextMedicationDate',
+        );
+
+        // Step 3: Add nextMedicationDate column if it doesn't exist
+        if (!hasNextMedicationDate) {
+          await customStatement(
+            'ALTER TABLE treatments ADD COLUMN nextMedicationDate TEXT',
+          );
+        }
+      } else {
+        // If medications table doesn't exist, create treatments table
+        await m.createTable(treatments);
+      }
+    } catch (e) {
+      // If treatments table already exists, just ensure nextMedicationDate column exists
+      try {
+        final tableInfo = await customSelect(
+          'PRAGMA table_info(treatments)',
+        ).get();
+        final hasNextMedicationDate = tableInfo.any(
+          (row) => row.data['name'] == 'nextMedicationDate',
+        );
+
+        if (!hasNextMedicationDate) {
+          await customStatement(
+            'ALTER TABLE treatments ADD COLUMN nextMedicationDate TEXT',
+          );
+        }
+      } catch (e2) {
+        // ignore migration errors - can be retried
+      }
+    }
+  }
+
+  /// Migration to version 28: Add eventDate column to all log tables
+  Future<void> _migrateAddEventDateToLogTables(Migrator m) async {
+    final logTables = [
+      'treatments',
+      'feedings',
+      'vaccinations',
+      'dewormings',
+      'weight_changes',
+      'disposals',
+      'birth_events',
+      'aborted_pregnancies',
+      'milkings',
+      'pregnancies',
+      'inseminations',
+      'dryoffs',
+      'transfers',
+      'calvings',
+    ];
+
+    for (final tableName in logTables) {
+      try {
+        // Check if table exists
+        final tableExists = await customSelect(
+          'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+          variables: [
+            const Variable<String>('table'),
+            Variable<String>(tableName),
+          ],
+        ).get();
+
+        if (tableExists.isNotEmpty) {
+          // Check if eventDate column already exists
+          final tableInfo = await customSelect(
+            'PRAGMA table_info($tableName)',
+          ).get();
+          final hasEventDate = tableInfo.any(
+            (row) => row.data['name'] == 'eventDate',
+          );
+
+          // Add eventDate column if it doesn't exist
+          if (!hasEventDate) {
+            await customStatement(
+              'ALTER TABLE $tableName ADD COLUMN eventDate TEXT',
+            );
+            log('✅ Added eventDate column to $tableName table');
+          }
+        } else {
+          log('⚠️ Table $tableName does not exist, skipping...');
+        }
+      } catch (e) {
+        log('❌ Error adding eventDate to $tableName: $e');
+        // Continue with other tables even if one fails
+      }
     }
   }
 }

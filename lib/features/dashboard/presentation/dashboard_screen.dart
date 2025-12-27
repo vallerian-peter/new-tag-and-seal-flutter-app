@@ -40,7 +40,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map<String, dynamic>> farmsWithLivestock = [];
   int _totalEventCount = 0;
-  bool _syncPromptShown = false;
   bool _isLogoutDialogOpen = false;
   FarmProvider? _farmProvider; // Store reference for cleanup
   
@@ -132,62 +131,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _showSyncToast() async {
-    if (_syncPromptShown || !mounted) return;
+    if (!mounted) return;
 
-    // Check persistent flag in shared preferences so we don't show this prompt repeatedly
+    // Check if sync prompt has been shown before for this user/role
     final prefs = await SharedPreferences.getInstance();
-    // Build a per-user, per-role storage key so different users/roles still see the prompt once
     final userId = await _secureStorage.read(key: 'userId') ?? '';
     final role = await _secureStorage.read(key: 'role') ?? '';
     final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
     final syncKey = '${_syncPromptStorageKey}_${userId}_${normalizedRole}';
-
-    bool storedFlag = prefs.getBool(syncKey) ?? false;
-    if (storedFlag) {
-      _syncPromptShown = true;
+    
+    // Check if prompt was already shown
+    final hasShownBefore = prefs.getBool(syncKey) ?? false;
+    if (hasShownBefore) {
+      print('✅ Sync prompt already shown for user $userId with role $role');
       return;
     }
 
-    await Future.delayed(const Duration(seconds: 2));
-    if (_syncPromptShown || !mounted) return;
+    // Show prompt once per dashboard mount, after a short delay
+    await Future.delayed(const Duration(seconds: 1));
+    if (!mounted) return;
 
-    _syncPromptShown = true;
+    // Mark as shown in SharedPreferences
     await prefs.setBool(syncKey, true);
+    print('📝 Marked sync prompt as shown for user $userId with role $role');
 
     final l10n = AppLocalizations.of(context)!;
     // Use dialogContext for Navigator to avoid using a disposed context
     
     if (!mounted) return;
-      showDialog<void>(
-        context: context,
-        builder: (dialogContext) {
-          final theme = Theme.of(dialogContext);
-          final isDark = theme.brightness == Brightness.dark;
-          return AlertDialog(
-            backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            title: Text(l10n.sync),
-            content: Text(
-              l10n.dashboardSyncPrompt,
-              style: theme.textTheme.bodyMedium,
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Make dialog non-dismissible (mandatory sync)
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final isDark = theme.brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: Text(l10n.sync),
+          content: Text(
+            l10n.dashboardSyncPrompt,
+            style: theme.textTheme.bodyMedium,
+          ),
+          actions: [
+            // Only sync button - mandatory sync
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _syncData();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n.sync),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(l10n.cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  _syncData();
-                },
-                child: Text(l10n.sync),
-              ),
-            ],
-          );
-        },
-      );
+          ],
+        );
+      },
+    );
   }
   
   /// Calculate total livestock count from all farms
@@ -702,7 +704,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       farmsWithLivestock = [];
       _totalEventCount = 0;
-      _syncPromptShown = false;
     });
 
     // Clear sync prompt flag so it's shown again next time user logs in (per user+role and legacy)

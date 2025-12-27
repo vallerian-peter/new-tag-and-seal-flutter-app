@@ -44,6 +44,7 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _noOfMonthsController = TextEditingController();
   final _testDateController = TextEditingController();
   final _remarksController = TextEditingController();
@@ -59,6 +60,7 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
 
   int? _selectedTestResultId;
   String _selectedStatus = 'active';
+  DateTime? _selectedEventDate;
   DateTime? _selectedTestDate;
 
   List<DropdownItem<int>> _testResultItems = const [];
@@ -81,6 +83,13 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
 
     if (pregnancy == null) return;
 
+    if (pregnancy.eventDate != null && pregnancy.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(pregnancy.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _selectedTestResultId = pregnancy.testResultId;
     _noOfMonthsController.text = pregnancy.noOfMonths ?? '';
     _remarksController.text = pregnancy.remarks ?? '';
@@ -228,6 +237,7 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _noOfMonthsController.dispose();
     _testDateController.dispose();
     _remarksController.dispose();
@@ -374,6 +384,15 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
         ],
         _buildSectionTitle(l10n.pregnancy),
         const SizedBox(height: 20),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         CustomDropdown<int>(
           label: l10n.testResult,
           hint: l10n.testResult,
@@ -535,6 +554,104 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
     );
   }
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Future<void> _pickTestDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -641,10 +758,12 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
     try {
       if (widget.isEditMode) {
         final existing = widget.pregnancy!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
           testResultId: testResultId,
+          eventDate: eventDateIso ?? existing.eventDate,
           noOfMonths: _noOfMonthsController.text.trim().isEmpty
               ? null
               : _noOfMonthsController.text.trim(),
@@ -693,11 +812,13 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-$testResultId';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = PregnancyModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
           testResultId: testResultId,
+          eventDate: eventDateIso,
           noOfMonths: _noOfMonthsController.text.trim().isEmpty
               ? null
               : _noOfMonthsController.text.trim(),

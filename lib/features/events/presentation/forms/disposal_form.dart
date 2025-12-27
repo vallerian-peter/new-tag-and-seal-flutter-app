@@ -21,6 +21,9 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
+import 'package:intl/intl.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 class DisposalFormScreen extends StatefulWidget {
   final DisposalModel? disposal;
@@ -48,6 +51,7 @@ class DisposalFormScreen extends StatefulWidget {
 
 class _DisposalFormScreenState extends State<DisposalFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _eventDateController = TextEditingController();
   final _reasonsController = TextEditingController();
   final _remarksController = TextEditingController();
 
@@ -64,6 +68,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   String? _selectedLivestockUuid;
   List<Livestock> _selectedBulkLivestock = [];
   int? _selectedDisposalTypeId;
+  DateTime? _selectedEventDate;
   String _selectedStatus = 'completed';
 
   bool get _isBulk => widget.isBulk;
@@ -87,6 +92,13 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
     if (disposal == null) return;
 
+    if (disposal.eventDate != null && disposal.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(disposal.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _reasonsController.text = disposal.reasons;
     _remarksController.text = disposal.remarks ?? '';
     _selectedDisposalTypeId = disposal.disposalTypeId;
@@ -282,6 +294,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _reasonsController.dispose();
     _remarksController.dispose();
     super.dispose();
@@ -470,6 +483,15 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         _buildSectionTitle(l10n.disposalDetails, theme),
         const SizedBox(height: 16),
         CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
           controller: _reasonsController,
           label: l10n.disposalReasons,
           hintText: l10n.enterDisposalReasons,
@@ -629,10 +651,12 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       if (isEditMode && !_isBulk) {
         // Update existing disposal (same pattern as Farm form - use method without dialog)
         final existing = widget.disposal!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
           disposalTypeId: disposalTypeId,
+          eventDate: eventDateIso ?? existing.eventDate,
           reasons: reasons,
           remarks: remarks,
           status: _selectedStatus,
@@ -687,11 +711,13 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
           final uuid = 'disposal-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = DisposalModel(
             uuid: uuid,
             farmUuid: selectedFarmUuid,
             livestockUuid: animalUuid,
             disposalTypeId: disposalTypeId,
+            eventDate: eventDateIso,
             reasons: reasons,
             remarks: remarks,
             status: _selectedStatus,
@@ -734,11 +760,13 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         final uuid =
             'disposal-${DateTime.now().microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = DisposalModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
           disposalTypeId: disposalTypeId,
+          eventDate: eventDateIso,
           reasons: reasons,
           remarks: remarks,
           status: _selectedStatus,
@@ -801,6 +829,104 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     DropdownItem(value: 'completed', label: l10n.statusCompleted),
     DropdownItem(value: 'failed', label: l10n.statusFailed),
   ];
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
 
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Text(

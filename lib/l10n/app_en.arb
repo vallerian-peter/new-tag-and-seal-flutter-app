@@ -947,6 +947,14 @@
   "ensureDewormingDetailsAccuracy": "Ensure the deworming information is accurate before saving.",
   "dewormingReminder": "Deworming Reminder",
   "timeToDewormLivestock": "Time to deworm livestock",
+  "treatmentReminder": "Treatment Reminder",
+  "@treatmentReminder": {
+    "description": "Treatment reminder notification title"
+  },
+  "timeToTreatLivestock": "Time to treat livestock",
+  "@timeToTreatLivestock": {
+    "description": "Treatment reminder notification description"
+  },
   "weightChange": "Weight Change",
   "disposalTransfer": "Disposal / Transfer",
   "calving": "Calving",
@@ -960,6 +968,30 @@
   "vaccination": "Vaccination",
   "dryoff": "Dryoff",
   "medication": "Medication",
+  "treatment": "Treatment",
+  "@treatment": {
+    "description": "Treatment label"
+  },
+  "addTreatment": "Add treatment log",
+  "@addTreatment": {
+    "description": "Add treatment log button"
+  },
+  "nextMedicationDate": "Next medication date",
+  "@nextMedicationDate": {
+    "description": "Next medication date label"
+  },
+  "selectNextMedicationDate": "Select next medication date",
+  "@selectNextMedicationDate": {
+    "description": "Select next medication date hint"
+  },
+  "treatmentLogSaved": "Treatment log saved successfully",
+  "@treatmentLogSaved": {
+    "description": "Treatment log saved success message"
+  },
+  "treatmentLogSaveFailed": "Failed to save treatment log. Please try again.",
+  "@treatmentLogSaveFailed": {
+    "description": "Treatment log save failed error message"
+  },
   "milking": "Milking",
   "comingSoon": "Coming soon",
   "logContextMissing": "Cannot open this log because farm or livestock details are missing.",
@@ -986,11 +1018,27 @@
   "diseaseOptionsMissing": "Diseases not available. Sync reference data first.",
   "diseaseId": "Disease",
   "selectDisease": "Select disease",
+  "eventDate": "Event Date",
+  "@eventDate": {
+    "description": "The date when the event actually occurred"
+  },
+  "selectEventDate": "Select when the event occurred",
+  "@selectEventDate": {
+    "description": "Hint text for event date picker"
+  },
   "medicationDate": "Medication date",
   "selectMedicationDate": "Select medication date",
   "medicationNotesInfo": "Provide any additional notes about this medication.",
   "confirmUpdateMedication": "Update medication record?",
   "confirmSaveMedication": "Save medication record?",
+  "confirmUpdateTreatment": "Update treatment record?",
+  "@confirmUpdateTreatment": {
+    "description": "Confirmation message for updating treatment record"
+  },
+  "confirmSaveTreatment": "Save treatment record?",
+  "@confirmSaveTreatment": {
+    "description": "Confirmation message for saving treatment record"
+  },
   "quantityUnitMl": "ml",
   "quantityUnitL": "L",
   "quantityUnitMg": "mg",
@@ -1387,6 +1435,18 @@
   "scanRfidPlaceholder": "Enter RFID code",
   "scanManualPlaceholder": "Enter tag manually",
   "scanManualConfirm": "Confirm tag",
+  "scanBluetoothRfidScannerTitle": "Bluetooth RFID Scanner",
+  "@scanBluetoothRfidScannerTitle": {
+    "description": "Bluetooth RFID scanner title"
+  },
+  "scanConnectBluetoothRfidScanner": "Connect Bluetooth RFID Scanner",
+  "@scanConnectBluetoothRfidScanner": {
+    "description": "Button text to connect Bluetooth RFID scanner"
+  },
+  "scanBluetoothRfidScannerDescription": "Connect your Bluetooth RFID scanner to scan tags",
+  "@scanBluetoothRfidScannerDescription": {
+    "description": "Description text for Bluetooth RFID scanner"
+  },
 
   "vaccineSavedSuccessfully": "Vaccine saved successfully",
   "vaccineSaveFailed": "Failed to save vaccine. Please try again.",
@@ -1782,5 +1842,18 @@
   "markAsPaid": "Mark as Paid",
   "@markAsPaid": {"description": "Button text to mark bill as paid"},
   "billMarkedAsPaid": "Bill marked as paid successfully",
-  "@billMarkedAsPaid": {"description": "Success message after marking bill as paid"}
+  "@billMarkedAsPaid": {"description": "Success message after marking bill as paid"},
+  
+  "milkingTrend": "Milking Trend",
+  "@milkingTrend": {"description": "Title for milking trend graph"},
+  "milkingTrendByFarm": "Milking Trend by Farm",
+  "@milkingTrendByFarm": {"description": "Title for multi-farm milking trend graph"},
+  "last6Months": "Last 6 Months",
+  "@last6Months": {"description": "Time period filter for last 6 months"},
+  "lastYear": "This Year",
+  "@lastYear": {"description": "Time period filter for last year"},
+  "average": "Average",
+  "@average": {"description": "Average value label"},
+  "maximum": "Maximum",
+  "@maximum": {"description": "Maximum value label"}
 }

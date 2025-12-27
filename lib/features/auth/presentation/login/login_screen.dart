@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:new_tag_and_seal_flutter_app/features/boarding/presentation/get_started.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
@@ -193,7 +194,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     isEnabledBgColor: true,
                     iconColor: Colors.white,
                     onPressed: () {
-                      Navigator.pop(context);
+                      // Always return to GetStartedScreen and clear the stack
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const GetStartedScreen(),
+                        ),
+                        (route) => false,
+                      );
                     },
                   ),
                   

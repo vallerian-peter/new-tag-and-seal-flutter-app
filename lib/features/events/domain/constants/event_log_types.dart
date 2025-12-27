@@ -11,7 +11,9 @@ class EventLogTypes {
   static const abortedPregnancy = 'abortedPregnancy'; // NEW: For pig aborted pregnancies
   static const vaccination = 'vaccination';
   static const dryoff = 'dryoff';
-  static const medication = 'medication';
+  static const treatment = 'treatment';
+  @Deprecated('Use treatment instead')
+  static const medication = treatment;
   static const milking = 'milking';
   static const transfer = 'transfer';
 

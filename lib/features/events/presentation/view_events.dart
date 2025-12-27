@@ -7,7 +7,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feedin
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/treatment_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
@@ -21,6 +21,8 @@ import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/milking_trend_graph.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/multi_farm_milking_trend_graph.dart';
 
 class ViewEventsScreen extends StatefulWidget {
   final String title;
@@ -85,11 +87,102 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
     return FutureBuilder<Map<String, dynamic>>(
       future: _loadLogsWithReferences(context),
       builder: (context, snapshot) {
-        PreferredSizeWidget buildAppBar(int? total) {
+        PreferredSizeWidget buildAppBar(
+          int? total, 
+          List<dynamic>? logs,
+          Map<String, String>? farmNamesMap,
+        ) {
+          final isMilking = widget.logType == EventLogTypes.milking;
+          final showSingleLivestockGraph = isMilking && 
+              widget.livestockUuid != null && 
+              widget.livestockUuid!.isNotEmpty &&
+              logs != null;
+          final showMultiFarmGraph = isMilking && 
+              (widget.livestockUuid == null || widget.livestockUuid!.isEmpty) &&
+              logs != null &&
+              logs.isNotEmpty &&
+              farmNamesMap != null;
+          
+          // Create a non-nullable reference for use in callbacks
+          final nonNullFarmNamesMap = farmNamesMap;
+          
           return AppBar(
             backgroundColor: theme.scaffoldBackgroundColor,
             title: Text(displayTitle),
             actions: [
+              // Graph button for single livestock milking view
+              if (showSingleLivestockGraph)
+                IconButton(
+                  icon: const Icon(Icons.bar_chart),
+                  tooltip: l10n.milkingTrend,
+                  onPressed: () {
+                    // logs is guaranteed to be non-null when showSingleLivestockGraph is true
+                    final milkingLogs = logs
+                        .where((log) {
+                          if (log is! MilkingModel) return false;
+                          return log.livestockUuid == widget.livestockUuid;
+                        })
+                        .cast<MilkingModel>()
+                        .toList();
+                    
+                    if (milkingLogs.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.noData)),
+                      );
+                      return;
+                    }
+                    
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => DraggableScrollableSheet(
+                        initialChildSize: 0.9,
+                        minChildSize: 0.5,
+                        maxChildSize: 0.95,
+                        builder: (context, scrollController) => MilkingTrendGraph(
+                          milkingLogs: milkingLogs,
+                          livestockName: widget.livestockName ?? l10n.livestock,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              // Graph button for multi-farm milking view (all livestock)
+              if (showMultiFarmGraph)
+                IconButton(
+                  icon: const Icon(Icons.show_chart),
+                  tooltip: l10n.milkingTrendByFarm,
+                  onPressed: () {
+                    // logs and farmNamesMap are guaranteed to be non-null when showMultiFarmGraph is true
+                    final milkingLogs = logs
+                        .where((log) => log is MilkingModel)
+                        .cast<MilkingModel>()
+                        .toList();
+                    
+                    if (milkingLogs.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.noData)),
+                      );
+                      return;
+                    }
+                    
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => DraggableScrollableSheet(
+                        initialChildSize: 0.9,
+                        minChildSize: 0.5,
+                        maxChildSize: 0.95,
+                        builder: (context, scrollController) => MultiFarmMilkingTrendGraph(
+                          milkingLogs: milkingLogs,
+                          farmNamesMap: nonNullFarmNamesMap ?? const {},
+                        ),
+                      ),
+                    );
+                  },
+                ),
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Text(
@@ -118,7 +211,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
         if (!snapshot.hasData ||
             snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: buildAppBar(null),
+            appBar: buildAppBar(null, null, null),
             body: const Center(
               child: CircularProgressIndicator(color: primaryColor),
             ),
@@ -127,7 +220,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
 
         if (snapshot.hasError) {
           return Scaffold(
-            appBar: buildAppBar(null),
+            appBar: buildAppBar(null, null, null),
             body: Center(
               child: Text(
                 l10n.eventsLoadFailed,
@@ -149,7 +242,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
 
         if (allLogs.isEmpty) {
           return Scaffold(
-            appBar: buildAppBar(0),
+            appBar: buildAppBar(0, allLogs, farmNamesMap),
             body: Center(
               child: Text(l10n.noData, style: theme.textTheme.bodyMedium),
             ),
@@ -163,10 +256,23 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
 
         // Check if this is milking events to show summary
         final isMilking = widget.logType == EventLogTypes.milking;
-        final milkingLogs = isMilking ? allLogs.cast<MilkingModel>() : <MilkingModel>[];
+        final milkingLogs = isMilking
+            ? allLogs
+                .where((log) {
+                  if (log is! MilkingModel) return false;
+                  // If viewing a specific livestock, restrict summary to that livestock
+                  if (widget.livestockUuid == null ||
+                      widget.livestockUuid!.isEmpty) {
+                    return true;
+                  }
+                  return log.livestockUuid == widget.livestockUuid;
+                })
+                .cast<MilkingModel>()
+                .toList()
+            : <MilkingModel>[];
 
         return Scaffold(
-          appBar: buildAppBar(totalLogs),
+          appBar: buildAppBar(totalLogs, allLogs, farmNamesMap),
           body: Column(
             children: [
               if (isMilking && milkingLogs.isNotEmpty) ...[
@@ -208,6 +314,51 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
     );
   }
 
+  /// Parse a milking amount string into litres.
+  ///
+  /// Supports values like:
+  /// - "2.5"   -> 2.5 L
+  /// - "2.5l"  / "2.5 L" / "2.5L" -> 2.5 L
+  /// - "250ml" / "250 ml"        -> 0.25 L
+  /// Falls back to 0 on invalid input.
+  double _parseAmountToLitres(String rawAmount) {
+    if (rawAmount.trim().isEmpty) return 0;
+
+    final normalized = rawAmount.trim().toLowerCase();
+
+    // Extract numeric value and optional unit (letters)
+    final match =
+        RegExp(r'^([0-9]*\.?[0-9]+)\s*([a-zA-Z]*)').firstMatch(normalized);
+    if (match == null) {
+      return double.tryParse(normalized) ?? 0;
+    }
+
+    final numericPart = double.tryParse(match.group(1) ?? '') ?? 0;
+    final unit = (match.group(2) ?? '').trim();
+
+    if (unit == 'ml') {
+      // Convert millilitres to litres
+      return numericPart / 1000.0;
+    }
+
+    // Default and for 'l' / 'lt' / unknown units – treat as litres
+    return numericPart;
+  }
+
+  /// Gets the effective date for a log (eventDate ?? createdAt)
+  DateTime? _getEffectiveDate(dynamic log) {
+    final eventDateStr = log.eventDate;
+    final createdAtStr = log.createdAt;
+    
+    if (eventDateStr != null && eventDateStr.trim().isNotEmpty) {
+      return DateTime.tryParse(eventDateStr);
+    }
+    if (createdAtStr != null && createdAtStr.trim().isNotEmpty) {
+      return DateTime.tryParse(createdAtStr);
+    }
+    return null;
+  }
+
   List<dynamic> _filterLogs(List<dynamic> logs) {
     if (_selectedFilter == 'all') return logs;
     
@@ -217,34 +368,15 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
     final weekStart = todayStart.subtract(Duration(days: now.weekday - 1));
     
     return logs.where((log) {
-      if (widget.logType != EventLogTypes.milking) {
-        // For non-milking logs, check createdAt
-        final createdAt = DateTime.tryParse(log.createdAt);
-        if (createdAt == null) return false;
-        final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
-        
-        if (_selectedFilter == 'today') {
-          return logDate.isAtSameMomentAs(todayStart) || 
-                 (logDate.isAfter(todayStart.subtract(const Duration(milliseconds: 1))) &&
-                  logDate.isBefore(todayEnd));
-        } else if (_selectedFilter == 'thisWeek') {
-          return logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-                 logDate.isBefore(now.add(const Duration(days: 1)));
-        }
-        return true;
-      }
-      
-      // For milking logs
-      if (log is! MilkingModel) return false;
-      final createdAt = DateTime.tryParse(log.createdAt);
-      if (createdAt == null) return false;
-      
-      final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
+      // Use eventDate ?? createdAt for all log types
+      final effectiveDate = _getEffectiveDate(log);
+      if (effectiveDate == null) return false;
+      final logDate = DateTime(effectiveDate.year, effectiveDate.month, effectiveDate.day);
       
       if (_selectedFilter == 'today') {
-        return logDate.year == todayStart.year &&
-               logDate.month == todayStart.month &&
-               logDate.day == todayStart.day;
+        return logDate.isAtSameMomentAs(todayStart) || 
+               (logDate.isAfter(todayStart.subtract(const Duration(milliseconds: 1))) &&
+                logDate.isBefore(todayEnd));
       } else if (_selectedFilter == 'thisWeek') {
         return logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
                logDate.isBefore(now.add(const Duration(days: 1)));
@@ -254,7 +386,6 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
   }
 
   Widget _buildMilkingSummary(BuildContext context, List<MilkingModel> milkingLogs) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     
     final now = DateTime.now();
@@ -266,11 +397,14 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
     double thisWeekLitres = 0;
     
     for (final milking in milkingLogs) {
-      final createdAt = DateTime.tryParse(milking.createdAt);
-      if (createdAt == null) continue;
+      // Use eventDate ?? createdAt
+      final effectiveDate = milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
+          ? DateTime.tryParse(milking.eventDate!)
+          : DateTime.tryParse(milking.createdAt);
+      if (effectiveDate == null) continue;
       
-      final logDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
-      final amount = double.tryParse(milking.amount) ?? 0;
+      final logDate = DateTime(effectiveDate.year, effectiveDate.month, effectiveDate.day);
+      final amount = _parseAmountToLitres(milking.amount);
       
       totalLitres += amount;
       
@@ -304,7 +438,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                 child: _MilkingSummaryCard(
                   title: l10n.allText,
                   value: totalLitres.toStringAsFixed(1),
-                  unit: l10n.litres,
+                  unit: 'L',
                   isSelected: _selectedFilter == 'all',
                   onTap: () {
                     setState(() {
@@ -318,7 +452,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                 child: _MilkingSummaryCard(
                   title: l10n.upcomingToday,
                   value: todayLitres.toStringAsFixed(1),
-                  unit: l10n.litres,
+                  unit: 'L',
                   isSelected: _selectedFilter == 'today',
                   onTap: () {
                     setState(() {
@@ -332,7 +466,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                 child: _MilkingSummaryCard(
                   title: l10n.thisWeek,
                   value: thisWeekLitres.toStringAsFixed(1),
-                  unit: l10n.litres,
+                  unit: 'L',
                   isSelected: _selectedFilter == 'thisWeek',
                   onTap: () {
                     setState(() {
@@ -431,8 +565,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
               id.trim().toLowerCase() == 'null') {
             id = livestock.identificationNumber;
           }
-          if (id != null &&
-              id.trim().isNotEmpty &&
+          if (id.trim().isNotEmpty &&
               id.trim().toLowerCase() != 'null') {
             displayName = '${livestock.name}-${id.trim()}';
           }
@@ -511,7 +644,9 @@ class _EventLogCard extends StatelessWidget {
         );
         addRow(l10n.amount, feeding.amount);
         addRow(l10n.remarks, feeding.remarks);
-        createdDate = DateTime.tryParse(feeding.createdAt);
+        createdDate = feeding.eventDate != null && feeding.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(feeding.eventDate!)
+            : DateTime.tryParse(feeding.createdAt);
         break;
       case EventLogTypes.weightChange:
         final change = log as WeightChangeModel;
@@ -527,7 +662,9 @@ class _EventLogCard extends StatelessWidget {
               : change.updatedAt,
         );
         addRow(l10n.remarks, change.remarks);
-        createdDate = DateTime.tryParse(change.createdAt);
+        createdDate = change.eventDate != null && change.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(change.eventDate!)
+            : DateTime.tryParse(change.createdAt);
         break;
       case EventLogTypes.deworming:
         final deworming = log as DewormingModel;
@@ -558,7 +695,9 @@ class _EventLogCard extends StatelessWidget {
                 : deworming.nextAdministrationDate!,
           );
         }
-        createdDate = DateTime.tryParse(deworming.createdAt);
+        createdDate = deworming.eventDate != null && deworming.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(deworming.eventDate!)
+            : DateTime.tryParse(deworming.createdAt);
         break;
       case EventLogTypes.calving:
       case EventLogTypes.farrowing:
@@ -600,7 +739,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.remarks, birthEvent.remarks);
         addRow(l10n.status, birthEvent.status);
-        createdDate = DateTime.tryParse(birthEvent.createdAt);
+        createdDate = birthEvent.eventDate != null && birthEvent.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(birthEvent.eventDate!)
+            : DateTime.tryParse(birthEvent.createdAt);
         break;
       case EventLogTypes.abortedPregnancy:
         final abortedPregnancy = log as AbortedPregnancyModel;
@@ -621,22 +762,24 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.remarks, abortedPregnancy.remarks);
         addRow(l10n.status, abortedPregnancy.status);
-        createdDate = DateTime.tryParse(abortedPregnancy.createdAt);
+        createdDate = abortedPregnancy.eventDate != null && abortedPregnancy.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(abortedPregnancy.eventDate!)
+            : DateTime.tryParse(abortedPregnancy.createdAt);
         break;
-      case EventLogTypes.medication:
-        final medication = log as MedicationModel;
+      case EventLogTypes.treatment:
+        final treatment = log as TreatmentModel;
         icon = Icons.medical_services_outlined;
-        title = l10n.medication;
-        final medicineName = _resolveMedicineName(medication.medicineId);
-        final diseaseName = _resolveDiseaseName(medication.diseaseId);
+        title = l10n.treatment;
+        final medicineName = _resolveMedicineName(treatment.medicineId);
+        final diseaseName = _resolveDiseaseName(treatment.diseaseId);
         addRow(l10n.medicine, medicineName);
         if (diseaseName != null) {
           addRow(l10n.diseaseId, diseaseName);
         }
-        addRow(l10n.quantity, medication.quantity);
-        addRow(l10n.withdrawalPeriod, medication.withdrawalPeriod);
+        addRow(l10n.quantity, treatment.quantity);
+        addRow(l10n.withdrawalPeriod, treatment.withdrawalPeriod);
         final medicationDate = DateTime.tryParse(
-          medication.medicationDate ?? '',
+          treatment.medicationDate ?? '',
         );
         if (medicationDate != null) {
           addRow(
@@ -644,8 +787,19 @@ class _EventLogCard extends StatelessWidget {
             dateFormat.format(medicationDate.toLocal()),
           );
         }
-        addRow(l10n.remarks, medication.remarks);
-        createdDate = DateTime.tryParse(medication.createdAt);
+        final nextMedicationDate = DateTime.tryParse(
+          treatment.nextMedicationDate ?? '',
+        );
+        if (nextMedicationDate != null) {
+          addRow(
+            l10n.nextMedicationDate,
+            dateFormat.format(nextMedicationDate.toLocal()),
+          );
+        }
+        addRow(l10n.remarks, treatment.remarks);
+        createdDate = treatment.eventDate != null && treatment.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(treatment.eventDate!)
+            : DateTime.tryParse(treatment.createdAt);
         break;
       case EventLogTypes.vaccination:
         final vaccination = log as VaccinationModel;
@@ -671,7 +825,9 @@ class _EventLogCard extends StatelessWidget {
           addRow(l10n.extensionOfficerLicense, vaccination.extensionOfficerId);
         }
         addRow(l10n.status, vaccination.status);
-        createdDate = DateTime.tryParse(vaccination.createdAt);
+        createdDate = vaccination.eventDate != null && vaccination.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(vaccination.eventDate!)
+            : DateTime.tryParse(vaccination.createdAt);
         break;
       case EventLogTypes.disposal:
         final disposal = log as DisposalModel;
@@ -686,7 +842,9 @@ class _EventLogCard extends StatelessWidget {
         addRow(l10n.disposalReasons, disposal.reasons);
         addRow(l10n.remarks, disposal.remarks);
         addRow(l10n.status, disposal.status);
-        createdDate = DateTime.tryParse(disposal.createdAt);
+        createdDate = disposal.eventDate != null && disposal.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(disposal.eventDate!)
+            : DateTime.tryParse(disposal.createdAt);
         break;
       case EventLogTypes.milking:
         final milking = log as MilkingModel;
@@ -714,7 +872,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.session, milking.session);
         addRow(l10n.status, milking.status);
-        createdDate = DateTime.tryParse(milking.createdAt);
+        createdDate = milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(milking.eventDate!)
+            : DateTime.tryParse(milking.createdAt);
         break;
       case EventLogTypes.dryoff:
         final dryoff = log as DryoffModel;
@@ -732,7 +892,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.reason, dryoff.reason);
         addRow(l10n.remarks, dryoff.remarks);
-        createdDate = DateTime.tryParse(dryoff.createdAt);
+        createdDate = dryoff.eventDate != null && dryoff.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(dryoff.eventDate!)
+            : DateTime.tryParse(dryoff.createdAt);
         break;
       case EventLogTypes.insemination:
         final insemination = log as InseminationModel;
@@ -788,7 +950,9 @@ class _EventLogCard extends StatelessWidget {
         addRow(l10n.aiCode, insemination.aiCode);
         addRow(l10n.manufacturerName, insemination.manufacturerName);
         addRow(l10n.semenSupplier, insemination.semenSupplier);
-        createdDate = DateTime.tryParse(insemination.createdAt);
+        createdDate = insemination.eventDate != null && insemination.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(insemination.eventDate!)
+            : DateTime.tryParse(insemination.createdAt);
         break;
       case EventLogTypes.pregnancy:
         final pregnancy = log as PregnancyModel;
@@ -810,7 +974,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.status, pregnancy.status);
         addRow(l10n.remarks, pregnancy.remarks);
-        createdDate = DateTime.tryParse(pregnancy.createdAt);
+        createdDate = pregnancy.eventDate != null && pregnancy.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(pregnancy.eventDate!)
+            : DateTime.tryParse(pregnancy.createdAt);
         break;
       case EventLogTypes.transfer:
         final transfer = log as TransferModel;
@@ -841,7 +1007,9 @@ class _EventLogCard extends StatelessWidget {
         if (transfer.status != null && transfer.status!.trim().isNotEmpty) {
           addRow(l10n.status, transfer.status);
         }
-        createdDate = DateTime.tryParse(transfer.createdAt);
+        createdDate = transfer.eventDate != null && transfer.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(transfer.eventDate!)
+            : DateTime.tryParse(transfer.createdAt);
         break;
     }
 
@@ -1128,7 +1296,7 @@ class _EventLogCardContainer extends StatelessWidget {
           if (createdDate != null) ...[
             const SizedBox(height: 12),
             _LogFooter(
-              title: AppLocalizations.of(context)!.createdAt,
+              title: AppLocalizations.of(context)!.eventDate,
               date: createdDate!,
             ),
           ],
@@ -1233,29 +1401,34 @@ class _MilkingSummaryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  value,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    unit,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+            // Responsive value + unit row to avoid overflow with large numbers
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    value,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      unit,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

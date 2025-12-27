@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 class Feedings extends Table {
   IntColumn get id => integer().nullable()();
   TextColumn get uuid => text()();
+  TextColumn get eventDate => text().nullable()();
   IntColumn get feedingTypeId => integer()();
   TextColumn get farmUuid => text()();
   TextColumn get livestockUuid => text()();

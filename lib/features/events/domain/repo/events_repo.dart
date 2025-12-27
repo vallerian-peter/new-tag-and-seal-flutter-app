@@ -1,7 +1,7 @@
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/deworming_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feeding_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/treatment_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
@@ -38,11 +38,11 @@ abstract class EventsRepositoryInterface {
   /// Update a deworming event locally (unsynced, marked for update).
   Future<DewormingModel> updateDewormingLocally(DewormingModel model);
 
-  /// Store a medication event locally (unsynced, marked for create).
-  Future<MedicationModel> createMedication(MedicationModel model);
+  /// Store a treatment event locally (unsynced, marked for create).
+  Future<TreatmentModel> createTreatment(TreatmentModel model);
 
-  /// Update a medication event locally (unsynced, marked for update).
-  Future<MedicationModel> updateMedicationLocally(MedicationModel model);
+  /// Update a treatment event locally (unsynced, marked for update).
+  Future<TreatmentModel> updateTreatmentLocally(TreatmentModel model);
 
   /// Store a vaccination event locally (unsynced, marked for create).
   Future<VaccinationModel> createVaccination(VaccinationModel model);
@@ -65,8 +65,8 @@ abstract class EventsRepositoryInterface {
   /// Retrieve deworming logs optionally filtered by farm/livestock.
   Future<List<DewormingModel>> getDewormings({String? farmUuid, String? livestockUuid});
 
-  /// Retrieve medication logs optionally filtered by farm/livestock.
-  Future<List<MedicationModel>> getMedications({String? farmUuid, String? livestockUuid});
+  /// Retrieve treatment logs optionally filtered by farm/livestock.
+  Future<List<TreatmentModel>> getTreatments({String? farmUuid, String? livestockUuid});
 
   /// Retrieve vaccination logs optionally filtered by farm/livestock.
   Future<List<VaccinationModel>> getVaccinations({String? farmUuid, String? livestockUuid});
@@ -82,7 +82,7 @@ abstract class EventsRepositoryInterface {
 
   /// Retrieve all local deworming logs.
   Future<List<DewormingModel>> getAllDewormings();
-  Future<List<MedicationModel>> getAllMedications();
+  Future<List<TreatmentModel>> getAllTreatments();
   Future<List<VaccinationModel>> getAllVaccinations();
   Future<List<DisposalModel>> getAllDisposals();
   Future<Map<String, int>> getLogCounts({
@@ -100,8 +100,8 @@ abstract class EventsRepositoryInterface {
   /// Get unsynced deworming logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedDewormingsForApi();
 
-  /// Get unsynced medication logs formatted for API submission.
-  Future<List<Map<String, dynamic>>> getUnsyncedMedicationsForApi();
+  /// Get unsynced treatment logs formatted for API submission.
+  Future<List<Map<String, dynamic>>> getUnsyncedTreatmentsForApi();
 
   /// Get unsynced vaccination logs formatted for API submission.
   Future<List<Map<String, dynamic>>> getUnsyncedVaccinationsForApi();
@@ -118,8 +118,8 @@ abstract class EventsRepositoryInterface {
   /// Mark deworming logs as synced or delete them if marked for deletion.
   Future<void> markDewormingsAsSynced(List<String> uuids);
 
-  /// Mark medication logs as synced or delete them if marked for deletion.
-  Future<void> markMedicationsAsSynced(List<String> uuids);
+  /// Mark treatment logs as synced or delete them if marked for deletion.
+  Future<void> markTreatmentsAsSynced(List<String> uuids);
 
   /// Mark vaccination logs as synced or delete them if marked for deletion.
   Future<void> markVaccinationsAsSynced(List<String> uuids);
@@ -136,8 +136,8 @@ abstract class EventsRepositoryInterface {
   /// Flag a deworming log for deletion during next sync.
   Future<bool> markDewormingAsDeleted(String uuid);
 
-  /// Flag a medication log for deletion during next sync.
-  Future<bool> markMedicationAsDeleted(String uuid);
+  /// Flag a treatment log for deletion during next sync.
+  Future<bool> markTreatmentAsDeleted(String uuid);
 
   /// Flag a vaccination log for deletion during next sync.
   Future<bool> markVaccinationAsDeleted(String uuid);

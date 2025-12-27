@@ -7,6 +7,7 @@ class DryoffModel {
   final String? endDate;
   final String? reason;
   final String? remarks;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -21,6 +22,7 @@ class DryoffModel {
     this.endDate,
     this.reason,
     this.remarks,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -35,6 +37,7 @@ class DryoffModel {
     String? endDate,
     String? reason,
     String? remarks,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -49,6 +52,7 @@ class DryoffModel {
       endDate: endDate ?? this.endDate,
       reason: reason ?? this.reason,
       remarks: remarks ?? this.remarks,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -66,6 +70,7 @@ class DryoffModel {
       'endDate': endDate,
       'reason': reason,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -83,6 +88,7 @@ class DryoffModel {
       endDate: json['endDate'] as String?,
       reason: json['reason'] as String?,
       remarks: json['remarks'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -99,6 +105,7 @@ class DryoffModel {
       'endDate': endDate,
       'reason': reason,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

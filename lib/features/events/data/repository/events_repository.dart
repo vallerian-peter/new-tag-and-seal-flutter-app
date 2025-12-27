@@ -7,7 +7,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/ev
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/deworming_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feeding_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/treatment_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
@@ -19,12 +19,18 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/domain/model/notification_model.dart';
 
 class EventsRepository implements EventsRepositoryInterface {
   final AppDatabase _database;
   late final EventDao _eventDao;
+  final NotificationProvider? _notificationProvider;
 
-  EventsRepository(this._database) {
+  EventsRepository(
+    this._database, {
+    NotificationProvider? notificationProvider,
+  })  : _notificationProvider = notificationProvider {
     _eventDao = _database.eventDao;
   }
 
@@ -39,7 +45,7 @@ class EventsRepository implements EventsRepositoryInterface {
     final feedingsCount = (logs['feedings'] as List?)?.length ?? 0;
     final weightChangesCount = (logs['weightChanges'] as List?)?.length ?? 0;
     final dewormingsCount = (logs['dewormings'] as List?)?.length ?? 0;
-    final medicationsCount = (logs['medications'] as List?)?.length ?? 0;
+    final treatmentsCount = (logs['treatments'] as List?)?.length ?? 0;
     final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
     final disposalsCount = (logs['disposals'] as List?)?.length ?? 0;
     final birthEventsCount = (logs['birthEvents'] as List?)?.length ?? 0;
@@ -53,7 +59,7 @@ class EventsRepository implements EventsRepositoryInterface {
 
     log(
       '🔄 Syncing event logs (feedings: $feedingsCount, weightChanges: $weightChangesCount, '
-      'dewormings: $dewormingsCount, medications: $medicationsCount, '
+      'dewormings: $dewormingsCount, treatments: $treatmentsCount, '
       'vaccinations: $vaccinationsCount, disposals: $disposalsCount, '
       'birthEvents: $birthEventsCount, abortedPregnancies: $abortedPregnanciesCount, '
       'milkings: $milkingsCount, pregnancies: $pregnanciesCount, '
@@ -63,7 +69,7 @@ class EventsRepository implements EventsRepositoryInterface {
     await _syncFeedings(logs['feedings']);
     await _syncWeightChanges(logs['weightChanges']);
     await _syncDewormings(logs['dewormings']);
-    await _syncMedications(logs['medications']);
+    await _syncTreatments(logs['treatments']);
     await _syncVaccinations(logs['vaccinations']);
     await _syncDisposals(logs['disposals']);
     await _syncBirthEvents(logs['birthEvents']);
@@ -88,8 +94,10 @@ class EventsRepository implements EventsRepositoryInterface {
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getFeedingByUuid(remote.uuid);
+        bool wasInsertedOrUpdated = false;
         if (existing == null) {
           await _eventDao.upsertFeeding(_toFeedingCompanion(remote));
+          wasInsertedOrUpdated = true;
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
@@ -99,7 +107,13 @@ class EventsRepository implements EventsRepositoryInterface {
               syncAction: 'server-update',
             );
             await _eventDao.upsertFeeding(_toFeedingCompanion(updated));
+            wasInsertedOrUpdated = true;
           }
+        }
+        
+        // Create/update notification for next feeding time if present and was inserted/updated
+        if (wasInsertedOrUpdated) {
+          await _createFeedingNotificationFromSync(remote);
         }
       } catch (e) {
         log('❌ Error syncing feeding log: $e');
@@ -158,8 +172,10 @@ class EventsRepository implements EventsRepositoryInterface {
         remoteUuids.add(remote.uuid);
 
         final existing = await _eventDao.getDewormingByUuid(remote.uuid);
+        bool wasInsertedOrUpdated = false;
         if (existing == null) {
           await _eventDao.upsertDeworming(_toDewormingCompanion(remote));
+          wasInsertedOrUpdated = true;
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
@@ -169,7 +185,13 @@ class EventsRepository implements EventsRepositoryInterface {
               syncAction: 'server-update',
             );
             await _eventDao.upsertDeworming(_toDewormingCompanion(updated));
+            wasInsertedOrUpdated = true;
           }
+        }
+        
+        // Create/update notification for next administration date if present and was inserted/updated
+        if (wasInsertedOrUpdated) {
+          await _createDewormingNotificationFromSync(remote);
         }
       } catch (e) {
         log('❌ Error syncing deworming log: $e');
@@ -179,21 +201,23 @@ class EventsRepository implements EventsRepositoryInterface {
     await _eventDao.deleteServerDewormingsNotIn(remoteUuids);
   }
 
-  Future<void> _syncMedications(dynamic payload) async {
+  Future<void> _syncTreatments(dynamic payload) async {
     if (payload is! List) return;
 
     final remoteUuids = <String>{};
 
     for (final raw in payload.cast<Map<String, dynamic>>()) {
       try {
-        final remote = MedicationModel.fromJson(
+        final remote = TreatmentModel.fromJson(
           raw,
         ).copyWith(synced: true, syncAction: 'server-create');
         remoteUuids.add(remote.uuid);
 
-        final existing = await _eventDao.getMedicationByUuid(remote.uuid);
+        final existing = await _eventDao.getTreatmentByUuid(remote.uuid);
+        bool wasInsertedOrUpdated = false;
         if (existing == null) {
-          await _eventDao.upsertMedication(_toMedicationCompanion(remote));
+          await _eventDao.upsertTreatment(_toTreatmentCompanion(remote));
+          wasInsertedOrUpdated = true;
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
@@ -202,15 +226,21 @@ class EventsRepository implements EventsRepositoryInterface {
               id: existing.id,
               syncAction: 'server-update',
             );
-            await _eventDao.upsertMedication(_toMedicationCompanion(updated));
+            await _eventDao.upsertTreatment(_toTreatmentCompanion(updated));
+            wasInsertedOrUpdated = true;
           }
         }
+        
+        // Create/update notification for next medication date if present and was inserted/updated
+        if (wasInsertedOrUpdated) {
+          await _createTreatmentNotificationFromSync(remote);
+        }
       } catch (e) {
-        log('❌ Error syncing medication log: $e');
+        log('❌ Error syncing treatment log: $e');
       }
     }
 
-    await _eventDao.deleteServerMedicationsNotIn(remoteUuids);
+    await _eventDao.deleteServerTreatmentsNotIn(remoteUuids);
   }
 
   Future<void> _syncVaccinations(dynamic payload) async {
@@ -547,6 +577,181 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   // ===========================================================================
+  // Notification creation helpers for sync
+  // ===========================================================================
+
+  /// Create or update notification for feeding events during sync
+  Future<void> _createFeedingNotificationFromSync(FeedingModel feeding) async {
+    if (_notificationProvider == null) return;
+
+    try {
+      final nextFeedingTime = DateTime.tryParse(feeding.nextFeedingTime);
+      if (nextFeedingTime == null) return;
+
+      final now = DateTime.now();
+      if (nextFeedingTime.isBefore(now)) return;
+
+      // Check if notification already exists
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'feeding_reminder' &&
+              n.farmUuid == feeding.farmUuid &&
+              n.livestockUuid == feeding.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextFeedingTime.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+      } else {
+        notification = NotificationModel(
+          farmUuid: feeding.farmUuid,
+          farmName: null,
+          livestockUuid: feeding.livestockUuid,
+          livestockName: null,
+          title: 'feeding_reminder',
+          description: 'time_to_feed_livestock',
+          scheduledAt: nextFeedingTime.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
+      }
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Sync: Feeding notification created/updated for ${nextFeedingTime.toLocal()}');
+    } catch (e) {
+      log('⚠️ Sync: Failed to create feeding notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail sync
+    }
+  }
+
+  /// Create or update notification for deworming events during sync
+  Future<void> _createDewormingNotificationFromSync(DewormingModel deworming) async {
+    if (_notificationProvider == null) return;
+
+    try {
+      final nextAdminDate = deworming.nextAdministrationDate;
+      if (nextAdminDate == null || nextAdminDate.isEmpty) return;
+
+      final nextDate = DateTime.tryParse(nextAdminDate);
+      if (nextDate == null) return;
+
+      final now = DateTime.now();
+      if (nextDate.isBefore(now)) return;
+
+      // Check if notification already exists
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'deworming_reminder' &&
+              n.farmUuid == deworming.farmUuid &&
+              n.livestockUuid == deworming.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextDate.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+      } else {
+        notification = NotificationModel(
+          farmUuid: deworming.farmUuid,
+          farmName: null,
+          livestockUuid: deworming.livestockUuid,
+          livestockName: null,
+          title: 'deworming_reminder',
+          description: 'time_to_deworm_livestock',
+          scheduledAt: nextDate.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
+      }
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Sync: Deworming notification created/updated for ${nextDate.toLocal()}');
+    } catch (e) {
+      log('⚠️ Sync: Failed to create deworming notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail sync
+    }
+  }
+
+  /// Create or update notification for treatment events during sync
+  Future<void> _createTreatmentNotificationFromSync(TreatmentModel treatment) async {
+    if (_notificationProvider == null) return;
+
+    try {
+      final nextMedicationDate = treatment.nextMedicationDate;
+      if (nextMedicationDate == null || nextMedicationDate.isEmpty) return;
+
+      final nextDate = DateTime.tryParse(nextMedicationDate);
+      if (nextDate == null) return;
+
+      final now = DateTime.now();
+      if (nextDate.isBefore(now)) return;
+
+      // Check if notification already exists
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'treatment_reminder' &&
+              n.farmUuid == treatment.farmUuid &&
+              n.livestockUuid == treatment.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextDate.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+      } else {
+        notification = NotificationModel(
+          farmUuid: treatment.farmUuid,
+          farmName: null,
+          livestockUuid: treatment.livestockUuid,
+          livestockName: null,
+          title: 'treatment_reminder',
+          description: 'time_to_treat_livestock',
+          scheduledAt: nextDate.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
+      }
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Sync: Treatment notification created/updated for ${nextDate.toLocal()}');
+    } catch (e) {
+      log('⚠️ Sync: Failed to create treatment notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail sync
+    }
+  }
+
+  // ===========================================================================
   // Local creation (unsynced defaults)
   // ===========================================================================
 
@@ -661,9 +866,9 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<MedicationModel> createMedication(MedicationModel model) async {
+  Future<TreatmentModel> createTreatment(TreatmentModel model) async {
     final now = DateTime.now().toIso8601String();
-    log('📝 Creating medication log locally: ${model.uuid}');
+    log('📝 Creating treatment log locally: ${model.uuid}');
     final localModel = model.copyWith(
       createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
       updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
@@ -671,14 +876,14 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: 'create',
     );
 
-    final inserted = await _eventDao.upsertMedication(
-      _toMedicationCompanion(localModel),
+    final inserted = await _eventDao.upsertTreatment(
+      _toTreatmentCompanion(localModel),
     );
-    return _mapMedicationEntity(inserted);
+    return _mapTreatmentEntity(inserted);
   }
 
   @override
-  Future<MedicationModel> updateMedicationLocally(MedicationModel model) async {
+  Future<TreatmentModel> updateTreatmentLocally(TreatmentModel model) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
@@ -690,10 +895,10 @@ class EventsRepository implements EventsRepositoryInterface {
       updatedAt: now,
     );
 
-    final updated = await _eventDao.upsertMedication(
-      _toMedicationCompanion(localModel),
+    final updated = await _eventDao.upsertTreatment(
+      _toTreatmentCompanion(localModel),
     );
-    return _mapMedicationEntity(updated);
+    return _mapTreatmentEntity(updated);
   }
 
   @override
@@ -1017,15 +1222,15 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<MedicationModel>> getMedications({
+  Future<List<TreatmentModel>> getTreatments({
     String? farmUuid,
     String? livestockUuid,
   }) async {
-    final rows = await _eventDao.getMedications(
+    final rows = await _eventDao.getTreatments(
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
-    return rows.map(_mapMedicationEntity).toList();
+    return rows.map(_mapTreatmentEntity).toList();
   }
 
   @override
@@ -1140,7 +1345,7 @@ class EventsRepository implements EventsRepositoryInterface {
   @override
   Future<List<DewormingModel>> getAllDewormings() => getDewormings();
   @override
-  Future<List<MedicationModel>> getAllMedications() => getMedications();
+  Future<List<TreatmentModel>> getAllTreatments() => getTreatments();
   @override
   Future<List<VaccinationModel>> getAllVaccinations() => getVaccinations();
   @override
@@ -1178,7 +1383,7 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
-    final medications = await getMedications(
+    final treatments = await getTreatments(
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
@@ -1231,7 +1436,7 @@ class EventsRepository implements EventsRepositoryInterface {
       EventLogTypes.feeding: feedings.length,
       EventLogTypes.weightChange: weightChanges.length,
       EventLogTypes.deworming: dewormings.length,
-      EventLogTypes.medication: medications.length,
+      EventLogTypes.treatment: treatments.length,
       EventLogTypes.vaccination: vaccinations.length,
       EventLogTypes.disposal: disposals.length,
       EventLogTypes.calving: calvingCount,
@@ -1250,7 +1455,7 @@ class EventsRepository implements EventsRepositoryInterface {
     final feedingsCount = (await getFeedings()).length;
     final weightChangesCount = (await getWeightChanges()).length;
     final dewormingsCount = (await getDewormings()).length;
-    final medicationsCount = (await getMedications()).length;
+    final treatmentsCount = (await getTreatments()).length;
     final vaccinationsCount = (await getVaccinations()).length;
     final disposalsCount = (await getDisposals()).length;
     final birthEvents = await getBirthEvents();
@@ -1274,7 +1479,7 @@ class EventsRepository implements EventsRepositoryInterface {
         EventLogTypes.feeding: feedingsCount,
         EventLogTypes.weightChange: weightChangesCount,
         EventLogTypes.deworming: dewormingsCount,
-        EventLogTypes.medication: medicationsCount,
+        EventLogTypes.treatment: treatmentsCount,
         EventLogTypes.vaccination: vaccinationsCount,
         EventLogTypes.disposal: disposalsCount,
         EventLogTypes.calving: calvingCount,
@@ -1326,15 +1531,15 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUnsyncedMedicationsForApi() async {
-    final rows = await _eventDao.getUnsyncedMedications();
+  Future<List<Map<String, dynamic>>> getUnsyncedTreatmentsForApi() async {
+    final rows = await _eventDao.getUnsyncedTreatments();
     if (rows.isEmpty) {
-      log('✅ No unsynced medication logs found');
+      log('✅ No unsynced treatment logs found');
       return [];
     }
 
-    log('📤 Preparing ${rows.length} medication logs for sync');
-    return rows.map((row) => _mapMedicationEntity(row).toApiJson()).toList();
+    log('📤 Preparing ${rows.length} treatment logs for sync');
+    return rows.map((row) => _mapTreatmentEntity(row).toApiJson()).toList();
   }
 
   @override
@@ -1439,24 +1644,24 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<void> markMedicationsAsSynced(List<String> uuids) async {
+  Future<void> markTreatmentsAsSynced(List<String> uuids) async {
     if (uuids.isEmpty) return;
     for (final uuid in uuids.toSet()) {
-      final existing = await _eventDao.getMedicationByUuid(uuid);
+      final existing = await _eventDao.getTreatmentByUuid(uuid);
       if (existing == null) {
-        log('⚠️ Medication log not found while marking as synced: $uuid');
+        log('⚠️ Treatment log not found while marking as synced: $uuid');
         continue;
       }
 
       if (existing.syncAction == 'deleted') {
-        await _eventDao.deleteMedicationByUuid(uuid);
-        log('🗑️ Removed medication log after synced delete: $uuid');
+        await _eventDao.deleteTreatmentByUuid(uuid);
+        log('🗑️ Removed treatment log after synced delete: $uuid');
       } else {
-        final model = _mapMedicationEntity(
+        final model = _mapTreatmentEntity(
           existing,
         ).copyWith(synced: true, syncAction: existing.syncAction);
-        await _eventDao.upsertMedication(_toMedicationCompanion(model));
-        log('✅ Marked medication log as synced: $uuid');
+        await _eventDao.upsertTreatment(_toTreatmentCompanion(model));
+        log('✅ Marked treatment log as synced: $uuid');
       }
     }
   }
@@ -1528,11 +1733,11 @@ class EventsRepository implements EventsRepositoryInterface {
       await markDewormingAsDeleted(log.uuid);
     }
 
-    final medications = await _eventDao.getMedications(
+    final treatments = await _eventDao.getTreatments(
       livestockUuid: livestockUuid,
     );
-    for (final log in medications) {
-      await markMedicationAsDeleted(log.uuid);
+    for (final log in treatments) {
+      await markTreatmentAsDeleted(log.uuid);
     }
 
     final vaccinations = await _eventDao.getVaccinations(
@@ -1674,19 +1879,19 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<bool> markMedicationAsDeleted(String uuid) async {
-    final existing = await _eventDao.getMedicationByUuid(uuid);
+  Future<bool> markTreatmentAsDeleted(String uuid) async {
+    final existing = await _eventDao.getTreatmentByUuid(uuid);
     if (existing == null) {
-      log('⚠️ Medication log not found when marking as deleted: $uuid');
+      log('⚠️ Treatment log not found when marking as deleted: $uuid');
       return false;
     }
 
     final now = DateTime.now().toIso8601String();
-    final model = _mapMedicationEntity(
+    final model = _mapTreatmentEntity(
       existing,
     ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
-    await _eventDao.upsertMedication(_toMedicationCompanion(model));
-    log('🗑️ Marked medication log as deleted (pending sync): $uuid');
+    await _eventDao.upsertTreatment(_toTreatmentCompanion(model));
+    log('🗑️ Marked treatment log as deleted (pending sync): $uuid');
     return true;
   }
 
@@ -1732,6 +1937,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return FeedingsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       feedingTypeId: Value(model.feedingTypeId),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
@@ -1751,6 +1959,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return WeightChangesCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       oldWeight: model.oldWeight != null
@@ -1771,6 +1982,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return DewormingsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       administrationRouteId: model.administrationRouteId != null
@@ -1797,10 +2011,13 @@ class EventsRepository implements EventsRepositoryInterface {
     );
   }
 
-  MedicationsCompanion _toMedicationCompanion(MedicationModel model) {
-    return MedicationsCompanion(
+  TreatmentsCompanion _toTreatmentCompanion(TreatmentModel model) {
+    return TreatmentsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       diseaseId: model.diseaseId != null
@@ -1817,6 +2034,9 @@ class EventsRepository implements EventsRepositoryInterface {
           : const Value.absent(),
       medicationDate: model.medicationDate != null
           ? Value(model.medicationDate!)
+          : const Value.absent(),
+      nextMedicationDate: model.nextMedicationDate != null
+          ? Value(model.nextMedicationDate!)
           : const Value.absent(),
       remarks: model.remarks != null
           ? Value(model.remarks!)
@@ -1835,6 +2055,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return VaccinationsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       vaccinationNo: model.vaccinationNo != null
           ? Value(model.vaccinationNo!)
           : const Value.absent(),
@@ -1862,6 +2085,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return DisposalsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       disposalTypeId: model.disposalTypeId != null
@@ -1886,6 +2112,7 @@ class EventsRepository implements EventsRepositoryInterface {
       feedingTypeId: entity.feedingTypeId,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       nextFeedingTime: entity.nextFeedingTime,
       amount: entity.amount,
       remarks: entity.remarks,
@@ -1902,6 +2129,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       oldWeight: entity.oldWeight,
       newWeight: entity.newWeight,
       remarks: entity.remarks,
@@ -1918,6 +2146,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       administrationRouteId: entity.administrationRouteId,
       medicineId: entity.medicineId,
       vetId: entity.vetId,
@@ -1932,17 +2161,19 @@ class EventsRepository implements EventsRepositoryInterface {
     );
   }
 
-  MedicationModel _mapMedicationEntity(Medication entity) {
-    return MedicationModel(
+  TreatmentModel _mapTreatmentEntity(Treatment entity) {
+    return TreatmentModel(
       id: entity.id,
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       diseaseId: entity.diseaseId,
       medicineId: entity.medicineId,
       quantity: entity.quantity,
       withdrawalPeriod: entity.withdrawalPeriod,
       medicationDate: entity.medicationDate,
+      nextMedicationDate: entity.nextMedicationDate,
       remarks: entity.remarks,
       synced: entity.synced,
       syncAction: entity.syncAction,
@@ -1957,6 +2188,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       vaccinationNo: entity.vaccinationNo,
       farmUuid: entity.farmUuid,
+      eventDate: entity.eventDate,
       livestockUuid: entity.livestockUuid,
       vaccineUuid: entity.vaccineUuid,
       diseaseId: entity.diseaseId,
@@ -1976,6 +2208,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       disposalTypeId: entity.disposalTypeId,
       reasons: entity.reasons,
       remarks: entity.remarks,
@@ -2090,6 +2323,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return BirthEventsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       eventType: Value(model.eventType),
@@ -2121,6 +2357,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       eventType: entity.eventType,
       startDate: entity.startDate,
       endDate: entity.endDate,
@@ -2253,6 +2490,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return AbortedPregnanciesCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       abortionDate: Value(model.abortionDate),
@@ -2276,6 +2516,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       abortionDate: entity.abortionDate,
       reproductiveProblemId: entity.reproductiveProblemId,
       remarks: entity.remarks,
@@ -2293,6 +2534,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       milkingMethodId: entity.milkingMethodId,
       amount: entity.amount,
       lactometerReading: entity.lactometerReading,
@@ -2316,6 +2558,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return MilkingsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: model.farmUuid != null
           ? Value(model.farmUuid!)
           : const Value.absent(),
@@ -2361,6 +2606,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       testResultId: entity.testResultId,
       noOfMonths: entity.noOfMonths,
       testDate: entity.testDate,
@@ -2377,6 +2623,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return PregnanciesCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       testResultId: Value(model.testResultId),
@@ -2403,6 +2652,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       lastHeatDate: entity.lastHeatDate,
       currentHeatTypeId: entity.currentHeatTypeId,
       inseminationServiceId: entity.inseminationServiceId,
@@ -2428,6 +2678,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return InseminationsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: model.farmUuid != null
           ? Value(model.farmUuid!)
           : const Value.absent(),
@@ -2481,6 +2734,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       startDate: entity.startDate,
       endDate: entity.endDate,
       reason: entity.reason,
@@ -2496,6 +2750,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return DryoffsCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       startDate: Value(model.startDate),
@@ -2521,6 +2778,7 @@ class EventsRepository implements EventsRepositoryInterface {
       uuid: entity.uuid,
       farmUuid: entity.farmUuid,
       livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
       toFarmUuid: entity.toFarmUuid,
       transporterId: entity.transporterId,
       reason: entity.reason,
@@ -2539,6 +2797,9 @@ class EventsRepository implements EventsRepositoryInterface {
     return TransfersCompanion(
       id: model.id != null ? Value(model.id!) : const Value.absent(),
       uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
       toFarmUuid: model.toFarmUuid != null

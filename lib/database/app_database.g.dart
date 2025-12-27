@@ -8996,6 +8996,17 @@ class $BirthEventsTable extends BirthEvents
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
   );
@@ -9155,6 +9166,7 @@ class $BirthEventsTable extends BirthEvents
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     eventType,
@@ -9192,6 +9204,12 @@ class $BirthEventsTable extends BirthEvents
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -9320,6 +9338,10 @@ class $BirthEventsTable extends BirthEvents
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -9388,6 +9410,7 @@ class $BirthEventsTable extends BirthEvents
 class BirthEvent extends DataClass implements Insertable<BirthEvent> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final String eventType;
@@ -9405,6 +9428,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
   const BirthEvent({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     required this.eventType,
@@ -9427,6 +9451,9 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     map['event_type'] = Variable<String>(eventType);
@@ -9456,6 +9483,9 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
     return BirthEventsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       eventType: Value(eventType),
@@ -9489,6 +9519,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
     return BirthEvent(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       eventType: serializer.fromJson<String>(json['eventType']),
@@ -9513,6 +9544,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'eventType': serializer.toJson<String>(eventType),
@@ -9533,6 +9565,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
   BirthEvent copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     String? eventType,
@@ -9550,6 +9583,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
   }) => BirthEvent(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     eventType: eventType ?? this.eventType,
@@ -9573,6 +9607,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
     return BirthEvent(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -9605,6 +9640,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
     return (StringBuffer('BirthEvent(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('eventType: $eventType, ')
@@ -9627,6 +9663,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     eventType,
@@ -9648,6 +9685,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
       (other is BirthEvent &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.eventType == this.eventType &&
@@ -9667,6 +9705,7 @@ class BirthEvent extends DataClass implements Insertable<BirthEvent> {
 class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String> eventType;
@@ -9685,6 +9724,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
   const BirthEventsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.eventType = const Value.absent(),
@@ -9704,6 +9744,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
   BirthEventsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     required String eventType,
@@ -9730,6 +9771,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
   static Insertable<BirthEvent> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? eventType,
@@ -9749,6 +9791,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (eventType != null) 'event_type': eventType,
@@ -9771,6 +9814,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
   BirthEventsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String>? eventType,
@@ -9790,6 +9834,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
     return BirthEventsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       eventType: eventType ?? this.eventType,
@@ -9817,6 +9862,9 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -9873,6 +9921,7 @@ class BirthEventsCompanion extends UpdateCompanion<BirthEvent> {
     return (StringBuffer('BirthEventsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('eventType: $eventType, ')
@@ -9916,6 +9965,17 @@ class $AbortedPregnanciesTable extends AbortedPregnancies
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -10032,6 +10092,7 @@ class $AbortedPregnanciesTable extends AbortedPregnancies
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     abortionDate,
@@ -10065,6 +10126,12 @@ class $AbortedPregnanciesTable extends AbortedPregnancies
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -10162,6 +10229,10 @@ class $AbortedPregnanciesTable extends AbortedPregnancies
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -10215,6 +10286,7 @@ class AbortedPregnancy extends DataClass
     implements Insertable<AbortedPregnancy> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final String abortionDate;
@@ -10228,6 +10300,7 @@ class AbortedPregnancy extends DataClass
   const AbortedPregnancy({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     required this.abortionDate,
@@ -10246,6 +10319,9 @@ class AbortedPregnancy extends DataClass
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     map['abortion_date'] = Variable<String>(abortionDate);
@@ -10267,6 +10343,9 @@ class AbortedPregnancy extends DataClass
     return AbortedPregnanciesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       abortionDate: Value(abortionDate),
@@ -10292,6 +10371,7 @@ class AbortedPregnancy extends DataClass
     return AbortedPregnancy(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       abortionDate: serializer.fromJson<String>(json['abortionDate']),
@@ -10312,6 +10392,7 @@ class AbortedPregnancy extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'abortionDate': serializer.toJson<String>(abortionDate),
@@ -10328,6 +10409,7 @@ class AbortedPregnancy extends DataClass
   AbortedPregnancy copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     String? abortionDate,
@@ -10341,6 +10423,7 @@ class AbortedPregnancy extends DataClass
   }) => AbortedPregnancy(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     abortionDate: abortionDate ?? this.abortionDate,
@@ -10358,6 +10441,7 @@ class AbortedPregnancy extends DataClass
     return AbortedPregnancy(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -10384,6 +10468,7 @@ class AbortedPregnancy extends DataClass
     return (StringBuffer('AbortedPregnancy(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('abortionDate: $abortionDate, ')
@@ -10402,6 +10487,7 @@ class AbortedPregnancy extends DataClass
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     abortionDate,
@@ -10419,6 +10505,7 @@ class AbortedPregnancy extends DataClass
       (other is AbortedPregnancy &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.abortionDate == this.abortionDate &&
@@ -10434,6 +10521,7 @@ class AbortedPregnancy extends DataClass
 class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String> abortionDate;
@@ -10448,6 +10536,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
   const AbortedPregnanciesCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.abortionDate = const Value.absent(),
@@ -10463,6 +10552,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
   AbortedPregnanciesCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     required String abortionDate,
@@ -10483,6 +10573,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
   static Insertable<AbortedPregnancy> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? abortionDate,
@@ -10498,6 +10589,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (abortionDate != null) 'abortion_date': abortionDate,
@@ -10516,6 +10608,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
   AbortedPregnanciesCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String>? abortionDate,
@@ -10531,6 +10624,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
     return AbortedPregnanciesCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       abortionDate: abortionDate ?? this.abortionDate,
@@ -10554,6 +10648,9 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -10598,6 +10695,7 @@ class AbortedPregnanciesCompanion extends UpdateCompanion<AbortedPregnancy> {
     return (StringBuffer('AbortedPregnanciesCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('abortionDate: $abortionDate, ')
@@ -11013,6 +11111,17 @@ class $FeedingsTable extends Feedings with TableInfo<$FeedingsTable, Feeding> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _feedingTypeIdMeta = const VerificationMeta(
     'feedingTypeId',
   );
@@ -11128,6 +11237,7 @@ class $FeedingsTable extends Feedings with TableInfo<$FeedingsTable, Feeding> {
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     feedingTypeId,
     farmUuid,
     livestockUuid,
@@ -11161,6 +11271,12 @@ class $FeedingsTable extends Feedings with TableInfo<$FeedingsTable, Feeding> {
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('feeding_type_id')) {
       context.handle(
@@ -11262,6 +11378,10 @@ class $FeedingsTable extends Feedings with TableInfo<$FeedingsTable, Feeding> {
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       feedingTypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}feeding_type_id'],
@@ -11314,6 +11434,7 @@ class $FeedingsTable extends Feedings with TableInfo<$FeedingsTable, Feeding> {
 class Feeding extends DataClass implements Insertable<Feeding> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final int feedingTypeId;
   final String farmUuid;
   final String livestockUuid;
@@ -11327,6 +11448,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
   const Feeding({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.feedingTypeId,
     required this.farmUuid,
     required this.livestockUuid,
@@ -11345,6 +11467,9 @@ class Feeding extends DataClass implements Insertable<Feeding> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['feeding_type_id'] = Variable<int>(feedingTypeId);
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
@@ -11364,6 +11489,9 @@ class Feeding extends DataClass implements Insertable<Feeding> {
     return FeedingsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       feedingTypeId: Value(feedingTypeId),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
@@ -11387,6 +11515,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
     return Feeding(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       feedingTypeId: serializer.fromJson<int>(json['feedingTypeId']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
@@ -11405,6 +11534,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'feedingTypeId': serializer.toJson<int>(feedingTypeId),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
@@ -11421,6 +11551,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
   Feeding copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     int? feedingTypeId,
     String? farmUuid,
     String? livestockUuid,
@@ -11434,6 +11565,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
   }) => Feeding(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     feedingTypeId: feedingTypeId ?? this.feedingTypeId,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
@@ -11449,6 +11581,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
     return Feeding(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       feedingTypeId: data.feedingTypeId.present
           ? data.feedingTypeId.value
           : this.feedingTypeId,
@@ -11475,6 +11608,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
     return (StringBuffer('Feeding(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('feedingTypeId: $feedingTypeId, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
@@ -11493,6 +11627,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     feedingTypeId,
     farmUuid,
     livestockUuid,
@@ -11510,6 +11645,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
       (other is Feeding &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.feedingTypeId == this.feedingTypeId &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
@@ -11525,6 +11661,7 @@ class Feeding extends DataClass implements Insertable<Feeding> {
 class FeedingsCompanion extends UpdateCompanion<Feeding> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<int> feedingTypeId;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
@@ -11539,6 +11676,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
   const FeedingsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.feedingTypeId = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
@@ -11554,6 +11692,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
   FeedingsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required int feedingTypeId,
     required String farmUuid,
     required String livestockUuid,
@@ -11576,6 +11715,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
   static Insertable<Feeding> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<int>? feedingTypeId,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
@@ -11591,6 +11731,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (feedingTypeId != null) 'feeding_type_id': feedingTypeId,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
@@ -11608,6 +11749,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
   FeedingsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<int>? feedingTypeId,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
@@ -11623,6 +11765,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
     return FeedingsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       feedingTypeId: feedingTypeId ?? this.feedingTypeId,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
@@ -11645,6 +11788,9 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (feedingTypeId.present) {
       map['feeding_type_id'] = Variable<int>(feedingTypeId.value);
@@ -11687,6 +11833,7 @@ class FeedingsCompanion extends UpdateCompanion<Feeding> {
     return (StringBuffer('FeedingsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('feedingTypeId: $feedingTypeId, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
@@ -11726,6 +11873,17 @@ class $WeightChangesTable extends WeightChanges
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -11833,6 +11991,7 @@ class $WeightChangesTable extends WeightChanges
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     oldWeight,
@@ -11865,6 +12024,12 @@ class $WeightChangesTable extends WeightChanges
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -11950,6 +12115,10 @@ class $WeightChangesTable extends WeightChanges
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -11998,6 +12167,7 @@ class $WeightChangesTable extends WeightChanges
 class WeightChange extends DataClass implements Insertable<WeightChange> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final String? oldWeight;
@@ -12010,6 +12180,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
   const WeightChange({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     this.oldWeight,
@@ -12027,6 +12198,9 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     if (!nullToAbsent || oldWeight != null) {
@@ -12047,6 +12221,9 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
     return WeightChangesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       oldWeight: oldWeight == null && nullToAbsent
@@ -12071,6 +12248,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
     return WeightChange(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       oldWeight: serializer.fromJson<String?>(json['oldWeight']),
@@ -12088,6 +12266,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'oldWeight': serializer.toJson<String?>(oldWeight),
@@ -12103,6 +12282,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
   WeightChange copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     Value<String?> oldWeight = const Value.absent(),
@@ -12115,6 +12295,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
   }) => WeightChange(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     oldWeight: oldWeight.present ? oldWeight.value : this.oldWeight,
@@ -12129,6 +12310,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
     return WeightChange(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -12150,6 +12332,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
     return (StringBuffer('WeightChange(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('oldWeight: $oldWeight, ')
@@ -12167,6 +12350,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     oldWeight,
@@ -12183,6 +12367,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
       (other is WeightChange &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.oldWeight == this.oldWeight &&
@@ -12197,6 +12382,7 @@ class WeightChange extends DataClass implements Insertable<WeightChange> {
 class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String?> oldWeight;
@@ -12210,6 +12396,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
   const WeightChangesCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.oldWeight = const Value.absent(),
@@ -12224,6 +12411,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
   WeightChangesCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     this.oldWeight = const Value.absent(),
@@ -12243,6 +12431,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
   static Insertable<WeightChange> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? oldWeight,
@@ -12257,6 +12446,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (oldWeight != null) 'old_weight': oldWeight,
@@ -12273,6 +12463,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
   WeightChangesCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String?>? oldWeight,
@@ -12287,6 +12478,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
     return WeightChangesCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       oldWeight: oldWeight ?? this.oldWeight,
@@ -12308,6 +12500,9 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -12347,6 +12542,7 @@ class WeightChangesCompanion extends UpdateCompanion<WeightChange> {
     return (StringBuffer('WeightChangesCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('oldWeight: $oldWeight, ')
@@ -12385,6 +12581,17 @@ class $DewormingsTable extends Dewormings
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -12531,6 +12738,7 @@ class $DewormingsTable extends Dewormings
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     administrationRouteId,
@@ -12567,6 +12775,12 @@ class $DewormingsTable extends Dewormings
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -12683,6 +12897,10 @@ class $DewormingsTable extends Dewormings
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -12747,6 +12965,7 @@ class $DewormingsTable extends Dewormings
 class Deworming extends DataClass implements Insertable<Deworming> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final int? administrationRouteId;
@@ -12763,6 +12982,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
   const Deworming({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     this.administrationRouteId,
@@ -12784,6 +13004,9 @@ class Deworming extends DataClass implements Insertable<Deworming> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     if (!nullToAbsent || administrationRouteId != null) {
@@ -12820,6 +13043,9 @@ class Deworming extends DataClass implements Insertable<Deworming> {
     return DewormingsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       administrationRouteId: administrationRouteId == null && nullToAbsent
@@ -12856,6 +13082,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
     return Deworming(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       administrationRouteId: serializer.fromJson<int?>(
@@ -12883,6 +13110,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'administrationRouteId': serializer.toJson<int?>(administrationRouteId),
@@ -12904,6 +13132,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
   Deworming copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     Value<int?> administrationRouteId = const Value.absent(),
@@ -12920,6 +13149,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
   }) => Deworming(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     administrationRouteId: administrationRouteId.present
@@ -12944,6 +13174,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
     return Deworming(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -12977,6 +13208,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
     return (StringBuffer('Deworming(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('administrationRouteId: $administrationRouteId, ')
@@ -12998,6 +13230,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     administrationRouteId,
@@ -13018,6 +13251,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
       (other is Deworming &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.administrationRouteId == this.administrationRouteId &&
@@ -13036,6 +13270,7 @@ class Deworming extends DataClass implements Insertable<Deworming> {
 class DewormingsCompanion extends UpdateCompanion<Deworming> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<int?> administrationRouteId;
@@ -13053,6 +13288,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
   const DewormingsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.administrationRouteId = const Value.absent(),
@@ -13071,6 +13307,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
   DewormingsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     this.administrationRouteId = const Value.absent(),
@@ -13093,6 +13330,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
   static Insertable<Deworming> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<int>? administrationRouteId,
@@ -13111,6 +13349,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (administrationRouteId != null)
@@ -13134,6 +13373,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
   DewormingsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<int?>? administrationRouteId,
@@ -13152,6 +13392,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
     return DewormingsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       administrationRouteId:
@@ -13179,6 +13420,9 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -13234,6 +13478,7 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
     return (StringBuffer('DewormingsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('administrationRouteId: $administrationRouteId, ')
@@ -13253,12 +13498,12 @@ class DewormingsCompanion extends UpdateCompanion<Deworming> {
   }
 }
 
-class $MedicationsTable extends Medications
-    with TableInfo<$MedicationsTable, Medication> {
+class $TreatmentsTable extends Treatments
+    with TableInfo<$TreatmentsTable, Treatment> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MedicationsTable(this.attachedDatabase, [this._alias]);
+  $TreatmentsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -13276,6 +13521,17 @@ class $MedicationsTable extends Medications
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -13354,6 +13610,17 @@ class $MedicationsTable extends Medications
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _nextMedicationDateMeta =
+      const VerificationMeta('nextMedicationDate');
+  @override
+  late final GeneratedColumn<String> nextMedicationDate =
+      GeneratedColumn<String>(
+        'next_medication_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _remarksMeta = const VerificationMeta(
     'remarks',
   );
@@ -13416,6 +13683,7 @@ class $MedicationsTable extends Medications
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     diseaseId,
@@ -13423,6 +13691,7 @@ class $MedicationsTable extends Medications
     quantity,
     withdrawalPeriod,
     medicationDate,
+    nextMedicationDate,
     remarks,
     synced,
     syncAction,
@@ -13433,10 +13702,10 @@ class $MedicationsTable extends Medications
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'medications';
+  static const String $name = 'treatments';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Medication> instance, {
+    Insertable<Treatment> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -13451,6 +13720,12 @@ class $MedicationsTable extends Medications
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -13507,6 +13782,15 @@ class $MedicationsTable extends Medications
         ),
       );
     }
+    if (data.containsKey('next_medication_date')) {
+      context.handle(
+        _nextMedicationDateMeta,
+        nextMedicationDate.isAcceptableOrUnknown(
+          data['next_medication_date']!,
+          _nextMedicationDateMeta,
+        ),
+      );
+    }
     if (data.containsKey('remarks')) {
       context.handle(
         _remarksMeta,
@@ -13547,9 +13831,9 @@ class $MedicationsTable extends Medications
   @override
   Set<GeneratedColumn> get $primaryKey => {uuid};
   @override
-  Medication map(Map<String, dynamic> data, {String? tablePrefix}) {
+  Treatment map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Medication(
+    return Treatment(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -13558,6 +13842,10 @@ class $MedicationsTable extends Medications
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -13586,6 +13874,10 @@ class $MedicationsTable extends Medications
         DriftSqlType.string,
         data['${effectivePrefix}medication_date'],
       ),
+      nextMedicationDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}next_medication_date'],
+      ),
       remarks: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}remarks'],
@@ -13610,14 +13902,15 @@ class $MedicationsTable extends Medications
   }
 
   @override
-  $MedicationsTable createAlias(String alias) {
-    return $MedicationsTable(attachedDatabase, alias);
+  $TreatmentsTable createAlias(String alias) {
+    return $TreatmentsTable(attachedDatabase, alias);
   }
 }
 
-class Medication extends DataClass implements Insertable<Medication> {
+class Treatment extends DataClass implements Insertable<Treatment> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final int? diseaseId;
@@ -13625,14 +13918,16 @@ class Medication extends DataClass implements Insertable<Medication> {
   final String? quantity;
   final String? withdrawalPeriod;
   final String? medicationDate;
+  final String? nextMedicationDate;
   final String? remarks;
   final bool synced;
   final String syncAction;
   final String createdAt;
   final String updatedAt;
-  const Medication({
+  const Treatment({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     this.diseaseId,
@@ -13640,6 +13935,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     this.quantity,
     this.withdrawalPeriod,
     this.medicationDate,
+    this.nextMedicationDate,
     this.remarks,
     required this.synced,
     required this.syncAction,
@@ -13653,6 +13949,9 @@ class Medication extends DataClass implements Insertable<Medication> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     if (!nullToAbsent || diseaseId != null) {
@@ -13670,6 +13969,9 @@ class Medication extends DataClass implements Insertable<Medication> {
     if (!nullToAbsent || medicationDate != null) {
       map['medication_date'] = Variable<String>(medicationDate);
     }
+    if (!nullToAbsent || nextMedicationDate != null) {
+      map['next_medication_date'] = Variable<String>(nextMedicationDate);
+    }
     if (!nullToAbsent || remarks != null) {
       map['remarks'] = Variable<String>(remarks);
     }
@@ -13680,10 +13982,13 @@ class Medication extends DataClass implements Insertable<Medication> {
     return map;
   }
 
-  MedicationsCompanion toCompanion(bool nullToAbsent) {
-    return MedicationsCompanion(
+  TreatmentsCompanion toCompanion(bool nullToAbsent) {
+    return TreatmentsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       diseaseId: diseaseId == null && nullToAbsent
@@ -13701,6 +14006,9 @@ class Medication extends DataClass implements Insertable<Medication> {
       medicationDate: medicationDate == null && nullToAbsent
           ? const Value.absent()
           : Value(medicationDate),
+      nextMedicationDate: nextMedicationDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nextMedicationDate),
       remarks: remarks == null && nullToAbsent
           ? const Value.absent()
           : Value(remarks),
@@ -13711,14 +14019,15 @@ class Medication extends DataClass implements Insertable<Medication> {
     );
   }
 
-  factory Medication.fromJson(
+  factory Treatment.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Medication(
+    return Treatment(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       diseaseId: serializer.fromJson<int?>(json['diseaseId']),
@@ -13726,6 +14035,9 @@ class Medication extends DataClass implements Insertable<Medication> {
       quantity: serializer.fromJson<String?>(json['quantity']),
       withdrawalPeriod: serializer.fromJson<String?>(json['withdrawalPeriod']),
       medicationDate: serializer.fromJson<String?>(json['medicationDate']),
+      nextMedicationDate: serializer.fromJson<String?>(
+        json['nextMedicationDate'],
+      ),
       remarks: serializer.fromJson<String?>(json['remarks']),
       synced: serializer.fromJson<bool>(json['synced']),
       syncAction: serializer.fromJson<String>(json['syncAction']),
@@ -13739,6 +14051,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'diseaseId': serializer.toJson<int?>(diseaseId),
@@ -13746,6 +14059,7 @@ class Medication extends DataClass implements Insertable<Medication> {
       'quantity': serializer.toJson<String?>(quantity),
       'withdrawalPeriod': serializer.toJson<String?>(withdrawalPeriod),
       'medicationDate': serializer.toJson<String?>(medicationDate),
+      'nextMedicationDate': serializer.toJson<String?>(nextMedicationDate),
       'remarks': serializer.toJson<String?>(remarks),
       'synced': serializer.toJson<bool>(synced),
       'syncAction': serializer.toJson<String>(syncAction),
@@ -13754,9 +14068,10 @@ class Medication extends DataClass implements Insertable<Medication> {
     };
   }
 
-  Medication copyWith({
+  Treatment copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     Value<int?> diseaseId = const Value.absent(),
@@ -13764,14 +14079,16 @@ class Medication extends DataClass implements Insertable<Medication> {
     Value<String?> quantity = const Value.absent(),
     Value<String?> withdrawalPeriod = const Value.absent(),
     Value<String?> medicationDate = const Value.absent(),
+    Value<String?> nextMedicationDate = const Value.absent(),
     Value<String?> remarks = const Value.absent(),
     bool? synced,
     String? syncAction,
     String? createdAt,
     String? updatedAt,
-  }) => Medication(
+  }) => Treatment(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     diseaseId: diseaseId.present ? diseaseId.value : this.diseaseId,
@@ -13783,16 +14100,20 @@ class Medication extends DataClass implements Insertable<Medication> {
     medicationDate: medicationDate.present
         ? medicationDate.value
         : this.medicationDate,
+    nextMedicationDate: nextMedicationDate.present
+        ? nextMedicationDate.value
+        : this.nextMedicationDate,
     remarks: remarks.present ? remarks.value : this.remarks,
     synced: synced ?? this.synced,
     syncAction: syncAction ?? this.syncAction,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
-  Medication copyWithCompanion(MedicationsCompanion data) {
-    return Medication(
+  Treatment copyWithCompanion(TreatmentsCompanion data) {
+    return Treatment(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -13808,6 +14129,9 @@ class Medication extends DataClass implements Insertable<Medication> {
       medicationDate: data.medicationDate.present
           ? data.medicationDate.value
           : this.medicationDate,
+      nextMedicationDate: data.nextMedicationDate.present
+          ? data.nextMedicationDate.value
+          : this.nextMedicationDate,
       remarks: data.remarks.present ? data.remarks.value : this.remarks,
       synced: data.synced.present ? data.synced.value : this.synced,
       syncAction: data.syncAction.present
@@ -13820,9 +14144,10 @@ class Medication extends DataClass implements Insertable<Medication> {
 
   @override
   String toString() {
-    return (StringBuffer('Medication(')
+    return (StringBuffer('Treatment(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('diseaseId: $diseaseId, ')
@@ -13830,6 +14155,7 @@ class Medication extends DataClass implements Insertable<Medication> {
           ..write('quantity: $quantity, ')
           ..write('withdrawalPeriod: $withdrawalPeriod, ')
           ..write('medicationDate: $medicationDate, ')
+          ..write('nextMedicationDate: $nextMedicationDate, ')
           ..write('remarks: $remarks, ')
           ..write('synced: $synced, ')
           ..write('syncAction: $syncAction, ')
@@ -13843,6 +14169,7 @@ class Medication extends DataClass implements Insertable<Medication> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     diseaseId,
@@ -13850,6 +14177,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     quantity,
     withdrawalPeriod,
     medicationDate,
+    nextMedicationDate,
     remarks,
     synced,
     syncAction,
@@ -13859,9 +14187,10 @@ class Medication extends DataClass implements Insertable<Medication> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Medication &&
+      (other is Treatment &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.diseaseId == this.diseaseId &&
@@ -13869,6 +14198,7 @@ class Medication extends DataClass implements Insertable<Medication> {
           other.quantity == this.quantity &&
           other.withdrawalPeriod == this.withdrawalPeriod &&
           other.medicationDate == this.medicationDate &&
+          other.nextMedicationDate == this.nextMedicationDate &&
           other.remarks == this.remarks &&
           other.synced == this.synced &&
           other.syncAction == this.syncAction &&
@@ -13876,9 +14206,10 @@ class Medication extends DataClass implements Insertable<Medication> {
           other.updatedAt == this.updatedAt);
 }
 
-class MedicationsCompanion extends UpdateCompanion<Medication> {
+class TreatmentsCompanion extends UpdateCompanion<Treatment> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<int?> diseaseId;
@@ -13886,15 +14217,17 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
   final Value<String?> quantity;
   final Value<String?> withdrawalPeriod;
   final Value<String?> medicationDate;
+  final Value<String?> nextMedicationDate;
   final Value<String?> remarks;
   final Value<bool> synced;
   final Value<String> syncAction;
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<int> rowid;
-  const MedicationsCompanion({
+  const TreatmentsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.diseaseId = const Value.absent(),
@@ -13902,6 +14235,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     this.quantity = const Value.absent(),
     this.withdrawalPeriod = const Value.absent(),
     this.medicationDate = const Value.absent(),
+    this.nextMedicationDate = const Value.absent(),
     this.remarks = const Value.absent(),
     this.synced = const Value.absent(),
     this.syncAction = const Value.absent(),
@@ -13909,9 +14243,10 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  MedicationsCompanion.insert({
+  TreatmentsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     this.diseaseId = const Value.absent(),
@@ -13919,6 +14254,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     this.quantity = const Value.absent(),
     this.withdrawalPeriod = const Value.absent(),
     this.medicationDate = const Value.absent(),
+    this.nextMedicationDate = const Value.absent(),
     this.remarks = const Value.absent(),
     this.synced = const Value.absent(),
     this.syncAction = const Value.absent(),
@@ -13930,9 +14266,10 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
        livestockUuid = Value(livestockUuid),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
-  static Insertable<Medication> custom({
+  static Insertable<Treatment> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<int>? diseaseId,
@@ -13940,6 +14277,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     Expression<String>? quantity,
     Expression<String>? withdrawalPeriod,
     Expression<String>? medicationDate,
+    Expression<String>? nextMedicationDate,
     Expression<String>? remarks,
     Expression<bool>? synced,
     Expression<String>? syncAction,
@@ -13950,6 +14288,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (diseaseId != null) 'disease_id': diseaseId,
@@ -13957,6 +14296,8 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
       if (quantity != null) 'quantity': quantity,
       if (withdrawalPeriod != null) 'withdrawal_period': withdrawalPeriod,
       if (medicationDate != null) 'medication_date': medicationDate,
+      if (nextMedicationDate != null)
+        'next_medication_date': nextMedicationDate,
       if (remarks != null) 'remarks': remarks,
       if (synced != null) 'synced': synced,
       if (syncAction != null) 'sync_action': syncAction,
@@ -13966,9 +14307,10 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     });
   }
 
-  MedicationsCompanion copyWith({
+  TreatmentsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<int?>? diseaseId,
@@ -13976,6 +14318,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     Value<String?>? quantity,
     Value<String?>? withdrawalPeriod,
     Value<String?>? medicationDate,
+    Value<String?>? nextMedicationDate,
     Value<String?>? remarks,
     Value<bool>? synced,
     Value<String>? syncAction,
@@ -13983,9 +14326,10 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     Value<String>? updatedAt,
     Value<int>? rowid,
   }) {
-    return MedicationsCompanion(
+    return TreatmentsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       diseaseId: diseaseId ?? this.diseaseId,
@@ -13993,6 +14337,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
       quantity: quantity ?? this.quantity,
       withdrawalPeriod: withdrawalPeriod ?? this.withdrawalPeriod,
       medicationDate: medicationDate ?? this.medicationDate,
+      nextMedicationDate: nextMedicationDate ?? this.nextMedicationDate,
       remarks: remarks ?? this.remarks,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
@@ -14010,6 +14355,9 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -14031,6 +14379,9 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     }
     if (medicationDate.present) {
       map['medication_date'] = Variable<String>(medicationDate.value);
+    }
+    if (nextMedicationDate.present) {
+      map['next_medication_date'] = Variable<String>(nextMedicationDate.value);
     }
     if (remarks.present) {
       map['remarks'] = Variable<String>(remarks.value);
@@ -14055,9 +14406,10 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
 
   @override
   String toString() {
-    return (StringBuffer('MedicationsCompanion(')
+    return (StringBuffer('TreatmentsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('diseaseId: $diseaseId, ')
@@ -14065,6 +14417,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
           ..write('quantity: $quantity, ')
           ..write('withdrawalPeriod: $withdrawalPeriod, ')
           ..write('medicationDate: $medicationDate, ')
+          ..write('nextMedicationDate: $nextMedicationDate, ')
           ..write('remarks: $remarks, ')
           ..write('synced: $synced, ')
           ..write('syncAction: $syncAction, ')
@@ -14099,6 +14452,17 @@ class $VaccinationsTable extends Vaccinations
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _vaccinationNoMeta = const VerificationMeta(
     'vaccinationNo',
@@ -14236,6 +14600,7 @@ class $VaccinationsTable extends Vaccinations
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     vaccinationNo,
     farmUuid,
     livestockUuid,
@@ -14271,6 +14636,12 @@ class $VaccinationsTable extends Vaccinations
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('vaccination_no')) {
       context.handle(
@@ -14381,6 +14752,10 @@ class $VaccinationsTable extends Vaccinations
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       vaccinationNo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}vaccination_no'],
@@ -14441,6 +14816,7 @@ class $VaccinationsTable extends Vaccinations
 class Vaccination extends DataClass implements Insertable<Vaccination> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String? vaccinationNo;
   final String farmUuid;
   final String livestockUuid;
@@ -14456,6 +14832,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
   const Vaccination({
     this.id,
     required this.uuid,
+    this.eventDate,
     this.vaccinationNo,
     required this.farmUuid,
     required this.livestockUuid,
@@ -14476,6 +14853,9 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     if (!nullToAbsent || vaccinationNo != null) {
       map['vaccination_no'] = Variable<String>(vaccinationNo);
     }
@@ -14505,6 +14885,9 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     return VaccinationsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       vaccinationNo: vaccinationNo == null && nullToAbsent
           ? const Value.absent()
           : Value(vaccinationNo),
@@ -14538,6 +14921,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     return Vaccination(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       vaccinationNo: serializer.fromJson<String?>(json['vaccinationNo']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
@@ -14560,6 +14944,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'vaccinationNo': serializer.toJson<String?>(vaccinationNo),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
@@ -14578,6 +14963,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
   Vaccination copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     Value<String?> vaccinationNo = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
@@ -14593,6 +14979,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
   }) => Vaccination(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     vaccinationNo: vaccinationNo.present
         ? vaccinationNo.value
         : this.vaccinationNo,
@@ -14614,6 +15001,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     return Vaccination(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       vaccinationNo: data.vaccinationNo.present
           ? data.vaccinationNo.value
           : this.vaccinationNo,
@@ -14644,6 +15032,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
     return (StringBuffer('Vaccination(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('vaccinationNo: $vaccinationNo, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
@@ -14664,6 +15053,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     vaccinationNo,
     farmUuid,
     livestockUuid,
@@ -14683,6 +15073,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
       (other is Vaccination &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.vaccinationNo == this.vaccinationNo &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
@@ -14700,6 +15091,7 @@ class Vaccination extends DataClass implements Insertable<Vaccination> {
 class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String?> vaccinationNo;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
@@ -14716,6 +15108,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   const VaccinationsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.vaccinationNo = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
@@ -14733,6 +15126,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   VaccinationsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     this.vaccinationNo = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
@@ -14754,6 +15148,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   static Insertable<Vaccination> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? vaccinationNo,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
@@ -14771,6 +15166,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (vaccinationNo != null) 'vaccination_no': vaccinationNo,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
@@ -14791,6 +15187,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
   VaccinationsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String?>? vaccinationNo,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
@@ -14808,6 +15205,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     return VaccinationsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       vaccinationNo: vaccinationNo ?? this.vaccinationNo,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
@@ -14832,6 +15230,9 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (vaccinationNo.present) {
       map['vaccination_no'] = Variable<String>(vaccinationNo.value);
@@ -14880,6 +15281,7 @@ class VaccinationsCompanion extends UpdateCompanion<Vaccination> {
     return (StringBuffer('VaccinationsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('vaccinationNo: $vaccinationNo, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
@@ -14921,6 +15323,17 @@ class $DisposalsTable extends Disposals
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -15038,6 +15451,7 @@ class $DisposalsTable extends Disposals
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     disposalTypeId,
@@ -15071,6 +15485,12 @@ class $DisposalsTable extends Disposals
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -15165,6 +15585,10 @@ class $DisposalsTable extends Disposals
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -15217,6 +15641,7 @@ class $DisposalsTable extends Disposals
 class Disposal extends DataClass implements Insertable<Disposal> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final int? disposalTypeId;
@@ -15230,6 +15655,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
   const Disposal({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     this.disposalTypeId,
@@ -15248,6 +15674,9 @@ class Disposal extends DataClass implements Insertable<Disposal> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     if (!nullToAbsent || disposalTypeId != null) {
@@ -15269,6 +15698,9 @@ class Disposal extends DataClass implements Insertable<Disposal> {
     return DisposalsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       disposalTypeId: disposalTypeId == null && nullToAbsent
@@ -15294,6 +15726,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
     return Disposal(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       disposalTypeId: serializer.fromJson<int?>(json['disposalTypeId']),
@@ -15312,6 +15745,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'disposalTypeId': serializer.toJson<int?>(disposalTypeId),
@@ -15328,6 +15762,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
   Disposal copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     Value<int?> disposalTypeId = const Value.absent(),
@@ -15341,6 +15776,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
   }) => Disposal(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     disposalTypeId: disposalTypeId.present
@@ -15358,6 +15794,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
     return Disposal(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -15382,6 +15819,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
     return (StringBuffer('Disposal(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('disposalTypeId: $disposalTypeId, ')
@@ -15400,6 +15838,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     disposalTypeId,
@@ -15417,6 +15856,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
       (other is Disposal &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.disposalTypeId == this.disposalTypeId &&
@@ -15432,6 +15872,7 @@ class Disposal extends DataClass implements Insertable<Disposal> {
 class DisposalsCompanion extends UpdateCompanion<Disposal> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<int?> disposalTypeId;
@@ -15446,6 +15887,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
   const DisposalsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.disposalTypeId = const Value.absent(),
@@ -15461,6 +15903,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
   DisposalsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     this.disposalTypeId = const Value.absent(),
@@ -15481,6 +15924,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
   static Insertable<Disposal> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<int>? disposalTypeId,
@@ -15496,6 +15940,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (disposalTypeId != null) 'disposal_type_id': disposalTypeId,
@@ -15513,6 +15958,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
   DisposalsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<int?>? disposalTypeId,
@@ -15528,6 +15974,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
     return DisposalsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       disposalTypeId: disposalTypeId ?? this.disposalTypeId,
@@ -15550,6 +15997,9 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -15592,6 +16042,7 @@ class DisposalsCompanion extends UpdateCompanion<Disposal> {
     return (StringBuffer('DisposalsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('disposalTypeId: $disposalTypeId, ')
@@ -15630,6 +16081,17 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -15833,6 +16295,7 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     milkingMethodId,
@@ -15874,6 +16337,12 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -16029,6 +16498,10 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -16113,6 +16586,7 @@ class $MilkingsTable extends Milkings with TableInfo<$MilkingsTable, Milking> {
 class Milking extends DataClass implements Insertable<Milking> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String? farmUuid;
   final String livestockUuid;
   final int? milkingMethodId;
@@ -16134,6 +16608,7 @@ class Milking extends DataClass implements Insertable<Milking> {
   const Milking({
     this.id,
     required this.uuid,
+    this.eventDate,
     this.farmUuid,
     required this.livestockUuid,
     this.milkingMethodId,
@@ -16160,6 +16635,9 @@ class Milking extends DataClass implements Insertable<Milking> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     if (!nullToAbsent || farmUuid != null) {
       map['farm_uuid'] = Variable<String>(farmUuid);
     }
@@ -16207,6 +16685,9 @@ class Milking extends DataClass implements Insertable<Milking> {
     return MilkingsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: farmUuid == null && nullToAbsent
           ? const Value.absent()
           : Value(farmUuid),
@@ -16257,6 +16738,7 @@ class Milking extends DataClass implements Insertable<Milking> {
     return Milking(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String?>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       milkingMethodId: serializer.fromJson<int?>(json['milkingMethodId']),
@@ -16289,6 +16771,7 @@ class Milking extends DataClass implements Insertable<Milking> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String?>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'milkingMethodId': serializer.toJson<int?>(milkingMethodId),
@@ -16315,6 +16798,7 @@ class Milking extends DataClass implements Insertable<Milking> {
   Milking copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     Value<String?> farmUuid = const Value.absent(),
     String? livestockUuid,
     Value<int?> milkingMethodId = const Value.absent(),
@@ -16336,6 +16820,7 @@ class Milking extends DataClass implements Insertable<Milking> {
   }) => Milking(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     milkingMethodId: milkingMethodId.present
@@ -16367,6 +16852,7 @@ class Milking extends DataClass implements Insertable<Milking> {
     return Milking(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -16409,6 +16895,7 @@ class Milking extends DataClass implements Insertable<Milking> {
     return (StringBuffer('Milking(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('milkingMethodId: $milkingMethodId, ')
@@ -16432,9 +16919,10 @@ class Milking extends DataClass implements Insertable<Milking> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     milkingMethodId,
@@ -16453,13 +16941,14 @@ class Milking extends DataClass implements Insertable<Milking> {
     syncAction,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Milking &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.milkingMethodId == this.milkingMethodId &&
@@ -16483,6 +16972,7 @@ class Milking extends DataClass implements Insertable<Milking> {
 class MilkingsCompanion extends UpdateCompanion<Milking> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String?> farmUuid;
   final Value<String> livestockUuid;
   final Value<int?> milkingMethodId;
@@ -16505,6 +16995,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   const MilkingsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.milkingMethodId = const Value.absent(),
@@ -16528,6 +17019,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   MilkingsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     required String livestockUuid,
     this.milkingMethodId = const Value.absent(),
@@ -16555,6 +17047,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   static Insertable<Milking> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<int>? milkingMethodId,
@@ -16578,6 +17071,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (milkingMethodId != null) 'milking_method_id': milkingMethodId,
@@ -16605,6 +17099,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
   MilkingsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String?>? farmUuid,
     Value<String>? livestockUuid,
     Value<int?>? milkingMethodId,
@@ -16628,6 +17123,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     return MilkingsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       milkingMethodId: milkingMethodId ?? this.milkingMethodId,
@@ -16659,6 +17155,9 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -16727,6 +17226,7 @@ class MilkingsCompanion extends UpdateCompanion<Milking> {
     return (StringBuffer('MilkingsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('milkingMethodId: $milkingMethodId, ')
@@ -16774,6 +17274,17 @@ class $PregnanciesTable extends Pregnancies
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -16902,6 +17413,7 @@ class $PregnanciesTable extends Pregnancies
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     testResultId,
@@ -16936,6 +17448,12 @@ class $PregnanciesTable extends Pregnancies
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -17039,6 +17557,10 @@ class $PregnanciesTable extends Pregnancies
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -17095,6 +17617,7 @@ class $PregnanciesTable extends Pregnancies
 class Pregnancy extends DataClass implements Insertable<Pregnancy> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final int testResultId;
@@ -17109,6 +17632,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
   const Pregnancy({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     required this.testResultId,
@@ -17128,6 +17652,9 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     map['test_result_id'] = Variable<int>(testResultId);
@@ -17152,6 +17679,9 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
     return PregnanciesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       testResultId: Value(testResultId),
@@ -17180,6 +17710,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
     return Pregnancy(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       testResultId: serializer.fromJson<int>(json['testResultId']),
@@ -17199,6 +17730,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'testResultId': serializer.toJson<int>(testResultId),
@@ -17216,6 +17748,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
   Pregnancy copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     int? testResultId,
@@ -17230,6 +17763,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
   }) => Pregnancy(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     testResultId: testResultId ?? this.testResultId,
@@ -17246,6 +17780,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
     return Pregnancy(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -17273,6 +17808,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
     return (StringBuffer('Pregnancy(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('testResultId: $testResultId, ')
@@ -17292,6 +17828,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     testResultId,
@@ -17310,6 +17847,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
       (other is Pregnancy &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.testResultId == this.testResultId &&
@@ -17326,6 +17864,7 @@ class Pregnancy extends DataClass implements Insertable<Pregnancy> {
 class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<int> testResultId;
@@ -17341,6 +17880,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
   const PregnanciesCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.testResultId = const Value.absent(),
@@ -17357,6 +17897,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
   PregnanciesCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     required int testResultId,
@@ -17378,6 +17919,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
   static Insertable<Pregnancy> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<int>? testResultId,
@@ -17394,6 +17936,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (testResultId != null) 'test_result_id': testResultId,
@@ -17412,6 +17955,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
   PregnanciesCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<int>? testResultId,
@@ -17428,6 +17972,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
     return PregnanciesCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       testResultId: testResultId ?? this.testResultId,
@@ -17451,6 +17996,9 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -17496,6 +18044,7 @@ class PregnanciesCompanion extends UpdateCompanion<Pregnancy> {
     return (StringBuffer('PregnanciesCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('testResultId: $testResultId, ')
@@ -17536,6 +18085,17 @@ class $InseminationsTable extends Inseminations
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -17762,6 +18322,7 @@ class $InseminationsTable extends Inseminations
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     lastHeatDate,
@@ -17805,6 +18366,12 @@ class $InseminationsTable extends Inseminations
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -17991,6 +18558,10 @@ class $InseminationsTable extends Inseminations
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -18083,6 +18654,7 @@ class $InseminationsTable extends Inseminations
 class Insemination extends DataClass implements Insertable<Insemination> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String? farmUuid;
   final String livestockUuid;
   final String? lastHeatDate;
@@ -18106,6 +18678,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
   const Insemination({
     this.id,
     required this.uuid,
+    this.eventDate,
     this.farmUuid,
     required this.livestockUuid,
     this.lastHeatDate,
@@ -18134,6 +18707,9 @@ class Insemination extends DataClass implements Insertable<Insemination> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     if (!nullToAbsent || farmUuid != null) {
       map['farm_uuid'] = Variable<String>(farmUuid);
     }
@@ -18185,6 +18761,9 @@ class Insemination extends DataClass implements Insertable<Insemination> {
     return InseminationsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: farmUuid == null && nullToAbsent
           ? const Value.absent()
           : Value(farmUuid),
@@ -18240,6 +18819,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
     return Insemination(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String?>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       lastHeatDate: serializer.fromJson<String?>(json['lastHeatDate']),
@@ -18274,6 +18854,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String?>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'lastHeatDate': serializer.toJson<String?>(lastHeatDate),
@@ -18300,6 +18881,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
   Insemination copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     Value<String?> farmUuid = const Value.absent(),
     String? livestockUuid,
     Value<String?> lastHeatDate = const Value.absent(),
@@ -18323,6 +18905,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
   }) => Insemination(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     lastHeatDate: lastHeatDate.present ? lastHeatDate.value : this.lastHeatDate,
@@ -18362,6 +18945,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
     return Insemination(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -18416,6 +19000,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
     return (StringBuffer('Insemination(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('lastHeatDate: $lastHeatDate, ')
@@ -18444,6 +19029,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
   int get hashCode => Object.hashAll([
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     lastHeatDate,
@@ -18471,6 +19057,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
       (other is Insemination &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.lastHeatDate == this.lastHeatDate &&
@@ -18496,6 +19083,7 @@ class Insemination extends DataClass implements Insertable<Insemination> {
 class InseminationsCompanion extends UpdateCompanion<Insemination> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String?> farmUuid;
   final Value<String> livestockUuid;
   final Value<String?> lastHeatDate;
@@ -18520,6 +19108,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
   const InseminationsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.lastHeatDate = const Value.absent(),
@@ -18545,6 +19134,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
   InseminationsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     required String livestockUuid,
     this.lastHeatDate = const Value.absent(),
@@ -18576,6 +19166,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
   static Insertable<Insemination> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? lastHeatDate,
@@ -18601,6 +19192,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (lastHeatDate != null) 'last_heat_date': lastHeatDate,
@@ -18630,6 +19222,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
   InseminationsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String?>? farmUuid,
     Value<String>? livestockUuid,
     Value<String?>? lastHeatDate,
@@ -18655,6 +19248,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
     return InseminationsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       lastHeatDate: lastHeatDate ?? this.lastHeatDate,
@@ -18688,6 +19282,9 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -18764,6 +19361,7 @@ class InseminationsCompanion extends UpdateCompanion<Insemination> {
     return (StringBuffer('InseminationsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('lastHeatDate: $lastHeatDate, ')
@@ -18812,6 +19410,17 @@ class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -18928,6 +19537,7 @@ class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     startDate,
@@ -18961,6 +19571,12 @@ class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -19052,6 +19668,10 @@ class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -19104,6 +19724,7 @@ class $DryoffsTable extends Dryoffs with TableInfo<$DryoffsTable, Dryoff> {
 class Dryoff extends DataClass implements Insertable<Dryoff> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final String startDate;
@@ -19117,6 +19738,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
   const Dryoff({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     required this.startDate,
@@ -19135,6 +19757,9 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     map['start_date'] = Variable<String>(startDate);
@@ -19158,6 +19783,9 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
     return DryoffsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       startDate: Value(startDate),
@@ -19185,6 +19813,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
     return Dryoff(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       startDate: serializer.fromJson<String>(json['startDate']),
@@ -19203,6 +19832,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'startDate': serializer.toJson<String>(startDate),
@@ -19219,6 +19849,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
   Dryoff copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     String? startDate,
@@ -19232,6 +19863,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
   }) => Dryoff(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     startDate: startDate ?? this.startDate,
@@ -19247,6 +19879,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
     return Dryoff(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -19269,6 +19902,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
     return (StringBuffer('Dryoff(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('startDate: $startDate, ')
@@ -19287,6 +19921,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     startDate,
@@ -19304,6 +19939,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
       (other is Dryoff &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.startDate == this.startDate &&
@@ -19319,6 +19955,7 @@ class Dryoff extends DataClass implements Insertable<Dryoff> {
 class DryoffsCompanion extends UpdateCompanion<Dryoff> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String> startDate;
@@ -19333,6 +19970,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
   const DryoffsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.startDate = const Value.absent(),
@@ -19348,6 +19986,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
   DryoffsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     required String startDate,
@@ -19368,6 +20007,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
   static Insertable<Dryoff> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? startDate,
@@ -19383,6 +20023,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (startDate != null) 'start_date': startDate,
@@ -19400,6 +20041,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
   DryoffsCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String>? startDate,
@@ -19415,6 +20057,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
     return DryoffsCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       startDate: startDate ?? this.startDate,
@@ -19437,6 +20080,9 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -19479,6 +20125,7 @@ class DryoffsCompanion extends UpdateCompanion<Dryoff> {
     return (StringBuffer('DryoffsCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('startDate: $startDate, ')
@@ -19518,6 +20165,17 @@ class $TransfersTable extends Transfers
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventDateMeta = const VerificationMeta(
+    'eventDate',
+  );
+  @override
+  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+    'event_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _farmUuidMeta = const VerificationMeta(
     'farmUuid',
@@ -19663,6 +20321,7 @@ class $TransfersTable extends Transfers
   List<GeneratedColumn> get $columns => [
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     toFarmUuid,
@@ -19699,6 +20358,12 @@ class $TransfersTable extends Transfers
       );
     } else if (isInserting) {
       context.missing(_uuidMeta);
+    }
+    if (data.containsKey('event_date')) {
+      context.handle(
+        _eventDateMeta,
+        eventDate.isAcceptableOrUnknown(data['event_date']!, _eventDateMeta),
+      );
     }
     if (data.containsKey('farm_uuid')) {
       context.handle(
@@ -19817,6 +20482,10 @@ class $TransfersTable extends Transfers
         DriftSqlType.string,
         data['${effectivePrefix}uuid'],
       )!,
+      eventDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_date'],
+      ),
       farmUuid: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}farm_uuid'],
@@ -19881,6 +20550,7 @@ class $TransfersTable extends Transfers
 class Transfer extends DataClass implements Insertable<Transfer> {
   final int? id;
   final String uuid;
+  final String? eventDate;
   final String farmUuid;
   final String livestockUuid;
   final String? toFarmUuid;
@@ -19897,6 +20567,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   const Transfer({
     this.id,
     required this.uuid,
+    this.eventDate,
     required this.farmUuid,
     required this.livestockUuid,
     this.toFarmUuid,
@@ -19918,6 +20589,9 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       map['id'] = Variable<int>(id);
     }
     map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || eventDate != null) {
+      map['event_date'] = Variable<String>(eventDate);
+    }
     map['farm_uuid'] = Variable<String>(farmUuid);
     map['livestock_uuid'] = Variable<String>(livestockUuid);
     if (!nullToAbsent || toFarmUuid != null) {
@@ -19950,6 +20624,9 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     return TransfersCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       uuid: Value(uuid),
+      eventDate: eventDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventDate),
       farmUuid: Value(farmUuid),
       livestockUuid: Value(livestockUuid),
       toFarmUuid: toFarmUuid == null && nullToAbsent
@@ -19986,6 +20663,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     return Transfer(
       id: serializer.fromJson<int?>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
+      eventDate: serializer.fromJson<String?>(json['eventDate']),
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       toFarmUuid: serializer.fromJson<String?>(json['toFarmUuid']),
@@ -20007,6 +20685,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'uuid': serializer.toJson<String>(uuid),
+      'eventDate': serializer.toJson<String?>(eventDate),
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'toFarmUuid': serializer.toJson<String?>(toFarmUuid),
@@ -20026,6 +20705,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   Transfer copyWith({
     Value<int?> id = const Value.absent(),
     String? uuid,
+    Value<String?> eventDate = const Value.absent(),
     String? farmUuid,
     String? livestockUuid,
     Value<String?> toFarmUuid = const Value.absent(),
@@ -20042,6 +20722,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   }) => Transfer(
     id: id.present ? id.value : this.id,
     uuid: uuid ?? this.uuid,
+    eventDate: eventDate.present ? eventDate.value : this.eventDate,
     farmUuid: farmUuid ?? this.farmUuid,
     livestockUuid: livestockUuid ?? this.livestockUuid,
     toFarmUuid: toFarmUuid.present ? toFarmUuid.value : this.toFarmUuid,
@@ -20062,6 +20743,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     return Transfer(
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      eventDate: data.eventDate.present ? data.eventDate.value : this.eventDate,
       farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
       livestockUuid: data.livestockUuid.present
           ? data.livestockUuid.value
@@ -20093,6 +20775,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     return (StringBuffer('Transfer(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('toFarmUuid: $toFarmUuid, ')
@@ -20114,6 +20797,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   int get hashCode => Object.hash(
     id,
     uuid,
+    eventDate,
     farmUuid,
     livestockUuid,
     toFarmUuid,
@@ -20134,6 +20818,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       (other is Transfer &&
           other.id == this.id &&
           other.uuid == this.uuid &&
+          other.eventDate == this.eventDate &&
           other.farmUuid == this.farmUuid &&
           other.livestockUuid == this.livestockUuid &&
           other.toFarmUuid == this.toFarmUuid &&
@@ -20152,6 +20837,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
 class TransfersCompanion extends UpdateCompanion<Transfer> {
   final Value<int?> id;
   final Value<String> uuid;
+  final Value<String?> eventDate;
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String?> toFarmUuid;
@@ -20169,6 +20855,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   const TransfersCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
+    this.eventDate = const Value.absent(),
     this.farmUuid = const Value.absent(),
     this.livestockUuid = const Value.absent(),
     this.toFarmUuid = const Value.absent(),
@@ -20187,6 +20874,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   TransfersCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
+    this.eventDate = const Value.absent(),
     required String farmUuid,
     required String livestockUuid,
     this.toFarmUuid = const Value.absent(),
@@ -20210,6 +20898,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   static Insertable<Transfer> custom({
     Expression<int>? id,
     Expression<String>? uuid,
+    Expression<String>? eventDate,
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? toFarmUuid,
@@ -20228,6 +20917,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
+      if (eventDate != null) 'event_date': eventDate,
       if (farmUuid != null) 'farm_uuid': farmUuid,
       if (livestockUuid != null) 'livestock_uuid': livestockUuid,
       if (toFarmUuid != null) 'to_farm_uuid': toFarmUuid,
@@ -20248,6 +20938,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   TransfersCompanion copyWith({
     Value<int?>? id,
     Value<String>? uuid,
+    Value<String?>? eventDate,
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String?>? toFarmUuid,
@@ -20266,6 +20957,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     return TransfersCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
+      eventDate: eventDate ?? this.eventDate,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
       toFarmUuid: toFarmUuid ?? this.toFarmUuid,
@@ -20291,6 +20983,9 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     }
     if (uuid.present) {
       map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (eventDate.present) {
+      map['event_date'] = Variable<String>(eventDate.value);
     }
     if (farmUuid.present) {
       map['farm_uuid'] = Variable<String>(farmUuid.value);
@@ -20342,6 +21037,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     return (StringBuffer('TransfersCompanion(')
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
+          ..write('eventDate: $eventDate, ')
           ..write('farmUuid: $farmUuid, ')
           ..write('livestockUuid: $livestockUuid, ')
           ..write('toFarmUuid: $toFarmUuid, ')
@@ -25191,7 +25887,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FeedingsTable feedings = $FeedingsTable(this);
   late final $WeightChangesTable weightChanges = $WeightChangesTable(this);
   late final $DewormingsTable dewormings = $DewormingsTable(this);
-  late final $MedicationsTable medications = $MedicationsTable(this);
+  late final $TreatmentsTable treatments = $TreatmentsTable(this);
   late final $VaccinationsTable vaccinations = $VaccinationsTable(this);
   late final $DisposalsTable disposals = $DisposalsTable(this);
   late final $MilkingsTable milkings = $MilkingsTable(this);
@@ -25271,7 +25967,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     feedings,
     weightChanges,
     dewormings,
-    medications,
+    treatments,
     vaccinations,
     disposals,
     milkings,
@@ -32749,6 +33445,7 @@ typedef $$BirthEventsTableCreateCompanionBuilder =
     BirthEventsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       required String eventType,
@@ -32769,6 +33466,7 @@ typedef $$BirthEventsTableUpdateCompanionBuilder =
     BirthEventsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String> eventType,
@@ -32802,6 +33500,11 @@ class $$BirthEventsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -32895,6 +33598,11 @@ class $$BirthEventsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -32980,6 +33688,9 @@ class $$BirthEventsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -33067,6 +33778,7 @@ class $$BirthEventsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String> eventType = const Value.absent(),
@@ -33085,6 +33797,7 @@ class $$BirthEventsTableTableManager
               }) => BirthEventsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 eventType: eventType,
@@ -33105,6 +33818,7 @@ class $$BirthEventsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 required String eventType,
@@ -33123,6 +33837,7 @@ class $$BirthEventsTableTableManager
               }) => BirthEventsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 eventType: eventType,
@@ -33168,6 +33883,7 @@ typedef $$AbortedPregnanciesTableCreateCompanionBuilder =
     AbortedPregnanciesCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       required String abortionDate,
@@ -33184,6 +33900,7 @@ typedef $$AbortedPregnanciesTableUpdateCompanionBuilder =
     AbortedPregnanciesCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String> abortionDate,
@@ -33213,6 +33930,11 @@ class $$AbortedPregnanciesTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -33286,6 +34008,11 @@ class $$AbortedPregnanciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -33351,6 +34078,9 @@ class $$AbortedPregnanciesTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -33433,6 +34163,7 @@ class $$AbortedPregnanciesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String> abortionDate = const Value.absent(),
@@ -33447,6 +34178,7 @@ class $$AbortedPregnanciesTableTableManager
               }) => AbortedPregnanciesCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 abortionDate: abortionDate,
@@ -33463,6 +34195,7 @@ class $$AbortedPregnanciesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 required String abortionDate,
@@ -33477,6 +34210,7 @@ class $$AbortedPregnanciesTableTableManager
               }) => AbortedPregnanciesCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 abortionDate: abortionDate,
@@ -33787,6 +34521,7 @@ typedef $$FeedingsTableCreateCompanionBuilder =
     FeedingsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required int feedingTypeId,
       required String farmUuid,
       required String livestockUuid,
@@ -33803,6 +34538,7 @@ typedef $$FeedingsTableUpdateCompanionBuilder =
     FeedingsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<int> feedingTypeId,
       Value<String> farmUuid,
       Value<String> livestockUuid,
@@ -33832,6 +34568,11 @@ class $$FeedingsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -33905,6 +34646,11 @@ class $$FeedingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get feedingTypeId => $composableBuilder(
     column: $table.feedingTypeId,
     builder: (column) => ColumnOrderings(column),
@@ -33970,6 +34716,9 @@ class $$FeedingsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<int> get feedingTypeId => $composableBuilder(
     column: $table.feedingTypeId,
@@ -34040,6 +34789,7 @@ class $$FeedingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<int> feedingTypeId = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
@@ -34054,6 +34804,7 @@ class $$FeedingsTableTableManager
               }) => FeedingsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 feedingTypeId: feedingTypeId,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
@@ -34070,6 +34821,7 @@ class $$FeedingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required int feedingTypeId,
                 required String farmUuid,
                 required String livestockUuid,
@@ -34084,6 +34836,7 @@ class $$FeedingsTableTableManager
               }) => FeedingsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 feedingTypeId: feedingTypeId,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
@@ -34122,6 +34875,7 @@ typedef $$WeightChangesTableCreateCompanionBuilder =
     WeightChangesCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       Value<String?> oldWeight,
@@ -34137,6 +34891,7 @@ typedef $$WeightChangesTableUpdateCompanionBuilder =
     WeightChangesCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String?> oldWeight,
@@ -34165,6 +34920,11 @@ class $$WeightChangesTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -34233,6 +34993,11 @@ class $$WeightChangesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -34293,6 +35058,9 @@ class $$WeightChangesTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -34359,6 +35127,7 @@ class $$WeightChangesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String?> oldWeight = const Value.absent(),
@@ -34372,6 +35141,7 @@ class $$WeightChangesTableTableManager
               }) => WeightChangesCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 oldWeight: oldWeight,
@@ -34387,6 +35157,7 @@ class $$WeightChangesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 Value<String?> oldWeight = const Value.absent(),
@@ -34400,6 +35171,7 @@ class $$WeightChangesTableTableManager
               }) => WeightChangesCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 oldWeight: oldWeight,
@@ -34440,6 +35212,7 @@ typedef $$DewormingsTableCreateCompanionBuilder =
     DewormingsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       Value<int?> administrationRouteId,
@@ -34459,6 +35232,7 @@ typedef $$DewormingsTableUpdateCompanionBuilder =
     DewormingsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<int?> administrationRouteId,
@@ -34491,6 +35265,11 @@ class $$DewormingsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -34579,6 +35358,11 @@ class $$DewormingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -34659,6 +35443,9 @@ class $$DewormingsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -34745,6 +35532,7 @@ class $$DewormingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int?> administrationRouteId = const Value.absent(),
@@ -34762,6 +35550,7 @@ class $$DewormingsTableTableManager
               }) => DewormingsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 administrationRouteId: administrationRouteId,
@@ -34781,6 +35570,7 @@ class $$DewormingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 Value<int?> administrationRouteId = const Value.absent(),
@@ -34798,6 +35588,7 @@ class $$DewormingsTableTableManager
               }) => DewormingsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 administrationRouteId: administrationRouteId,
@@ -34835,10 +35626,11 @@ typedef $$DewormingsTableProcessedTableManager =
       Deworming,
       PrefetchHooks Function()
     >;
-typedef $$MedicationsTableCreateCompanionBuilder =
-    MedicationsCompanion Function({
+typedef $$TreatmentsTableCreateCompanionBuilder =
+    TreatmentsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       Value<int?> diseaseId,
@@ -34846,6 +35638,7 @@ typedef $$MedicationsTableCreateCompanionBuilder =
       Value<String?> quantity,
       Value<String?> withdrawalPeriod,
       Value<String?> medicationDate,
+      Value<String?> nextMedicationDate,
       Value<String?> remarks,
       Value<bool> synced,
       Value<String> syncAction,
@@ -34853,10 +35646,11 @@ typedef $$MedicationsTableCreateCompanionBuilder =
       required String updatedAt,
       Value<int> rowid,
     });
-typedef $$MedicationsTableUpdateCompanionBuilder =
-    MedicationsCompanion Function({
+typedef $$TreatmentsTableUpdateCompanionBuilder =
+    TreatmentsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<int?> diseaseId,
@@ -34864,6 +35658,7 @@ typedef $$MedicationsTableUpdateCompanionBuilder =
       Value<String?> quantity,
       Value<String?> withdrawalPeriod,
       Value<String?> medicationDate,
+      Value<String?> nextMedicationDate,
       Value<String?> remarks,
       Value<bool> synced,
       Value<String> syncAction,
@@ -34872,9 +35667,9 @@ typedef $$MedicationsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-class $$MedicationsTableFilterComposer
-    extends Composer<_$AppDatabase, $MedicationsTable> {
-  $$MedicationsTableFilterComposer({
+class $$TreatmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -34888,6 +35683,11 @@ class $$MedicationsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -34926,6 +35726,11 @@ class $$MedicationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get nextMedicationDate => $composableBuilder(
+    column: $table.nextMedicationDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get remarks => $composableBuilder(
     column: $table.remarks,
     builder: (column) => ColumnFilters(column),
@@ -34952,9 +35757,9 @@ class $$MedicationsTableFilterComposer
   );
 }
 
-class $$MedicationsTableOrderingComposer
-    extends Composer<_$AppDatabase, $MedicationsTable> {
-  $$MedicationsTableOrderingComposer({
+class $$TreatmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -34968,6 +35773,11 @@ class $$MedicationsTableOrderingComposer
 
   ColumnOrderings<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -35006,6 +35816,11 @@ class $$MedicationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nextMedicationDate => $composableBuilder(
+    column: $table.nextMedicationDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get remarks => $composableBuilder(
     column: $table.remarks,
     builder: (column) => ColumnOrderings(column),
@@ -35032,9 +35847,9 @@ class $$MedicationsTableOrderingComposer
   );
 }
 
-class $$MedicationsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MedicationsTable> {
-  $$MedicationsTableAnnotationComposer({
+class $$TreatmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TreatmentsTable> {
+  $$TreatmentsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -35046,6 +35861,9 @@ class $$MedicationsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -35076,6 +35894,11 @@ class $$MedicationsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get nextMedicationDate => $composableBuilder(
+    column: $table.nextMedicationDate,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get remarks =>
       $composableBuilder(column: $table.remarks, builder: (column) => column);
 
@@ -35094,39 +35917,40 @@ class $$MedicationsTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$MedicationsTableTableManager
+class $$TreatmentsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $MedicationsTable,
-          Medication,
-          $$MedicationsTableFilterComposer,
-          $$MedicationsTableOrderingComposer,
-          $$MedicationsTableAnnotationComposer,
-          $$MedicationsTableCreateCompanionBuilder,
-          $$MedicationsTableUpdateCompanionBuilder,
+          $TreatmentsTable,
+          Treatment,
+          $$TreatmentsTableFilterComposer,
+          $$TreatmentsTableOrderingComposer,
+          $$TreatmentsTableAnnotationComposer,
+          $$TreatmentsTableCreateCompanionBuilder,
+          $$TreatmentsTableUpdateCompanionBuilder,
           (
-            Medication,
-            BaseReferences<_$AppDatabase, $MedicationsTable, Medication>,
+            Treatment,
+            BaseReferences<_$AppDatabase, $TreatmentsTable, Treatment>,
           ),
-          Medication,
+          Treatment,
           PrefetchHooks Function()
         > {
-  $$MedicationsTableTableManager(_$AppDatabase db, $MedicationsTable table)
+  $$TreatmentsTableTableManager(_$AppDatabase db, $TreatmentsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MedicationsTableFilterComposer($db: db, $table: table),
+              $$TreatmentsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MedicationsTableOrderingComposer($db: db, $table: table),
+              $$TreatmentsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MedicationsTableAnnotationComposer($db: db, $table: table),
+              $$TreatmentsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int?> diseaseId = const Value.absent(),
@@ -35134,15 +35958,17 @@ class $$MedicationsTableTableManager
                 Value<String?> quantity = const Value.absent(),
                 Value<String?> withdrawalPeriod = const Value.absent(),
                 Value<String?> medicationDate = const Value.absent(),
+                Value<String?> nextMedicationDate = const Value.absent(),
                 Value<String?> remarks = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
                 Value<String> syncAction = const Value.absent(),
                 Value<String> createdAt = const Value.absent(),
                 Value<String> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => MedicationsCompanion(
+              }) => TreatmentsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 diseaseId: diseaseId,
@@ -35150,6 +35976,7 @@ class $$MedicationsTableTableManager
                 quantity: quantity,
                 withdrawalPeriod: withdrawalPeriod,
                 medicationDate: medicationDate,
+                nextMedicationDate: nextMedicationDate,
                 remarks: remarks,
                 synced: synced,
                 syncAction: syncAction,
@@ -35161,6 +35988,7 @@ class $$MedicationsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 Value<int?> diseaseId = const Value.absent(),
@@ -35168,15 +35996,17 @@ class $$MedicationsTableTableManager
                 Value<String?> quantity = const Value.absent(),
                 Value<String?> withdrawalPeriod = const Value.absent(),
                 Value<String?> medicationDate = const Value.absent(),
+                Value<String?> nextMedicationDate = const Value.absent(),
                 Value<String?> remarks = const Value.absent(),
                 Value<bool> synced = const Value.absent(),
                 Value<String> syncAction = const Value.absent(),
                 required String createdAt,
                 required String updatedAt,
                 Value<int> rowid = const Value.absent(),
-              }) => MedicationsCompanion.insert(
+              }) => TreatmentsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 diseaseId: diseaseId,
@@ -35184,6 +36014,7 @@ class $$MedicationsTableTableManager
                 quantity: quantity,
                 withdrawalPeriod: withdrawalPeriod,
                 medicationDate: medicationDate,
+                nextMedicationDate: nextMedicationDate,
                 remarks: remarks,
                 synced: synced,
                 syncAction: syncAction,
@@ -35199,27 +36030,25 @@ class $$MedicationsTableTableManager
       );
 }
 
-typedef $$MedicationsTableProcessedTableManager =
+typedef $$TreatmentsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $MedicationsTable,
-      Medication,
-      $$MedicationsTableFilterComposer,
-      $$MedicationsTableOrderingComposer,
-      $$MedicationsTableAnnotationComposer,
-      $$MedicationsTableCreateCompanionBuilder,
-      $$MedicationsTableUpdateCompanionBuilder,
-      (
-        Medication,
-        BaseReferences<_$AppDatabase, $MedicationsTable, Medication>,
-      ),
-      Medication,
+      $TreatmentsTable,
+      Treatment,
+      $$TreatmentsTableFilterComposer,
+      $$TreatmentsTableOrderingComposer,
+      $$TreatmentsTableAnnotationComposer,
+      $$TreatmentsTableCreateCompanionBuilder,
+      $$TreatmentsTableUpdateCompanionBuilder,
+      (Treatment, BaseReferences<_$AppDatabase, $TreatmentsTable, Treatment>),
+      Treatment,
       PrefetchHooks Function()
     >;
 typedef $$VaccinationsTableCreateCompanionBuilder =
     VaccinationsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       Value<String?> vaccinationNo,
       required String farmUuid,
       required String livestockUuid,
@@ -35238,6 +36067,7 @@ typedef $$VaccinationsTableUpdateCompanionBuilder =
     VaccinationsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String?> vaccinationNo,
       Value<String> farmUuid,
       Value<String> livestockUuid,
@@ -35269,6 +36099,11 @@ class $$VaccinationsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -35352,6 +36187,11 @@ class $$VaccinationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get vaccinationNo => $composableBuilder(
     column: $table.vaccinationNo,
     builder: (column) => ColumnOrderings(column),
@@ -35427,6 +36267,9 @@ class $$VaccinationsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get vaccinationNo => $composableBuilder(
     column: $table.vaccinationNo,
@@ -35508,6 +36351,7 @@ class $$VaccinationsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> vaccinationNo = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
@@ -35524,6 +36368,7 @@ class $$VaccinationsTableTableManager
               }) => VaccinationsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 vaccinationNo: vaccinationNo,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
@@ -35542,6 +36387,7 @@ class $$VaccinationsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> vaccinationNo = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
@@ -35558,6 +36404,7 @@ class $$VaccinationsTableTableManager
               }) => VaccinationsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 vaccinationNo: vaccinationNo,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
@@ -35601,6 +36448,7 @@ typedef $$DisposalsTableCreateCompanionBuilder =
     DisposalsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       Value<int?> disposalTypeId,
@@ -35617,6 +36465,7 @@ typedef $$DisposalsTableUpdateCompanionBuilder =
     DisposalsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<int?> disposalTypeId,
@@ -35646,6 +36495,11 @@ class $$DisposalsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -35719,6 +36573,11 @@ class $$DisposalsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -35784,6 +36643,9 @@ class $$DisposalsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -35852,6 +36714,7 @@ class $$DisposalsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int?> disposalTypeId = const Value.absent(),
@@ -35866,6 +36729,7 @@ class $$DisposalsTableTableManager
               }) => DisposalsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 disposalTypeId: disposalTypeId,
@@ -35882,6 +36746,7 @@ class $$DisposalsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 Value<int?> disposalTypeId = const Value.absent(),
@@ -35896,6 +36761,7 @@ class $$DisposalsTableTableManager
               }) => DisposalsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 disposalTypeId: disposalTypeId,
@@ -35934,6 +36800,7 @@ typedef $$MilkingsTableCreateCompanionBuilder =
     MilkingsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       Value<String?> farmUuid,
       required String livestockUuid,
       Value<int?> milkingMethodId,
@@ -35958,6 +36825,7 @@ typedef $$MilkingsTableUpdateCompanionBuilder =
     MilkingsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String?> farmUuid,
       Value<String> livestockUuid,
       Value<int?> milkingMethodId,
@@ -35995,6 +36863,11 @@ class $$MilkingsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -36108,6 +36981,11 @@ class $$MilkingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -36214,6 +37092,9 @@ class $$MilkingsTableAnnotationComposer
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
 
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
+
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
 
@@ -36315,6 +37196,7 @@ class $$MilkingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int?> milkingMethodId = const Value.absent(),
@@ -36338,6 +37220,7 @@ class $$MilkingsTableTableManager
               }) => MilkingsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 milkingMethodId: milkingMethodId,
@@ -36362,6 +37245,7 @@ class $$MilkingsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> farmUuid = const Value.absent(),
                 required String livestockUuid,
                 Value<int?> milkingMethodId = const Value.absent(),
@@ -36385,6 +37269,7 @@ class $$MilkingsTableTableManager
               }) => MilkingsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 milkingMethodId: milkingMethodId,
@@ -36431,6 +37316,7 @@ typedef $$PregnanciesTableCreateCompanionBuilder =
     PregnanciesCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       required int testResultId,
@@ -36448,6 +37334,7 @@ typedef $$PregnanciesTableUpdateCompanionBuilder =
     PregnanciesCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<int> testResultId,
@@ -36478,6 +37365,11 @@ class $$PregnanciesTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -36556,6 +37448,11 @@ class $$PregnanciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -36626,6 +37523,9 @@ class $$PregnanciesTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -36702,6 +37602,7 @@ class $$PregnanciesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<int> testResultId = const Value.absent(),
@@ -36717,6 +37618,7 @@ class $$PregnanciesTableTableManager
               }) => PregnanciesCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 testResultId: testResultId,
@@ -36734,6 +37636,7 @@ class $$PregnanciesTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 required int testResultId,
@@ -36749,6 +37652,7 @@ class $$PregnanciesTableTableManager
               }) => PregnanciesCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 testResultId: testResultId,
@@ -36788,6 +37692,7 @@ typedef $$InseminationsTableCreateCompanionBuilder =
     InseminationsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       Value<String?> farmUuid,
       required String livestockUuid,
       Value<String?> lastHeatDate,
@@ -36814,6 +37719,7 @@ typedef $$InseminationsTableUpdateCompanionBuilder =
     InseminationsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String?> farmUuid,
       Value<String> livestockUuid,
       Value<String?> lastHeatDate,
@@ -36853,6 +37759,11 @@ class $$InseminationsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -36976,6 +37887,11 @@ class $$InseminationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -37091,6 +38007,9 @@ class $$InseminationsTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
@@ -37212,6 +38131,7 @@ class $$InseminationsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String?> lastHeatDate = const Value.absent(),
@@ -37236,6 +38156,7 @@ class $$InseminationsTableTableManager
               }) => InseminationsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 lastHeatDate: lastHeatDate,
@@ -37262,6 +38183,7 @@ class $$InseminationsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 Value<String?> farmUuid = const Value.absent(),
                 required String livestockUuid,
                 Value<String?> lastHeatDate = const Value.absent(),
@@ -37286,6 +38208,7 @@ class $$InseminationsTableTableManager
               }) => InseminationsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 lastHeatDate: lastHeatDate,
@@ -37337,6 +38260,7 @@ typedef $$DryoffsTableCreateCompanionBuilder =
     DryoffsCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       required String startDate,
@@ -37353,6 +38277,7 @@ typedef $$DryoffsTableUpdateCompanionBuilder =
     DryoffsCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String> startDate,
@@ -37382,6 +38307,11 @@ class $$DryoffsTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -37455,6 +38385,11 @@ class $$DryoffsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -37521,6 +38456,9 @@ class $$DryoffsTableAnnotationComposer
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
 
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
+
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
 
@@ -37586,6 +38524,7 @@ class $$DryoffsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String> startDate = const Value.absent(),
@@ -37600,6 +38539,7 @@ class $$DryoffsTableTableManager
               }) => DryoffsCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 startDate: startDate,
@@ -37616,6 +38556,7 @@ class $$DryoffsTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 required String startDate,
@@ -37630,6 +38571,7 @@ class $$DryoffsTableTableManager
               }) => DryoffsCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 startDate: startDate,
@@ -37668,6 +38610,7 @@ typedef $$TransfersTableCreateCompanionBuilder =
     TransfersCompanion Function({
       Value<int?> id,
       required String uuid,
+      Value<String?> eventDate,
       required String farmUuid,
       required String livestockUuid,
       Value<String?> toFarmUuid,
@@ -37687,6 +38630,7 @@ typedef $$TransfersTableUpdateCompanionBuilder =
     TransfersCompanion Function({
       Value<int?> id,
       Value<String> uuid,
+      Value<String?> eventDate,
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String?> toFarmUuid,
@@ -37719,6 +38663,11 @@ class $$TransfersTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -37807,6 +38756,11 @@ class $$TransfersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get eventDate => $composableBuilder(
+    column: $table.eventDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get farmUuid => $composableBuilder(
     column: $table.farmUuid,
     builder: (column) => ColumnOrderings(column),
@@ -37888,6 +38842,9 @@ class $$TransfersTableAnnotationComposer
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
 
+  GeneratedColumn<String> get eventDate =>
+      $composableBuilder(column: $table.eventDate, builder: (column) => column);
+
   GeneratedColumn<String> get farmUuid =>
       $composableBuilder(column: $table.farmUuid, builder: (column) => column);
 
@@ -37968,6 +38925,7 @@ class $$TransfersTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
+                Value<String?> eventDate = const Value.absent(),
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String?> toFarmUuid = const Value.absent(),
@@ -37985,6 +38943,7 @@ class $$TransfersTableTableManager
               }) => TransfersCompanion(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 toFarmUuid: toFarmUuid,
@@ -38004,6 +38963,7 @@ class $$TransfersTableTableManager
               ({
                 Value<int?> id = const Value.absent(),
                 required String uuid,
+                Value<String?> eventDate = const Value.absent(),
                 required String farmUuid,
                 required String livestockUuid,
                 Value<String?> toFarmUuid = const Value.absent(),
@@ -38021,6 +38981,7 @@ class $$TransfersTableTableManager
               }) => TransfersCompanion.insert(
                 id: id,
                 uuid: uuid,
+                eventDate: eventDate,
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
                 toFarmUuid: toFarmUuid,
@@ -40335,8 +41296,8 @@ class $AppDatabaseManager {
       $$WeightChangesTableTableManager(_db, _db.weightChanges);
   $$DewormingsTableTableManager get dewormings =>
       $$DewormingsTableTableManager(_db, _db.dewormings);
-  $$MedicationsTableTableManager get medications =>
-      $$MedicationsTableTableManager(_db, _db.medications);
+  $$TreatmentsTableTableManager get treatments =>
+      $$TreatmentsTableTableManager(_db, _db.treatments);
   $$VaccinationsTableTableManager get vaccinations =>
       $$VaccinationsTableTableManager(_db, _db.vaccinations);
   $$DisposalsTableTableManager get disposals =>

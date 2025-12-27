@@ -7,6 +7,7 @@ class DisposalModel {
   final String reasons;
   final String? remarks;
   final String status;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -21,6 +22,7 @@ class DisposalModel {
     required this.reasons,
     this.remarks,
     this.status = 'completed',
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -35,6 +37,7 @@ class DisposalModel {
     String? reasons,
     String? remarks,
     String? status,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -49,6 +52,7 @@ class DisposalModel {
       reasons: reasons ?? this.reasons,
       remarks: remarks ?? this.remarks,
       status: status ?? this.status,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -66,6 +70,7 @@ class DisposalModel {
       'reasons': reasons,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -83,6 +88,7 @@ class DisposalModel {
       reasons: json['reasons'] as String? ?? '',
       remarks: json['remarks'] as String?,
       status: (json['status'] as String?) ?? 'completed',
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -99,6 +105,7 @@ class DisposalModel {
       'reasons': reasons,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

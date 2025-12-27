@@ -18,6 +18,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widget
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 
 /// Weight Change Form Screen
 ///
@@ -50,6 +52,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _oldWeightController = TextEditingController();
   final _newWeightController = TextEditingController();
   final _remarksController = TextEditingController();
@@ -70,6 +73,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
+  DateTime? _selectedEventDate;
   String _selectedOldWeightUnit = 'kg';
   String _selectedNewWeightUnit = 'kg';
   bool get _isBulk => widget.isBulk;
@@ -91,6 +95,14 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     _selectedLivestockUuid = _isBulk ? null : widget.livestockUuid;
 
     if (weightChange == null) return;
+
+    if (weightChange.eventDate != null && weightChange.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(weightChange.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
 
     if (weightChange.oldWeight != null && weightChange.oldWeight!.trim().isNotEmpty) {
       final parsedOld = _parseWeight(weightChange.oldWeight!.trim());
@@ -252,6 +264,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _oldWeightController.dispose();
     _newWeightController.dispose();
     _remarksController.dispose();
@@ -438,6 +451,15 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         const SizedBox(height: 24),
         _buildSectionTitle(l10n.weightChange),
         const SizedBox(height: 16),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         // Old Weight and Unit in a row
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,6 +553,104 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
   }
 
   Widget _buildSectionTitle(String title) {
@@ -677,11 +797,13 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
       if (widget.isEditMode) {
         final existing = widget.weightChange!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updated = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
           oldWeight: formattedOldWeight,
           newWeight: formattedNewWeight,
+          eventDate: eventDateIso ?? existing.eventDate,
           remarks: _remarksController.text.trim().isEmpty
               ? null
               : _remarksController.text.trim(),
@@ -714,12 +836,14 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-weight';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final model = WeightChangeModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
           oldWeight: formattedOldWeight,
           newWeight: formattedNewWeight,
+          eventDate: eventDateIso,
           remarks: _remarksController.text.trim().isEmpty
               ? null
               : _remarksController.text.trim(),

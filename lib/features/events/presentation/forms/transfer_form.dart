@@ -45,6 +45,7 @@ class TransferFormScreen extends StatefulWidget {
 
 class _TransferFormScreenState extends State<TransferFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _eventDateController = TextEditingController();
   final _toFarmUuidController = TextEditingController();
   final _transporterIdController = TextEditingController();
   final _reasonController = TextEditingController();
@@ -64,6 +65,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
   String _selectedStatus = 'completed';
+  DateTime? _selectedEventDate;
   DateTime? _selectedTransferDate;
 
   bool get _isBulk => widget.isBulk;
@@ -94,6 +96,13 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       return;
     }
 
+    if (transfer.eventDate != null && transfer.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(transfer.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _toFarmUuidController.text = transfer.toFarmUuid ?? '';
     _transporterIdController.text =
         transfer.transporterId != null ? '${transfer.transporterId}' : '';
@@ -278,6 +287,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _toFarmUuidController.dispose();
     _transporterIdController.dispose();
     _reasonController.dispose();
@@ -470,6 +480,15 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         _buildSectionTitle(l10n.transferDetails, theme),
         const SizedBox(height: 16),
         CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
           controller: _toFarmUuidController,
           label: l10n.toFarmUuidLabel,
           hintText: l10n.enterToFarmUuid,
@@ -583,6 +602,104 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
   }
 
   Future<void> _pickTransferDate() async {
@@ -781,9 +898,11 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     try {
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.transfer!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
+          eventDate: eventDateIso ?? existing.eventDate,
           toFarmUuid: toFarmUuid,
           transporterId: transporterId,
           reason: reason,
@@ -824,10 +943,12 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         final uuid =
             'transfer-${now.microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = TransferModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
+          eventDate: eventDateIso,
           toFarmUuid: toFarmUuid,
           transporterId: transporterId,
           reason: reason,

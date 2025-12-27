@@ -19,6 +19,7 @@ class FeedingModel {
   final String nextFeedingTime;
   final String amount;
   final String? remarks;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -33,6 +34,7 @@ class FeedingModel {
     required this.nextFeedingTime,
     required this.amount,
     this.remarks,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -47,6 +49,7 @@ class FeedingModel {
     String? nextFeedingTime,
     String? amount,
     String? remarks,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -61,6 +64,7 @@ class FeedingModel {
       nextFeedingTime: nextFeedingTime ?? this.nextFeedingTime,
       amount: amount ?? this.amount,
       remarks: remarks ?? this.remarks,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -78,6 +82,7 @@ class FeedingModel {
       'nextFeedingTime': nextFeedingTime,
       'amount': amount,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -95,6 +100,7 @@ class FeedingModel {
       nextFeedingTime: json['nextFeedingTime'] as String,
       amount: json['amount'] as String,
       remarks: json['remarks'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -111,6 +117,7 @@ class FeedingModel {
       'nextFeedingTime': nextFeedingTime,
       'amount': amount,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

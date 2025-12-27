@@ -14,7 +14,7 @@ import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/treatment_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_selector_page.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
@@ -23,33 +23,35 @@ import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 
-class MedicationFormScreen extends StatefulWidget {
-  final MedicationModel? medication;
+class TreatmentFormScreen extends StatefulWidget {
+  final TreatmentModel? treatment;
   final String? farmUuid;
   final String? livestockUuid;
   final bool isBulk;
   final List<String>? bulkLivestockUuids;
 
-  const MedicationFormScreen({
+  const TreatmentFormScreen({
     super.key,
-    this.medication,
+    this.treatment,
     this.farmUuid,
     this.livestockUuid,
     this.isBulk = false,
     this.bulkLivestockUuids,
   });
 
-  bool get isEditMode => medication != null;
+  bool get isEditMode => treatment != null;
 
   @override
-  State<MedicationFormScreen> createState() => _MedicationFormScreenState();
+  State<TreatmentFormScreen> createState() => _TreatmentFormScreenState();
 }
 
-class _MedicationFormScreenState extends State<MedicationFormScreen> {
+class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController();
   final _withdrawalController = TextEditingController();
+  final _eventDateController = TextEditingController();
   final _medicationDateController = TextEditingController();
+  final _nextMedicationDateController = TextEditingController();
   final _remarksController = TextEditingController();
 
   int _currentStep = 0;
@@ -76,7 +78,9 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
   String? _selectedLivestockUuid;
   List<Livestock> _selectedBulkLivestock = [];
   int? _selectedMedicineId;
+  DateTime? _selectedEventDate;
   DateTime? _selectedMedicationDate;
+  DateTime? _selectedNextMedicationDate;
   int? _selectedDiseaseId;
   String? _selectedQuantityUnit;
   String? _selectedWithdrawalUnit;
@@ -95,21 +99,30 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
   }
 
   void _prefillIfEditing() {
-    final medication = widget.medication;
-    _selectedFarmUuid = widget.farmUuid ?? medication?.farmUuid;
+    final treatment = widget.treatment;
+    _selectedFarmUuid = widget.farmUuid ?? treatment?.farmUuid;
     _selectedLivestockUuid =
-        _isBulk ? null : widget.livestockUuid ?? medication?.livestockUuid;
+        _isBulk ? null : widget.livestockUuid ?? treatment?.livestockUuid;
 
-    if (medication == null) return;
+    if (treatment == null) return;
 
-    _parseQuantityString(medication.quantity);
-    _parseWithdrawalString(medication.withdrawalPeriod);
-    _remarksController.text = medication.remarks ?? '';
-    _selectedDiseaseId = medication.diseaseId;
+    _parseQuantityString(treatment.quantity);
+    _parseWithdrawalString(treatment.withdrawalPeriod);
+    _remarksController.text = treatment.remarks ?? '';
+    _selectedDiseaseId = treatment.diseaseId;
 
-    if (medication.medicationDate != null &&
-        medication.medicationDate!.trim().isNotEmpty) {
-      final parsed = DateTime.tryParse(medication.medicationDate!);
+    if (treatment.eventDate != null &&
+        treatment.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(treatment.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
+
+    if (treatment.medicationDate != null &&
+        treatment.medicationDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(treatment.medicationDate!);
       if (parsed != null) {
         _selectedMedicationDate = parsed;
         _medicationDateController.text = DateFormat.yMMMd().add_jm().format(
@@ -118,7 +131,18 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       }
     }
 
-    _selectedMedicineId = medication.medicineId;
+    if (treatment.nextMedicationDate != null &&
+        treatment.nextMedicationDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(treatment.nextMedicationDate!);
+      if (parsed != null) {
+        _selectedNextMedicationDate = parsed;
+        _nextMedicationDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
+      }
+    }
+
+    _selectedMedicineId = treatment.medicineId;
     _selectedQuantityUnit ??= _quantityUnits.first;
     _selectedWithdrawalUnit ??= _withdrawalUnits.first;
   }
@@ -133,7 +157,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       final database = Provider.of<AppDatabase>(context, listen: false);
       await Future.wait([_loadContextData(database), _loadReferenceData()]);
     } catch (e, stackTrace) {
-      log('❌ Failed to initialize medication form: $e', stackTrace: stackTrace);
+      log('❌ Failed to initialize treatment form: $e', stackTrace: stackTrace);
     } finally {
       if (mounted) {
         setState(() {
@@ -352,6 +376,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
     _quantityController.dispose();
     _withdrawalController.dispose();
     _medicationDateController.dispose();
+    _nextMedicationDateController.dispose();
     _remarksController.dispose();
     super.dispose();
   }
@@ -362,22 +387,18 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
     final theme = Theme.of(context);
 
     final title = widget.isEditMode
-        ? '${l10n.edit} ${l10n.medication}'
-        : l10n.addMedication;
+        ? '${l10n.edit} ${l10n.treatment ?? l10n.medication}'
+        : (l10n.addTreatment ?? l10n.addMedication);
     final submitLabel = widget.isEditMode ? l10n.update : l10n.save;
 
     final isLoading = _isLoadingContext || _isLoadingReference;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
+        systemOverlayStyle: theme.brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         leading: CustomBackButton(
           isEnabledBgColor: false,
           iconColor: theme.colorScheme.tertiary,
@@ -653,12 +674,30 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           ),
         const SizedBox(height: 16),
         CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
           controller: _medicationDateController,
           label: l10n.medicationDate,
           hintText: l10n.selectMedicationDate,
           prefixIcon: Icons.event_outlined,
           readOnly: true,
           onTap: _pickMedicationDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _nextMedicationDateController,
+          label: l10n.nextMedicationDate ?? 'Next Medication Date',
+          hintText: l10n.selectNextMedicationDate ?? 'Select Next Medication Date',
+          prefixIcon: Icons.calendar_today_outlined,
+          readOnly: true,
+          onTap: _pickNextMedicationDate,
         ),
         const SizedBox(height: 16),
         CustomTextField(
@@ -676,6 +715,207 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _pickNextMedicationDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedNextMedicationDate ?? DateTime.now();
+    final now = DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedNextMedicationDate = combined;
+      _nextMedicationDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
+    });
+  }
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
+    });
   }
 
   Future<void> _pickMedicationDate() async {
@@ -795,8 +1035,8 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       context: context,
       title: widget.isEditMode ? l10n.update : l10n.save,
       message: widget.isEditMode
-          ? l10n.confirmUpdateMedication
-          : l10n.confirmSaveMedication,
+          ? l10n.confirmUpdateTreatment
+          : l10n.confirmSaveTreatment,
       confirmText: widget.isEditMode ? l10n.update : l10n.save,
       cancelText: l10n.cancel,
       onConfirm: () async {
@@ -854,10 +1094,12 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       final remarks = _remarksController.text.trim().isEmpty
           ? null
           : _remarksController.text.trim();
+      final eventDateIso = _selectedEventDate?.toIso8601String();
       final medicationDateIso = _selectedMedicationDate?.toIso8601String();
+      final nextMedicationDateIso = _selectedNextMedicationDate?.toIso8601String();
 
       if (widget.isEditMode && !_isBulk) {
-        final existing = widget.medication!;
+        final existing = widget.treatment!;
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
@@ -865,7 +1107,9 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           diseaseId: _selectedDiseaseId,
           quantity: quantity,
           withdrawalPeriod: withdrawal,
+          eventDate: eventDateIso ?? existing.eventDate,
           medicationDate: medicationDateIso ?? existing.medicationDate,
+          nextMedicationDate: nextMedicationDateIso ?? existing.nextMedicationDate,
           remarks: remarks,
           synced: false,
           syncAction: existing.syncAction == 'create' ? 'create' : 'update',
@@ -880,7 +1124,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           isDismissible: false,
         );
         
-        final updated = await eventsProvider.updateMedication(updatedModel);
+        final updated = await eventsProvider.updateTreatment(updatedModel);
         
         if (mounted) {
           Navigator.of(context).pop(); // Close loading
@@ -888,7 +1132,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
-            logType: EventLogTypes.medication,
+            logType: EventLogTypes.treatment,
             farmUuid: selectedFarmUuid,
             subjectUuid: updated.uuid,
             quantity: 1,
@@ -900,7 +1144,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
             await AlertDialogs.showSuccess(
               context: context,
               title: l10n.success,
-              message: l10n.medicationLogSaved,
+              message: l10n.treatmentLogSaved,
               buttonText: l10n.ok,
             );
             if (mounted) {
@@ -918,11 +1162,11 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
         );
         
         // Create batch manually
-        final created = <MedicationModel>[];
+        final created = <TreatmentModel>[];
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
-          final uuid = 'medication-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
-          final model = MedicationModel(
+          final uuid = 'treatment-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final model = TreatmentModel(
             uuid: uuid,
             farmUuid: selectedFarmUuid,
             livestockUuid: animalUuid,
@@ -930,14 +1174,16 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
             diseaseId: _selectedDiseaseId,
             quantity: quantity,
             withdrawalPeriod: withdrawal,
+            eventDate: eventDateIso,
             medicationDate: medicationDateIso ?? now,
+            nextMedicationDate: nextMedicationDateIso,
             remarks: remarks,
             synced: false,
             syncAction: 'create',
             createdAt: now,
             updatedAt: now,
           );
-          created.add(await eventsProvider.addMedication(model));
+          created.add(await eventsProvider.addTreatment(model));
         }
 
         if (mounted) {
@@ -946,7 +1192,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
-            logType: EventLogTypes.medication,
+            logType: EventLogTypes.treatment,
             farmUuid: selectedFarmUuid,
             subjectUuid: created.first.uuid,
             quantity: 1,
@@ -958,7 +1204,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
             await AlertDialogs.showSuccess(
               context: context,
               title: l10n.success,
-              message: l10n.medicationLogSaved,
+              message: l10n.treatmentLogSaved,
               buttonText: l10n.ok,
             );
             if (mounted) {
@@ -969,9 +1215,9 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       } else {
         final now = DateTime.now().toIso8601String();
         final uuid =
-            'medication-${DateTime.now().microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
+            'treatment-${DateTime.now().microsecondsSinceEpoch}-${livestockUuids.first.hashCode}';
 
-        final newModel = MedicationModel(
+        final newModel = TreatmentModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
@@ -979,7 +1225,9 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           diseaseId: _selectedDiseaseId,
           quantity: quantity,
           withdrawalPeriod: withdrawal,
+          eventDate: eventDateIso,
           medicationDate: medicationDateIso ?? now,
+          nextMedicationDate: nextMedicationDateIso,
           remarks: remarks,
           synced: false,
           syncAction: 'create',
@@ -995,7 +1243,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           isDismissible: false,
         );
         
-        final created = await eventsProvider.addMedication(newModel);
+        final created = await eventsProvider.addTreatment(newModel);
         
         if (mounted) {
           Navigator.of(context).pop(); // Close loading
@@ -1003,7 +1251,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
-            logType: EventLogTypes.medication,
+            logType: EventLogTypes.treatment,
             farmUuid: selectedFarmUuid,
             subjectUuid: created.uuid,
             quantity: 1,
@@ -1015,7 +1263,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
             await AlertDialogs.showSuccess(
               context: context,
               title: l10n.success,
-              message: l10n.medicationLogSaved,
+              message: l10n.treatmentLogSaved,
               buttonText: l10n.ok,
             );
             if (mounted) {
@@ -1030,7 +1278,7 @@ class _MedicationFormScreenState extends State<MedicationFormScreen> {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
-        message: l10n.medicationLogSaveFailed,
+        message: l10n.treatmentLogSaveFailed,
         buttonText: l10n.ok,
         onPressed: () => Navigator.of(context).pop(),
       );

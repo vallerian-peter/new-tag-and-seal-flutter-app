@@ -75,9 +75,14 @@ class _LivestockListScreenState extends State<LivestockListScreen>
 
     // Fetch livestock types
     final livestockTypes = await database.livestockTypeDao.getAllLivestockTypes();
+    print('📊 Fetched ${livestockTypes.length} livestock types');
+    if (livestockTypes.isNotEmpty) {
+      print('📊 First type: ${livestockTypes.first.name} (ID: ${livestockTypes.first.id})');
+    }
     if (mounted) {
       setState(() {
         _livestockTypes = livestockTypes;
+        print('📊 Updated _livestockTypes: ${_livestockTypes.length} items');
       });
       final livestockTypeNamesMap = <int, String>{};
       for (var type in livestockTypes) {
@@ -596,21 +601,56 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     
+    // Debug logging
+    print('🔍 Building dropdown with ${_livestockTypes.length} types');
+    
     return PopupMenuButton<int?>(
+      key: ValueKey('livestock_type_dropdown_${_livestockTypes.length}'), // Force rebuild when types change
       onSelected: (value) {
         _onLivestockTypeFilterSelected(value);
       },
-      itemBuilder: (context) => [
-        for (var type in _livestockTypes)
+      itemBuilder: (context) {
+        print('🔍 itemBuilder called with ${_livestockTypes.length} types');
+        
+        // Always include "All" option first
+        final items = <PopupMenuEntry<int?>>[
           PopupMenuItem<int?>(
-            value: type.id,
+            value: null,
             child: Text(
-              type.name,
+              l10n.allText,
               style: const TextStyle(fontSize: 12),
             ),
           ),
-      ],
+        ];
+        
+        // Add all livestock types
+        if (_livestockTypes.isNotEmpty) {
+          for (var type in _livestockTypes) {
+            print('🔍 Adding type: ${type.name} (ID: ${type.id})');
+            items.add(
+              PopupMenuItem<int?>(
+                value: type.id,
+                child: Text(
+                  type.name,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+            );
+          }
+        } else {
+          print('⚠️ No livestock types available!');
+        }
+        
+        print('🔍 Returning ${items.length} menu items');
+        return items;
+      },
+      enabled: true, // Always enabled
       color: isDarkMode ? Colors.grey[700] : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -646,6 +686,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
               color: theme.colorScheme.onSurface.withOpacity(0.5),
             ),
           ],
+          ),
         ),
       ),
     );

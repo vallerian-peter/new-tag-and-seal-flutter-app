@@ -4,7 +4,7 @@ import '../app_database.dart';
 import '../../features/events/data/tables/feeding_table.dart';
 import '../../features/events/data/tables/weight_change_table.dart';
 import '../../features/events/data/tables/deworming_table.dart';
-import '../../features/events/data/tables/medication_table.dart';
+import '../../features/events/data/tables/treatment_table.dart';
 import '../../features/events/data/tables/vaccination_table.dart';
 import '../../features/events/data/tables/disposal_table.dart';
 import '../../features/events/data/tables/birth_event_table.dart';
@@ -21,7 +21,7 @@ part 'event_dao.g.dart';
   Feedings,
   WeightChanges,
   Dewormings,
-  Medications,
+  Treatments,
   Vaccinations,
   Disposals,
   BirthEvents,
@@ -59,10 +59,10 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     });
   }
 
-  Future<void> upsertMedications(List<MedicationsCompanion> entries) async {
+  Future<void> upsertTreatments(List<TreatmentsCompanion> entries) async {
     if (entries.isEmpty) return;
     await batch((batch) {
-      batch.insertAllOnConflictUpdate(medications, entries);
+      batch.insertAllOnConflictUpdate(treatments, entries);
     });
   }
 
@@ -143,8 +143,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return into(dewormings).insertReturning(entry, mode: InsertMode.insertOrReplace);
   }
 
-  Future<Medication> upsertMedication(MedicationsCompanion entry) {
-    return into(medications).insertReturning(entry, mode: InsertMode.insertOrReplace);
+  Future<Treatment> upsertTreatment(TreatmentsCompanion entry) {
+    return into(treatments).insertReturning(entry, mode: InsertMode.insertOrReplace);
   }
 
   Future<Vaccination> upsertVaccination(VaccinationsCompanion entry) {
@@ -202,8 +202,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return (select(dewormings)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
   }
 
-  Future<Medication?> getMedicationByUuid(String uuid) {
-    return (select(medications)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
+  Future<Treatment?> getTreatmentByUuid(String uuid) {
+    return (select(treatments)..where((tbl) => tbl.uuid.equals(uuid))).getSingleOrNull();
   }
 
   Future<Vaccination?> getVaccinationByUuid(String uuid) {
@@ -278,8 +278,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return query.get();
   }
 
-  Future<List<Medication>> getMedications({String? farmUuid, String? livestockUuid}) {
-    final query = select(medications);
+  Future<List<Treatment>> getTreatments({String? farmUuid, String? livestockUuid}) {
+    final query = select(treatments);
     if (farmUuid != null) {
       query.where((tbl) => tbl.farmUuid.equals(farmUuid));
     }
@@ -350,8 +350,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return (select(dewormings)..where((tbl) => tbl.synced.equals(false))).get();
   }
 
-  Future<List<Medication>> getUnsyncedMedications() {
-    return (select(medications)..where((tbl) => tbl.synced.equals(false))).get();
+  Future<List<Treatment>> getUnsyncedTreatments() {
+    return (select(treatments)..where((tbl) => tbl.synced.equals(false))).get();
   }
 
   Future<List<Vaccination>> getUnsyncedVaccinations() {
@@ -462,8 +462,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return update(dewormings).replace(entry);
   }
 
-  Future<bool> updateMedication(Medication entry) {
-    return update(medications).replace(entry);
+  Future<bool> updateTreatment(Treatment entry) {
+    return update(treatments).replace(entry);
   }
 
   Future<bool> updateVaccination(Vaccination entry) {
@@ -506,8 +506,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return (delete(dewormings)..where((tbl) => tbl.uuid.equals(uuid))).go();
   }
 
-  Future<int> deleteMedicationByUuid(String uuid) {
-    return (delete(medications)..where((tbl) => tbl.uuid.equals(uuid))).go();
+  Future<int> deleteTreatmentByUuid(String uuid) {
+    return (delete(treatments)..where((tbl) => tbl.uuid.equals(uuid))).go();
   }
 
   Future<int> deleteVaccinationByUuid(String uuid) {
@@ -597,8 +597,8 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
         .go();
   }
 
-  Future<int> deleteServerMedicationsNotIn(Set<String> uuids) async {
-    return (delete(medications)
+  Future<int> deleteServerTreatmentsNotIn(Set<String> uuids) async {
+    return (delete(treatments)
           ..where((tbl) {
             var condition =
                 tbl.synced.equals(true) & tbl.syncAction.like('server%');
@@ -708,7 +708,7 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
       batch.deleteWhere(feedings, (_) => const Constant(true));
       batch.deleteWhere(weightChanges, (_) => const Constant(true));
       batch.deleteWhere(dewormings, (_) => const Constant(true));
-      batch.deleteWhere(medications, (_) => const Constant(true));
+      batch.deleteWhere(treatments, (_) => const Constant(true));
       batch.deleteWhere(vaccinations, (_) => const Constant(true));
       batch.deleteWhere(disposals, (_) => const Constant(true));
       batch.deleteWhere(birthEvents, (_) => const Constant(true));

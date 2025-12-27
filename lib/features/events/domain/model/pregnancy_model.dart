@@ -8,6 +8,7 @@ class PregnancyModel {
   final String? testDate;
   final String status;
   final String? remarks;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -23,6 +24,7 @@ class PregnancyModel {
     this.testDate,
     this.status = 'active',
     this.remarks,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -38,6 +40,7 @@ class PregnancyModel {
     String? testDate,
     String? status,
     String? remarks,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -53,6 +56,7 @@ class PregnancyModel {
       testDate: testDate ?? this.testDate,
       status: status ?? this.status,
       remarks: remarks ?? this.remarks,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -71,6 +75,7 @@ class PregnancyModel {
       'testDate': testDate,
       'status': status,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -89,6 +94,7 @@ class PregnancyModel {
       testDate: json['testDate'] as String?,
       status: json['status'] as String? ?? 'active',
       remarks: json['remarks'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -106,6 +112,7 @@ class PregnancyModel {
       'testDate': testDate,
       'status': status,
       'remarks': remarks,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

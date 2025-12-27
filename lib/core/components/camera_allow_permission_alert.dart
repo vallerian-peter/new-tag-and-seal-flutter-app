@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// Camera Permission Alert Component
@@ -100,7 +101,7 @@ class _CameraPermissionDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: theme.scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -199,7 +200,7 @@ class _CameraPermissionDialog extends StatelessWidget {
                       style: TextStyle(
                         fontSize: Constants.textSize,
                         fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onPrimary,
+                        color: whiteColor,
                       ),
                     ),
                   ),

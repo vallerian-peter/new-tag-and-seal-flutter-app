@@ -3668,6 +3668,18 @@ abstract class AppLocalizations {
   /// **'Time to deworm livestock'**
   String get timeToDewormLivestock;
 
+  /// Treatment reminder notification title
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment Reminder'**
+  String get treatmentReminder;
+
+  /// Treatment reminder notification description
+  ///
+  /// In en, this message translates to:
+  /// **'Time to treat livestock'**
+  String get timeToTreatLivestock;
+
   /// No description provided for @weightChange.
   ///
   /// In en, this message translates to:
@@ -3745,6 +3757,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Medication'**
   String get medication;
+
+  /// Treatment label
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment'**
+  String get treatment;
+
+  /// Add treatment log button
+  ///
+  /// In en, this message translates to:
+  /// **'Add treatment log'**
+  String get addTreatment;
+
+  /// Next medication date label
+  ///
+  /// In en, this message translates to:
+  /// **'Next medication date'**
+  String get nextMedicationDate;
+
+  /// Select next medication date hint
+  ///
+  /// In en, this message translates to:
+  /// **'Select next medication date'**
+  String get selectNextMedicationDate;
+
+  /// Treatment log saved success message
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment log saved successfully'**
+  String get treatmentLogSaved;
+
+  /// Treatment log save failed error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save treatment log. Please try again.'**
+  String get treatmentLogSaveFailed;
 
   /// No description provided for @milking.
   ///
@@ -3902,6 +3950,18 @@ abstract class AppLocalizations {
   /// **'Select disease'**
   String get selectDisease;
 
+  /// The date when the event actually occurred
+  ///
+  /// In en, this message translates to:
+  /// **'Event Date'**
+  String get eventDate;
+
+  /// Hint text for event date picker
+  ///
+  /// In en, this message translates to:
+  /// **'Select when the event occurred'**
+  String get selectEventDate;
+
   /// No description provided for @medicationDate.
   ///
   /// In en, this message translates to:
@@ -3931,6 +3991,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save medication record?'**
   String get confirmSaveMedication;
+
+  /// Confirmation message for updating treatment record
+  ///
+  /// In en, this message translates to:
+  /// **'Update treatment record?'**
+  String get confirmUpdateTreatment;
+
+  /// Confirmation message for saving treatment record
+  ///
+  /// In en, this message translates to:
+  /// **'Save treatment record?'**
+  String get confirmSaveTreatment;
 
   /// No description provided for @quantityUnitMl.
   ///
@@ -5852,6 +5924,24 @@ abstract class AppLocalizations {
   /// **'Confirm tag'**
   String get scanManualConfirm;
 
+  /// Bluetooth RFID scanner title
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth RFID Scanner'**
+  String get scanBluetoothRfidScannerTitle;
+
+  /// Button text to connect Bluetooth RFID scanner
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Bluetooth RFID Scanner'**
+  String get scanConnectBluetoothRfidScanner;
+
+  /// Description text for Bluetooth RFID scanner
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your Bluetooth RFID scanner to scan tags'**
+  String get scanBluetoothRfidScannerDescription;
+
   /// No description provided for @vaccineSavedSuccessfully.
   ///
   /// In en, this message translates to:
@@ -6835,6 +6925,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bill marked as paid successfully'**
   String get billMarkedAsPaid;
+
+  /// Title for milking trend graph
+  ///
+  /// In en, this message translates to:
+  /// **'Milking Trend'**
+  String get milkingTrend;
+
+  /// Title for multi-farm milking trend graph
+  ///
+  /// In en, this message translates to:
+  /// **'Milking Trend by Farm'**
+  String get milkingTrendByFarm;
+
+  /// Time period filter for last 6 months
+  ///
+  /// In en, this message translates to:
+  /// **'Last 6 Months'**
+  String get last6Months;
+
+  /// Time period filter for last year
+  ///
+  /// In en, this message translates to:
+  /// **'This Year'**
+  String get lastYear;
+
+  /// Average value label
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get average;
+
+  /// Maximum value label
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum'**
+  String get maximum;
 }
 
 class _AppLocalizationsDelegate

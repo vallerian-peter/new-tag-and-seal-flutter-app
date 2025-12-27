@@ -1888,6 +1888,12 @@ class AppLocalizationsSw extends AppLocalizations {
       'Ni wakati wa kutoa dawa za minyoo kwa mifugo';
 
   @override
+  String get treatmentReminder => 'Ukumbusho wa Matibabu';
+
+  @override
+  String get timeToTreatLivestock => 'Ni wakati wa kutibu mifugo';
+
+  @override
   String get weightChange => 'Mabadiliko ya Uzito';
 
   @override
@@ -1925,6 +1931,26 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get medication => 'Matibabu';
+
+  @override
+  String get treatment => 'Matibabu';
+
+  @override
+  String get addTreatment => 'Ongeza rekodi ya matibabu';
+
+  @override
+  String get nextMedicationDate => 'Tarehe ya matibabu yanayofuata';
+
+  @override
+  String get selectNextMedicationDate =>
+      'Chagua tarehe ya matibabu yanayofuata';
+
+  @override
+  String get treatmentLogSaved => 'Rekodi ya matibabu imehifadhiwa kikamilifu';
+
+  @override
+  String get treatmentLogSaveFailed =>
+      'Imeshindwa kuhifadhi rekodi ya matibabu. Tafadhali jaribu tena.';
 
   @override
   String get milking => 'Kukamua';
@@ -2014,6 +2040,12 @@ class AppLocalizationsSw extends AppLocalizations {
   String get selectDisease => 'Chagua ugonjwa';
 
   @override
+  String get eventDate => 'Tarehe ya Tukio';
+
+  @override
+  String get selectEventDate => 'Chagua wakati tukio lilitokea';
+
+  @override
   String get medicationDate => 'Tarehe ya matibabu';
 
   @override
@@ -2028,6 +2060,12 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get confirmSaveMedication => 'Hifadhi rekodi ya matibabu?';
+
+  @override
+  String get confirmUpdateTreatment => 'Sasisha rekodi ya matibabu?';
+
+  @override
+  String get confirmSaveTreatment => 'Hifadhi rekodi ya matibabu?';
 
   @override
   String get quantityUnitMl => 'ml';
@@ -3059,6 +3097,17 @@ class AppLocalizationsSw extends AppLocalizations {
   String get scanManualConfirm => 'Thibitisha lebo';
 
   @override
+  String get scanBluetoothRfidScannerTitle => 'Kisomaji cha RFID cha Bluetooth';
+
+  @override
+  String get scanConnectBluetoothRfidScanner =>
+      'Unganisha Kisomaji cha RFID cha Bluetooth';
+
+  @override
+  String get scanBluetoothRfidScannerDescription =>
+      'Unganisha kisomaji chako cha RFID cha Bluetooth ili kusoma lebo';
+
+  @override
   String get vaccineSavedSuccessfully => 'Chanjo imehifadhiwa kikamilifu';
 
   @override
@@ -3607,4 +3656,22 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get billMarkedAsPaid => 'Bili imewekwa kama imelipwa';
+
+  @override
+  String get milkingTrend => 'Mwelekeo wa Kukamua';
+
+  @override
+  String get milkingTrendByFarm => 'Mwelekeo wa Kukamua kwa Shamba';
+
+  @override
+  String get last6Months => 'Miezi 6 Iliyopita';
+
+  @override
+  String get lastYear => 'Mwaka Huu';
+
+  @override
+  String get average => 'Wastani';
+
+  @override
+  String get maximum => 'Kiwango cha Juu';
 }

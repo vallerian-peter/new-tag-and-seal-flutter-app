@@ -5,6 +5,8 @@ import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart'
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:developer';
@@ -250,12 +252,22 @@ class SyncProvider extends ChangeNotifier {
       // Step 1: Starting sync
       _updateProgress(l10n.syncStarting, 2);
       
-      // Step 2: Call the existing Sync.splashSync method
-      // Note: This sync will send unsynced farm users to backend, which triggers email sending
-      _updateProgress('Syncing data...', 3);
-      await Sync.splashSync(_database);
+      // Step 2: Get NotificationProvider from context if available
+      NotificationProvider? notificationProvider;
+      try {
+        notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+      } catch (_) {
+        // NotificationProvider not available in context, continue without it
+        log('⚠️ NotificationProvider not available in context - notifications will not be created during sync');
+      }
       
-      // Step 3: Sync completed
+      // Step 3: Call the existing Sync.splashSync method
+      // Note: This sync will send unsynced farm users to backend, which triggers email sending
+      // Also creates notifications for logs with nextDates if NotificationProvider is available
+      _updateProgress('Syncing data...', 3);
+      await Sync.splashSync(_database, notificationProvider: notificationProvider);
+      
+      // Step 4: Sync completed
       _updateProgress(l10n.syncCompleted, 4);
       
       log('✅ Sync completed - farm user invitation emails have been sent if any were synced');
@@ -389,11 +401,21 @@ class SyncProvider extends ChangeNotifier {
       return;
     }
     
+    // Try to get NotificationProvider from context if available
+    NotificationProvider? notificationProvider;
+    if (_currentContext != null && _currentContext!.mounted) {
+      try {
+        notificationProvider = Provider.of<NotificationProvider>(_currentContext!, listen: false);
+      } catch (_) {
+        // NotificationProvider not available, continue without it
+      }
+    }
+    
     _isSyncing = true;
     notifyListeners();
     
     try {
-      await Sync.splashSync(_database);
+      await Sync.splashSync(_database, notificationProvider: notificationProvider);
       log('✅ Background sync completed');
     } catch (e) {
       log('❌ Background sync failed: $e');

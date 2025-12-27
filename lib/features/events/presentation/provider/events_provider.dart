@@ -6,7 +6,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/ev
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/deworming_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feeding_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/medication_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/treatment_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
@@ -39,13 +39,13 @@ class EventsProvider extends ChangeNotifier {
   List<FeedingModel> _feedings = const [];
   List<WeightChangeModel> _weightChanges = const [];
   List<DewormingModel> _dewormings = const [];
-  List<MedicationModel> _medications = const [];
+  List<TreatmentModel> _treatments = const [];
   List<VaccinationModel> _vaccinations = const [];
   List<DisposalModel> _disposals = const [];
   List<FeedingModel> _allFeedings = const [];
   List<WeightChangeModel> _allWeightChanges = const [];
   List<DewormingModel> _allDewormings = const [];
-  List<MedicationModel> _allMedications = const [];
+  List<TreatmentModel> _allTreatments = const [];
   List<VaccinationModel> _allVaccinations = const [];
   List<DisposalModel> _allDisposals = const [];
   List<BirthEventModel> _allBirthEvents = const [];
@@ -66,13 +66,13 @@ class EventsProvider extends ChangeNotifier {
   List<FeedingModel> get feedings => _feedings;
   List<WeightChangeModel> get weightChanges => _weightChanges;
   List<DewormingModel> get dewormings => _dewormings;
-  List<MedicationModel> get medications => _medications;
+  List<TreatmentModel> get treatments => _treatments;
   List<VaccinationModel> get vaccinations => _vaccinations;
   List<DisposalModel> get disposals => _disposals;
   List<FeedingModel> get allFeedings => _allFeedings;
   List<WeightChangeModel> get allWeightChanges => _allWeightChanges;
   List<DewormingModel> get allDewormings => _allDewormings;
-  List<MedicationModel> get allMedications => _allMedications;
+  List<TreatmentModel> get allTreatments => _allTreatments;
   List<VaccinationModel> get allVaccinations => _allVaccinations;
   List<DisposalModel> get allDisposals => _allDisposals;
   List<BirthEventModel> get allBirthEvents => _allBirthEvents;
@@ -120,7 +120,7 @@ class EventsProvider extends ChangeNotifier {
         farmUuid: farmUuid,
         livestockUuid: livestockUuid,
       );
-      _medications = await _eventsRepository.getMedications(
+      _treatments = await _eventsRepository.getTreatments(
         farmUuid: farmUuid,
         livestockUuid: livestockUuid,
       );
@@ -171,7 +171,7 @@ class EventsProvider extends ChangeNotifier {
       _allFeedings = await _eventsRepository.getAllFeedings();
       _allWeightChanges = await _eventsRepository.getAllWeightChanges();
       _allDewormings = await _eventsRepository.getAllDewormings();
-      _allMedications = await _eventsRepository.getAllMedications();
+      _allTreatments = await _eventsRepository.getAllTreatments();
       _allVaccinations = await _eventsRepository.getAllVaccinations();
       _allDisposals = await _eventsRepository.getAllDisposals();
       _allBirthEvents = await _eventsRepository.getAllBirthEvents();
@@ -223,6 +223,10 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
+      
+      // Update notification for next feeding time if it changed
+      await _createFeedingNotification(updated);
+      
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -291,6 +295,10 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
+      
+      // Update notification for next administration date if it changed
+      await _createDewormingNotification(updated);
+      
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -299,12 +307,16 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<MedicationModel> addMedication(MedicationModel model) async {
+  Future<TreatmentModel> addTreatment(TreatmentModel model) async {
     try {
-      final created = await _eventsRepository.createMedication(model);
-      _medications = [..._medications, created];
-      _allMedications = [..._allMedications, created];
+      final created = await _eventsRepository.createTreatment(model);
+      _treatments = [..._treatments, created];
+      _allTreatments = [..._allTreatments, created];
       notifyListeners();
+      
+      // Create notification for next treatment date if it's in the future
+      await _createTreatmentNotification(created);
+      
       return created;
     } catch (e) {
       _error = e.toString();
@@ -313,16 +325,20 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<MedicationModel> updateMedication(MedicationModel model) async {
+  Future<TreatmentModel> updateTreatment(TreatmentModel model) async {
     try {
-      final updated = await _eventsRepository.updateMedicationLocally(model);
-      _medications = _medications
+      final updated = await _eventsRepository.updateTreatmentLocally(model);
+      _treatments = _treatments
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
-      _allMedications = _allMedications
+      _allTreatments = _allTreatments
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
+      
+      // Update notification for next treatment date if it changed
+      await _createTreatmentNotification(updated);
+      
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -1862,9 +1878,9 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<MedicationModel?> addMedicationWithDialog(
+  Future<TreatmentModel?> addTreatmentWithDialog(
     BuildContext context,
-    MedicationModel model,
+    TreatmentModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     AlertDialogs.showLoading(
@@ -1875,14 +1891,14 @@ class EventsProvider extends ChangeNotifier {
     );
 
     try {
-      final created = await addMedication(model);
+      final created = await addTreatment(model);
       _error = null;
       if (context.mounted) {
         Navigator.of(context).pop();
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
-          message: l10n.medicationLogSaved,
+          message: l10n.treatmentLogSaved,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -1895,7 +1911,7 @@ class EventsProvider extends ChangeNotifier {
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
-          message: l10n.medicationLogSaveFailed,
+          message: l10n.treatmentLogSaveFailed,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -1904,9 +1920,9 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<MedicationModel?> updateMedicationWithDialog(
+  Future<TreatmentModel?> updateTreatmentWithDialog(
     BuildContext context,
-    MedicationModel model,
+    TreatmentModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     AlertDialogs.showLoading(
@@ -1917,14 +1933,14 @@ class EventsProvider extends ChangeNotifier {
     );
 
     try {
-      final updated = await updateMedication(model);
+      final updated = await updateTreatment(model);
       _error = null;
       if (context.mounted) {
         Navigator.of(context).pop();
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
-          message: l10n.medicationLogSaved,
+          message: l10n.treatmentLogSaved,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -1937,7 +1953,7 @@ class EventsProvider extends ChangeNotifier {
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
-          message: l10n.medicationLogSaveFailed,
+          message: l10n.treatmentLogSaveFailed,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -1946,7 +1962,7 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<MedicationModel>> addMedicationBatchWithDialog({
+  Future<List<TreatmentModel>> addTreatmentBatchWithDialog({
     required BuildContext context,
     required String farmUuid,
     required List<String> livestockUuids,
@@ -1955,6 +1971,7 @@ class EventsProvider extends ChangeNotifier {
     String? quantity,
     String? withdrawalPeriod,
     String? medicationDate,
+    String? nextMedicationDate,
     String? remarks,
   }) async {
     final l10n = AppLocalizations.of(context)!;
@@ -1968,12 +1985,12 @@ class EventsProvider extends ChangeNotifier {
     );
 
     try {
-      final created = <MedicationModel>[];
+      final created = <TreatmentModel>[];
       for (final animalUuid in livestockUuids) {
         final now = DateTime.now().toIso8601String();
         final uuid =
-            'medication-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
-        final model = MedicationModel(
+            'treatment-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+        final model = TreatmentModel(
           uuid: uuid,
           farmUuid: farmUuid,
           livestockUuid: animalUuid,
@@ -1982,13 +1999,14 @@ class EventsProvider extends ChangeNotifier {
           quantity: quantity,
           withdrawalPeriod: withdrawalPeriod,
           medicationDate: medicationDate ?? now,
+          nextMedicationDate: nextMedicationDate,
           remarks: remarks,
           synced: false,
           syncAction: 'create',
           createdAt: now,
           updatedAt: now,
         );
-        created.add(await addMedication(model));
+        created.add(await addTreatment(model));
       }
 
       if (context.mounted) {
@@ -1996,7 +2014,7 @@ class EventsProvider extends ChangeNotifier {
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
-          message: l10n.medicationLogSaved,
+          message: l10n.treatmentLogSaved,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -2010,7 +2028,7 @@ class EventsProvider extends ChangeNotifier {
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
-          message: l10n.medicationLogSaveFailed,
+          message: l10n.treatmentLogSaveFailed,
           buttonText: l10n.ok,
           // Dialog already pops itself, no need for onPressed
         );
@@ -2377,8 +2395,8 @@ class EventsProvider extends ChangeNotifier {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
         );
-      case EventLogTypes.medication:
-        return await _eventsRepository.getMedications(
+      case EventLogTypes.treatment:
+        return await _eventsRepository.getTreatments(
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
         );
@@ -2449,13 +2467,13 @@ class EventsProvider extends ChangeNotifier {
     _feedings = const [];
     _weightChanges = const [];
     _dewormings = const [];
-    _medications = const [];
+    _treatments = const [];
     _vaccinations = const [];
     _disposals = const [];
     _allFeedings = const [];
     _allWeightChanges = const [];
     _allDewormings = const [];
-    _allMedications = const [];
+    _allTreatments = const [];
     _allVaccinations = const [];
     _allDisposals = const [];
     _allBirthEvents = const [];
@@ -2474,7 +2492,7 @@ class EventsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Helper method to create notification for feeding events
+  // Helper method to create or update notification for feeding events
   Future<void> _createFeedingNotification(FeedingModel feeding) async {
     if (_notificationProvider == null) {
       log('⚠️ NotificationProvider not available, skipping notification creation');
@@ -2494,8 +2512,29 @@ class EventsProvider extends ChangeNotifier {
         return;
       }
 
-      // Use notification_type field to allow UI to localize dynamically
-      final notification = NotificationModel(
+      // Check if notification already exists for this feeding event
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'feeding_reminder' &&
+              n.farmUuid == feeding.farmUuid &&
+              n.livestockUuid == feeding.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        // Update existing notification with new scheduled time
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextFeedingTime.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+        log('🔄 Updating existing feeding notification');
+      } else {
+        // Create new notification
+        notification = NotificationModel(
         farmUuid: feeding.farmUuid,
         farmName: null, // Will be populated when displaying
         livestockUuid: feeding.livestockUuid,
@@ -2510,16 +2549,18 @@ class EventsProvider extends ChangeNotifier {
         updatedAt: DateTime.now().toIso8601String(),
         repeatDaily: false,
       );
+        log('➕ Creating new feeding notification');
+      }
 
       await _notificationProvider.saveNotification(notification);
-      log('✅ Feeding notification created for ${nextFeedingTime.toLocal()}');
+      log('✅ Feeding notification saved for ${nextFeedingTime.toLocal()}');
     } catch (e) {
       log('❌ Failed to create feeding notification: $e');
       // Don't rethrow - notification creation failure shouldn't fail the feeding event
     }
   }
 
-  // Helper method to create notification for deworming events
+  // Helper method to create or update notification for deworming events
   Future<void> _createDewormingNotification(DewormingModel deworming) async {
     if (_notificationProvider == null) {
       log('⚠️ NotificationProvider not available, skipping notification creation');
@@ -2545,8 +2586,29 @@ class EventsProvider extends ChangeNotifier {
         return;
       }
 
-      // Use notification_type field to allow UI to localize dynamically
-      final notification = NotificationModel(
+      // Check if notification already exists for this deworming event
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'deworming_reminder' &&
+              n.farmUuid == deworming.farmUuid &&
+              n.livestockUuid == deworming.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        // Update existing notification with new scheduled time
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextDate.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+        log('🔄 Updating existing deworming notification');
+      } else {
+        // Create new notification
+        notification = NotificationModel(
         farmUuid: deworming.farmUuid,
         farmName: null, // Will be populated when displaying
         livestockUuid: deworming.livestockUuid,
@@ -2561,12 +2623,88 @@ class EventsProvider extends ChangeNotifier {
         updatedAt: DateTime.now().toIso8601String(),
         repeatDaily: false,
       );
+        log('➕ Creating new deworming notification');
+      }
 
       await _notificationProvider.saveNotification(notification);
-      log('✅ Deworming notification created for ${nextDate.toLocal()}');
+      log('✅ Deworming notification saved for ${nextDate.toLocal()}');
     } catch (e) {
       log('❌ Failed to create deworming notification: $e');
       // Don't rethrow - notification creation failure shouldn't fail the deworming event
+    }
+  }
+
+  // Helper method to create or update notification for treatment events
+  Future<void> _createTreatmentNotification(TreatmentModel treatment) async {
+    if (_notificationProvider == null) {
+      log('⚠️ NotificationProvider not available, skipping notification creation');
+      return;
+    }
+
+    try {
+      final nextMedicationDate = treatment.nextMedicationDate;
+      if (nextMedicationDate == null || nextMedicationDate.isEmpty) {
+        log('⚠️ No next medication date set for treatment');
+        return;
+      }
+
+      final nextDate = DateTime.tryParse(nextMedicationDate);
+      if (nextDate == null) {
+        log('⚠️ Invalid nextMedicationDate format: $nextMedicationDate');
+        return;
+      }
+
+      final now = DateTime.now();
+      if (nextDate.isBefore(now)) {
+        log('⚠️ Next treatment date is in the past, skipping notification');
+        return;
+      }
+
+      // Check if notification already exists for this treatment event
+      final existingNotifications = _notificationProvider.notifications
+          .where((n) =>
+              n.title == 'treatment_reminder' &&
+              n.farmUuid == treatment.farmUuid &&
+              n.livestockUuid == treatment.livestockUuid &&
+              !n.isCompleted)
+          .toList();
+
+      NotificationModel notification;
+      if (existingNotifications.isNotEmpty) {
+        // Update existing notification with new scheduled time
+        final existing = existingNotifications.first;
+        notification = existing.copyWith(
+          scheduledAt: nextDate.toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          synced: false,
+          syncAction: 'update',
+        );
+        log('🔄 Updating existing treatment notification');
+      } else {
+        // Create new notification
+        notification = NotificationModel(
+          farmUuid: treatment.farmUuid,
+          farmName: null, // Will be populated when displaying
+          livestockUuid: treatment.livestockUuid,
+          livestockName: null, // Will be populated when displaying
+          title: 'treatment_reminder', // Key for localization
+          description: 'time_to_treat_livestock', // Key for localization
+          scheduledAt: nextDate.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
+        log('➕ Creating new treatment notification');
+      }
+
+      await _notificationProvider.saveNotification(notification);
+      log('✅ Treatment notification saved for ${nextDate.toLocal()}');
+    } catch (e) {
+      log('❌ Failed to create treatment notification: $e');
+      // Don't rethrow - notification creation failure shouldn't fail the treatment event
     }
   }
 

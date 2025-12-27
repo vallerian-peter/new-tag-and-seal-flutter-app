@@ -702,7 +702,9 @@ class _ScanModeSelector extends StatelessWidget {
       runSpacing: 12,
       children: configs.map((config) {
         final isSelected = config.mode == selectedMode;
+
         return ChoiceChip(
+          elevation: 0,
           labelPadding: const EdgeInsets.symmetric(horizontal: 12),
           avatar: Icon(
             config.icon,
@@ -714,7 +716,7 @@ class _ScanModeSelector extends StatelessWidget {
           selected: isSelected,
           label: Text(config.title),
           onSelected: (_) => onModeSelected(config.mode),
-          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800] : theme.colorScheme.surface,
+          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800] : theme.scaffoldBackgroundColor,
           selectedColor: config.accentColor,
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
             color: isSelected ? Colors.white : theme.colorScheme.onSurface,
@@ -926,7 +928,7 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                   FilledButton.icon(
                     onPressed: () => _openBluetoothRfidScanner(),
                     icon: const Icon(Icons.bluetooth),
-                    label: const Text('Connect Bluetooth RFID Scanner'),
+                    label: Text(l10n.scanConnectBluetoothRfidScanner),
                     style: FilledButton.styleFrom(
                       backgroundColor: widget.config.accentColor,
                       foregroundColor: Colors.white,
@@ -1020,6 +1022,7 @@ class _RfidBluetoothScanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       color: theme.colorScheme.surface.withOpacity(0.9),
       child: Center(
@@ -1033,7 +1036,7 @@ class _RfidBluetoothScanner extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Bluetooth RFID Scanner',
+              l10n.scanBluetoothRfidScannerTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: accentColor,
                 fontWeight: FontWeight.w600,
@@ -1041,7 +1044,7 @@ class _RfidBluetoothScanner extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Connect your Bluetooth RFID scanner to scan tags',
+              l10n.scanBluetoothRfidScannerDescription,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),

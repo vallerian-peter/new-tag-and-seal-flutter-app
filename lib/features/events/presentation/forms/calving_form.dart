@@ -43,6 +43,7 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _remarksController = TextEditingController();
 
   int _currentStep = 0;
@@ -59,6 +60,7 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
   int? _selectedReproductiveProblemId;
   String _selectedStatus = 'active';
 
+  DateTime? _selectedEventDate;
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -87,6 +89,13 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
 
     if (calving == null) return;
 
+    if (calving.eventDate != null && calving.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(calving.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _selectedCalvingTypeId = calving.calvingTypeId;
     _selectedCalvingProblemId = calving.calvingProblemsId;
     _selectedReproductiveProblemId = calving.reproductiveProblemId;
@@ -247,14 +256,6 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
   }
 
   @override
-  void dispose() {
-    _remarksController.dispose();
-    _startDateController.dispose();
-    _endDateController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -394,6 +395,15 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
         ],
         _buildSectionTitle(l10n.calving),
         const SizedBox(height: 20),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
         CustomTextField(
           controller: _startDateController,
           label: l10n.startDate,
@@ -588,6 +598,113 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    _eventDateController.dispose();
+    _remarksController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Future<void> _pickDate({required bool isStartDate}) async {
     final theme = Theme.of(context);
     final initialDate = isStartDate
@@ -708,9 +825,11 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
     try {
       if (widget.isEditMode) {
         final existing = widget.calving!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso ?? existing.eventDate,
           startDate: startDateIso ?? existing.startDate,
           endDate: endDateIso ?? existing.endDate,
           calvingTypeId: calvingTypeId,
@@ -744,10 +863,12 @@ class _CalvingFormScreenState extends State<CalvingFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-$calvingTypeId';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = CalvingModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso,
           startDate: startDateIso ?? nowIso,
           endDate: endDateIso,
           calvingTypeId: calvingTypeId,

@@ -47,6 +47,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _quantityController = TextEditingController();
   final _doseController = TextEditingController();
   final _nextAdministrationController = TextEditingController();
@@ -67,6 +68,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   int? _selectedAdministrationRouteId;
   int? _selectedMedicineId;
 
+  DateTime? _selectedEventDate;
   DateTime? _selectedNextAdministrationDate;
   _TreatmentProviderType _selectedProviderType = _TreatmentProviderType.none;
   bool get _isBulk => widget.isBulk;
@@ -93,6 +95,14 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
     _selectedMedicineId = deworming.medicineId;
     _quantityController.text = deworming.quantity ?? '';
     _doseController.text = deworming.dose ?? '';
+
+    if (deworming.eventDate != null && deworming.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(deworming.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
 
     if (deworming.vetId != null && deworming.vetId!.trim().isNotEmpty) {
       _selectedProviderType = _TreatmentProviderType.vet;
@@ -289,6 +299,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _quantityController.dispose();
     _doseController.dispose();
     _nextAdministrationController.dispose();
@@ -477,6 +488,15 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
         ],
         const SizedBox(height: 24),
         _buildSectionTitle(l10n.dewormingDetails),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
         const SizedBox(height: 16),
         CustomDropdown<int>(
           label: l10n.administrationRoute,
@@ -761,6 +781,104 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
     });
   }
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   String _formatDisplayDate(DateTime date) {
     return DateFormat.yMMMd().format(date.toLocal());
   }
@@ -817,11 +935,13 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
       if (widget.isEditMode) {
         final existing = widget.deworming!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updated = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
           administrationRouteId: _selectedAdministrationRouteId,
           medicineId: _selectedMedicineId,
+          eventDate: eventDateIso ?? existing.eventDate,
           vetId: vetId,
           extensionOfficerId: extensionOfficerId,
           quantity: _quantityController.text.trim(),
@@ -875,12 +995,14 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
         for (final animalUuid in bulkLivestockUuids) {
           final now = DateTime.now().toIso8601String();
           final uuid = '${DateTime.now().millisecondsSinceEpoch}-${animalUuid.hashCode}-deworming';
+          final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = DewormingModel(
             uuid: uuid,
             farmUuid: selectedFarmUuid,
             livestockUuid: animalUuid,
             administrationRouteId: _selectedAdministrationRouteId,
             medicineId: _selectedMedicineId,
+            eventDate: eventDateIso,
             vetId: vetId,
             extensionOfficerId: extensionOfficerId,
             quantity: _quantityController.text.trim(),
@@ -923,12 +1045,14 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-deworming';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final model = DewormingModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid!,
           administrationRouteId: _selectedAdministrationRouteId,
           medicineId: _selectedMedicineId,
+          eventDate: eventDateIso,
           vetId: vetId,
           extensionOfficerId: extensionOfficerId,
           quantity: _quantityController.text.trim(),

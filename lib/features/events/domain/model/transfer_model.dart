@@ -12,6 +12,7 @@ class TransferModel {
   final String transferDate;
   final String? remarks;
   final String? status;
+  final String? eventDate;
   final bool synced;
   final String syncAction;
   final String createdAt;
@@ -32,6 +33,7 @@ class TransferModel {
     required this.transferDate,
     this.remarks,
     this.status,
+    this.eventDate,
     this.synced = false,
     this.syncAction = 'create',
     required this.createdAt,
@@ -52,6 +54,7 @@ class TransferModel {
     String? transferDate,
     Object? remarks = _unset,
     Object? status = _unset,
+    String? eventDate,
     bool? synced,
     String? syncAction,
     String? createdAt,
@@ -78,6 +81,7 @@ class TransferModel {
           identical(remarks, _unset) ? this.remarks : remarks as String?,
       status:
           identical(status, _unset) ? this.status : status as String?,
+      eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
@@ -105,6 +109,7 @@ class TransferModel {
       'transferDate': transferDate,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,
@@ -128,6 +133,7 @@ class TransferModel {
       transferDate: json['transferDate'] as String,
       remarks: json['remarks'] as String?,
       status: json['status'] as String?,
+      eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
       syncAction: json['syncAction'] as String? ?? 'create',
       createdAt: json['createdAt'] as String,
@@ -150,6 +156,7 @@ class TransferModel {
       'transferDate': transferDate,
       'remarks': remarks,
       'status': status,
+      'eventDate': eventDate,
       'synced': synced,
       'syncAction': syncAction,
       'createdAt': createdAt,

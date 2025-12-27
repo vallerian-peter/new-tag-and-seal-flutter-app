@@ -42,6 +42,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _stepperKey = GlobalKey<FormState>();
 
+  final _eventDateController = TextEditingController();
   final _reasonController = TextEditingController();
   final _remarksController = TextEditingController();
   final _startDateController = TextEditingController();
@@ -56,6 +57,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
 
+  DateTime? _selectedEventDate;
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -77,6 +79,13 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
 
     if (dryoff == null) return;
 
+    if (dryoff.eventDate != null && dryoff.eventDate!.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(dryoff.eventDate!);
+      if (parsed != null) {
+        _selectedEventDate = parsed;
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+      }
+    }
     _reasonController.text = dryoff.reason ?? '';
     _remarksController.text = dryoff.remarks ?? '';
 
@@ -207,6 +216,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
 
   @override
   void dispose() {
+    _eventDateController.dispose();
     _reasonController.dispose();
     _remarksController.dispose();
     _startDateController.dispose();
@@ -355,6 +365,15 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
         _buildSectionTitle(l10n.dryoff),
         const SizedBox(height: 20),
         CustomTextField(
+          controller: _eventDateController,
+          label: l10n.eventDate,
+          hintText: l10n.selectEventDate,
+          prefixIcon: Icons.event_available_outlined,
+          readOnly: true,
+          onTap: _pickEventDate,
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
           controller: _startDateController,
           label: l10n.startDate,
           hintText: l10n.startDate,
@@ -490,6 +509,104 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
     );
   }
 
+  Future<void> _pickEventDate() async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = isDark 
+        ? theme.scaffoldBackgroundColor 
+        : whiteColor;
+    final initial = _selectedEventDate ?? DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: backgroundColor,
+              surfaceTintColor: Colors.transparent,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date == null) return;
+
+    if (!mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+      builder: (context, child) {
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: Constants.primaryColor,
+              onPrimary: theme.colorScheme.onPrimary,
+              onSurface: theme.colorScheme.onSurface,
+              surface: backgroundColor,
+              surfaceContainerHighest: backgroundColor,
+            ),
+            dialogBackgroundColor: backgroundColor,
+            canvasColor: backgroundColor,
+            cardColor: backgroundColor,
+            scaffoldBackgroundColor: backgroundColor,
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: backgroundColor,
+              dialBackgroundColor: backgroundColor,
+              hourMinuteColor: backgroundColor,
+              hourMinuteTextColor: theme.colorScheme.onSurface,
+              dialHandColor: Constants.primaryColor,
+              dialTextColor: theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Constants.primaryColor,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (time == null || !mounted) return;
+
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      _selectedEventDate = combined;
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+    });
+  }
+
   Future<void> _pickDate({required bool isStartDate}) async {
     final theme = Theme.of(context);
     final initialDate = isStartDate
@@ -609,9 +726,11 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
     try {
       if (widget.isEditMode) {
         final existing = widget.dryoff!;
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso ?? existing.eventDate,
           startDate: startDateIso,
           endDate: endDateIso,
           reason: _reasonController.text.trim().isEmpty
@@ -660,10 +779,12 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-dryoff';
 
+        final eventDateIso = _selectedEventDate?.toIso8601String();
         final newModel = DryoffModel(
           uuid: uuid,
           farmUuid: selectedFarmUuid,
           livestockUuid: selectedLivestockUuid,
+          eventDate: eventDateIso,
           startDate: startDateIso,
           endDate: endDateIso,
           reason: _reasonController.text.trim().isEmpty

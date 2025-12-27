@@ -226,8 +226,8 @@ class _EventsScreenState extends State<EventsScreen> {
         icon: Icons.bug_report_outlined,
       ),
       _EventTypeConfig(
-        logType: EventLogTypes.medication,
-        title: l10n.medication,
+        logType: EventLogTypes.treatment,
+        title: l10n.treatment,
         color: Colors.purple,
         icon: Icons.medical_services_outlined,
       ),
@@ -283,8 +283,8 @@ class _EventsScreenState extends State<EventsScreen> {
         return provider.allFeedings;
       case EventLogTypes.deworming:
         return provider.allDewormings;
-      case EventLogTypes.medication:
-        return provider.allMedications;
+      case EventLogTypes.treatment:
+        return provider.allTreatments;
       case EventLogTypes.vaccination:
         return provider.allVaccinations;
       case EventLogTypes.disposal:

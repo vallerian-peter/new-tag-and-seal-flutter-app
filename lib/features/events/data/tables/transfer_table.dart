@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 class Transfers extends Table {
   IntColumn get id => integer().nullable()();
   TextColumn get uuid => text()();
+  TextColumn get eventDate => text().nullable()();
   TextColumn get farmUuid => text()();
   TextColumn get livestockUuid => text()();
   TextColumn get toFarmUuid => text().nullable()();

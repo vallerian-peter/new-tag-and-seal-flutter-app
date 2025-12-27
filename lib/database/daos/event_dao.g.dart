@@ -7,7 +7,7 @@ mixin _$EventDaoMixin on DatabaseAccessor<AppDatabase> {
   $FeedingsTable get feedings => attachedDatabase.feedings;
   $WeightChangesTable get weightChanges => attachedDatabase.weightChanges;
   $DewormingsTable get dewormings => attachedDatabase.dewormings;
-  $MedicationsTable get medications => attachedDatabase.medications;
+  $TreatmentsTable get treatments => attachedDatabase.treatments;
   $VaccinationsTable get vaccinations => attachedDatabase.vaccinations;
   $DisposalsTable get disposals => attachedDatabase.disposals;
   $BirthEventsTable get birthEvents => attachedDatabase.birthEvents;
