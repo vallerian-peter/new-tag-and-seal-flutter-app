@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -116,6 +117,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      )
+    );
     
     return Scaffold(
       body: _isLoading
@@ -141,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.only(right: 20, left: 20, bottom: 30),
                         child: Column(
                           children: [
 
@@ -194,7 +202,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: Colors.white,
                               ),
                             ),
+
                             const SizedBox(height: 4),
+                            
                             Text(
                               _userEmail,
                               style: TextStyle(

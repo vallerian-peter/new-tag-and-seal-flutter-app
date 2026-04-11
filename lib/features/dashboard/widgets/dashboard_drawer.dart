@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bills_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/income_expenditure_report_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 
 class DashboardDrawer extends StatelessWidget {
@@ -21,6 +22,7 @@ class DashboardDrawer extends StatelessWidget {
   final bool showFarmUsersLink;
   final bool showExtensionsLink;
   final bool showBillsLink;
+  final bool showReportsLink;
 
   const DashboardDrawer({
     super.key,
@@ -31,6 +33,7 @@ class DashboardDrawer extends StatelessWidget {
     this.showFarmUsersLink = true,
     this.showExtensionsLink = true,
     this.showBillsLink = false,
+    this.showReportsLink = false,
   });
 
   @override
@@ -50,7 +53,10 @@ class DashboardDrawer extends StatelessWidget {
         final rt = authProvider.currentProfile?['roleTitle'] as String?;
         displayRole = (rt != null && rt.isNotEmpty) ? rt : 'Farm User';
       } else {
-        final raw = (authProvider.userRole ?? '').replaceAll(RegExp(r'[ _-]+'), ' ');
+        final raw = (authProvider.userRole ?? '').replaceAll(
+          RegExp(r'[ _-]+'),
+          ' ',
+        );
         displayRole = raw.isNotEmpty ? raw : 'User';
       }
     }
@@ -171,8 +177,21 @@ class DashboardDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const BillsScreen()),
+                      );
+                    },
+                  ),
+
+                if (showReportsLink)
+                  _buildDrawerItem(
+                    context: context,
+                    icon: Icons.print_outlined,
+                    title: l10n.incomeExpenditureReport,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const BillsScreen(),
+                          builder: (_) => const IncomeExpenditureReportScreen(),
                         ),
                       );
                     },
@@ -205,7 +224,10 @@ class DashboardDrawer extends StatelessWidget {
                           builder: (routeCtx) => ChangeNotifierProvider(
                             create: (_) => ExtensionOfficerProvider(
                               repository: ExtensionOfficerRepository(
-                                Provider.of<AppDatabase>(context, listen: false),
+                                Provider.of<AppDatabase>(
+                                  context,
+                                  listen: false,
+                                ),
                               ),
                             ),
                             child: const ExtensionOfficerListScreen(),

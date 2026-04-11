@@ -9,10 +9,45 @@ import 'package:new_tag_and_seal_flutter_app/features/legal/presentation/terms_o
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/main.dart';
 import 'package:new_tag_and_seal_flutter_app/theme/theme_provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _appVersion = '...';
+  String _buildNumber = '...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersionInfo();
+  }
+
+  Future<void> _loadVersionInfo() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = packageInfo.version;
+          _buildNumber = packageInfo.buildNumber;
+        });
+      }
+    } catch (e) {
+      // Fallback to Constants if package_info_plus fails
+      if (mounted) {
+        setState(() {
+          _appVersion = Constants.appVersion;
+          _buildNumber = Constants.appBuildNumber;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -250,8 +285,25 @@ class SettingsScreen extends StatelessWidget {
 
               ],
             ),
+
+            const SizedBox(height: 24),
+
+            // Version & Build
+            _buildSettingsSection(
+              context: context,
+              title: l10n.settingsVersionBuildTitle,
+              children: [
+                _buildDisplayOnlyOption(
+                  context: context,
+                  icon: Iconsax.layer_outline,
+                  title: l10n.version,
+                  subtitle: '${l10n.versionSubtitle} $_appVersion+$_buildNumber',
+                ),
+              ],
+            ),
             
             const SizedBox(height: 40),
+
           ],
         ),
       ),
@@ -370,6 +422,61 @@ class SettingsScreen extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDisplayOnlyOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Constants.primaryColor
+                  .withValues(alpha: isDark ? 0.18 : 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Constants.primaryColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -15,7 +15,14 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/teeth_clipping_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/tail_docking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/iron_injection_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/livestock_marking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/stage_change_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/prepuce_condition_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
@@ -583,6 +590,26 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
   }
 }
 
+String _prepuceIdLabel(
+  LogAdditionalDataProvider? refs,
+  String kind,
+  int id,
+  String? languageCode,
+) {
+  if (refs == null) return id.toString();
+  return refs.prepuceLabelFor(kind, id, languageCode) ?? id.toString();
+}
+
+String? _prepuceIdLabelNullable(
+  LogAdditionalDataProvider? refs,
+  String kind,
+  int? id,
+  String? languageCode,
+) {
+  if (id == null) return null;
+  return _prepuceIdLabel(refs, kind, id, languageCode);
+}
+
 class _EventLogCard extends StatelessWidget {
   final String logType;
   final dynamic log;
@@ -841,6 +868,13 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.disposalReasons, disposal.reasons);
         addRow(l10n.remarks, disposal.remarks);
+        if (disposal.saleWeight != null) {
+          addRow(l10n.saleWeight, disposal.saleWeight!.toString());
+        }
+        if (disposal.salePrice != null) {
+          addRow(l10n.salePrice, disposal.salePrice!.toString());
+        }
+        addRow(l10n.buyerName, disposal.buyerName);
         addRow(l10n.status, disposal.status);
         createdDate = disposal.eventDate != null && disposal.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(disposal.eventDate!)
@@ -1010,6 +1044,171 @@ class _EventLogCard extends StatelessWidget {
         createdDate = transfer.eventDate != null && transfer.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(transfer.eventDate!)
             : DateTime.tryParse(transfer.createdAt);
+        break;
+      case EventLogTypes.teethClipping:
+        final e = log as TeethClippingModel;
+        icon = Icons.content_cut_outlined;
+        title = l10n.teethClipping;
+        addRow(l10n.procedureMethod, e.method);
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
+        break;
+      case EventLogTypes.tailDocking:
+        final e = log as TailDockingModel;
+        icon = Icons.cut_outlined;
+        title = l10n.tailDocking;
+        addRow(l10n.procedureMethod, e.method);
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
+        break;
+      case EventLogTypes.ironInjection:
+        final e = log as IronInjectionModel;
+        icon = Icons.vaccines_outlined;
+        title = l10n.ironInjection;
+        addRow(l10n.dosage, e.dosage);
+        addRow(l10n.medicine, _resolveMedicineName(e.medicineId));
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
+        break;
+      case EventLogTypes.livestockMarking:
+        final e = log as LivestockMarkingModel;
+        icon = Icons.brush_outlined;
+        title = l10n.livestockMarking;
+        addRow(l10n.markingType, e.markingType);
+        addRow(l10n.description, e.description);
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
+        break;
+      case EventLogTypes.stageChange:
+        final e = log as StageChangeModel;
+        icon = Icons.trending_up_outlined;
+        title = l10n.stageChange;
+        if (e.fromStageId != null) {
+          addRow(l10n.fromStage, e.fromStageId.toString());
+        }
+        if (e.toStageId != null) {
+          addRow(l10n.toStage, e.toStageId.toString());
+        }
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
+        break;
+      case EventLogTypes.prepuceCondition:
+        final e = log as PrepuceConditionModel;
+        final lc = Localizations.localeOf(context).languageCode;
+        icon = Icons.medical_information_outlined;
+        title = l10n.prepuceConditionTitle;
+        addRow(
+          l10n.prepuceConditionTypeLabel,
+          _prepuceIdLabel(
+            references,
+            PrepuceReferenceKind.conditionType,
+            e.conditionTypeId,
+            lc,
+          ),
+        );
+        addRow(
+          l10n.prepuceConditionSeverityLabel,
+          _prepuceIdLabel(
+            references,
+            PrepuceReferenceKind.severity,
+            e.severityId,
+            lc,
+          ),
+        );
+        if (e.clinicalSignIds.isNotEmpty) {
+          addRow(
+            l10n.prepuceConditionClinicalSignsLabel,
+            e.clinicalSignIds
+                .map(
+                  (c) => _prepuceIdLabel(
+                    references,
+                    PrepuceReferenceKind.clinicalSign,
+                    c,
+                    lc,
+                  ),
+                )
+                .join(', '),
+          );
+        }
+        addRow(
+          l10n.prepuceConditionCauseLabel,
+          _prepuceIdLabelNullable(
+            references,
+            PrepuceReferenceKind.causeRisk,
+            e.causeRiskId,
+            lc,
+          ),
+        );
+        if (e.treatmentGivenIds.isNotEmpty) {
+          addRow(
+            l10n.prepuceConditionTreatmentLabel,
+            e.treatmentGivenIds
+                .map(
+                  (c) => _prepuceIdLabel(
+                    references,
+                    PrepuceReferenceKind.treatmentGiven,
+                    c,
+                    lc,
+                  ),
+                )
+                .join(', '),
+          );
+        }
+        addRow(l10n.medicine, _resolveMedicineName(e.medicineId));
+        addRow(
+          l10n.prepuceConditionRouteLabel,
+          _resolveAdministrationRouteName(e.administrationRouteId),
+        );
+        addRow(l10n.quantity, e.quantity);
+        addRow(l10n.dose, e.dose);
+        if (e.vetId != null && e.vetId!.trim().isNotEmpty) {
+          addRow(l10n.vetLicense, e.vetId);
+        }
+        if (e.extensionOfficerId != null &&
+            e.extensionOfficerId!.trim().isNotEmpty) {
+          addRow(l10n.extensionOfficerLicense, e.extensionOfficerId);
+        }
+        addRow(
+          l10n.prepuceConditionBreedingLabel,
+          _prepuceIdLabel(
+            references,
+            PrepuceReferenceKind.breedingStatus,
+            e.breedingStatusId,
+            lc,
+          ),
+        );
+        addRow(
+          l10n.prepuceConditionHealingLabel,
+          _prepuceIdLabelNullable(
+            references,
+            PrepuceReferenceKind.healingStatus,
+            e.healingStatusId,
+            lc,
+          ),
+        );
+        final followUpDate = e.followUpDate != null
+            ? DateTime.tryParse(e.followUpDate!)
+            : null;
+        addRow(
+          l10n.prepuceConditionFollowUpLabel,
+          followUpDate != null
+              ? dateFormat.format(followUpDate.toLocal())
+              : e.followUpDate,
+        );
+        addRow(l10n.notes, e.notes);
+        createdDate = e.eventDate != null && e.eventDate!.trim().isNotEmpty
+            ? DateTime.tryParse(e.eventDate!)
+            : DateTime.tryParse(e.createdAt);
         break;
     }
 

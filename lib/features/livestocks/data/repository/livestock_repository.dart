@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/domain/models/livestock_model.dart';
@@ -5,7 +7,6 @@ import 'package:new_tag_and_seal_flutter_app/features/livestocks/domain/repo/liv
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/data/mapper/livestock_mapper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
-import 'dart:developer';
 
 /// Repository for Livestocks data management
 /// Implements the domain repository interface
@@ -139,7 +140,8 @@ class LivestockRepository implements LivestockRepo {
       LivestocksCompanion.insert(
         farmUuid: livestockData['farmUuid'] as String, // Farm UUID
         uuid: livestockData['uuid'] as String,
-        identificationNumber: livestockData['identificationNumber'] as String,
+        identificationNumber:
+            (livestockData['identificationNumber'] as String?) ?? '',
         dummyTagId: Value(livestockData['dummyTagId'] as String?),
         barcodeTagId: Value(livestockData['barcodeTagId'] as String?),
         rfidTagId: Value(livestockData['rfidTagId'] as String?),
@@ -152,6 +154,9 @@ class LivestockRepository implements LivestockRepo {
         fatherUuid: Value(
           livestockData['fatherUuid'] as String?,
         ), // Father UUID
+        birthEventUuid: Value(livestockData['birthEventUuid'] as String?),
+        stageId: Value(livestockData['stageId'] as int?),
+        isIdentified: Value(livestockData['isIdentified'] as bool? ?? true),
         gender: livestockData['gender'] as String,
         breedId: livestockData['breedId'] as int,
         speciesId: livestockData['speciesId'] as int,
@@ -163,6 +168,8 @@ class LivestockRepository implements LivestockRepo {
         ),
         weightAsOnRegistration:
             livestockData['weightAsOnRegistration'] as double,
+        primaryColor: Value(livestockData['primaryColor'] as String?),
+        secondaryColor: Value(livestockData['secondaryColor'] as String?),
         synced: const Value(true),
         syncAction: const Value('server-create'),
         createdAt: livestockData['createdAt'] as String,
@@ -180,7 +187,8 @@ class LivestockRepository implements LivestockRepo {
       id: id,
       farmUuid: livestockData['farmUuid'] as String, // Farm UUID
       uuid: livestockData['uuid'] as String,
-      identificationNumber: livestockData['identificationNumber'] as String,
+      identificationNumber:
+          (livestockData['identificationNumber'] as String?) ?? '',
       dummyTagId: livestockData['dummyTagId'] as String?,
       barcodeTagId: livestockData['barcodeTagId'] as String?,
       rfidTagId: livestockData['rfidTagId'] as String?,
@@ -189,6 +197,9 @@ class LivestockRepository implements LivestockRepo {
       dateOfBirth: livestockData['dateOfBirth'] as String,
       motherUuid: livestockData['motherUuid'] as String?, // Mother UUID
       fatherUuid: livestockData['fatherUuid'] as String?, // Father UUID
+      birthEventUuid: livestockData['birthEventUuid'] as String?,
+      stageId: livestockData['stageId'] as int?,
+      isIdentified: livestockData['isIdentified'] as bool? ?? true,
       gender: livestockData['gender'] as String,
       breedId: livestockData['breedId'] as int,
       speciesId: livestockData['speciesId'] as int,
@@ -199,6 +210,8 @@ class LivestockRepository implements LivestockRepo {
         livestockData['dateFirstEnteredToFarm'] as String,
       ),
       weightAsOnRegistration: livestockData['weightAsOnRegistration'] as double,
+      primaryColor: livestockData['primaryColor'] as String?,
+      secondaryColor: livestockData['secondaryColor'] as String?,
       synced: true,
       syncAction: 'server-update',
       createdAt: livestockData['createdAt'] as String,
@@ -314,7 +327,8 @@ class LivestockRepository implements LivestockRepo {
       final companion = LivestocksCompanion.insert(
         farmUuid: livestockData['farmUuid'] as String,
         uuid: livestockData['uuid'] as String,
-        identificationNumber: livestockData['identificationNumber'] as String,
+        identificationNumber:
+            (livestockData['identificationNumber'] as String?) ?? '',
         dummyTagId: Value(livestockData['dummyTagId'] as String?),
         barcodeTagId: Value(livestockData['barcodeTagId'] as String?),
         rfidTagId: Value(livestockData['rfidTagId'] as String?),
@@ -323,6 +337,9 @@ class LivestockRepository implements LivestockRepo {
         dateOfBirth: livestockData['dateOfBirth'] as String,
         motherUuid: Value(livestockData['motherUuid'] as String?),
         fatherUuid: Value(livestockData['fatherUuid'] as String?),
+        birthEventUuid: Value(livestockData['birthEventUuid'] as String?),
+        stageId: Value(livestockData['stageId'] as int?),
+        isIdentified: Value(livestockData['isIdentified'] as bool? ?? true),
         gender: livestockData['gender'] as String,
         breedId: livestockData['breedId'] as int,
         speciesId: livestockData['speciesId'] as int,
@@ -361,6 +378,13 @@ class LivestockRepository implements LivestockRepo {
       log('❌ Error creating livestock: $e');
       throw Exception('Failed to create livestock: $e');
     }
+  }
+
+  @override
+  Future<Set<String>> findExistingIdentificationNumbers(
+    Iterable<String> candidates,
+  ) {
+    return _database.livestockDao.findExistingIdentificationNumbers(candidates);
   }
 
   /// Update livestock
@@ -410,6 +434,15 @@ class LivestockRepository implements LivestockRepo {
         fatherUuid: livestockData.containsKey('fatherUuid')
             ? livestockData['fatherUuid'] as String?
             : existing.fatherUuid,
+        birthEventUuid: livestockData.containsKey('birthEventUuid')
+            ? livestockData['birthEventUuid'] as String?
+            : existing.birthEventUuid,
+        stageId: livestockData.containsKey('stageId')
+            ? livestockData['stageId'] as int?
+            : existing.stageId,
+        isIdentified: livestockData.containsKey('isIdentified')
+            ? (livestockData['isIdentified'] as bool? ?? existing.isIdentified)
+            : existing.isIdentified,
         gender: livestockData['gender'] as String? ?? existing.gender,
         breedId: livestockData['breedId'] as int? ?? existing.breedId,
         speciesId: livestockData['speciesId'] as int? ?? existing.speciesId,
@@ -564,6 +597,9 @@ class LivestockRepository implements LivestockRepo {
         dateOfBirth: livestock.dateOfBirth,
         motherUuid: livestock.motherUuid,
         fatherUuid: livestock.fatherUuid,
+        birthEventUuid: livestock.birthEventUuid,
+        stageId: livestock.stageId,
+        isIdentified: livestock.isIdentified,
         gender: livestock.gender,
         breedId: livestock.breedId,
         speciesId: livestock.speciesId,
@@ -571,6 +607,8 @@ class LivestockRepository implements LivestockRepo {
         livestockObtainedMethodId: livestock.livestockObtainedMethodId,
         dateFirstEnteredToFarm: livestock.dateFirstEnteredToFarm,
         weightAsOnRegistration: livestock.weightAsOnRegistration,
+        primaryColor: livestock.primaryColor,
+        secondaryColor: livestock.secondaryColor,
         synced: false, // Mark as unsynced so it gets synced to server
         syncAction: 'deleted', // Mark sync action as deleted
         createdAt: livestock.createdAt,
@@ -699,6 +737,9 @@ class LivestockRepository implements LivestockRepo {
               dateOfBirth: livestock.dateOfBirth,
               motherUuid: livestock.motherUuid,
               fatherUuid: livestock.fatherUuid,
+              birthEventUuid: livestock.birthEventUuid,
+              stageId: livestock.stageId,
+              isIdentified: livestock.isIdentified,
               gender: livestock.gender,
               breedId: livestock.breedId,
               speciesId: livestock.speciesId,
@@ -706,6 +747,8 @@ class LivestockRepository implements LivestockRepo {
               livestockObtainedMethodId: livestock.livestockObtainedMethodId,
               dateFirstEnteredToFarm: livestock.dateFirstEnteredToFarm,
               weightAsOnRegistration: livestock.weightAsOnRegistration,
+              primaryColor: livestock.primaryColor,
+              secondaryColor: livestock.secondaryColor,
               synced: true, // Mark as synced
               syncAction: newSyncAction,
               createdAt: livestock.createdAt,

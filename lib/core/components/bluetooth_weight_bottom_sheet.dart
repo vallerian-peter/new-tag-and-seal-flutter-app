@@ -72,13 +72,17 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
       }
     });
 
-    // Listen to weight data
+    // Listen to weight data with detailed logging
     _bluetoothService.weightDataStream.listen((weight) {
+      log('📊 Bottom sheet received weight: $weight kg');
       if (mounted) {
         setState(() {
           _receivedWeight = weight;
+          log('✅ Updated UI with weight: $weight kg');
         });
       }
+    }, onError: (error) {
+      log('❌ Error in weight stream: $error');
     });
 
     // Listen to connection state
@@ -796,7 +800,7 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                 ),
               ),
               const SizedBox(height: 8),
-              if (_receivedWeight != null)
+              if (_receivedWeight != null && _receivedWeight! > 0)
                 Text(
                   '${_receivedWeight!.toStringAsFixed(2)} kg',
                   style: theme.textTheme.displayLarge?.copyWith(
@@ -804,6 +808,26 @@ class _BluetoothWeightBottomSheetState extends State<BluetoothWeightBottomSheet>
                     color: Constants.primaryColor,
                     fontSize: 48,
                   ),
+                )
+              else if (_receivedWeight != null && _receivedWeight! == 0)
+                Column(
+                  children: [
+                    Text(
+                      '0.00 kg',
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                        fontSize: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Place item on scale',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
                 )
               else
                 Column(

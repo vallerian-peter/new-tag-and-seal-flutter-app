@@ -14,6 +14,9 @@ class BirthEvents extends Table {
   IntColumn get birthProblemsId => integer().nullable()(); // Renamed from calvingProblemsId
   IntColumn get reproductiveProblemId => integer().nullable()();
   TextColumn get remarks => text().nullable()();
+  IntColumn get totalBorn => integer().nullable()();
+  IntColumn get aliveCount => integer().nullable()();
+  IntColumn get deadCount => integer().nullable()();
   TextColumn get status => text().withDefault(const Constant('active'))();
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
   TextColumn get syncAction => text().withDefault(const Constant('create'))();

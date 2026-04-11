@@ -28,19 +28,27 @@ class LivestockMapper {
     final syncedRaw = entity['synced'];
     final synced = syncedRaw is bool ? syncedRaw : (syncedRaw == 1 || syncedRaw == true);
     
+    final identifiedRaw = entity['isIdentified'];
+    final isIdentified = identifiedRaw is bool
+        ? identifiedRaw
+        : (identifiedRaw == 1 || identifiedRaw == true);
+
     return LivestockModel(
       id: entity['id'] as int,
       farmUuid: entity['farmUuid'].toString(),  // Ensure string
       uuid: entity['uuid'].toString(),  // Ensure string
-      identificationNumber: entity['identificationNumber'].toString(),  // Ensure string
-      dummyTagId: entity['dummyTagId'].toString(),  // Ensure string
-      barcodeTagId: entity['barcodeTagId'].toString(),  // Ensure string
-      rfidTagId: entity['rfidTagId'].toString(),  // Ensure string
+      identificationNumber: entity['identificationNumber']?.toString() ?? '',  // Ensure string
+      dummyTagId: entity['dummyTagId']?.toString() ?? '',  // Ensure string
+      barcodeTagId: entity['barcodeTagId']?.toString() ?? '',  // Ensure string
+      rfidTagId: entity['rfidTagId']?.toString() ?? '',  // Ensure string
       livestockTypeId: entity['livestockTypeId'] as int,
       name: entity['name'].toString(),  // Ensure string
       dateOfBirth: entity['dateOfBirth'].toString(),  // Ensure string
       motherUuid: entity['motherUuid']?.toString(),  // Nullable, ensure string
       fatherUuid: entity['fatherUuid']?.toString(),  // Nullable, ensure string
+      birthEventUuid: entity['birthEventUuid']?.toString(),
+      stageId: entity['stageId'] as int?,
+      isIdentified: isIdentified,
       gender: entity['gender'].toString(),  // Ensure string
       breedId: entity['breedId'] as int,
       speciesId: entity['speciesId'] as int,
@@ -75,6 +83,9 @@ class LivestockMapper {
       'dateOfBirth': model.dateOfBirth,
       'motherUuid': model.motherUuid,
       'fatherUuid': model.fatherUuid,
+      'birthEventUuid': model.birthEventUuid,
+      'stageId': model.stageId,
+      'isIdentified': model.isIdentified,
       'gender': model.gender,
       'breedId': model.breedId,
       'speciesId': model.speciesId,
@@ -108,6 +119,9 @@ class LivestockMapper {
       'dateOfBirth': model.dateOfBirth,
       'motherUuid': model.motherUuid,
       'fatherUuid': model.fatherUuid,
+      'birthEventUuid': model.birthEventUuid,
+      'stageId': model.stageId,
+      'isIdentified': model.isIdentified,
       'gender': model.gender,
       'breedId': model.breedId,
       'speciesId': model.speciesId,

@@ -28,6 +28,10 @@ class LivestockLogVisibilityHelper {
         // Aborted pregnancy: currently relevant for cattle and pigs
         return typeId == 1 || typeId == 2;
 
+      case EventLogTypes.prepuceCondition:
+        // Prepuce / sheath condition: pigs (boars) only in this product
+        return typeId == 2;
+
       // Generic logs – allowed for all livestock types
       case EventLogTypes.feeding:
       case EventLogTypes.deworming:

@@ -35,6 +35,9 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
     as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart'
     as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/teeth_clipping_method.dart'
+    as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/repo/log_additional_data_repo.dart';
 
 class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterface {
@@ -143,6 +146,107 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
                   ))
               .toList() ??
           const <MilkingMethodsCompanion>[];
+      final teethClippingMethods = (data['teethClippingMethods'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(logModels.TeethClippingMethod.fromJson)
+              .map((model) => TeethClippingMethodsCompanion(
+                    id: Value(model.id),
+                    name: Value(model.name),
+                  ))
+              .toList() ??
+          const <TeethClippingMethodsCompanion>[];
+
+      final prepuceConditionTypes = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceConditionTypes',
+        kind: PrepuceReferenceKind.conditionType,
+      ).map((opt) {
+        return PrepuceConditionTypesCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceSeverities = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceSeverities',
+        kind: PrepuceReferenceKind.severity,
+      ).map((opt) {
+        return PrepuceSeveritiesCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceClinicalSigns = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceClinicalSigns',
+        kind: PrepuceReferenceKind.clinicalSign,
+      ).map((opt) {
+        return PrepuceClinicalSignsCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceCauseRisks = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceCauseRisks',
+        kind: PrepuceReferenceKind.causeRisk,
+      ).map((opt) {
+        return PrepuceCauseRisksCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceTreatmentsGiven = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceTreatmentsGiven',
+        kind: PrepuceReferenceKind.treatmentGiven,
+      ).map((opt) {
+        return PrepuceTreatmentsGivenCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceBreedingStatuses = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceBreedingStatuses',
+        kind: PrepuceReferenceKind.breedingStatus,
+      ).map((opt) {
+        return PrepuceBreedingStatusesCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
+      final prepuceHealingStatuses = _prepuceReferenceRowsFromSync(
+        data,
+        key: 'prepuceHealingStatuses',
+        kind: PrepuceReferenceKind.healingStatus,
+      ).map((opt) {
+        return PrepuceHealingStatusesCompanion(
+          id: Value(opt.referenceId),
+          name: Value(opt.name),
+          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+              ? Value(opt.nameSw!.trim())
+              : const Value.absent(),
+        );
+      }).toList();
 
       final heatTypes = (data['heatTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
@@ -243,6 +347,14 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
       await _dao.upsertDiseases(diseases);
       await _dao.upsertDisposalTypes(disposalTypes);
       await _dao.upsertMilkingMethods(milkingMethods);
+      await _dao.upsertTeethClippingMethods(teethClippingMethods);
+      await _dao.replacePrepuceConditionTypes(prepuceConditionTypes);
+      await _dao.replacePrepuceSeverities(prepuceSeverities);
+      await _dao.replacePrepuceClinicalSigns(prepuceClinicalSigns);
+      await _dao.replacePrepuceCauseRisks(prepuceCauseRisks);
+      await _dao.replacePrepuceTreatmentsGiven(prepuceTreatmentsGiven);
+      await _dao.replacePrepuceBreedingStatuses(prepuceBreedingStatuses);
+      await _dao.replacePrepuceHealingStatuses(prepuceHealingStatuses);
       await _dao.upsertHeatTypes(heatTypes);
       await _dao.upsertInseminationServices(inseminationServices);
       await _dao.upsertSemenStrawTypes(semenStrawTypes);
@@ -320,6 +432,90 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
     return entities
         .map((entity) => logModels.MilkingMethod(id: entity.id, name: entity.name))
         .toList();
+  }
+
+  @override
+  Future<List<logModels.TeethClippingMethod>> getTeethClippingMethods() async {
+    final entities = await _dao.getAllTeethClippingMethods();
+    return entities
+        .map(
+          (entity) => logModels.TeethClippingMethod(
+            id: entity.id,
+            name: entity.name,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<PrepuceReferenceOption>> getPrepuceReferenceOptions() async {
+    final out = <PrepuceReferenceOption>[];
+    final conditionTypes = await _dao.getAllPrepuceConditionTypes();
+    out.addAll(conditionTypes.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.conditionType,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final severities = await _dao.getAllPrepuceSeverities();
+    out.addAll(severities.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.severity,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final clinicalSigns = await _dao.getAllPrepuceClinicalSigns();
+    out.addAll(clinicalSigns.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.clinicalSign,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final causeRisks = await _dao.getAllPrepuceCauseRisks();
+    out.addAll(causeRisks.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.causeRisk,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final treatments = await _dao.getAllPrepuceTreatmentsGiven();
+    out.addAll(treatments.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.treatmentGiven,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final breeding = await _dao.getAllPrepuceBreedingStatuses();
+    out.addAll(breeding.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.breedingStatus,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    final healing = await _dao.getAllPrepuceHealingStatuses();
+    out.addAll(healing.map((e) => PrepuceReferenceOption(
+          kind: PrepuceReferenceKind.healingStatus,
+          referenceId: e.id,
+          name: e.name,
+          nameSw: e.nameSw,
+        )));
+    return out;
+  }
+
+  static List<PrepuceReferenceOption> _prepuceReferenceRowsFromSync(
+    Map<String, dynamic> data, {
+    required String key,
+    required String kind,
+  }) {
+    final list = data[key] as List?;
+    if (list == null) return const [];
+    final out = <PrepuceReferenceOption>[];
+    for (final raw in list.cast<Map<String, dynamic>>()) {
+      final opt = PrepuceReferenceOption.fromJson(raw, kind: kind);
+      if (opt.referenceId <= 0 || opt.name.isEmpty) continue;
+      out.add(opt);
+    }
+    return out;
   }
 
   @override
@@ -416,7 +612,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   }
 
   @override
-  Future<void> clearLogAdditionalData() => _dao.clearAll();
+  Future<void> clearLogAdditionalData() async {
+    await _dao.clearAll();
+  }
 }
 
 

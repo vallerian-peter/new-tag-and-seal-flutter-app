@@ -18,6 +18,38 @@ import 'package:provider/provider.dart';
 import 'dart:developer';
 
 class LivestockDetailsModal {
+  static bool _isLikelyPiglet(Livestock livestock) {
+    if (livestock.livestockTypeId != 2) return false; // pigs only
+    try {
+      final dob = DateTime.parse(livestock.dateOfBirth);
+      final ageDays = DateTime.now().difference(dob).inDays;
+      // Treat first ~8 months as piglet/grower stage for event visibility.
+      return ageDays <= 240;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static bool _isPigletRelevantLog(String logType) {
+    switch (logType) {
+      case EventLogTypes.feeding:
+      case EventLogTypes.deworming:
+      case EventLogTypes.weightChange:
+      case EventLogTypes.treatment:
+      case EventLogTypes.vaccination:
+      case EventLogTypes.disposal:
+      case EventLogTypes.ironInjection:
+      case EventLogTypes.teethClipping:
+      case EventLogTypes.tailDocking:
+      case EventLogTypes.livestockMarking:
+      case EventLogTypes.stageChange:
+      case EventLogTypes.prepuceCondition:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   static void show({
     required BuildContext context,
     required Livestock livestock,
@@ -469,13 +501,18 @@ class LivestockDetailsModal {
         )
         .toList();
 
+    final isPiglet = _isLikelyPiglet(livestock);
+    final speciesScopedLogs = isPiglet
+        ? applicableLogs.where((log) => _isPigletRelevantLog(log.logType)).toList()
+        : applicableLogs;
+
     // If current user is an extension officer, show only technical logs they are allowed to access
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final visibleLogs = authProvider.isExtensionOfficer
-        ? applicableLogs
+        ? speciesScopedLogs
             .where((log) => authProvider.hasAccessToLogType(log.logType))
             .toList()
-        : applicableLogs;
+        : speciesScopedLogs;
 
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
 
@@ -608,8 +645,10 @@ class LivestockDetailsModal {
             farmUuid: farmUuid,
             livestockUuid: livestockUuid,
             onCompleted: () {
-              // Close the modal and refresh parent
-              Navigator.of(ctx).pop();
+              // Close livestock details sheet and refresh parent after birth flow.
+              // Use the sheet's own context to reliably dismiss this modal even
+              // when nested routes (birth form + bulk registration) were used.
+              Navigator.of(context).pop();
               onRefresh();
             },
           ),
@@ -976,6 +1015,177 @@ class LivestockDetailsModal {
           livestockName: LivestockHelper.getDisplayName(livestock),
         ),
       ),
+      _LogConfig(
+        logType: EventLogTypes.ironInjection,
+        title: l10n.ironInjection,
+        icon: Icons.medication_outlined,
+        color: Colors.deepOrange,
+        supportsMale: true,
+        supportsFemale: true,
+        onAdd: (ctx) => EventFormControl.open(
+          context: context,
+          logType: EventLogTypes.ironInjection,
+          title: l10n.ironInjection,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          onCompleted: () {
+            Navigator.of(ctx).pop();
+            onRefresh();
+          },
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.ironInjection,
+          title: l10n.ironInjection,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.teethClipping,
+        title: l10n.teethClipping,
+        icon: Icons.content_cut_outlined,
+        color: Colors.teal,
+        supportsMale: true,
+        supportsFemale: true,
+        onAdd: (ctx) => EventFormControl.open(
+          context: context,
+          logType: EventLogTypes.teethClipping,
+          title: l10n.teethClipping,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          onCompleted: () {
+            Navigator.of(ctx).pop();
+            onRefresh();
+          },
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.teethClipping,
+          title: l10n.teethClipping,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.tailDocking,
+        title: l10n.tailDocking,
+        icon: Icons.content_cut,
+        color: Colors.indigo,
+        supportsMale: true,
+        supportsFemale: true,
+        onAdd: (ctx) => EventFormControl.open(
+          context: context,
+          logType: EventLogTypes.tailDocking,
+          title: l10n.tailDocking,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          onCompleted: () {
+            Navigator.of(ctx).pop();
+            onRefresh();
+          },
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.tailDocking,
+          title: l10n.tailDocking,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.livestockMarking,
+        title: l10n.livestockMarking,
+        icon: Icons.sell_outlined,
+        color: Colors.pinkAccent,
+        supportsMale: true,
+        supportsFemale: true,
+        onAdd: (ctx) => EventFormControl.open(
+          context: context,
+          logType: EventLogTypes.livestockMarking,
+          title: l10n.livestockMarking,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          onCompleted: () {
+            Navigator.of(ctx).pop();
+            onRefresh();
+          },
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.livestockMarking,
+          title: l10n.livestockMarking,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.stageChange,
+        title: l10n.stageChange,
+        icon: Icons.alt_route_outlined,
+        color: Colors.amber.shade700,
+        supportsMale: true,
+        supportsFemale: true,
+        onAdd: (ctx) => EventFormControl.open(
+          context: context,
+          logType: EventLogTypes.stageChange,
+          title: l10n.stageChange,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          onCompleted: () {
+            Navigator.of(ctx).pop();
+            onRefresh();
+          },
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.stageChange,
+          title: l10n.stageChange,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
+      _LogConfig(
+        logType: EventLogTypes.prepuceCondition,
+        title: l10n.prepuceConditionTitle,
+        icon: Icons.medical_information_outlined,
+        color: Colors.deepPurple,
+        supportsMale: true,
+        supportsFemale: false,
+        onAdd: wrapWithRoleCheck(
+          EventLogTypes.prepuceCondition,
+          (ctx) => EventFormControl.open(
+            context: context,
+            logType: EventLogTypes.prepuceCondition,
+            title: l10n.prepuceConditionTitle,
+            farmUuid: farmUuid,
+            livestockUuid: livestockUuid,
+            onCompleted: () {
+              Navigator.of(ctx).pop();
+              onRefresh();
+            },
+          ),
+        ),
+        onView: (ctx) => EventsViewControl.openLogs(
+          context: context,
+          logType: EventLogTypes.prepuceCondition,
+          title: l10n.prepuceConditionTitle,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          farmName: farmName,
+          livestockName: LivestockHelper.getDisplayName(livestock),
+        ),
+      ),
     ];
   }
 
@@ -1064,7 +1274,7 @@ class LivestockDetailsModal {
             ),
 
             // Only show add button if not from scanner and not notActive
-            if (!fromScanner && !isNotActive) ...[
+            if (!fromScanner && !isNotActive && config.onAdd != null) ...[
               const SizedBox(width: 15),
 
               // Click to add log

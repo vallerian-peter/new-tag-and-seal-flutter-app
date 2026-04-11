@@ -14,8 +14,8 @@ class AboutUsScreen extends StatefulWidget {
 class _AboutUsScreenState extends State<AboutUsScreen> {
   bool _isTitleCenter = true;
   late ScrollController _scrollController;
-  String _appVersion = '.....';
-  String _buildNumber = '..';
+  String _appVersion = '...';
+  String _buildNumber = '...';
 
   @override
   void initState() {
@@ -191,7 +191,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                     icon: Bootstrap.phone,
                     title: l10n.appVersion,
                     content:
-                        '${l10n.version}: $_appVersion+$_buildNumber\n${l10n.lastUpdated}: ${DateTime.now().toString().split(' ')[0]}',
+                        '${l10n.versionSubtitle} $_appVersion+$_buildNumber',
                     isDark: isDark,
                   ),
 

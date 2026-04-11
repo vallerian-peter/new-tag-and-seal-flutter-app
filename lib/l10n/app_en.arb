@@ -394,6 +394,14 @@
       }
     }
   },
+  "settingsVersionBuildTitle": "Version & Build",
+  "@settingsVersionBuildTitle": {
+    "description": "Version and build section title"
+  },
+  "versionSubtitle": "App version information",
+  "@versionSubtitle": {
+    "description": "Version display subtitle"
+  },
   "settingsAppDescription": "A comprehensive livestock management application.",
   "settingsLanguageEnglish": "English",
   "settingsLanguageSwahili": "Kiswahili",
@@ -955,6 +963,14 @@
   "@timeToTreatLivestock": {
     "description": "Treatment reminder notification description"
   },
+  "prepuceConditionFollowUpReminder": "Prepuce follow-up",
+  "@prepuceConditionFollowUpReminder": {
+    "description": "Notification title for prepuce (sheath) condition follow-up reminder"
+  },
+  "prepuceConditionFollowUpReminderBody": "Scheduled follow-up for this animal's prepuce (sheath) condition.",
+  "@prepuceConditionFollowUpReminderBody": {
+    "description": "Notification body for prepuce condition follow-up reminder"
+  },
   "weightChange": "Weight Change",
   "disposalTransfer": "Disposal / Transfer",
   "calving": "Calving",
@@ -1203,8 +1219,11 @@
   "reproductiveProblem": "Reproductive problem",
   "calvingType": "Calving type",
   "calvingTypeRequired": "Calving type is required",
+  "farrowingTypeRequired": "Farrowing type is required",
   "ensureCalvingDetailsAccuracy": "Ensure calving information is accurate before saving.",
+  "ensureFarrowingDetailsAccuracy": "Ensure farrowing information is accurate before saving.",
   "calvingNotesInfo": "Add notes about calves, complications, or support provided.",
+  "farrowingNotesInfo": "Add notes about piglets, complications, or support provided.",
   "confirmUpdateCalving": "Update calving log?",
   "confirmSaveCalving": "Save calving log?",
   "confirmUpdateFarrowing": "Update farrowing log?",
@@ -1213,6 +1232,174 @@
   "noLivestockFound": "No livestock found",
   "total": "Total",
   "tryDifferentSearchTerm": "Try searching with a different term",
+
+  "registerLivestockHowTitle": "Register livestock",
+  "registerLivestockSingleOption": "Single animal",
+  "registerLivestockSingleOptionDesc": "Full form with tags and one ID",
+  "registerPigletLitterOption": "Piglet litter",
+  "registerPigletLitterOptionDesc": "Same details for many piglets; IDs like YYYYMMDD-01",
+  "pigletBulkTitle": "Register piglet litter",
+  "pigletBulkCompleteBirthFlowTitle": "Complete birth & offspring",
+  "@pigletBulkCompleteBirthFlowTitle": {"description": "App bar when finishing a birth log and litter in one flow"},
+  "pigletBulkDeferredBirthHint": "The birth log will be saved together with the offspring when you tap Register all on the preview step. Review and adjust details below, then confirm.",
+  "@pigletBulkDeferredBirthHint": {"description": "Info when user arrived from birth event form with litter"},
+  "pigletBulkStepCommonTitle": "Shared details",
+  "pigletBulkStepCommonSubtitle": "Farm, type, litter size, dates, parents",
+  "pigletBulkStepPreviewTitle": "Preview",
+  "pigletBulkStepPreviewSubtitle": "Generated IDs and sex per piglet",
+  "pigletBulkNumberOfPiglets": "Number of piglets",
+  "pigletBulkInvalidCount": "Enter a whole number from 1 to {max}.",
+  "@pigletBulkInvalidCount": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkNamePrefix": "Name prefix",
+  "pigletBulkNamePrefixHint": "e.g. Piglet (combined with number or nickname)",
+  "pigletBulkPreviewInfo": "Each ID uses the date of birth as YYYYMMDD plus a sequence (01, 02, …). Young stages stay not identified until you add tags later.",
+  "pigletBulkNicknameOptional": "Nickname (optional)",
+  "pigletBulkRegisterAll": "Register all",
+  "pigletBulkSelectSexEach": "Choose male or female for every piglet.",
+  "pigletBulkQuickSexTitle": "Quick sex split",
+  "pigletBulkQuickSexSubtitle": "Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to {alive}.",
+  "@pigletBulkQuickSexSubtitle": {
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickSexCountLabel": "Count",
+  "pigletBulkApplySexSplit": "Apply to list",
+  "pigletBulkSexCountMismatch": "Female + male + unknown must equal {expected} (all piglet rows). You entered {actual}.",
+  "@pigletBulkSexCountMismatch": {
+    "placeholders": {
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickSexOrderNote": "Order: first N rows = female, then male, then unknown across all rows (alive and dead). You can still change any row below.",
+  "pigletBulkPreviewSaveAllNote": "Every row—including dead at birth—is saved as livestock first. Disposals are created only after that, using the saved animal records.",
+  "pigletBulkQuickFillSectionTitle": "Quick fill",
+  "pigletBulkQuickFillSectionSubtitle": "Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.",
+  "pigletBulkQuickNicknameTitle": "Nicknames",
+  "pigletBulkQuickNicknameSubtitle": "Fills \"Name prefix 1\", \"Name prefix 2\", … using the name prefix from the previous step (same as default display names).",
+  "pigletBulkApplyNicknamePattern": "Fill name sequence",
+  "pigletBulkQuickWeightTitle": "Weights (kg)",
+  "pigletBulkQuickWeightSubtitle": "Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.",
+  "pigletBulkWeightAliveHint": "Alive",
+  "pigletBulkWeightDeadHint": "Dead at birth",
+  "pigletBulkApplyWeights": "Apply weights to rows",
+  "pigletBulkWeightPerRowLabel": "Weight (kg)",
+  "pigletBulkWeightPerRowHint": "Optional; uses step 1 if empty",
+  "pigletBulkBatchSizeMismatch": "Expected {expected} animals to save but got {actual}. Nothing was partially disposed; try again or contact support.",
+  "@pigletBulkBatchSizeMismatch": {
+    "placeholders": {
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickFillFooterNote": "Sex split applies to alive rows only, in list order. Names and weights apply to every row unless you skip the action.",
+  "pigletBulkIdConflict": "Some generated IDs already exist. Change the birth date or remove existing records, then try again.",
+  "pigletBulkConflictingIds": "Taken: {ids}",
+  "@pigletBulkConflictingIds": {
+    "placeholders": {
+      "ids": {
+        "type": "String"
+      }
+    }
+  },
+  "pigletBulkConfirmRegister": "Register {count} piglets now? They are saved on this device and will sync when online.",
+  "@pigletBulkConfirmRegister": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkSuccess": "Successfully registered {count} piglets.",
+  "@pigletBulkSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkFailed": "Could not register the litter. Please try again.",
+  "pigletDefaultNamePrefix": "Piglet",
+  "pigletBulkSavingMessage": "Registering piglets…",
+  "pigletBulkCountRangeHint": "1–{max}",
+  "@pigletBulkCountRangeHint": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkBirthEventLitterHint": "If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.",
+  "pigletBulkSaveCheckTitle": "Save check",
+  "pigletBulkStatusReady": "Ready",
+  "pigletBulkStatusRequired": "Required",
+  "pigletBulkStatusNotApplicable": "N/A",
+  "pigletBulkMotherRequiredForBirthFlow": "Mother must remain selected for this birth flow.",
+  "pigletBulkLitterTotal": "{totalBorn} born",
+  "@pigletBulkLitterTotal": {
+    "placeholders": {
+      "totalBorn": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkLitterTotalDead": "{totalBorn} born, {deadCount} dead",
+  "@pigletBulkLitterTotalDead": {
+    "placeholders": {
+      "totalBorn": {
+        "type": "int"
+      },
+      "deadCount": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkPreviewAliveDeadSummary": "{alive} alive at birth · {dead} dead at birth (last IDs in the list).",
+  "@pigletBulkPreviewAliveDeadSummary": {
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      },
+      "dead": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkDeadAtBirthChip": "Dead at birth",
+  "pigletBulkDisposalSectionTitle": "Disposal for dead at birth",
+  "pigletBulkDisposalSectionSubtitle": "Required when registering stillborn piglets. A disposal log is created for each.",
+  "pigletBulkDisposalTypeLabel": "Disposal type",
+  "pigletBulkSelectDisposalTypeForDead": "Select a disposal type for dead-at-birth piglets.",
+  "pigletBulkDeadDisposalReasonHint": "Reason (e.g. stillborn / birth mortality)",
+  "pigletDeadAtBirthDisposalReasonDefault": "Dead at birth (litter registration)",
+  "pigletBulkGenderOptionalDead": "Sex (optional)",
+  "pigletBulkSuccessDisposals": "Also logged {count} disposal records for stillborn piglets.",
+  "@pigletBulkSuccessDisposals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkDisposalPartialFailure": "Livestock was saved but some disposal logs failed. Check records and add disposals manually if needed.",
+  "pigletGenderUnknown": "Unknown",
 
   "connectionError": "Connection Error",
   "connectionErrorMessage": "Unable to connect to the server. Please check your internet connection and try again.",
@@ -1271,6 +1458,7 @@
   "livestockType": "Livestock Type",
   "livestockTypeRequired": "Livestock type is required",
   "pleaseSelectLivestockType": "Please select livestock type",
+  "noStagesForThisType": "No stages for this type",
   
   "speciesRequired": "Species is required",
   "pleaseSelectSpecies": "Please select species",
@@ -1288,6 +1476,16 @@
   
   "motherOptional": "Mother (Optional)",
   "fatherOptional": "Father (Optional)",
+  "filterByMother": "Mother",
+  "filterByFather": "Father",
+  "parentFilterChildrenCount": "{count} children",
+  "@parentFilterChildrenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "obtainedMethod": "Obtained Method",
   
   "physicalDetails": "Physical Details",
@@ -1359,6 +1557,10 @@
   "scheduleDate": "Schedule date",
   "scheduleTime": "Schedule time",
   "saveNotification": "Save notification",
+  "manualInput": "Manual input",
+  "@manualInput": {"description": "Option to enter value manually"},
+  "chooseFromList": "Choose from list",
+  "@chooseFromList": {"description": "Option to choose value from list"},
   "notificationChipToday": "Today",
   "notificationChipUpcoming": "Upcoming",
   "thisWeek": "This Week",
@@ -1697,6 +1899,99 @@
   "@billDetails": {"description": "Label for bill details section in dialog"},
   "confirmPayment": "Confirm Payment",
   "@confirmPayment": {"description": "Title for payment confirmation dialog"},
+  "incomeExpenditureReport": "Income and Expenditures Report",
+  "@incomeExpenditureReport": {"description": "Income and expenditures report title"},
+  "generatedOn": "Generated on",
+  "@generatedOn": {"description": "Generated on label"},
+  "dateRange": "Date range",
+  "@dateRange": {"description": "Date range label"},
+  "allTime": "All time",
+  "@allTime": {"description": "All time label"},
+  "noRecordsFoundForSelectedPeriod": "No records found for selected period",
+  "@noRecordsFoundForSelectedPeriod": {"description": "No data message in report screen"},
+  "paidStatus": "Paid",
+  "@paidStatus": {"description": "Paid status label"},
+  "pendingStatus": "Pending",
+  "@pendingStatus": {"description": "Pending status label"},
+  "accessDeniedFarmerOrFarmManagerOnly": "Access denied. Farmer or Farm Manager only.",
+  "@accessDeniedFarmerOrFarmManagerOnly": {"description": "Role-based access denied message for report screen"},
+  "reportActions": "Report actions",
+  "@reportActions": {"description": "Tooltip/title for report action menu"},
+  "printReport": "Print Report",
+  "@printReport": {"description": "Print report action"},
+  "downloadReport": "Download Report",
+  "@downloadReport": {"description": "Download report action"},
+  "reportDownloaded": "Report downloaded",
+  "@reportDownloaded": {"description": "Success message when report pdf is downloaded"},
+  "addManualExpense": "Add expense",
+  "@addManualExpense": {"description": "Menu: record a manual finance expense"},
+  "manualExpenseTitle": "Record expense",
+  "@manualExpenseTitle": {"description": "Title for manual expense form"},
+  "manualExpenseDetailsSubtitle": "Record purchases and costs not tied to bills or transfers",
+  "@manualExpenseDetailsSubtitle": {"description": "Subtitle under manual expense header"},
+  "manualExpenseBasicStep": "Expense details",
+  "@manualExpenseBasicStep": {"description": "Stepper step 1 title"},
+  "manualExpenseAdditionalStep": "Additional details",
+  "@manualExpenseAdditionalStep": {"description": "Stepper step 2 title"},
+  "manualExpenseAdditionalStepSubtitle": "Quantity, status, and notes",
+  "@manualExpenseAdditionalStepSubtitle": {"description": "Stepper step 2 subtitle"},
+  "manualExpenseSavedSuccessfully": "Expense saved locally. Sync to update the server.",
+  "@manualExpenseSavedSuccessfully": {"description": "After saving manual expense"},
+  "manualExpenseSaveFailed": "Could not save expense. Please try again.",
+  "@manualExpenseSaveFailed": {"description": "Manual expense save error"},
+  "confirmSaveManualExpense": "Save this expense to your records?",
+  "@confirmSaveManualExpense": {"description": "Confirm save manual expense"},
+  "expenseSubject": "What was purchased",
+  "@expenseSubject": {"description": "Label for expense description"},
+  "expenseSubjectHint": "e.g. Feed, fuel, equipment",
+  "@expenseSubjectHint": {"description": "Hint for expense description"},
+  "expenseSubjectRequired": "Please describe the expense",
+  "@expenseSubjectRequired": {"description": "Validation expense description"},
+  "expenseAmount": "Total amount (TZS)",
+  "@expenseAmount": {"description": "Total cost label"},
+  "expenseAmountHint": "Enter total cost",
+  "@expenseAmountHint": {"description": "Total cost hint"},
+  "expenseAmountRequired": "Enter a valid amount greater than zero",
+  "@expenseAmountRequired": {"description": "Validation amount"},
+  "expenseDate": "Expense date",
+  "@expenseDate": {"description": "Expense date label"},
+  "expenseDateRequired": "Select a date",
+  "@expenseDateRequired": {"description": "Validation date"},
+  "selectExpenseDate": "Select date",
+  "@selectExpenseDate": {"description": "Open date picker"},
+  "expenseQuantity": "Quantity",
+  "@expenseQuantity": {"description": "Quantity label"},
+  "expenseQuantityHint": "Units or items (defaults to 1)",
+  "@expenseQuantityHint": {"description": "Quantity hint"},
+  "expenseNotes": "Notes",
+  "@expenseNotes": {"description": "Notes label"},
+  "expenseNotesHint": "Optional details",
+  "@expenseNotesHint": {"description": "Notes hint"},
+  "expensePaymentStatus": "Payment status",
+  "@expensePaymentStatus": {"description": "Paid vs pending"},
+  "selectExpensePaymentStatus": "Select payment status",
+  "@selectExpensePaymentStatus": {"description": "Payment status hint"},
+  "manualExpenseAccuracyNote": "Ensure amounts and dates are correct for your income and expenditure report.",
+  "@manualExpenseAccuracyNote": {"description": "Footer info on manual expense form"},
+  "reportTableCellPlaceholder": "—",
+  "@reportTableCellPlaceholder": {"description": "Placeholder when a report/PDF table cell has no value"},
+  "incomeReportExpenseEntriesSectionTitle": "Expense entries ({count})",
+  "@incomeReportExpenseEntriesSectionTitle": {
+    "description": "Section title with number of income/expenditure rows",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomeReportPdfColumnReference": "Reference",
+  "@incomeReportPdfColumnReference": {"description": "PDF column: bill number or expense reference"},
+  "incomeReportPdfColumnDate": "Date",
+  "@incomeReportPdfColumnDate": {"description": "PDF column: expense date"},
+  "incomeReportPdfColumnSubject": "Subject",
+  "@incomeReportPdfColumnSubject": {"description": "PDF column: expense description"},
+  "incomeReportPdfColumnQuantity": "Qty",
+  "@incomeReportPdfColumnQuantity": {"description": "PDF column: quantity"},
+  "incomeReportPdfColumnStatus": "Status",
+  "@incomeReportPdfColumnStatus": {"description": "PDF column: payment status"},
   
   "aboutUs": "About Us",
   "@aboutUs": {"description": "About Us page title"},
@@ -1850,10 +2145,108 @@
   "@milkingTrendByFarm": {"description": "Title for multi-farm milking trend graph"},
   "last6Months": "Last 6 Months",
   "@last6Months": {"description": "Time period filter for last 6 months"},
+  "yesterday": "Yesterday",
+  "@yesterday": {"description": "Time period filter for previous day"},
+  "thisMonth": "This Month",
+  "@thisMonth": {"description": "Time period filter for current month"},
+  "last6Years": "Last 6 Years",
+  "@last6Years": {"description": "Time period filter for last 6 years"},
   "lastYear": "This Year",
   "@lastYear": {"description": "Time period filter for last year"},
   "average": "Average",
   "@average": {"description": "Average value label"},
   "maximum": "Maximum",
-  "@maximum": {"description": "Maximum value label"}
+  "@maximum": {"description": "Maximum value label"},
+  "isLivestockFound": "Is Livestock Found?",
+  "@isLivestockFound": {"description": "Confirmation dialog question when changing livestock status from lost to active"},
+  "livestockStatusUpdatedAndDisposalRemoved": "Livestock status updated to active. Disposal records removed.",
+  "@livestockStatusUpdatedAndDisposalRemoved": {"description": "Success message when livestock is found and disposal records are removed"},
+  "markLivestockAsFound": "Mark Livestock as Found",
+  "@markLivestockAsFound": {"description": "Title for the confirmation dialog when marking lost livestock as found"},
+  "livestockFoundConfirmationDescription": "This livestock was previously marked as lost. If the livestock has been found, you can mark it as active again.",
+  "@livestockFoundConfirmationDescription": {"description": "Description in the confirmation dialog explaining that the livestock was lost"},
+  "livestockWasMarkedAsLost": "Livestock was marked as Lost",
+  "@livestockWasMarkedAsLost": {"description": "Label indicating that the livestock was marked as lost"},
+  "livestockFoundActionDescription": "By confirming, the livestock status will be changed to active and the disposal record will be removed.",
+  "@livestockFoundActionDescription": {"description": "Description of what will happen when user confirms"},
+  "date": "Date",
+  "@date": {"description": "Label for date field"},
+  "copyrightText": "All Rights Reserved",
+  "@copyrightText": {"description": "Copyright text suffix"},
+  "teethClipping": "Teeth clipping",
+  "tailDocking": "Tail docking",
+  "ironInjection": "Iron injection",
+  "livestockMarking": "Livestock marking",
+  "stageChange": "Stage change",
+  "procedureMethod": "Method",
+  "dosage": "Dosage",
+  "markingType": "Marking type",
+  "description": "Description",
+  "fromStage": "From stage",
+  "toStage": "To stage",
+  "selectFromStage": "Select from stage",
+  "selectToStage": "Select to stage",
+  "selectProcedureMethod": "Select method",
+  "eventDateRequired": "Event date is required",
+  "husbandryRequiredFields": "Please fill required fields",
+  "husbandryFromToStageMismatch": "From and To stage cannot be the same",
+  "eventLogSavedSuccessfully": "Saved successfully",
+  "saleWeight": "Sale weight (kg)",
+  "salePrice": "Sale price",
+  "buyerName": "Buyer",
+  "stage": "Stage",
+  "identificationStatus": "Identification status",
+  "identified": "Identified",
+  "notIdentified": "Not identified",
+  "birthEventOptional": "Birth event (optional)",
+  "birthEventOptionalHelper": "Link this animal to a recorded birth event (farrowing/calving). Leave empty for purchased, transferred, donated, or other non-birth registrations.",
+  "@birthEventOptionalHelper": {"description": "Helper text below optional birth event field in Add Livestock form"},
+  "addLivestockAllTypesReminder": "Add Livestock is for all animals: newborn, purchased, transferred, donated, and more.",
+  "@addLivestockAllTypesReminder": {"description": "Reminder that Add Livestock is not only for newborn animals"},
+  "totalBorn": "Total born",
+  "aliveCount": "Alive count",
+  "alive": "Alive",
+  "deadCount": "Dead count",
+  "dead": "Dead",
+  "enterTotalBornOptional": "Enter total born (optional)",
+  "enterAliveCountOptional": "Enter alive count (optional)",
+  "enterDeadCountOptional": "Enter dead count (optional)",
+  "valueMustBeZeroOrMore": "Value must be 0 or more",
+  "aliveDeadExceedTotalBorn": "Alive + dead cannot exceed total born.",
+  "deadCountDefaultsToZero": "Defaults to 0 (max = total born)",
+  "aliveCountDerivedNote": "Calculated as total born minus dead.",
+  "enterTotalBornToPreviewAlive": "Enter total born to preview alive count.",
+  "deadCountExceedsTotalBorn": "Dead count cannot exceed total born.",
+  "farrowingPigletRegisterPromptTitle": "Register Piglets?",
+  "@farrowingPigletRegisterPromptTitle": {"description": "Dialog title after saving a farrowing event"},
+  "farrowingPigletRegisterPromptMessage": "The farrowing event has been saved. Would you like to register the piglets from this litter now?",
+  "@farrowingPigletRegisterPromptMessage": {"description": "Dialog body after saving farrowing"},
+  "farrowingPigletRegisterNow": "Register Piglets",
+  "farrowingPigletRegisterSkip": "Skip for Now",
+  "calvingRegisterPromptTitle": "Register Calves?",
+  "calvingRegisterPromptMessage": "The calving event has been saved. Would you like to register the calves from this birth now?",
+  "calvingRegisterNow": "Register Calves",
+  "birthEventRegisterPromptTitle": "Register Offspring?",
+  "birthEventRegisterPromptMessage": "The birth event has been saved. Would you like to register the offspring from this birth now?",
+  "birthEventRegisterNow": "Register Offspring",
+  "prepuceConditionTitle": "Prepuce (sheath) condition",
+  "prepuceConditionTypeLabel": "Condition type",
+  "prepuceConditionSeverityLabel": "Severity",
+  "prepuceConditionClinicalSignsLabel": "Clinical signs",
+  "prepuceConditionTreatmentLabel": "Treatment given",
+  "prepuceConditionCauseLabel": "Cause / risk (optional)",
+  "prepuceConditionBreedingLabel": "Breeding status",
+  "prepuceConditionReportedByLabel": "Reported by",
+  "prepuceConditionAttendedByLabel": "Attended by (optional)",
+  "prepuceConditionHealingLabel": "Healing status (optional)",
+  "prepuceConditionFollowUpLabel": "Follow-up date (optional)",
+  "prepuceConditionDrugNameLabel": "Drug name (optional)",
+  "prepuceConditionRouteLabel": "Route (optional)",
+  "prepuceConditionDurationLabel": "Duration (optional)",
+  "prepuceConditionVetNameLabel": "Vet name (optional)",
+  "prepuceConditionVetContactLabel": "Vet contact (optional)",
+  "prepuceConditionFollowUpHint": "Select follow-up date",
+  "prepuceConditionTreatmentRequired": "Select at least one treatment",
+  "prepuceConditionSelectCodes": "Select options above",
+  "viewEvents": "View events"
 }

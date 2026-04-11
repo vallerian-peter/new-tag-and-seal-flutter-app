@@ -12,6 +12,12 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dispos
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregnancy_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/teeth_clipping_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/tail_docking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/iron_injection_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/livestock_marking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/stage_change_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/prepuce_condition_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/calving_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/aborted_pregnancy_model.dart';
@@ -60,6 +66,12 @@ class EventsProvider extends ChangeNotifier {
   List<InseminationModel> _allInseminations = const [];
   List<DryoffModel> _allDryoffs = const [];
   List<TransferModel> _allTransfers = const [];
+  List<TeethClippingModel> _allTeethClippings = const [];
+  List<TailDockingModel> _allTailDockings = const [];
+  List<IronInjectionModel> _allIronInjections = const [];
+  List<LivestockMarkingModel> _allLivestockMarkings = const [];
+  List<StageChangeModel> _allStageChanges = const [];
+  List<PrepuceConditionModel> _allPrepuceConditions = const [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -87,6 +99,12 @@ class EventsProvider extends ChangeNotifier {
   List<InseminationModel> get allInseminations => _allInseminations;
   List<DryoffModel> get allDryoffs => _allDryoffs;
   List<TransferModel> get allTransfers => _allTransfers;
+  List<TeethClippingModel> get allTeethClippings => _allTeethClippings;
+  List<TailDockingModel> get allTailDockings => _allTailDockings;
+  List<IronInjectionModel> get allIronInjections => _allIronInjections;
+  List<LivestockMarkingModel> get allLivestockMarkings => _allLivestockMarkings;
+  List<StageChangeModel> get allStageChanges => _allStageChanges;
+  List<PrepuceConditionModel> get allPrepuceConditions => _allPrepuceConditions;
   
   Future<Map<String, int>> loadLogCounts({
     String? farmUuid,
@@ -181,6 +199,12 @@ class EventsProvider extends ChangeNotifier {
       _allInseminations = await _eventsRepository.getAllInseminations();
       _allDryoffs = await _eventsRepository.getAllDryoffs();
       _allTransfers = await _eventsRepository.getAllTransfers();
+      _allTeethClippings = await _eventsRepository.getAllTeethClippings();
+      _allTailDockings = await _eventsRepository.getAllTailDockings();
+      _allIronInjections = await _eventsRepository.getAllIronInjections();
+      _allLivestockMarkings = await _eventsRepository.getAllLivestockMarkings();
+      _allStageChanges = await _eventsRepository.getAllStageChanges();
+      _allPrepuceConditions = await _eventsRepository.getAllPrepuceConditions();
       _isLoading = false;
       _error = null;
       notifyListeners();
@@ -400,6 +424,187 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       _allDisposals = _allDisposals
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<TeethClippingModel> addTeethClipping(TeethClippingModel model) async {
+    try {
+      final created = await _eventsRepository.createTeethClipping(model);
+      _allTeethClippings = [..._allTeethClippings, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<TeethClippingModel> updateTeethClipping(
+    TeethClippingModel model,
+  ) async {
+    try {
+      final updated = await _eventsRepository.updateTeethClippingLocally(model);
+      _allTeethClippings = _allTeethClippings
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<TailDockingModel> addTailDocking(TailDockingModel model) async {
+    try {
+      final created = await _eventsRepository.createTailDocking(model);
+      _allTailDockings = [..._allTailDockings, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<TailDockingModel> updateTailDocking(TailDockingModel model) async {
+    try {
+      final updated = await _eventsRepository.updateTailDockingLocally(model);
+      _allTailDockings = _allTailDockings
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<IronInjectionModel> addIronInjection(IronInjectionModel model) async {
+    try {
+      final created = await _eventsRepository.createIronInjection(model);
+      _allIronInjections = [..._allIronInjections, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<IronInjectionModel> updateIronInjection(IronInjectionModel model) async {
+    try {
+      final updated = await _eventsRepository.updateIronInjectionLocally(model);
+      _allIronInjections = _allIronInjections
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<LivestockMarkingModel> addLivestockMarking(
+    LivestockMarkingModel model,
+  ) async {
+    try {
+      final created = await _eventsRepository.createLivestockMarking(model);
+      _allLivestockMarkings = [..._allLivestockMarkings, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<LivestockMarkingModel> updateLivestockMarking(
+    LivestockMarkingModel model,
+  ) async {
+    try {
+      final updated = await _eventsRepository.updateLivestockMarkingLocally(
+        model,
+      );
+      _allLivestockMarkings = _allLivestockMarkings
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<StageChangeModel> addStageChange(StageChangeModel model) async {
+    try {
+      final created = await _eventsRepository.createStageChange(model);
+      _allStageChanges = [..._allStageChanges, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<StageChangeModel> updateStageChange(StageChangeModel model) async {
+    try {
+      final updated = await _eventsRepository.updateStageChangeLocally(model);
+      _allStageChanges = _allStageChanges
+          .map((item) => item.uuid == updated.uuid ? updated : item)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<PrepuceConditionModel> addPrepuceCondition(
+    PrepuceConditionModel model,
+  ) async {
+    try {
+      final created = await _eventsRepository.createPrepuceCondition(model);
+      _allPrepuceConditions = [..._allPrepuceConditions, created];
+      notifyListeners();
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<PrepuceConditionModel> updatePrepuceCondition(
+    PrepuceConditionModel model,
+  ) async {
+    try {
+      final updated =
+          await _eventsRepository.updatePrepuceConditionLocally(model);
+      _allPrepuceConditions = _allPrepuceConditions
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
@@ -2458,6 +2663,36 @@ class EventsProvider extends ChangeNotifier {
           farmUuid: farmUuid,
           livestockUuid: livestockUuid,
         );
+      case EventLogTypes.teethClipping:
+        return await _eventsRepository.getTeethClippings(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.tailDocking:
+        return await _eventsRepository.getTailDockings(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.ironInjection:
+        return await _eventsRepository.getIronInjections(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.livestockMarking:
+        return await _eventsRepository.getLivestockMarkings(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.stageChange:
+        return await _eventsRepository.getStageChanges(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
+      case EventLogTypes.prepuceCondition:
+        return await _eventsRepository.getPrepuceConditions(
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+        );
       default:
         return [];
     }
@@ -2488,6 +2723,12 @@ class EventsProvider extends ChangeNotifier {
     _allInseminations = const [];
     _allDryoffs = const [];
     _allTransfers = const [];
+    _allTeethClippings = const [];
+    _allTailDockings = const [];
+    _allIronInjections = const [];
+    _allLivestockMarkings = const [];
+    _allStageChanges = const [];
+    _allPrepuceConditions = const [];
     _error = null;
     notifyListeners();
   }

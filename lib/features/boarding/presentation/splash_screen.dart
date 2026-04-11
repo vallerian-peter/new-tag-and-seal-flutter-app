@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/features/boarding/presentation/get_started.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,9 +12,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  static const int year = 2024;
 
   bool _isSyncing = false;
   bool _syncCompleted = false;
+  String _appVersion = '...';
+  String _buildNumber = '...';
 
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -29,7 +33,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     _initializeAnimations();
     _startAnimationSequence();
+    _loadVersionInfo();
     _performSyncAndNavigate();
+  }
+
+  Future<void> _loadVersionInfo() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = packageInfo.version;
+          _buildNumber = packageInfo.buildNumber;
+        });
+      }
+    } catch (e) {
+      // Fallback to Constants if package_info_plus fails
+      if (mounted) {
+        setState(() {
+          _appVersion = Constants.appVersion;
+          _buildNumber = Constants.appBuildNumber;
+        });
+      }
+    }
   }
 
   void _initializeAnimations() {
@@ -116,172 +141,191 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final tagline = l10n.tagline;
 
     return Scaffold(
-      backgroundColor: theme.brightness != Brightness.dark ? Constants.primaryColor : Colors.grey[880],
-      body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      Colors.grey[900]!,
-                      Colors.grey[800]!,
-                      Colors.grey[900]!,
-                    ]
-                  : [
-                      Constants.primaryColor,
-                      Constants.primaryColor.withOpacity(0.8),
-                      Constants.primaryColor.withOpacity(0.6),
-                    ],
-            ),
+      backgroundColor: theme.brightness != Brightness.dark ? Constants.primaryColor : const Color.fromARGB(255, 40, 40, 40),
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    Colors.grey[900]!,
+                    Colors.grey[800]!,
+                    Colors.grey[900]!,
+                  ]
+                : [
+                    Constants.primaryColor,
+                    Constants.primaryColor.withOpacity(0.8),
+                    Constants.primaryColor.withOpacity(0.6),
+                  ],
           ),
-          child: Stack(
-            children: [
-              
-              // Animated background particles (optional)
-              ...List.generate(6, (index) => _buildFloatingParticle(index)),
-
-              // Main content
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    // Logo with animations
-                    AnimatedBuilder(
-                      animation: Listenable.merge([_fadeAnimation, _scaleAnimation]),
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _scaleAnimation.value,
-                          child: Opacity(
-                            opacity: _fadeAnimation.value,
-                            child: Container(
-                              width: screenWidth * 0.6,
-                              height: screenWidth * 0.6,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2),
-                                  width: 2,
+        ),
+        child: Stack(
+          children: [
+            
+            // Animated background particles (optional)
+            ...List.generate(6, (index) => _buildFloatingParticle(index)),
+      
+            // Main content
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+      
+                  // Logo with animations
+                  AnimatedBuilder(
+                    animation: Listenable.merge([_fadeAnimation, _scaleAnimation]),
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scaleAnimation.value,
+                        child: Opacity(
+                          opacity: _fadeAnimation.value,
+                          child: Container(
+                            width: screenWidth * 0.6,
+                            height: screenWidth * 0.6,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 20,
-                                    spreadRadius: 5,
-                                  ),
-                                ],
-                              ),
-                              child: const Image(
-                                image: AssetImage('assets/images/logos/my-ngombe-logo-2.png'),
-                                fit: BoxFit.contain,
-                              ),
+                              ],
+                            ),
+                            child: const Image(
+                              image: AssetImage('assets/images/logos/my-ngombe-logo-2.png'),
+                              fit: BoxFit.contain,
                             ),
                           ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // Animated tagline
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          child: Text(
-                            tagline,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 1.2,
-                              height: 1.4,
-                            ),
+                        ),
+                      );
+                    },
+                  ),
+      
+                  const SizedBox(height: 40),
+      
+                  // Animated tagline
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        child: Text(
+                          tagline,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.2,
+                            height: 1.4,
                           ),
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 40),
-
-                    // Loading text with sync status
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        children: [
+                  ),
+      
+                  const SizedBox(height: 40),
+      
+                  // Loading text with sync status
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.loadingData,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        if (_isSyncing && !_syncCompleted) ...[
+                          const SizedBox(height: 8),
                           Text(
-                            l10n.loadingData,
+                            l10n.syncingData,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
                             ),
                           ),
-                          if (_isSyncing && !_syncCompleted) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              l10n.syncingData,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ],
                         ],
-                      ),
+                      ],
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // Loading indicator
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white.withOpacity(0.8),
-                          ),
+                  ),
+      
+                  const SizedBox(height: 20),
+      
+                  // Loading indicator
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.white.withOpacity(0.8),
                         ),
                       ),
                     ),
-                    
+                  ),
+                  
+                ],
+              ),
+            ),
+      
+            // Copyright text and version at bottom
+            Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Copyright
+                    Text(
+                      '© $year $appName. ${l10n.copyrightText}.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+
+                    const SizedBox(height: 13),
+
+                    // Version
+                    Text(
+                      '${l10n.version}: $_appVersion+$_buildNumber',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
                   ],
                 ),
               ),
+            ),
 
-              // Copyright text at bottom
-              Positioned(
-                bottom: 30,
-                left: 0,
-                right: 0,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    '© ${DateTime.now().year} $appName. All Rights Reserved.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

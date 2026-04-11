@@ -21,6 +21,7 @@ import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/farm_fo
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm_user_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/extension_officer_invite_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/notification_screen.dart';
 import 'package:provider/provider.dart';
@@ -40,22 +41,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map<String, dynamic>> farmsWithLivestock = [];
   int _totalEventCount = 0;
+  SyncUnsyncedSummary _unsyncedSummary = const SyncUnsyncedSummary.empty();
   bool _isLogoutDialogOpen = false;
   FarmProvider? _farmProvider; // Store reference for cleanup
-  
+
   String _userName = '';
   String _userEmail = '';
   String? _roleTitle;
-  
-  
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
     getALlFarmsWithThereLivestocks();
     _loadEventSummary();
+    _loadUnsyncedSummary();
     WidgetsBinding.instance.addPostFrameCallback((_) => _showSyncToast());
-    
+
     // Listen to FarmProvider changes to auto-refresh when farms are created/updated
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -64,14 +66,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     });
   }
-  
+
   @override
   void dispose() {
     // Remove listener to prevent memory leaks
     _farmProvider?.removeListener(_onFarmProviderChanged);
     super.dispose();
   }
-  
+
   /// Called when FarmProvider notifies listeners (e.g., after farm creation)
   void _onFarmProviderChanged() {
     if (mounted) {
@@ -80,13 +82,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _loadEventSummary();
     }
   }
-  
+
   Future<void> _loadUserData() async {
     final firstname = await _secureStorage.read(key: 'firstname') ?? '';
     final surname = await _secureStorage.read(key: 'surname') ?? '';
     final email = await _secureStorage.read(key: 'email') ?? '';
     final roleTitle = await _secureStorage.read(key: 'roleTitle');
-    
+
     if (mounted) {
       setState(() {
         _userName = '$firstname $surname'.trim();
@@ -98,12 +100,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
     }
   }
+
   Future<void> _loadEventSummary() async {
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
     final summary = await eventsProvider.getEventSummary();
     if (mounted) {
       setState(() {
         _totalEventCount = summary.totalCount;
+      });
+    }
+  }
+
+  Future<void> _loadUnsyncedSummary() async {
+    try {
+      final database = Provider.of<AppDatabase>(context, listen: false);
+      final summary = await Sync.getUnsyncedSummary(database);
+      if (!mounted) return;
+      setState(() {
+        _unsyncedSummary = summary;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _unsyncedSummary = const SyncUnsyncedSummary.empty();
       });
     }
   }
@@ -118,11 +137,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final syncProvider = Provider.of<SyncProvider>(context, listen: false);
     await syncProvider.splashSyncWithDialog(context);
-    
+
     // After successful sync (and user taps OK on the dialog), refresh dashboard data
     if (!mounted) return;
     await getALlFarmsWithThereLivestocks();
     await _loadEventSummary();
+    await _loadUnsyncedSummary();
 
     if (!mounted) return;
     setState(() {
@@ -139,7 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final role = await _secureStorage.read(key: 'role') ?? '';
     final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
     final syncKey = '${_syncPromptStorageKey}_${userId}_${normalizedRole}';
-    
+
     // Check if prompt was already shown
     final hasShownBefore = prefs.getBool(syncKey) ?? false;
     if (hasShownBefore) {
@@ -157,7 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final l10n = AppLocalizations.of(context)!;
     // Use dialogContext for Navigator to avoid using a disposed context
-    
+
     if (!mounted) return;
     showDialog<void>(
       context: context,
@@ -167,7 +187,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final isDark = theme.brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           title: Text(l10n.sync),
           content: Text(
             l10n.dashboardSyncPrompt,
@@ -191,11 +213,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-  
+
   /// Calculate total livestock count from all farms
   int get totalLivestockCount {
     return farmsWithLivestock.fold<int>(
-      0, 
+      0,
       (sum, farm) => sum + (farm['livestockCount'] as int? ?? 0),
     );
   }
@@ -204,26 +226,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final farmProvider = Provider.of<FarmProvider>(context, listen: false);
     // Get all farms with livestock WITHOUT dialogs
     final farmsData = await farmProvider.getAllFarmsWithLivestock();
-    
+
     if (farmsData != null && farmsData.isNotEmpty) {
       print('✅ Found ${farmsData.length} farms with livestock');
-      
+
       // Transform data to match FarmsSection expected format
       final transformedFarms = farmsData.map((farmData) {
         final farm = farmData['farm'];
         final livestock = farmData['livestock'] as List;
         final livestockCount = farmData['livestockCount'] as int;
-        
+
         return {
           'name': farm.name,
           'livestockCount': livestockCount,
-          'location': farm.physicalAddress ?? 'Unknown Location',  // Use fallback string
+          'location':
+              farm.physicalAddress ?? 'Unknown Location', // Use fallback string
           'uuid': farm.uuid,
           'farmData': farm, // Keep full farm data for details
           'livestock': livestock, // Keep livestock list for details
         };
       }).toList();
-      
+
       setState(() {
         farmsWithLivestock = transformedFarms;
       });
@@ -240,23 +263,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final notificationProvider = context.watch<NotificationProvider>();
+    final totalNotifications = notificationProvider.notifications.length;
     final authProvider = context.read<AuthProvider>();
     final isFarmer = authProvider.isFarmer;
     final isExtensionOfficer = authProvider.isExtensionOfficer;
+    final roleTitleNormalized =
+        (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
+            .toLowerCase()
+            .trim());
     final isFarmManager = authProvider.isFarmUser
-        ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
-                .toLowerCase()
-                .trim() ==
-            'farm-manager')
+        ? (roleTitleNormalized == 'farm-manager' ||
+              roleTitleNormalized == 'farmer_manager')
         : false;
     final isVaccinationFarmUser = authProvider.isFarmUser
         ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
-                .toLowerCase()
-                .trim() ==
-            'vaccination-user')
+                  .toLowerCase()
+                  .trim() ==
+              'vaccination-user')
         : false;
     final hasDrawerAccess =
-        isFarmer || isFarmManager || isExtensionOfficer || isVaccinationFarmUser;
+        isFarmer ||
+        isFarmManager ||
+        isExtensionOfficer ||
+        isVaccinationFarmUser;
 
     // ignore: deprecated_member_use
     return WillPopScope(
@@ -267,126 +297,152 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        drawer: hasDrawerAccess ? Consumer<AuthProvider>(
-          builder: (context, authProvider, child) {
-            final localIsFarmer = authProvider.isFarmer;
-            final localIsExtensionOfficer = authProvider.isExtensionOfficer;
-            final localIsFarmManager = authProvider.isFarmUser
-                ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
-                        .toLowerCase()
-                        .trim() ==
-                    'farm-manager')
-                : false;
-            final localIsVaccinationFarmUser = authProvider.isFarmUser
-                ? (((authProvider.currentProfile?['roleTitle'] as String?) ?? '')
-                        .toLowerCase()
-                        .trim() ==
-                    'vaccination-user')
-                : false;
-            if (!(localIsFarmer || localIsFarmManager || localIsExtensionOfficer || localIsVaccinationFarmUser)) {
-              return const SizedBox.shrink();
-            }
-            return DashboardDrawer(
-              userName: _userName,
-              userEmail: _userEmail,
-              roleTitle: _roleTitle,
-              onLogout: _onLogoutPressed,
-              showFarmUsersLink: localIsFarmer,
-              showExtensionsLink: localIsFarmer,
-              showBillsLink: localIsFarmer || localIsExtensionOfficer,
-            );
-          },
-        ) : null,
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'dashboard_sync_fab',
-          onPressed: () => _syncData(),
-          child: _isSyncing
-              ? const LoadingIndicator(size: 20, strokeWidth: 2, color: Colors.white)
-              : const Icon(Iconsax.refresh_outline, color: Colors.white,),
-        ),
-        appBar: AppBar(
-        centerTitle: hasDrawerAccess,
-        automaticallyImplyLeading: false,
-        leadingWidth: hasDrawerAccess ? null : 0,
-        titleSpacing: hasDrawerAccess ? null : 0,
-        toolbarHeight: kToolbarHeight,
-        title: hasDrawerAccess
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${l10n.welcome},',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  Text(
-                    _userName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ],
-              )
-            : Transform.translate(
-                offset: const Offset(0, 0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${l10n.welcome},',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      Text(
-                        _userName,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-        
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        leading: hasDrawerAccess
-            ? Align(
-                alignment: Alignment.bottomRight,
-                child: IconButton(
-                  icon: Icon(
-                    FontAwesome.bars_solid,
-                    size: 20,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                  onPressed: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                ),
+        drawer: hasDrawerAccess
+            ? Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final localIsFarmer = authProvider.isFarmer;
+                  final localIsExtensionOfficer =
+                      authProvider.isExtensionOfficer;
+                  final localRoleTitleNormalized =
+                      (((authProvider.currentProfile?['roleTitle']
+                                  as String?) ??
+                              '')
+                          .toLowerCase()
+                          .trim());
+                  final localIsFarmManager = authProvider.isFarmUser
+                      ? (localRoleTitleNormalized == 'farm-manager' ||
+                            localRoleTitleNormalized == 'farmer_manager')
+                      : false;
+                  final localIsVaccinationFarmUser = authProvider.isFarmUser
+                      ? (((authProvider.currentProfile?['roleTitle']
+                                        as String?) ??
+                                    '')
+                                .toLowerCase()
+                                .trim() ==
+                            'vaccination-user')
+                      : false;
+                  if (!(localIsFarmer ||
+                      localIsFarmManager ||
+                      localIsExtensionOfficer ||
+                      localIsVaccinationFarmUser)) {
+                    return const SizedBox.shrink();
+                  }
+                  return DashboardDrawer(
+                    userName: _userName,
+                    userEmail: _userEmail,
+                    roleTitle: _roleTitle,
+                    onLogout: _onLogoutPressed,
+                    showFarmUsersLink: localIsFarmer,
+                    showExtensionsLink: localIsFarmer,
+                    showBillsLink: localIsFarmer || localIsExtensionOfficer,
+                    showReportsLink: localIsFarmer || localIsFarmManager,
+                  );
+                },
               )
             : null,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(
+            bottom: _unsyncedSummary.hasPending ? 75 : 0,
+          ),
+          child: FloatingActionButton(
+            heroTag: 'dashboard_sync_fab',
+            onPressed: () => _syncData(),
+            child: _isSyncing
+                ? const LoadingIndicator(
+                    size: 20,
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  )
+                : const Icon(Iconsax.refresh_outline, color: Colors.white),
+          ),
+        ),
+        appBar: AppBar(
+          centerTitle: hasDrawerAccess,
+          automaticallyImplyLeading: false,
+          leadingWidth: hasDrawerAccess ? null : 0,
+          titleSpacing: hasDrawerAccess ? null : 0,
+          toolbarHeight: kToolbarHeight,
+          title: hasDrawerAccess
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${l10n.welcome},',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    Text(
+                      _userName,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                )
+              : Transform.translate(
+                  offset: const Offset(0, 0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${l10n.welcome},',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          _userName,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          elevation: 0,
+          leading: hasDrawerAccess
+              ? Align(
+                  alignment: Alignment.bottomRight,
+                  child: IconButton(
+                    icon: Icon(
+                      FontAwesome.bars_solid,
+                      size: 20,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    onPressed: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                  ),
+                )
+              : null,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -394,189 +450,271 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   );
                 },
-                icon: Icon(
-                  Iconsax.notification_outline,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-              Positioned(
-                top: 14,
-                right: 16,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1,
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Iconsax.notification_outline,
+                      color: theme.colorScheme.onSurface,
                     ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-        body: RefreshIndicator(
-        backgroundColor: isDarkMode ? Colors.grey.shade800 : Colors.white,
-        onRefresh: () async {
-          // await _loadUserData();
-          await getALlFarmsWithThereLivestocks();
-          await _loadEventSummary();
-        },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-              // My Farms Section
-              FarmsSection(
-                farms: farmsWithLivestock,
-                onRefresh: getALlFarmsWithThereLivestocks,
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Farm Management Section
-              SectionHeader(
-                title: l10n.farmManagementText,
-                icon: Iconsax.setting_2_outline,
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Create New Farm
-              ActionCard(
-                icon: Iconsax.add_circle_outline,
-                title: l10n.createNewFarmText,
-                subtitle: l10n.registerFarmDesc,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Constants.primaryColor,
-                    Constants.primaryColor.withValues(alpha: 0.8),
+                    if (totalNotifications > 0)
+                      Positioned(
+                        top: -6,
+                        right: -8,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: theme.scaffoldBackgroundColor,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Text(
+                            totalNotifications > 9
+                                ? '9+'
+                                : '$totalNotifications',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              height: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-                onTap: () async {
-                  // Check if user is a farmer
-                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
-                    return;
-                  }
-                  
-                  // Navigate to create farm
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FarmFormScreen()),
-                  );
-                  
-                  debugPrint('🔄 Dashboard received navigation result: $result');
-                  
-                  // Reload farms and event summary if farm was successfully created
-                  if (result == true && mounted) {
-                    debugPrint('🔄 Refreshing dashboard data...');
-                    await getALlFarmsWithThereLivestocks();
-                    await _loadEventSummary();
-                    debugPrint('✅ Dashboard refresh completed');
-                  } else {
-                    debugPrint('⚠️ Dashboard refresh skipped - result: $result, mounted: $mounted');
-                  }
-                },
               ),
-
-              // Invite Farm User
-              ActionCard(
-                icon: Iconsax.user_add_outline,
-                title: l10n.inviteFarmUserText,
-                subtitle: l10n.collaborateText,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Constants.successColor,
-                    Constants.successColor.withValues(alpha: 0.8),
-                  ],
-                ),
-                onTap: () {
-                  // Check if user is a farmer
-                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
-                    return;
-                  }
-                  
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const FarmUserFormScreen(),
-                    ),
-                  );
-                },
-              ),
-              
-              // Add Extension Officer
-              ActionCard(
-                icon: Iconsax.profile_2user_outline,
-                title: l10n.addExtensionOfficerText,
-                subtitle: l10n.inviteOfficerText,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Constants.tertiaryColor,
-                    Constants.tertiaryColor.withValues(alpha: 0.8),
-                  ],
-                ),
-                onTap: () {
-                  // Check if user is a farmer
-                  if (!RoleHelper.checkFarmerRole(context, l10n)) {
-                    return;
-                  }
-                  
-                  // Navigate to extension officer invite form
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ExtensionOfficerInviteFormScreen(),
-                    ),
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Quick Stats
-              SectionHeader(
-                title: l10n.analytics,
-                icon: Bootstrap.bar_chart,
-              ),
-              
-              const SizedBox(height: 16),
-              
-              Row(
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      title: l10n.livestock,
-                      value: '$totalLivestockCount',
-                      icon: Iconsax.pet_outline,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: StatCard(
-                      title: l10n.events,
-                      value: '$_totalEventCount',
-                      icon: Iconsax.calendar_outline,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+        body: Stack(
+          children: [
+            RefreshIndicator(
+              backgroundColor: isDarkMode ? Colors.grey.shade800 : Colors.white,
+              onRefresh: () async {
+                // await _loadUserData();
+                await getALlFarmsWithThereLivestocks();
+                await _loadEventSummary();
+                await _loadUnsyncedSummary();
+              },
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  16,
+                  16,
+                  _unsyncedSummary.hasPending ? 140 : 80,
+                ),
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // My Farms Section
+                    FarmsSection(
+                      farms: farmsWithLivestock,
+                      onRefresh: getALlFarmsWithThereLivestocks,
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Farm Management Section
+                    SectionHeader(
+                      title: l10n.farmManagementText,
+                      icon: Iconsax.setting_2_outline,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Create New Farm
+                    ActionCard(
+                      icon: Iconsax.add_circle_outline,
+                      title: l10n.createNewFarmText,
+                      subtitle: l10n.registerFarmDesc,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Constants.primaryColor,
+                          Constants.primaryColor.withValues(alpha: 0.8),
+                        ],
+                      ),
+                      onTap: () async {
+                        // Check if user is a farmer
+                        if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                          return;
+                        }
+
+                        // Navigate to create farm
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FarmFormScreen(),
+                          ),
+                        );
+
+                        debugPrint(
+                          '🔄 Dashboard received navigation result: $result',
+                        );
+
+                        // Reload farms and event summary if farm was successfully created
+                        if (result == true && mounted) {
+                          debugPrint('🔄 Refreshing dashboard data...');
+                          await getALlFarmsWithThereLivestocks();
+                          await _loadEventSummary();
+                          debugPrint('✅ Dashboard refresh completed');
+                        } else {
+                          debugPrint(
+                            '⚠️ Dashboard refresh skipped - result: $result, mounted: $mounted',
+                          );
+                        }
+                      },
+                    ),
+
+                    // Invite Farm User
+                    ActionCard(
+                      icon: Iconsax.user_add_outline,
+                      title: l10n.inviteFarmUserText,
+                      subtitle: l10n.collaborateText,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Constants.successColor,
+                          Constants.successColor.withValues(alpha: 0.8),
+                        ],
+                      ),
+                      onTap: () {
+                        // Check if user is a farmer
+                        if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                          return;
+                        }
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const FarmUserFormScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    // Add Extension Officer
+                    ActionCard(
+                      icon: Iconsax.profile_2user_outline,
+                      title: l10n.addExtensionOfficerText,
+                      subtitle: l10n.inviteOfficerText,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Constants.tertiaryColor,
+                          Constants.tertiaryColor.withValues(alpha: 0.8),
+                        ],
+                      ),
+                      onTap: () {
+                        // Check if user is a farmer
+                        if (!RoleHelper.checkFarmerRole(context, l10n)) {
+                          return;
+                        }
+
+                        // Navigate to extension officer invite form
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const ExtensionOfficerInviteFormScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Quick Stats
+                    SectionHeader(
+                      title: l10n.analytics,
+                      icon: Bootstrap.bar_chart,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: StatCard(
+                            title: l10n.livestock,
+                            value: '$totalLivestockCount',
+                            icon: Iconsax.pet_outline,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: StatCard(
+                            title: l10n.events,
+                            value: '$_totalEventCount',
+                            icon: Iconsax.calendar_outline,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_unsyncedSummary.hasPending)
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 16,
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(12, 10, 84, 10),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.amber.withValues(alpha: 0.65),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.sync_problem_rounded,
+                          size: 20,
+                          color: Colors.amber.shade800,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.syncRequiredMessage(
+                              _unsyncedSummary.totalPending,
+                            ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -609,15 +747,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           title: Text(l10n.logout),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(summary.hasPending
-                  ? l10n.unsyncedDataWarning
-                  : l10n.noUnsyncedDataMessage),
+              Text(
+                summary.hasPending
+                    ? l10n.unsyncedDataWarning
+                    : l10n.noUnsyncedDataMessage,
+              ),
               if (summary.hasPending) ...[
                 const SizedBox(height: 12),
                 ..._buildUnsyncedSummaryItems(dialogContext, l10n, summary),
@@ -742,10 +884,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -812,6 +953,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return key;
     }
   }
-
 }
-

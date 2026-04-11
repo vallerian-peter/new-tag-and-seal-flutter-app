@@ -12,6 +12,8 @@ mixin _$LogReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $DiseasesTable get diseases => attachedDatabase.diseases;
   $DisposalTypesTable get disposalTypes => attachedDatabase.disposalTypes;
   $MilkingMethodsTable get milkingMethods => attachedDatabase.milkingMethods;
+  $TeethClippingMethodsTable get teethClippingMethods =>
+      attachedDatabase.teethClippingMethods;
   $HeatTypesTable get heatTypes => attachedDatabase.heatTypes;
   $InseminationServicesTable get inseminationServices =>
       attachedDatabase.inseminationServices;
@@ -23,4 +25,18 @@ mixin _$LogReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $BirthProblemsTable get birthProblems => attachedDatabase.birthProblems;
   $ReproductiveProblemsTable get reproductiveProblems =>
       attachedDatabase.reproductiveProblems;
+  $PrepuceConditionTypesTable get prepuceConditionTypes =>
+      attachedDatabase.prepuceConditionTypes;
+  $PrepuceSeveritiesTable get prepuceSeverities =>
+      attachedDatabase.prepuceSeverities;
+  $PrepuceClinicalSignsTable get prepuceClinicalSigns =>
+      attachedDatabase.prepuceClinicalSigns;
+  $PrepuceCauseRisksTable get prepuceCauseRisks =>
+      attachedDatabase.prepuceCauseRisks;
+  $PrepuceTreatmentsGivenTable get prepuceTreatmentsGiven =>
+      attachedDatabase.prepuceTreatmentsGiven;
+  $PrepuceBreedingStatusesTable get prepuceBreedingStatuses =>
+      attachedDatabase.prepuceBreedingStatuses;
+  $PrepuceHealingStatusesTable get prepuceHealingStatuses =>
+      attachedDatabase.prepuceHealingStatuses;
 }

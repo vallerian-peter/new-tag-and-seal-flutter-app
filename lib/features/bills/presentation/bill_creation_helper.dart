@@ -66,4 +66,26 @@ class BillCreationHelper {
       livestockCount: 1,
     );
   }
+
+  /// Single bill flow for a litter or batch (quantity = head count).
+  static Future<void> maybeCreateBillForLivestockBatch({
+    required BuildContext context,
+    required String farmUuid,
+    required int livestockCount,
+    required String referenceLivestockUuid,
+  }) async {
+    final authProvider = context.read<AuthProvider>();
+    if (!authProvider.isExtensionOfficer) {
+      return;
+    }
+    if (livestockCount < 1) return;
+
+    await showBillCreateDialogAndSave(
+      context,
+      farmUuid: farmUuid,
+      subjectType: 'livestock',
+      subjectUuid: referenceLivestockUuid,
+      livestockCount: livestockCount,
+    );
+  }
 }

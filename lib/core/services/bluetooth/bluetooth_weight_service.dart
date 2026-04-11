@@ -48,6 +48,14 @@ class BluetoothWeightService {
   BluetoothDevice? _connectedDevice;
   List<BluetoothDevice> _discoveredDevices = [];
   bool _isScanning = false;
+  StreamSubscription<BluetoothConnectionState>? _connectionStateSubscription;
+  List<StreamSubscription<List<int>>>? _characteristicSubscriptions = [];
+  Timer? _weightPollingTimer;
+  BluetoothCharacteristic? _weightCharacteristic;
+  double? _lastValidWeight;
+  DateTime? _lastWeightUpdateTime;
+  bool _isHandlingDisconnection = false; // Prevent recursive disconnect calls
+  StreamSubscription<List<ScanResult>>? _scanResultsSubscription;
 
   /// Check and request Bluetooth permissions
   /// 
@@ -187,14 +195,11 @@ class BluetoothWeightService {
 
       log('🔍 Starting Bluetooth scan for weight scales...');
 
-      // Start scanning
-      await FlutterBluePlus.startScan(
-        timeout: const Duration(seconds: 10),
-        androidUsesFineLocation: true,
-      );
-
-      // Listen to scan results
-      FlutterBluePlus.scanResults.listen((results) {
+      // Cancel any existing scan subscription
+      await _scanResultsSubscription?.cancel();
+      
+      // Listen to scan results BEFORE starting scan
+      _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
         for (ScanResult r in results) {
           // Filter for weight scales (check device name contains weight-related keywords)
           final deviceName = r.device.platformName.toLowerCase();
@@ -214,8 +219,15 @@ class BluetoothWeightService {
         }
       });
 
-      // Wait for scan to complete
+      // Start scanning WITHOUT timeout - we'll manage the duration ourselves
+      await FlutterBluePlus.startScan(
+        androidUsesFineLocation: true,
+      );
+
+      // Wait for scan to complete (scan for 10 seconds to find all devices)
       await Future.delayed(const Duration(seconds: 10));
+      
+      // Stop scanning after duration
       await stopScan();
 
       return null; // Success
@@ -229,11 +241,14 @@ class BluetoothWeightService {
   /// Stop scanning
   Future<void> stopScan() async {
     try {
-      await FlutterBluePlus.stopScan();
-      _isScanning = false;
-      log('✅ Scan stopped');
+      if (_isScanning) {
+        await FlutterBluePlus.stopScan();
+        _isScanning = false;
+        log('✅ Scan stopped');
+      }
     } catch (e) {
       log('❌ Error stopping scan: $e');
+      _isScanning = false;
     }
   }
 
@@ -242,16 +257,144 @@ class BluetoothWeightService {
     try {
       log('🔗 Connecting to ${device.platformName}...');
 
+      // Check if device is available before attempting connection
+      try {
+        final currentState = await device.connectionState.first.timeout(
+          const Duration(seconds: 2),
+          onTimeout: () => BluetoothConnectionState.disconnected,
+        );
+        if (currentState == BluetoothConnectionState.disconnected) {
+          // Device might be turned off or out of range
+          final deviceName = device.platformName;
+          log('⚠️ Device $deviceName appears to be disconnected/unavailable');
+        }
+      } catch (e) {
+        log('⚠️ Could not check device state: $e');
+      }
+
       // Disconnect from previous device if any
       if (_connectedDevice != null) {
         await disconnectDevice();
       }
 
-      // Connect to device
+      // Cancel previous connection state subscription if any
+      await _connectionStateSubscription?.cancel();
+
+      // Listen to device connection state changes BEFORE connecting
+      _connectionStateSubscription = device.connectionState.listen((state) async {
+        log('📡 Device connection state changed: $state');
+        final isConnected = state == BluetoothConnectionState.connected;
+        
+        if (isConnected && _connectedDevice?.remoteId == device.remoteId) {
+          _connectionStateController.add(true);
+          log('✅ Device connected: ${device.platformName}');
+          _isHandlingDisconnection = false; // Reset flag on successful connection
+        } else if (!isConnected && _connectedDevice?.remoteId == device.remoteId && !_isHandlingDisconnection) {
+          // Connection lost - disconnect, remove device from list, and restart scan
+          _isHandlingDisconnection = true; // Prevent recursive calls
+          final disconnectedDevice = _connectedDevice;
+          log('⚠️ Connection lost to ${disconnectedDevice?.platformName}, cleaning up and removing device...');
+          
+          // Disconnect and clean up (without canceling subscription here to avoid issues)
+          try {
+            await _cancelCharacteristicSubscriptions();
+            _lastValidWeight = null;
+            _lastWeightUpdateTime = null;
+            _weightCharacteristic = null;
+            
+            // Remove device from discovered devices list
+            if (disconnectedDevice != null) {
+              _discoveredDevices.removeWhere((d) => d.remoteId == disconnectedDevice.remoteId);
+              log('🗑️ Removed ${disconnectedDevice.platformName} from discovered devices list');
+              _devicesController.add(List.from(_discoveredDevices));
+            }
+            
+            try {
+              await disconnectedDevice!.disconnect();
+            } catch (e) {
+              log('⚠️ Error during disconnect (may already be disconnected): $e');
+            }
+            
+            // Clear all connection state
+            log('✅ Disconnected from ${disconnectedDevice?.platformName ?? 'Device'}');
+            _connectedDevice = null;
+            _connectionStateController.add(false);
+            
+            // Cancel subscription after cleanup
+            await _connectionStateSubscription?.cancel();
+            _connectionStateSubscription = null;
+            
+            // Wait a moment before restarting scan to allow cleanup
+            await Future.delayed(const Duration(milliseconds: 1000));
+            
+            // Restart scanning for devices
+            if (!_isScanning) {
+              log('🔄 Restarting device scan after disconnection...');
+              await startScan();
+            }
+          } catch (e) {
+            log('❌ Error handling disconnection: $e');
+            _connectedDevice = null;
+            _connectionStateController.add(false);
+            // Still try to remove device from list even on error
+            if (disconnectedDevice != null) {
+              _discoveredDevices.removeWhere((d) => d.remoteId == disconnectedDevice.remoteId);
+              _devicesController.add(List.from(_discoveredDevices));
+            }
+          } finally {
+            _isHandlingDisconnection = false;
+          }
+        }
+      });
+
+      // For automatic pairing, create bond first (Android only)
+      // This will show the pairing dialog automatically without requiring user to go to settings
+      log('🔐 Initiating pairing/bonding process...');
+      
+      try {
+        // Listen to bond state changes to track pairing progress
+        final bondSubscription = device.bondState.listen((bondState) {
+          log('🔐 Bond state changed: $bondState');
+        });
+        
+        // Cancel bond subscription when device disconnects
+        device.cancelWhenDisconnected(bondSubscription);
+        
+        // Create bond to trigger pairing dialog (Android only, iOS handles automatically)
+        // This will show the pairing dialog if device is not already paired
+        await device.createBond();
+        log('✅ Bond creation initiated');
+        
+        // Wait a moment for bonding to complete
+        await Future.delayed(const Duration(milliseconds: 1500));
+      } catch (bondError) {
+        log('⚠️ Bonding may not be needed or already bonded: $bondError');
+        // Continue with connection anyway - some devices don't need explicit bonding
+      }
+      
+      // Connect to device (pairing dialog should have appeared if needed)
+      log('🔗 Connecting to device...');
       await device.connect(
-        timeout: const Duration(seconds: 15),
-        autoConnect: false,
+        timeout: const Duration(seconds: 20),
+        autoConnect: false, // Must be false to allow MTU negotiation
+        // Note: We rely on strict filtering in _discoverServicesAndSubscribe to only
+        // subscribe to the weight characteristic (fec8/ffe1) and validate data format (ST,GS).
+        // This prevents processing data from other characteristics that flutter_blue_plus
+        // may read during service discovery.
       );
+
+      // Wait a bit for connection state to stabilize
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Check if actually connected
+      final connectionState = await device.connectionState.first;
+      if (connectionState != BluetoothConnectionState.connected) {
+        log('❌ Connection failed, state: $connectionState');
+        _connectionStateController.add(false);
+        await _connectionStateSubscription?.cancel();
+        _connectionStateSubscription = null;
+        return false;
+      }
 
       _connectedDevice = device;
       _connectionStateController.add(true);
@@ -265,6 +408,18 @@ class BluetoothWeightService {
     } catch (e) {
       log('❌ Error connecting to device: $e');
       _connectionStateController.add(false);
+      await _connectionStateSubscription?.cancel();
+      _connectionStateSubscription = null;
+      
+      // If connection failed (timeout, device unavailable), remove device from list
+      // This handles cases where device was turned off or is out of range
+      final deviceId = device.remoteId;
+      final deviceName = device.platformName;
+      _discoveredDevices.removeWhere((d) => d.remoteId == deviceId);
+      log('🗑️ Removed unavailable device $deviceName from discovered devices list');
+      _devicesController.add(List.from(_discoveredDevices));
+      
+      _connectedDevice = null;
       return false;
     }
   }
@@ -272,49 +427,153 @@ class BluetoothWeightService {
   /// Discover services and subscribe to weight data notifications
   Future<void> _discoverServicesAndSubscribe(BluetoothDevice device) async {
     try {
+      // Cancel any existing subscriptions
+      await _cancelCharacteristicSubscriptions();
+      _weightCharacteristic = null;
+      _lastValidWeight = null;
+      _lastWeightUpdateTime = null;
+      
       // Discover services
       final services = await device.discoverServices();
       log('🔍 Discovered ${services.length} services');
 
-      // Look for weight characteristic (usually in a custom service)
+      // The UUIDs that send the actual weight data for this scale type (ST,GS format)
+      const knownWeightUuids = ['fec8', 'ffe1'];
+      
+      // Look ONLY for weight characteristics with known UUIDs (fec8, ffe1)
+      // These are the characteristics that send actual weight data in ST,GS format
       for (BluetoothService service in services) {
+        log('🔍 Service UUID: ${service.uuid}');
         for (BluetoothCharacteristic characteristic in service.characteristics) {
-          // Check if characteristic supports notify
-          if (characteristic.properties.notify) {
-            log('📡 Found notify characteristic: ${characteristic.uuid}');
+          final uuidStr = characteristic.uuid.toString().toLowerCase();
+          log('  📡 Characteristic UUID: ${characteristic.uuid}, Properties: ${characteristic.properties}');
+          
+          // Check for the known weight UUID and that it supports data streaming
+          final isWeightCharacteristic = knownWeightUuids.any((uuid) => uuidStr.contains(uuid));
+          
+          if (isWeightCharacteristic && (characteristic.properties.notify || characteristic.properties.indicate)) {
+            log('✅ Found weight characteristic with notify: ${characteristic.uuid}');
 
-            // Subscribe to notifications
-            await characteristic.setNotifyValue(true);
-            
-            characteristic.lastValueStream.listen((value) {
-              if (value.isNotEmpty) {
-                // Parse weight data (format depends on device)
-                final weight = _parseWeightData(value);
-                if (weight != null) {
-                  log('📊 Weight received: $weight kg');
-                  _weightDataController.add(weight);
-                }
-              }
-            });
-          }
-
-          // If characteristic supports read, try reading it
-          if (characteristic.properties.read) {
             try {
-              final value = await characteristic.read();
-              final weight = _parseWeightData(value);
-              if (weight != null) {
-                log('📊 Weight read: $weight kg');
-                _weightDataController.add(weight);
-              }
+              // Subscribe to notifications
+              await characteristic.setNotifyValue(true);
+              log('✅ Subscribed to notifications for weight characteristic: ${characteristic.uuid}');
+              
+              // Set as the primary weight characteristic
+              _weightCharacteristic = characteristic;
+              
+              // Use lastValueStream for real-time updates - THIS IS THE ONLY SOURCE
+              final subscription = characteristic.lastValueStream.listen((value) {
+                log('📊 Raw data received via notify from ${characteristic.uuid}: $value (${value.length} bytes)');
+                if (value.isNotEmpty) {
+                  // Check if data matches weight format (ST,GS pattern)
+                  final asciiString = String.fromCharCodes(value);
+                  if (asciiString.contains('ST,GS') || asciiString.contains('GS,')) {
+                    // This is definitely weight data
+                    final weight = _parseWeightData(value);
+                    if (weight != null && _isValidWeight(weight)) {
+                      log('📊 ✅ Valid weight received via notify: $weight kg');
+                      _updateWeight(weight);
+                    } else {
+                      log('⚠️ Could not parse valid weight from ${characteristic.uuid}: $weight');
+                    }
+                  } else {
+                    log('⚠️ Data from ${characteristic.uuid} does not match weight format, ignoring');
+                  }
+                } else {
+                  log('⚠️ Received empty data from ${characteristic.uuid}');
+                }
+              }, onError: (error) {
+                log('❌ Error in weight characteristic notify stream ${characteristic.uuid}: $error');
+              });
+              
+              _characteristicSubscriptions?.add(subscription);
+              log('✅ Added subscription for weight characteristic ${characteristic.uuid}');
+              
+              // Found the one we need, stop searching immediately and exit function
+              log('✅ Successfully subscribed to weight characteristic, stopping discovery');
+              return; // Exit the function once the correct characteristic is found
             } catch (e) {
-              log('⚠️ Could not read characteristic: $e');
+              log('❌ Error subscribing to weight characteristic ${characteristic.uuid}: $e');
             }
           }
         }
       }
+
+      // DO NOT poll any characteristics - only use notify stream
+      // Polling causes interference and reads from wrong characteristics
+      if (_weightCharacteristic == null) {
+        log('⚠️ No weight characteristic (fec8/ffe1) with notify found');
+      } else {
+        log('✅ Using weight characteristic ${_weightCharacteristic!.uuid} via notify stream only');
+      }
     } catch (e) {
       log('❌ Error discovering services: $e');
+    }
+  }
+
+  /// Check if weight value is valid (filters out invalid parsed data)
+  bool _isValidWeight(double weight) {
+    // Filter out invalid weights:
+    // - Very large negative values (unrealistic, likely parsing errors)
+    // - Extremely small scientific notation values (parsing errors)
+    // - Extremely large values (unrealistic)
+    // - Zero and small negative values are valid (empty scale or tare offset)
+    
+    // Allow small negative values (common for tare/zero offset, e.g., -0.2 kg)
+    // But reject very large negative values (likely parsing errors)
+    if (weight < -10.0) return false; // Reject very large negative values
+    
+    if (weight > 10000) return false; // Max 10 tons
+    
+    // Reject any value that looks like scientific notation (parsing errors)
+    // These are usually from incorrectly parsing device info as weight
+    final weightStr = weight.toString();
+    if (weightStr.contains('e-') || weightStr.contains('E-')) {
+      return false; // Scientific notation = parsing error
+    }
+    
+    // Reject very small positive values (likely parsing errors from device info)
+    // But allow small negative values (they're valid for tare/zero offset)
+    if (weight > 0 && weight < 0.01) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  /// Update weight with debouncing to prevent rapid UI updates
+  void _updateWeight(double weight) {
+    final now = DateTime.now();
+    
+    // Debounce: only update if weight changed significantly or enough time passed
+    if (_lastValidWeight != null && _lastWeightUpdateTime != null) {
+      final weightDiff = (weight - _lastValidWeight!).abs();
+      final timeDiff = now.difference(_lastWeightUpdateTime!);
+      
+      // Update if weight changed by more than 0.05kg (50g) or 300ms passed
+      // This prevents rapid flickering while still being responsive
+      if (weightDiff < 0.05 && timeDiff.inMilliseconds < 300) {
+        return; // Skip update, too soon and too small change
+      }
+    }
+    
+    _lastValidWeight = weight;
+    _lastWeightUpdateTime = now;
+    _weightDataController.add(weight);
+  }
+
+
+  /// Cancel all characteristic subscriptions
+  Future<void> _cancelCharacteristicSubscriptions() async {
+    _weightPollingTimer?.cancel();
+    _weightPollingTimer = null;
+    
+    if (_characteristicSubscriptions != null) {
+      for (var subscription in _characteristicSubscriptions!) {
+        await subscription.cancel();
+      }
+      _characteristicSubscriptions?.clear();
     }
   }
 
@@ -422,13 +681,41 @@ class BluetoothWeightService {
   Future<void> disconnectDevice() async {
     try {
       if (_connectedDevice != null) {
-        await _connectedDevice!.disconnect();
-        log('✅ Disconnected from ${_connectedDevice!.platformName}');
+        final deviceName = _connectedDevice!.platformName;
+        final deviceId = _connectedDevice!.remoteId;
+        
+        // Cancel characteristic subscriptions and polling first
+        await _cancelCharacteristicSubscriptions();
+        
+        // Cancel connection state subscription to prevent recursive calls
+        await _connectionStateSubscription?.cancel();
+        _connectionStateSubscription = null;
+        
+        // Disconnect from device
+        try {
+          await _connectedDevice!.disconnect();
+        } catch (e) {
+          log('⚠️ Error during disconnect (may already be disconnected): $e');
+        }
+        
+        // Remove device from discovered devices list
+        _discoveredDevices.removeWhere((d) => d.remoteId == deviceId);
+        log('🗑️ Removed $deviceName from discovered devices list');
+        _devicesController.add(List.from(_discoveredDevices));
+        
+        log('✅ Disconnected from $deviceName');
         _connectedDevice = null;
         _connectionStateController.add(false);
+        
+        // Reset weight data and characteristic
+        _lastValidWeight = null;
+        _lastWeightUpdateTime = null;
+        _weightCharacteristic = null;
       }
     } catch (e) {
       log('❌ Error disconnecting: $e');
+      _connectedDevice = null;
+      _connectionStateController.add(false);
     }
   }
 
@@ -440,6 +727,13 @@ class BluetoothWeightService {
 
   /// Dispose streams
   void dispose() {
+    _connectionStateSubscription?.cancel();
+    _connectionStateSubscription = null;
+    _scanResultsSubscription?.cancel();
+    _scanResultsSubscription = null;
+    _weightPollingTimer?.cancel();
+    _weightPollingTimer = null;
+    _cancelCharacteristicSubscriptions();
     _devicesController.close();
     _weightDataController.close();
     _connectionStateController.close();

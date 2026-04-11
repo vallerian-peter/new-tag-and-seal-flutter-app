@@ -16,14 +16,12 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dispos
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_selector_page.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/bulk_livestock_summary_tile.dart';
-import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
-import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 class DisposalFormScreen extends StatefulWidget {
   final DisposalModel? disposal;
@@ -54,6 +52,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   final _eventDateController = TextEditingController();
   final _reasonsController = TextEditingController();
   final _remarksController = TextEditingController();
+  final _saleWeightController = TextEditingController();
+  final _salePriceController = TextEditingController();
+  final _buyerNameController = TextEditingController();
 
   int _currentStep = 0;
   bool _isLoadingContext = true;
@@ -101,6 +102,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     }
     _reasonsController.text = disposal.reasons;
     _remarksController.text = disposal.remarks ?? '';
+    _saleWeightController.text = disposal.saleWeight?.toString() ?? '';
+    _salePriceController.text = disposal.salePrice?.toString() ?? '';
+    _buyerNameController.text = disposal.buyerName ?? '';
     _selectedDisposalTypeId = disposal.disposalTypeId;
     if (disposal.status.isNotEmpty) {
       _selectedStatus = disposal.status;
@@ -297,6 +301,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     _eventDateController.dispose();
     _reasonsController.dispose();
     _remarksController.dispose();
+    _saleWeightController.dispose();
+    _salePriceController.dispose();
+    _buyerNameController.dispose();
     super.dispose();
   }
 
@@ -304,6 +311,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     // Check if we're in edit mode (same pattern as Farm form)
     final isEditMode = widget.isEditMode;
@@ -318,14 +326,14 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         : l10n.continueButton;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -548,6 +556,39 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           prefixIcon: Icons.notes_outlined,
           maxLines: 4,
         ),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _saleWeightController,
+          label: l10n.saleWeight,
+          hintText: l10n.optionalFieldHint,
+          prefixIcon: Icons.scale_outlined,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _salePriceController,
+          label: '${l10n.salePrice}${_isSaleDisposalTypeSelected ? ' *' : ''}',
+          hintText: l10n.optionalFieldHint,
+          prefixIcon: Icons.attach_money_outlined,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          validator: (value) {
+            final raw = value?.trim() ?? '';
+            if (_isSaleDisposalTypeSelected && raw.isEmpty) {
+              return l10n.salePrice;
+            }
+            if (raw.isNotEmpty && double.tryParse(raw) == null) {
+              return l10n.salePrice;
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _buyerNameController,
+          label: l10n.buyerName,
+          hintText: l10n.optionalFieldHint,
+          prefixIcon: Icons.person_outline,
+        ),
         const SizedBox(height: 24),
         _buildInfoBanner(
           message: l10n.disposalNotesInfo,
@@ -640,6 +681,19 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       return;
     }
 
+    final saleWeight = _parseOptionalDouble(_saleWeightController.text);
+    final salePrice = _parseOptionalDouble(_salePriceController.text);
+    final buyerName = _buyerNameController.text.trim().isEmpty
+        ? null
+        : _buyerNameController.text.trim();
+
+    if (_isSaleDisposalTypeSelected && salePrice == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.salePrice)));
+      return;
+    }
+
     try {
       final remarks = _remarksController.text.trim().isEmpty
           ? null
@@ -659,6 +713,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           eventDate: eventDateIso ?? existing.eventDate,
           reasons: reasons,
           remarks: remarks,
+          saleWeight: saleWeight,
+          salePrice: salePrice,
+          buyerName: buyerName,
           status: _selectedStatus,
           synced: false,
           syncAction: existing.syncAction == 'create' ? 'create' : 'update',
@@ -720,6 +777,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             eventDate: eventDateIso,
             reasons: reasons,
             remarks: remarks,
+            saleWeight: saleWeight,
+            salePrice: salePrice,
+            buyerName: buyerName,
             status: _selectedStatus,
             synced: false,
             syncAction: 'create',
@@ -769,6 +829,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           eventDate: eventDateIso,
           reasons: reasons,
           remarks: remarks,
+          saleWeight: saleWeight,
+          salePrice: salePrice,
+          buyerName: buyerName,
           status: _selectedStatus,
           synced: false,
           syncAction: 'create',
@@ -926,6 +989,26 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       _selectedEventDate = combined;
       _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
     });
+  }
+
+  bool get _isSaleDisposalTypeSelected {
+    final selectedId = _selectedDisposalTypeId;
+    if (selectedId == null) return false;
+    for (final item in _disposalTypeItems) {
+      if (item.value == selectedId) {
+        final label = item.label.toLowerCase();
+        return label.contains('sale') ||
+            label.contains('sold') ||
+            label.contains('uuzaji');
+      }
+    }
+    return false;
+  }
+
+  double? _parseOptionalDouble(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return null;
+    return double.tryParse(value);
   }
 
   Widget _buildSectionTitle(String title, ThemeData theme) {

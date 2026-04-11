@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem;
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem, TeethClippingMethod;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/administration_route.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/feeding_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/medicine.dart';
@@ -16,6 +16,8 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/teeth_clipping_method.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/repo/log_additional_data_repo.dart';
 
 class LogAdditionalDataProvider extends ChangeNotifier {
@@ -46,6 +48,8 @@ class LogAdditionalDataProvider extends ChangeNotifier {
   List<BirthType> _birthTypes = const [];
   List<BirthProblem> _birthProblems = const [];
   List<ReproductiveProblem> _reproductiveProblems = const [];
+  List<TeethClippingMethod> _teethClippingMethods = const [];
+  List<PrepuceReferenceOption> _prepuceReferenceOptions = const [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -65,6 +69,22 @@ class LogAdditionalDataProvider extends ChangeNotifier {
   List<BirthType> get birthTypes => _birthTypes;
   List<BirthProblem> get birthProblems => _birthProblems;
   List<ReproductiveProblem> get reproductiveProblems => _reproductiveProblems;
+  List<TeethClippingMethod> get teethClippingMethods => _teethClippingMethods;
+  List<PrepuceReferenceOption> get prepuceReferenceOptions =>
+      _prepuceReferenceOptions;
+
+  List<PrepuceReferenceOption> prepuceOptionsForKind(String kind) {
+    return _prepuceReferenceOptions.where((e) => e.kind == kind).toList();
+  }
+
+  String? prepuceLabelFor(String kind, int referenceId, String? languageCode) {
+    for (final o in _prepuceReferenceOptions) {
+      if (o.kind == kind && o.referenceId == referenceId) {
+        return o.labelForLocale(languageCode);
+      }
+    }
+    return null;
+  }
 
   Future<void> loadFromLocal() async {
     try {
@@ -90,6 +110,8 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _birthTypes = await _repository.getBirthTypes();
       _birthProblems = await _repository.getBirthProblems();
       _reproductiveProblems = await _repository.getReproductiveProblems();
+      _teethClippingMethods = await _repository.getTeethClippingMethods();
+      _prepuceReferenceOptions = await _repository.getPrepuceReferenceOptions();
 
       // Log for debugging
       debugPrint('📊 LogAdditionalDataProvider: Loaded from local DB - HeatTypes: ${_heatTypes.length}, InseminationServices: ${_inseminationServices.length}, SemenStrawTypes: ${_semenStrawTypes.length}');
@@ -153,6 +175,8 @@ class LogAdditionalDataProvider extends ChangeNotifier {
     _birthTypes = const [];
     _birthProblems = const [];
     _reproductiveProblems = const [];
+    _teethClippingMethods = const [];
+    _prepuceReferenceOptions = const [];
     _initialized = false;
     _initializationFuture = null;
     notifyListeners();

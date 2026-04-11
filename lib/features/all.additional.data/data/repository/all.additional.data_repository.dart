@@ -22,6 +22,13 @@ class AllAdditionalDataRepository {
 
   AllAdditionalDataRepository(this._database);
 
+  int _asInt(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
+
   /// Fetch all additional data from API (REMOTE ONLY - NO LOCAL STORAGE)
   /// 
   /// Returns a map containing:
@@ -69,6 +76,7 @@ class AllAdditionalDataRepository {
         'livestockObtainedMethods': livestockReferenceData['livestockObtainedMethods'] ?? data['livestockObtainedMethods'],
         'breeds': livestockReferenceData['breeds'] ?? data['breeds'],
         'vaccineTypes': livestockReferenceData['vaccineTypes'] ?? data['vaccineTypes'],
+        'stages': livestockReferenceData['stages'] ?? data['stages'],
       };
       
       // Store using the shared logic
@@ -85,8 +93,8 @@ class AllAdditionalDataRepository {
   /// for offline access. Used during app initialization/splash sync.
   Future<void> syncAndStoreLocally() async {
     try {
-      // Fetch all data from remote API
-      final remoteData = await AllAdditionalDataService.fetchAllAdditionalData();
+      // Fetch raw data from remote API for direct DB upsert mapping.
+      final remoteData = await AllAdditionalDataService.fetchAllAdditionalDataRaw();
       
       // Store using the shared logic
       await _storeDataToDatabase(remoteData);
@@ -306,6 +314,19 @@ class AllAdditionalDataRepository {
             .toList();
 
         await _database.vaccineTypeDao.upsertVaccineTypes(vaccineTypeCompanions);
+      }
+
+      // Production stages (per livestock type)
+      if (remoteData['stages'] != null && (remoteData['stages'] as List).isNotEmpty) {
+        final stageCompanions = (remoteData['stages'] as List)
+            .map((json) => StagesCompanion.insert(
+                  id: Value(_asInt(json['id'])),
+                  name: json['name'] ?? '',
+                  livestockTypeId: _asInt(json['livestockTypeId']),
+                ))
+            .toList();
+
+        await _database.stageDao.upsertStages(stageCompanions);
       }
 
     } catch (e) {

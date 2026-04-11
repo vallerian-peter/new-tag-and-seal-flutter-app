@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../domain/model/notification_model.dart';
@@ -35,11 +37,18 @@ class _NotificationScreenBody extends StatefulWidget {
 }
 
 class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
+  List<Farm> _farms = const [];
+  List<Livestock> _livestock = const [];
+
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
-  String _notificationKey(NotificationModel notification) =>
-      '${notification.id ?? notification.title}-${notification.scheduledAt}-${notification.farmUuid}-${notification.livestockUuid}';
+  String _notificationKey(NotificationModel notification) {
+    if (NotificationModel.isPrepuceFollowUpTitle(notification.title)) {
+      return notification.title;
+    }
+    return '${notification.id ?? notification.title}-${notification.scheduledAt}-${notification.farmUuid}-${notification.livestockUuid}';
+  }
 
   @override
   void initState() {
@@ -47,7 +56,27 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<NotificationProvider>().loadNotifications();
+      _loadNotificationContextData();
     });
+  }
+
+  Future<void> _loadNotificationContextData() async {
+    try {
+      final database = context.read<AppDatabase>();
+      final farms = await database.farmDao.getAllActiveFarms();
+      final livestock = await database.livestockDao.getAllActiveLivestock();
+      if (!mounted) return;
+      setState(() {
+        _farms = farms;
+        _livestock = livestock;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _farms = const [];
+        _livestock = const [];
+      });
+    }
   }
 
   @override
@@ -182,6 +211,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     final farmNameController = TextEditingController();
     final livestockNameController = TextEditingController();
     final scheduleController = TextEditingController();
+    String? selectedFarmUuid;
+    String? selectedLivestockUuid;
     DateTime? scheduledAt;
     bool repeatDaily = false;
     TimeOfDay? dailyTime;
@@ -191,6 +222,7 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     bool vibrate = true;
     double volume = 1.0;
     bool previewing = false;
+    bool _isPickingFile = false; // Guard against concurrent FilePicker requests
     final previewPlayer = AudioPlayer();
 
     final theme = Theme.of(context);
@@ -205,16 +237,31 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
           final theme = Theme.of(context);
 
           Future<void> pickSound(StateSetter setModalState) async {
-            final result = await FilePicker.platform.pickFiles(type: FileType.audio);
-            if (result == null || result.files.isEmpty) return;
-            final picked = result.files.single;
-            final path = picked.path;
-            if (path == null) return;
-            final relative = await AlarmAudioUtils.copySoundToAppDirectory(path);
-            setModalState(() {
-              selectedSoundPath = relative;
-              selectedSoundName = picked.name;
-            });
+            // Guard: block concurrent requests — update state so button disables in UI
+            if (_isPickingFile) return;
+            setModalState(() => _isPickingFile = true);
+            try {
+              // Clear stale temp files from previous picks (prevents iOS multiple_request)
+              await FilePicker.platform.clearTemporaryFiles();
+              final result = await FilePicker.platform.pickFiles(type: FileType.audio);
+              if (result == null || result.files.isEmpty) return;
+              final picked = result.files.single;
+              final path = picked.path;
+              if (path == null) return;
+              final relative = await AlarmAudioUtils.copySoundToAppDirectory(path);
+              setModalState(() {
+                selectedSoundPath = relative;
+                selectedSoundName = picked.name;
+              });
+            } on PlatformException catch (e) {
+              // Swallow iOS multiple_request / cancellation exceptions silently
+              debugPrint('[FilePicker] PlatformException suppressed: ${e.code} — ${e.message}');
+            } on Exception catch (e) {
+              debugPrint('[FilePicker] Ignored error: $e');
+            } finally {
+              // Always re-enable the button via setModalState
+              if (mounted) setModalState(() => _isPickingFile = false);
+            }
           }
 
           Future<void> previewSound(StateSetter setModalState) async {
@@ -237,6 +284,188 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                 setModalState(() => previewing = false);
               }
             }
+          }
+
+          Future<void> pickFarmFromSheet() async {
+            await showModalBottomSheet<void>(
+              context: context,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              showDragHandle: true,
+              builder: (ctx) {
+                if (_farms.isEmpty) {
+                  return SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(l10n.noData),
+                    ),
+                  );
+                }
+                return SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text(
+                          l10n.selectFarm,
+                          style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        subtitle: Text('${l10n.recordsText}: ${_farms.length}'),
+                      ),
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: _farms.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: theme.colorScheme.tertiary.withValues(alpha: 0.4),
+                          ),
+                          itemBuilder: (context, index) {
+                            final farm = _farms[index];
+                            final isSelected = selectedFarmUuid == farm.uuid;
+
+                            return ListTile(
+                              leading: Text(
+                                '${index + 1}.',
+                                style: Theme.of(ctx).textTheme.bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              title: Text(farm.name),
+                              trailing: Checkbox(
+                                value: isSelected,
+                                onChanged: (_) {
+                                  setState(() {
+                                    selectedFarmUuid = farm.uuid;
+                                    farmNameController.text = farm.name;
+                                    selectedLivestockUuid = null;
+                                    livestockNameController.clear();
+                                  });
+                                  Navigator.of(ctx).pop();
+                                },
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  selectedFarmUuid = farm.uuid;
+                                  farmNameController.text = farm.name;
+                                  selectedLivestockUuid = null;
+                                  livestockNameController.clear();
+                                });
+                                Navigator.of(ctx).pop();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+
+          Future<void> pickLivestockFromSheet() async {
+            final available = selectedFarmUuid == null
+                ? _livestock
+                : _livestock
+                    .where((l) => l.farmUuid == selectedFarmUuid)
+                    .toList();
+            await showModalBottomSheet<void>(
+              context: context,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              showDragHandle: true,
+              builder: (ctx) {
+                if (available.isEmpty) {
+                  return SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(l10n.noData),
+                    ),
+                  );
+                }
+                return SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text(
+                          l10n.selectLivestock,
+                          style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        subtitle: Text('${l10n.recordsText}: ${available.length}'),
+                      ),
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: available.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: theme.colorScheme.tertiary.withValues(alpha: 0.4),
+                          ),
+                          itemBuilder: (context, index) {
+                            final animal = available[index];
+                            final trimmedName = animal.name.trim();
+                            final animalNameForTile = trimmedName.isEmpty
+                                ? '${l10n.livestock} #${animal.id}'
+                                : trimmedName;
+                            final isSelected = selectedLivestockUuid == animal.uuid;
+                            return ListTile(
+                              leading: Text(
+                                '${index + 1}.',
+                                style: Theme.of(ctx).textTheme.bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              title: Text(animalNameForTile),
+                              trailing: Checkbox(
+                                value: isSelected,
+                                onChanged: (_) {
+                                  setState(() {
+                                    selectedLivestockUuid = animal.uuid;
+                                    livestockNameController.text = trimmedName;
+                                    if (selectedFarmUuid == null) {
+                                      selectedFarmUuid = animal.farmUuid;
+                                      String farmName = '';
+                                      for (final farm in _farms) {
+                                        if (farm.uuid == animal.farmUuid) {
+                                          farmName = farm.name;
+                                          break;
+                                        }
+                                      }
+                                      farmNameController.text = farmName;
+                                    }
+                                  });
+                                  Navigator.of(ctx).pop();
+                                },
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  selectedLivestockUuid = animal.uuid;
+                                  livestockNameController.text = trimmedName;
+                                  if (selectedFarmUuid == null) {
+                                    selectedFarmUuid = animal.farmUuid;
+                                    String farmName = '';
+                                    for (final farm in _farms) {
+                                      if (farm.uuid == animal.farmUuid) {
+                                        farmName = farm.name;
+                                        break;
+                                      }
+                                    }
+                                    farmNameController.text = farmName;
+                                  }
+                                });
+                                Navigator.of(ctx).pop();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
           }
 
           return Padding(
@@ -270,7 +499,7 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                               onPressed: () => Navigator.of(context).pop(),
                               icon: const Icon(Icons.cancel_outlined),
                               style: IconButton.styleFrom(
-                                backgroundColor: theme.colorScheme.surface,
+                                backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.4),
                                 shape: const CircleBorder(),
                               ),
                               tooltip: l10n.cancel,
@@ -295,12 +524,65 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                           controller: farmNameController,
                           label: l10n.farmName,
                           hintText: l10n.optionalFieldHint,
+                          onChanged: (value) {
+                            final text = value.trim();
+                            if (text.isEmpty) {
+                              setModalState(() {
+                                selectedFarmUuid = null;
+                                if (livestockNameController.text.trim().isEmpty) {
+                                  selectedLivestockUuid = null;
+                                }
+                              });
+                              return;
+                            }
+                            // Manual text input should detach from previously selected UUID.
+                            final selectedFarmName = _farms
+                                .where((f) => f.uuid == selectedFarmUuid)
+                                .map((f) => f.name.trim())
+                                .firstWhere(
+                                  (name) => name.isNotEmpty,
+                                  orElse: () => '',
+                                );
+                            if (selectedFarmName.toLowerCase() != text.toLowerCase()) {
+                              setModalState(() {
+                                selectedFarmUuid = null;
+                                // Farm context changed manually; reset livestock linkage too.
+                                selectedLivestockUuid = null;
+                              });
+                            }
+                          },
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.expand_more),
+                            onPressed: pickFarmFromSheet,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         CustomTextField(
                           controller: livestockNameController,
                           label: l10n.livestock,
                           hintText: l10n.optionalFieldHint,
+                          onChanged: (value) {
+                            final text = value.trim();
+                            if (text.isEmpty) {
+                              setModalState(() => selectedLivestockUuid = null);
+                              return;
+                            }
+                            final selectedLivestockName = _livestock
+                                .where((l) => l.uuid == selectedLivestockUuid)
+                                .map((l) => l.name.trim())
+                                .firstWhere(
+                                  (name) => name.isNotEmpty,
+                                  orElse: () => '',
+                                );
+                            if (selectedLivestockName.toLowerCase() !=
+                                text.toLowerCase()) {
+                              setModalState(() => selectedLivestockUuid = null);
+                            }
+                          },
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.expand_more),
+                            onPressed: pickLivestockFromSheet,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         if (!repeatDaily)
@@ -469,8 +751,15 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                 children: [
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () => pickSound(setModalState),
-                                      child: Text(l10n.chooseSound),
+                                      // Disabled while a pick is in progress — prevents double-invoke
+                                      onPressed: _isPickingFile ? null : () => pickSound(setModalState),
+                                      child: _isPickingFile
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : Text(l10n.chooseSound),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -570,11 +859,11 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                   await provider.saveNotification(
                                     NotificationModel(
                                       id: null,
-                                      farmUuid: null,
+                                      farmUuid: selectedFarmUuid,
                                       farmName: farmNameController.text.trim().isEmpty
                                           ? null
                                           : farmNameController.text.trim(),
-                                      livestockUuid: null,
+                                      livestockUuid: selectedLivestockUuid,
                                       livestockName: livestockNameController.text
                                               .trim()
                                               .isEmpty

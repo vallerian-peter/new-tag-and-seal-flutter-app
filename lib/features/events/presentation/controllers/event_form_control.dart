@@ -15,6 +15,8 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/milking_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/dryoff_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/transfer_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/husbandry_event_form.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/presentation/forms/prepuce_condition_form.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -254,6 +256,101 @@ class EventFormControl {
           ),
         );
         // Only refresh if form completed successfully (result is not null)
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.teethClipping:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HusbandryEventFormScreen(
+              eventType: HusbandryEventType.teethClipping,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.tailDocking:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HusbandryEventFormScreen(
+              eventType: HusbandryEventType.tailDocking,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.ironInjection:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HusbandryEventFormScreen(
+              eventType: HusbandryEventType.ironInjection,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.livestockMarking:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HusbandryEventFormScreen(
+              eventType: HusbandryEventType.livestockMarking,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.stageChange:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HusbandryEventFormScreen(
+              eventType: HusbandryEventType.stageChange,
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
+        if (result != null) {
+          onCompleted?.call();
+        }
+        return;
+      case EventLogTypes.prepuceCondition:
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => PrepuceConditionFormScreen(
+              farmUuid: farmUuid,
+              livestockUuid: livestockUuid,
+              isBulk: isBulk,
+              bulkLivestockUuids: bulkLivestockUuids,
+            ),
+          ),
+        );
         if (result != null) {
           onCompleted?.call();
         }

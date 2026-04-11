@@ -98,6 +98,12 @@ class AuthProvider extends ChangeNotifier {
       EventLogTypes.abortedPregnancy.toLowerCase(),
       EventLogTypes.disposal.toLowerCase(),
       EventLogTypes.dryoff.toLowerCase(),
+      EventLogTypes.teethClipping.toLowerCase(),
+      EventLogTypes.tailDocking.toLowerCase(),
+      EventLogTypes.ironInjection.toLowerCase(),
+      EventLogTypes.livestockMarking.toLowerCase(),
+      EventLogTypes.stageChange.toLowerCase(),
+      EventLogTypes.prepuceCondition.toLowerCase(),
     };
 
     // Allow if the normalized logType exactly matches an allowed event type
@@ -113,7 +119,13 @@ class AuthProvider extends ChangeNotifier {
         normalized.contains('calv') ||
         normalized.contains('farrow') ||
         normalized.contains('abort') ||
-        normalized.contains('dryoff')) {
+        normalized.contains('dryoff') ||
+        normalized.contains('teeth') ||
+        normalized.contains('taildock') ||
+        normalized.contains('iron') ||
+        normalized.contains('marking') ||
+        normalized.contains('stagechange') ||
+        normalized.contains('prepuce')) {
       return true;
     }
     return false;

@@ -2,6 +2,19 @@ class NotificationModel {
   static const String defaultSoundPath = 'alarm_sounds/default_alarm.wav';
   static const String defaultSoundName = 'Default Alarm';
 
+  /// Stable title prefix + log [uuid] so one reminder row exists per prepuce log.
+  static const String prepuceFollowUpTitlePrefix = 'prepuce_followup_reminder_';
+
+  static String prepuceFollowUpTitleForLog(String logUuid) =>
+      '$prepuceFollowUpTitlePrefix$logUuid';
+
+  /// Stored in [description]; localized in the UI via l10n.
+  static const String prepuceFollowUpDescriptionKey =
+      'prepuce_followup_reminder_body';
+
+  static bool isPrepuceFollowUpTitle(String title) =>
+      title.startsWith(prepuceFollowUpTitlePrefix);
+
   final int? id;
   final String? farmUuid;
   final String? farmName;

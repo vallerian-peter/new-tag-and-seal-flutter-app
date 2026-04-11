@@ -11,6 +11,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.d
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
@@ -247,6 +248,7 @@ class _AbortedPregnancyFormScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final title = widget.isEditMode
         ? '${l10n.edit} ${l10n.abortedPregnancy}'
@@ -254,14 +256,14 @@ class _AbortedPregnancyFormScreenState
     final submitText = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -743,19 +745,13 @@ class _AbortedPregnancyFormScreenState
         selectedLivestockUuid == null ||
         selectedLivestockUuid.isEmpty) {
       if (!mounted) return;
-      ToastAlerts.showError(
-        context,
-        message: l10n.logContextMissing,
-      );
+      ModernAlerts.showErrorToast(context, message: l10n.logContextMissing);
       return;
     }
 
     if (_abortionDate == null) {
       if (!mounted) return;
-      ToastAlerts.showError(
-        context,
-        message: l10n.startDateRequired,
-      );
+      ModernAlerts.showErrorToast(context, message: l10n.startDateRequired);
       return;
     }
 

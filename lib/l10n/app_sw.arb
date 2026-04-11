@@ -28,20 +28,20 @@
   "yes": "Ndiyo",
   "no": "Hapana",
   "optional": "Si Lazima",
-  "sync": "Sawazisha",
-  "syncData": "Sawazisha Data",
-  "syncing": "Inasawazisha...",
-  "syncTitle": "Inasawazisha Data",
-  "syncStarting": "Inaanza kusawazisha...",
-  "syncAdditionalData": "Inasawazisha data za ziada...",
-  "syncLivestockReference": "Inasawazisha data za mifugo...",
-  "syncLivestockData": "Inasawazisha data za mifugo...",
-  "syncFarmData": "Inasawazisha data za shamba...",
-  "syncCompleted": "Kusawazisha kumekamilika!",
-  "syncSuccessful": "Kusawazisha Kumefanikiwa",
-  "syncSuccessfulMessage": "Data zote zimesawazishwa kwa mafanikio. Programu yako ni ya kisasa.",
-  "syncFailed": "Kusawazisha Kumeshindwa",
-  "syncFailedMessage": "Imeshindwa kusawazisha data. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.",
+  "sync": "Landanisha",
+  "syncData": "Landanisha Taarifa",
+  "syncing": "Inalandanisha...",
+  "syncTitle": "Inalandanisha Taarifa",
+  "syncStarting": "Inaanza kulandanisha...",
+  "syncAdditionalData": "Inalandanisha data za ziada...",
+  "syncLivestockReference": "Inalandanisha data za mifugo...",
+  "syncLivestockData": "Inalandanisha data za mifugo...",
+  "syncFarmData": "Inalandanisha data za shamba...",
+  "syncCompleted": "Kulandanisha kumekamilika!",
+  "syncSuccessful": "Kulandanisha Kumefanikiwa",
+  "syncSuccessfulMessage": "Taarifa zote zimelandanishwa kwa mafanikio. Programu yako ni ya kisasa.",
+  "syncFailed": "Kulandanisha Kumeshindwa",
+  "syncFailedMessage": "Imeshindwa kulandanisha data. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.",
   "retry": "Jaribu Tena",
   "stepsCompleted": "hatua zimekamilika",
   "manageAndTrackLivestockText": "Simamia na hariri mifugo wote",
@@ -49,7 +49,7 @@
 
   "livestockName": "Jina la Mfugo",
 
-  "farmDataNotFound": "Data za Shamba Hazipo",
+  "farmDataNotFound": "Taarifa za Shamba Hazipo",
 
   "age": "Umri",
   "weight": "Uzito",
@@ -91,7 +91,7 @@
   "invalidServerResponse": "Jibu Lisilo sahihi la Seva",
   "invalidServerResponseMessage": "Seva imerudisha data isiyotarajiwa. Tafadhali ujaribu tena.",
 
-  "userDataAvailable":"Data za mtumiaji zipo",
+  "userDataAvailable":"Taarifa za mtumiaji zipo",
 
   "welcomeAgain":"Karibu tena",
   "continueTrackingYourLivestocks": "Endelea kuangalia mifugo yako nasi",
@@ -188,36 +188,36 @@
   "digitalTaggingDesc": "Weka lebo kwa mifugo yako na vitambulisho vya dijitali pamoja na RFID, msimbo wa mstari, na lebo za desturi kwa ufuatiliaji rahisi",
   "healthRecordsDesc": "Weka rekodi kamili za afya pamoja na chanjo, dawa, matibabu, na historia ya matibabu",
   "analyticsReportsDesc": "Tengeneza ripoti za kina na uchambuzi ili kufuatilia utendakazi, mienendo ya afya, na uzalishaji wa shamba",
-  "offlineCapabilityDesc": "Fanya kazi vizuri nje ya mtandao. Data zote zimehifadhiwa ndani na zinasawazishwa kiotomatiki unapounganishwa",
+  "offlineCapabilityDesc": "Fanya kazi vizuri nje ya mtandao. Data zote zimehifadhiwa ndani na zinalandanishwa kiotomatiki unapounganishwa",
   "registerFarm": "Sajili Shamba Lako",
   "registerFarmDesc": "Unda wasifu wa shamba lako na eneo, ukubwa, na maelezo mengine kuanza",
   "addLivestock": "Ongeza Mifugo",
   "addLivestockDesc": "Sajili wanyama binafsi na lebo, majina, aina, na taarifa zingine za utambulisho",
   "trackManage": "Fuatilia na Simamia",
   "trackManageDesc": "Fuatilia afya, rekodi matukio, fuatilia uzazi, na simamia mambo yote ya mifugo yako",
-  "syncAnalyze": "Sawazisha na Chambua",
-  "syncAnalyzeDesc": "Sawazisha data kwenye wingu na upate uchambuzi kamili na ripoti kwa ajili ya kufanya maamuzi bora",
+  "syncAnalyze": "Landanisha na Chambua",
+  "syncAnalyzeDesc": "Landanisha data kwenye wingu na upate uchambuzi kamili na ripoti kwa ajili ya kufanya maamuzi bora",
   "gotIt": "Nimeelewa",
 
   "tagYourLivestock": "Weka Lebo Mifugo Yako",
   "keepTrackFarms": "Fuatilia Mashamba Yako",
   "inviteUsers": "Karibisha Watumiaji na Maofisa",
 
-  "loadingData": "Inapakia data...",
-  "syncingData": "Tafadhali subiri, inasawazisha data...",
+  "loadingData": "Inapakia taarifa...",
+  "syncingData": "Tafadhali subiri, inalandanisha data...",
   "success": "Mafanikio",
   "error": "Hitilafu",
   "warning": "Onyo",
   "info": "Taarifa",
   "loading": "Inapakia...",
-  "noData": "Hakuna data",
+  "noData": "Hakuna taarifa",
   "tryAgain": "Jaribu Tena",
 
-  "sync": "Sawazisha",
-  "syncing": "Inasawazisha...",
-  "syncSuccess": "Usawazishaji umefanikiwa",
-  "syncFailed": "Usawazishaji umeshindwa",
-  "lastSync": "Usawazishaji wa mwisho",
+  "sync": "Landanisha",
+  "syncing": "Inalandanisha...",
+  "syncSuccess": "Ulandanishaji umefanikiwa",
+  "syncFailed": "Ulandanishaji umeshindwa",
+  "lastSync": "Ulandanishaji wa mwisho",
 
   "howItWorksTitle": "Jinsi Inavyofanya Kazi",
   "systemTitle": "Mfumo wa Tag & Seal wa Mifugo",
@@ -226,14 +226,14 @@
   "healthRecordsDesc": "Hifadhi rekodi kamili za afya pamoja na chanjo, dawa, na matibabu",
   "analyticsReports": "Uchambuzi na Ripoti",
   "analyticsReportsDesc": "Pata maarifa juu ya utendaji wa shamba lako kwa uchambuzi wa kina na ripoti",
-  "offlineCapabilityDesc": "Fanya kazi bila mtandao na sawazisha data yako kiotomatiki wakati mtandao unapatikana",
+  "offlineCapabilityDesc": "Fanya kazi bila mtandao na landanisha data yako kiotomatiki wakati mtandao unapatikana",
   "registerFarm": "Sajili Shamba Lako",
   "registerFarmDesc": "Unda wasifu wa shamba lako na maelezo ya eneo na taarifa za shamba",
   "addLivestockDesc": "Sajili wanyama wako kwa alama za kidijitali na taarifa za msingi",
   "trackManage": "Fuatilia na Simamia",
   "trackManageDesc": "Rekodi matukio ya afya, uzalishaji, kulisha, na shughuli zingine",
-  "syncAnalyze": "Sawazisha na Chambua",
-  "syncAnalyzeDesc": "Sawazisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako",
+  "syncAnalyze": "Landanisha na Chambua",
+  "syncAnalyzeDesc": "Landanisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako",
   "gotIt": "Nimeelewa!",
 
   "enterCredentialsToContinue": "Ingiza taarifa zako ili kuendelea",
@@ -427,7 +427,7 @@
   "connectionLostMessage": "Muunganisho ulipotea wakati wa uendeshaji. Tafadhali jaribu tena.",
   "retry": "Jaribu Tena",
   "networkError": "Hitilafu ya Mtandao",
-  "fetchingData": "Inapakua Data",
+  "fetchingData": "Inapakua Taarifa",
   "loadingLocations": "Inapakia Maeneo...",
   "locationsLoadedSuccessfully": "Maeneo yamepakiwa kwa mafanikio",
   "failedToLoadLocations": "Imeshindwa kupakia maeneo",
@@ -595,7 +595,7 @@
   "totalLogs": "Jumla ya rekodi",
   "eventTypes": "Aina za tukio",
   "readyOffline": "Tayari bila mtandao",
-  "unsyncedData": "Data zisizosawazishwa",
+  "unsyncedData": "Taarifa zisizolandanishwa",
   "settingsAppHeaderTitle": "Mipangilio ya Programu",
   "settingsAppHeaderSubtitle": "Badilisha jinsi unavyotumia programu",
   "settingsAppearanceTitle": "Mwonekano",
@@ -616,6 +616,14 @@
         "type": "String"
       }
     }
+  },
+  "settingsVersionBuildTitle": "Toleo na Ujenzi",
+  "@settingsVersionBuildTitle": {
+    "description": "Kichwa cha sehemu ya toleo na ujenzi"
+  },
+  "versionSubtitle": "Taarifa za toleo la programu",
+  "@versionSubtitle": {
+    "description": "Maelezo ya onyesho la toleo"
   },
   "settingsAppDescription": "Programu kamili ya usimamizi wa mifugo.",
   "settingsLanguageEnglish": "Kiingereza",
@@ -648,7 +656,7 @@
   "waitingForWeightData": "Inangoja data ya uzito...",
   "placeOnScaleInstruction": "Weka mnyama kwenye mzani na usubiri usomaji tulivu",
   "saveWeight": "Hifadhi Uzito",
-  "dashboardSyncPrompt": "Gonga kitufe cha kusawazisha ili kupakua mashamba, mifugo na kumbukumbu mpya kabla ya kuanza kazi.",
+  "dashboardSyncPrompt": "Gonga kitufe cha kulandanisha ili kupakua mashamba, mifugo na kumbukumbu mpya kabla ya kuanza kazi.",
   "bulk": "Kwa wingi",
   "bulkActions": "Vitendo vya wingi",
   "logsText": "Rekodi",
@@ -682,6 +690,8 @@
   "timeToDewormLivestock": "Ni wakati wa kutoa dawa za minyoo kwa mifugo",
   "treatmentReminder": "Ukumbusho wa Matibabu",
   "timeToTreatLivestock": "Ni wakati wa kutibu mifugo",
+  "prepuceConditionFollowUpReminder": "Ufuatiliaji wa prepusi",
+  "prepuceConditionFollowUpReminderBody": "Ufuatiliaji uliopangwa kwa hali ya prepusi (sheath) ya mnyama huyu.",
   "weightChange": "Mabadiliko ya Uzito",
   "disposalTransfer": "Uhamisho/Uuzaji",
   "calving": "Kuzaa",
@@ -724,7 +734,7 @@
   "enterWithdrawalPeriodOptional": "Ingiza muda wa kujiondoa (si lazima)",
   "withdrawalUnit": "Kipimo cha muda wa kujiondoa",
   "selectWithdrawalUnit": "Chagua kipimo cha muda wa kujiondoa",
-  "diseaseOptionsMissing": "Hakuna magonjwa. Sawazisha data ya marejeo kwanza.",
+  "diseaseOptionsMissing": "Hakuna magonjwa. Landanisha data ya marejeo kwanza.",
   "diseaseId": "Ugonjwa",
   "selectDisease": "Chagua ugonjwa",
   "eventDate": "Tarehe ya Tukio",
@@ -769,7 +779,7 @@
   "confirmSaveVaccination": "Hifadhi rekodi ya chanjo?",
   "vaccinationLogSaved": "Rekodi ya chanjo imehifadhiwa kikamilifu",
   "vaccinationLogSaveFailed": "Imeshindwa kuhifadhi rekodi ya chanjo. Jaribu tena.",
-  "vaccineOptionsMissing": "Hakuna chanjo. Sawazisha data ya chanjo kwanza.",
+  "vaccineOptionsMissing": "Hakuna chanjo. Landanisha data ya chanjo kwanza.",
   "vaccineRequired": "Chanjo inahitajika",
   "addDisposal": "Ongeza rekodi ya uondoaji",
   "disposalDetails": "Maelezo ya uondoaji",
@@ -777,7 +787,7 @@
   "disposalContextInfo": "Toa maelezo ya njia, sababu na maelezo ya ziada.",
   "disposalReasons": "Sababu za uondoaji",
   "enterDisposalReasons": "Ingiza sababu za uondoaji",
-  "disposalTypeOptionsMissing": "Aina za uondoaji hazipatikani. Sawazisha data rejea.",
+  "disposalTypeOptionsMissing": "Aina za uondoaji hazipatikani. Landanisha data rejea.",
   "disposalTypeId": "Aina ya uondoaji",
   "selectDisposalType": "Chagua aina ya uondoaji",
   "disposalTypeRequired": "Aina ya uondoaji inahitajika",
@@ -912,10 +922,13 @@
   "calvingNotesSubtitle": "Ongeza uchunguzi, changamoto au hatua zilizochukuliwa.",
   "calvingType": "Aina ya kuzaa",
   "calvingTypeRequired": "Aina ya kuzaa inahitajika",
+  "farrowingTypeRequired": "Aina ya kuzalisha nguruwe inahitajika",
   "calvingProblem": "Tatizo la kuzaa",
   "reproductiveProblem": "Tatizo la uzazi",
   "ensureCalvingDetailsAccuracy": "Hakikisha taarifa za kuzaa ni sahihi kabla ya kuhifadhi.",
+  "ensureFarrowingDetailsAccuracy": "Hakikisha taarifa za kuzalisha nguruwe ni sahihi kabla ya kuhifadhi.",
   "calvingNotesInfo": "Ongeza maelezo kuhusu ndama, usaidizi au matatizo yaliyotokea.",
+  "farrowingNotesInfo": "Ongeza maelezo kuhusu nguruwe wadogo, matatizo, au msaada uliotolewa.",
   "confirmUpdateCalving": "Sasisha rekodi ya kuzaa?",
   "confirmSaveCalving": "Hifadhi rekodi ya kuzaa?",
   "confirmUpdateFarrowing": "Sasisha rekodi ya kuzalisha nguruwe?",
@@ -924,6 +937,172 @@
   "noLivestockFound": "Hakuna mifugo iliyopatikana",
   "total": "Jumla",
   "tryDifferentSearchTerm": "Jaribu kutafuta kwa neno tofauti",
+
+  "registerLivestockHowTitle": "Sajili mifugo",
+  "registerLivestockSingleOption": "Mnyama mmoja",
+  "registerLivestockSingleOptionDesc": "Fomu kamili na lebo na kitambulisho kimoja",
+  "registerPigletLitterOption": "Vizazi vya nguruwe wadogo",
+  "registerPigletLitterOptionDesc": "Maelezo sawa kwa wengi; vitambulisho kama TAREHE-01",
+  "pigletBulkTitle": "Sajili vizazi vya nguruwe wadogo",
+  "pigletBulkCompleteBirthFlowTitle": "Maliza kuzaa na watoto",
+  "pigletBulkDeferredBirthHint": "Rekodi ya kuzaa itahifadhiwa pamoja na watoto wa mifugo unaposajili wote baada ya hatua ya hakiki. Hakiki na urekebishe maelezo hapa chini, kisha thibitisha.",
+  "pigletBulkStepCommonTitle": "Maelezo ya pamoja",
+  "pigletBulkStepCommonSubtitle": "Shamba, aina, idadi, tarehe, wazazi",
+  "pigletBulkStepPreviewTitle": "Hakiki",
+  "pigletBulkStepPreviewSubtitle": "Vitambulisho na jinsia kwa kila nguruwe",
+  "pigletBulkNumberOfPiglets": "Idadi ya nguruwe wadogo",
+  "pigletBulkInvalidCount": "Ingiza nambari kamili kati ya 1 hadi {max}.",
+  "@pigletBulkInvalidCount": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkNamePrefix": "Kiambishi cha jina",
+  "pigletBulkNamePrefixHint": "Mfano: Nguruwe (pamoja na nambari au jina)",
+  "pigletBulkPreviewInfo": "Kitambulisho kinatumia tarehe ya kuzaliwa (YYYYMMDD) na mfululizo (01, 02, …). Hatua za utoto hubaki bila kutambuliwa hadi uongeze lebo baadaye.",
+  "pigletBulkNicknameOptional": "Jina la ziada (si lazima)",
+  "pigletBulkRegisterAll": "Sajili wote",
+  "pigletBulkSelectSexEach": "Chagua jinsia kwa kila nguruwe.",
+  "pigletBulkQuickSexTitle": "Mgawanyo wa haraka wa jinsia",
+  "pigletBulkQuickSexSubtitle": "Weka idadi ya nguruwe wa kike, kiume, au wasiojulikana kwa lita nzima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe {alive}.",
+  "@pigletBulkQuickSexSubtitle": {
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickSexCountLabel": "Idadi",
+  "pigletBulkApplySexSplit": "Tumia kwenye orodha",
+  "pigletBulkSexCountMismatch": "Kike + kiume + wasiojulikana lazima iwe {expected} (safu zote za nguruwe). Umeingiza {actual}.",
+  "@pigletBulkSexCountMismatch": {
+    "placeholders": {
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickSexOrderNote": "Mpangilio: safu za mwanzo = kike, kisha kiume, kisha wasiojulikana kwa safu zote (hai na waliokufa). Unaweza kubadilisha kila safu hapa chini.",
+  "pigletBulkPreviewSaveAllNote": "Kila safu—ikiwemo aliyekufa kuzaliwa—inahifadhiwa kama mnyama kwanza. Utupaji unafuatia na hutumia rekodi hizo zilizohifadhiwa.",
+  "pigletBulkQuickFillSectionTitle": "Jaza haraka",
+  "pigletBulkQuickFillSectionSubtitle": "Weka kwa wingi maeneo yanayotofautiana kwa kila nguruwe. Haiyabadilishi idadi ya fahali. Unaweza kuhariri kila safu hapa chini.",
+  "pigletBulkQuickNicknameTitle": "Majina",
+  "pigletBulkQuickNicknameSubtitle": "Inajaza \"Kiambishi cha jina 1\", \"2\", … kutoka hatua iliyopita (sawa na majina chaguomsingi).",
+  "pigletBulkApplyNicknamePattern": "Jaza mfululizo wa majina",
+  "pigletBulkQuickWeightTitle": "Uzito (kg)",
+  "pigletBulkQuickWeightSubtitle": "Weka uzito mmoja kwa nguruwe hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.",
+  "pigletBulkWeightAliveHint": "Hai",
+  "pigletBulkWeightDeadHint": "Aliyekufa kuzaliwa",
+  "pigletBulkApplyWeights": "Weka uzito kwenye safu",
+  "pigletBulkWeightPerRowLabel": "Uzito (kg)",
+  "pigletBulkWeightPerRowHint": "Si lazima; hatua ya 1 kama tupu",
+  "pigletBulkBatchSizeMismatch": "Kulitarajiwa {expected} wanyama kuhifadhiwa lakini kumepatikana {actual}. Hakuna utupaji wa kati; jaribu tena.",
+  "@pigletBulkBatchSizeMismatch": {
+    "placeholders": {
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkQuickFillFooterNote": "Mgawanyo wa jinsia ni kwa nguruwe hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.",
+  "pigletBulkIdConflict": "Baadhi ya vitambulisho tayari vipo. Badilisha tarehe ya kuzaliwa au futa rekodi, kisha jaribu tena.",
+  "pigletBulkConflictingIds": "Zilizochukuliwa: {ids}",
+  "@pigletBulkConflictingIds": {
+    "placeholders": {
+      "ids": {
+        "type": "String"
+      }
+    }
+  },
+  "pigletBulkConfirmRegister": "Sajili nguruwe {count} sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.",
+  "@pigletBulkConfirmRegister": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkSuccess": "Nguruwe {count} wamesajiliwa kwa mafanikio.",
+  "@pigletBulkSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkFailed": "Imeshindwa kusajili vizazi. Jaribu tena.",
+  "pigletDefaultNamePrefix": "Nguruwe",
+  "pigletBulkSavingMessage": "Inasajili nguruwe wadogo…",
+  "pigletBulkCountRangeHint": "1–{max}",
+  "@pigletBulkCountRangeHint": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkBirthEventLitterHint": "Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza idadi na kuashiria nguruwe waliofariki hatua inayofuata.",
+  "pigletBulkSaveCheckTitle": "Ukaguzi kabla ya kuhifadhi",
+  "pigletBulkStatusReady": "Tayari",
+  "pigletBulkStatusRequired": "Inahitajika",
+  "pigletBulkStatusNotApplicable": "Haitumiki",
+  "pigletBulkMotherRequiredForBirthFlow": "Mama lazima abaki amechaguliwa kwa mtiririko huu wa kuzaa.",
+  "pigletBulkLitterTotal": "{totalBorn} waliozaliwa",
+  "@pigletBulkLitterTotal": {
+    "placeholders": {
+      "totalBorn": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkLitterTotalDead": "{totalBorn} waliozaliwa, {deadCount} waliokufa",
+  "@pigletBulkLitterTotalDead": {
+    "placeholders": {
+      "totalBorn": {
+        "type": "int"
+      },
+      "deadCount": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkPreviewAliveDeadSummary": "{alive} hai kuzaliwa · {dead} waliokufa (vitambulisho vya mwisho kwenye orodha).",
+  "@pigletBulkPreviewAliveDeadSummary": {
+    "placeholders": {
+      "alive": {
+        "type": "int"
+      },
+      "dead": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkDeadAtBirthChip": "Aliyekufa kuzaliwa",
+  "pigletBulkDisposalSectionTitle": "Utupaji kwa aliyekufa kuzaliwa",
+  "pigletBulkDisposalSectionSubtitle": "Inahitajika unaposajili nguruwe aliyekufa kuzaliwa. Rekodi ya utupaji itatengenezwa kwa kila mmoja.",
+  "pigletBulkDisposalTypeLabel": "Aina ya utupaji",
+  "pigletBulkSelectDisposalTypeForDead": "Chagua aina ya utupaji kwa nguruwe aliyekufa kuzaliwa.",
+  "pigletBulkDeadDisposalReasonHint": "Sababu (mf. kufia tumboni / vifo vya kuzaliwa)",
+  "pigletDeadAtBirthDisposalReasonDefault": "Aliyekufa kuzaliwa (usajili wa fahali)",
+  "pigletBulkGenderOptionalDead": "Jinsia (si lazima)",
+  "pigletBulkSuccessDisposals": "Pia kumbukumbu {count} za utupaji zimeandikwa kwa aliyekufa kuzaliwa.",
+  "@pigletBulkSuccessDisposals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkDisposalPartialFailure": "Mifugo imehifadhiwa lakini baadhi ya rekodi za utupaji zimeshindwa. Angalia na ongeza utupaji mwenyewe ikiwa inahitajika.",
+  "pigletGenderUnknown": "Haijulikani",
 
   "connectionError": "Hitilafu ya Muunganisho",
   "connectionErrorMessage": "Hawezi kuunganisha na seva. Tafadhali angalia muunganisho wa mtandao wako na ujaribu tena.",
@@ -979,6 +1158,7 @@
   "livestockType": "Aina ya Mifugo",
   "livestockTypeRequired": "Aina ya mifugo inahitajika",
   "pleaseSelectLivestockType": "Tafadhali chagua aina ya mifugo",
+  "noStagesForThisType": "Hakuna awamu za aina hii",
   
   "speciesRequired": "Spishi inahitajika",
   "pleaseSelectSpecies": "Tafadhali chagua spishi",
@@ -996,6 +1176,16 @@
   
   "motherOptional": "Mama (Si Lazima)",
   "fatherOptional": "Baba (Si Lazima)",
+  "filterByMother": "Mama",
+  "filterByFather": "Baba",
+  "parentFilterChildrenCount": "Watoto {count}",
+  "@parentFilterChildrenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "obtainedMethod": "Njia ya Kupata",
   
   "physicalDetails": "Maelezo ya Kimwili",
@@ -1047,10 +1237,10 @@
   "disposal": "Utupaji",
   "notProvided": "Haijatolewa",
   "role": "Wadhifa",
-  "unsyncedDataWarning": "Una data ambayo haijasawazishwa. Hakikisha unasawazisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.",
-  "noUnsyncedDataMessage": "Hakuna data iliyosalia kusawazishwa. Unaweza kutoka salama.",
-  "syncAndLogout": "Sawazisha na utoke",
-  "syncingBeforeLogout": "Kusawazisha data kabla ya kutoka...",
+  "unsyncedDataWarning": "Una data ambayo haijalandanishwa. Hakikisha unalandanisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.",
+  "noUnsyncedDataMessage": "Hakuna data iliyosalia kulandanisha. Unaweza kutoka salama.",
+  "syncAndLogout": "Landanisha na utoke",
+  "syncingBeforeLogout": "Kulandanisha data kabla ya kutoka...",
 
   "changeFarm": "Badili Shamba",
   "deleteUser": "Futa Mtumiaji",
@@ -1068,6 +1258,10 @@
   "scheduleDate": "Ratibu tarehe",
   "scheduleTime": "Ratibu muda",
   "saveNotification": "Hifadhi taarifa",
+  "manualInput": "Ingiza kwa mkono",
+  "@manualInput": {"description": "Chaguo la kuingiza thamani kwa mkono"},
+  "chooseFromList": "Chagua kutoka kwenye orodha",
+  "@chooseFromList": {"description": "Chaguo la kuchagua thamani kutoka kwenye orodha"},
   "notificationChipToday": "Leo",
   "notificationChipUpcoming": "Zijazo",
   "thisWeek": "Wiki Hii",
@@ -1155,7 +1349,7 @@
   "vaccineDetailsSubtitle": "Weka taarifa sahihi ya chanjo",
   "vaccineType": "Aina ya chanjo",
   "selectVaccineType": "Chagua aina ya chanjo",
-  "vaccineTypesMissing": "Hakuna aina za chanjo. Sawazisha data ya marejeo kwanza.",
+  "vaccineTypesMissing": "Hakuna aina za chanjo. Landanisha data ya marejeo kwanza.",
   "vaccineTypeRequired": "Aina ya chanjo inahitajika",
   "formulationLiveAttenuated": "Live attenuated",
   "formulationInactivated": "Inactivated",
@@ -1206,14 +1400,14 @@
   "logTypeAccessDenied": "Wakulima, wasimamizi wa shamba, na watumiaji walioidhinishwa tu wanaweza kufikia nakala za {logType}.",
   "livestockNotActiveCannotAddLogs": "Mifugo hii haipo hai. Nakala haziwezi kuongezwa kwa mifugo iliyotolewa.",
 
-  "syncRequired": "Sinkronisha Inahitajika",
+  "syncRequired": "Kulandanisha Kunahitajika",
   "@syncRequired": {
-    "description": "Kichwa cha dialog ya kulazimisha sinkronisha wakati idadi ya data isiyosinkronishwa ni kubwa"
+    "description": "Kichwa cha dialog ya kulazimisha kulandanisha wakati idadi ya data isiyolandanishwa ni kubwa"
   },
 
-  "syncRequiredMessage": "Una vitu {count} visivyosinkronishwa. Tafadhali sinkronisha data yako ili kuhakikisha taarifa zote ni za kisasa.",
+  "syncRequiredMessage": "Una vitu {count} visivyolandanishwa. Tafadhali landanisha data yako ili kuhakikisha taarifa zote ni za kisasa.",
   "@syncRequiredMessage": {
-    "description": "Ujumbe wa dialog ya kulazimisha sinkronisha",
+    "description": "Ujumbe wa dialog ya kulazimisha kulandanisha",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1221,9 +1415,9 @@
     }
   },
 
-  "syncNow": "Sinkronisha Sasa",
+  "syncNow": "Landanisha Sasa",
   "@syncNow": {
-    "description": "Maandishi ya kitufe cha dialog ya kulazimisha sinkronisha"
+    "description": "Maandishi ya kitufe cha dialog ya kulazimisha kulandanisha"
   },
 
   "enterAsExtensionOfficer": "Ingia kama Bwana Shamba?",
@@ -1337,6 +1531,67 @@
   "@billDetails": {"description": "Lebo ya sehemu ya maelezo ya bili kwenye dialog"},
   "confirmPayment": "Thibitisha Malipo",
   "@confirmPayment": {"description": "Kichwa cha mazungumzo ya kuthibitisha malipo"},
+  "incomeExpenditureReport": "Ripoti ya Mapato na Matumizi",
+  "@incomeExpenditureReport": {"description": "Kichwa cha ripoti ya mapato na matumizi"},
+  "generatedOn": "Imetengenezwa tarehe",
+  "@generatedOn": {"description": "Lebo ya tarehe ya kutengeneza ripoti"},
+  "dateRange": "Kipindi cha tarehe",
+  "@dateRange": {"description": "Lebo ya kipindi cha tarehe"},
+  "allTime": "Muda wote",
+  "@allTime": {"description": "Lebo ya muda wote"},
+  "noRecordsFoundForSelectedPeriod": "Hakuna rekodi kwa kipindi kilichochaguliwa",
+  "@noRecordsFoundForSelectedPeriod": {"description": "Ujumbe wa kukosekana data kwenye ripoti"},
+  "paidStatus": "Imelipwa",
+  "@paidStatus": {"description": "Lebo ya hali ya malipo iliyolipwa"},
+  "pendingStatus": "Inasubiri",
+  "@pendingStatus": {"description": "Lebo ya hali ya malipo inayosubiri"},
+  "accessDeniedFarmerOrFarmManagerOnly": "Hairuhusiwi. Mkulima au Meneja wa Shamba pekee.",
+  "@accessDeniedFarmerOrFarmManagerOnly": {"description": "Ujumbe wa kunyimwa ruhusa kwa skrini ya ripoti"},
+  "reportActions": "Vitendo vya ripoti",
+  "@reportActions": {"description": "Kidokezo/kichwa cha menyu ya vitendo vya ripoti"},
+  "printReport": "Chapisha Ripoti",
+  "@printReport": {"description": "Kitendo cha kuchapisha ripoti"},
+  "downloadReport": "Pakua Ripoti",
+  "@downloadReport": {"description": "Kitendo cha kupakua ripoti"},
+  "reportDownloaded": "Ripoti imepakuliwa",
+  "@reportDownloaded": {"description": "Ujumbe wa mafanikio baada ya kupakua PDF ya ripoti"},
+  "addManualExpense": "Ongeza matumizi",
+  "manualExpenseTitle": "Rekodi matumizi",
+  "manualExpenseDetailsSubtitle": "Rekodi manunuzi na gharama zisizohusiana na bili au uhamisho",
+  "manualExpenseBasicStep": "Maelezo ya matumizi",
+  "manualExpenseAdditionalStep": "Maelezo ya ziada",
+  "manualExpenseAdditionalStepSubtitle": "Idadi, hali, na maelezo",
+  "manualExpenseSavedSuccessfully": "Matumizi yamehifadhiwa kwenye kifaa. Sawazisha ili kusasisha seva.",
+  "manualExpenseSaveFailed": "Imeshindwa kuhifadhi matumizi. Jaribu tena.",
+  "confirmSaveManualExpense": "Ungependa kuhifadhi matumizi haya?",
+  "expenseSubject": "Kilichonunuliwa",
+  "expenseSubjectHint": "Mf. chakula, mafuta, vifaa",
+  "expenseSubjectRequired": "Tafadhali eleza matumizi",
+  "expenseAmount": "Jumla (TZS)",
+  "expenseAmountHint": "Ingiza jumla ya gharama",
+  "expenseAmountRequired": "Ingiza kiasi halali zaidi ya sifuri",
+  "expenseDate": "Tarehe ya matumizi",
+  "expenseDateRequired": "Chagua tarehe",
+  "selectExpenseDate": "Chagua tarehe",
+  "expenseQuantity": "Idadi",
+  "expenseQuantityHint": "Vipimo au vitu (chaguo-msingi 1)",
+  "expenseNotes": "Maelezo",
+  "expenseNotesHint": "Maelezo ya hiari",
+  "expensePaymentStatus": "Hali ya malipo",
+  "selectExpensePaymentStatus": "Chagua hali ya malipo",
+  "manualExpenseAccuracyNote": "Hakikisha kiasi na tarehe ni sahihi kwa ripoti ya mapato na matumizi.",
+  "reportTableCellPlaceholder": "—",
+  "incomeReportExpenseEntriesSectionTitle": "Matumizi ({count})",
+  "@incomeReportExpenseEntriesSectionTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomeReportPdfColumnReference": "Rejea",
+  "incomeReportPdfColumnDate": "Tarehe",
+  "incomeReportPdfColumnSubject": "Kichwa",
+  "incomeReportPdfColumnQuantity": "Idadi",
+  "incomeReportPdfColumnStatus": "Hali",
   "markBillAsPaidConfirmation": "Je, una uhakika unataka kuweka bili hii kama imelipwa?",
   "@markBillAsPaidConfirmation": {"description": "Ujumbe wa kuthibitisha kuweka bili kama imelipwa"},
   "markAsPaid": "Weka Imelipwa",
@@ -1414,11 +1669,11 @@
   "@faq2Answer": {"description": "FAQ answer 2"},
   "faq3": "Hali ya nje ya mtandao inafanya kazi vipi?",
   "@faq3": {"description": "FAQ question 3"},
-  "faq3Answer": "Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinasawazishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kusawazisha ili kusawazisha data kwa mikono.",
+  "faq3Answer": "Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinalandanishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kulandanisha ili kulandanisha data kwa mikono.",
   "@faq3Answer": {"description": "FAQ answer 3"},
-  "faq4": "Ninawezaje kusawazisha data zangu?",
+  "faq4": "Ninawezaje kulandanisha data zangu?",
   "@faq4": {"description": "FAQ question 4"},
-  "faq4Answer": "Bonyeza kitufe cha kusawazisha (ikoni ya kusasisha) kwenye Dashibodi. Programu itapakia mabadiliko ya ndani na kupakua sasisho kutoka kwa seva.",
+  "faq4Answer": "Bonyeza kitufe cha kulandanisha (ikoni ya kusasisha) kwenye Dashibodi. Programu itapakia mabadiliko ya ndani na kupakua sasisho kutoka kwa seva.",
   "@faq4Answer": {"description": "FAQ answer 4"},
   "needMoreHelp": "Unahitaji Msaada Zaidi?",
   "@needMoreHelp": {"description": "Need more help text"},
@@ -1496,10 +1751,104 @@
   "@milkingTrendByFarm": {"description": "Kichwa cha grafu ya mwelekeo wa kukamua kwa shamba nyingi"},
   "last6Months": "Miezi 6 Iliyopita",
   "@last6Months": {"description": "Kichujio cha kipindi cha miezi 6 iliyopita"},
+  "yesterday": "Jana",
+  "@yesterday": {"description": "Kichujio cha kipindi cha siku iliyopita"},
+  "thisMonth": "Mwezi Huu",
+  "@thisMonth": {"description": "Kichujio cha kipindi cha mwezi huu"},
+  "last6Years": "Miaka 6 Iliyopita",
+  "@last6Years": {"description": "Kichujio cha kipindi cha miaka 6 iliyopita"},
   "lastYear": "Mwaka Huu",
   "@lastYear": {"description": "Kichujio cha kipindi cha mwaka uliopita"},
   "average": "Wastani",
   "@average": {"description": "Lebo ya thamani ya wastani"},
   "maximum": "Kiwango cha Juu",
-  "@maximum": {"description": "Lebo ya thamani ya juu"}
+  "@maximum": {"description": "Lebo ya thamani ya juu"},
+  "isLivestockFound": "Je, Mifugo Imepatikana?",
+  "@isLivestockFound": {"description": "Swali la uthibitishaji wakati wa kubadilisha hali ya mifugo kutoka iliyopotea hadi hai"},
+  "livestockStatusUpdatedAndDisposalRemoved": "Hali ya mifugo imesasishwa kuwa hai. Rekodi za uondoaji zimeondolewa.",
+  "@livestockStatusUpdatedAndDisposalRemoved": {"description": "Ujumbe wa mafanikio wakati mifugo inapatikana na rekodi za uondoaji zinaondolewa"},
+  "markLivestockAsFound": "Weka Mifugo Kama Imepatikana",
+  "@markLivestockAsFound": {"description": "Kichwa cha kidialogi cha uthibitishaji wakati wa kuweka mifugo iliyopotea kama imepatikana"},
+  "livestockFoundConfirmationDescription": "Mifugo hii ilikuwa imewekwa kama iliyopotea. Ikiwa mifugo imepatikana, unaweza kuiweka kama hai tena.",
+  "@livestockFoundConfirmationDescription": {"description": "Maelezo katika kidialogi cha uthibitishaji yanayoeleza kuwa mifugo ilipotea"},
+  "livestockWasMarkedAsLost": "Mifugo iliwekwa kama Imepotea",
+  "@livestockWasMarkedAsLost": {"description": "Lebo inayoonyesha kuwa mifugo iliwekwa kama imepotea"},
+  "livestockFoundActionDescription": "Kwa kuthibitisha, hali ya mifugo itabadilishwa kuwa hai na rekodi ya uondoaji itaondolewa.",
+  "@livestockFoundActionDescription": {"description": "Maelezo ya kitakachotokea wakati mtumiaji anapothibitisha"},
+  "date": "Tarehe",
+  "@date": {"description": "Lebo ya uga wa tarehe"},
+  "copyrightText": "Haki Zote Zimehifadhiwa",
+  "@copyrightText": {"description": "Nakala ya mwisho ya hakimiliki"},
+  "teethClipping": "Kukata meno",
+  "tailDocking": "Kukata mkia",
+  "ironInjection": "Sindano ya chuma",
+  "livestockMarking": "Alama ya mifugo",
+  "stageChange": "Mabadiliko ya awamu",
+  "procedureMethod": "Njia",
+  "dosage": "Kipimo dawa",
+  "markingType": "Aina ya alama",
+  "description": "Maelezo",
+  "fromStage": "Kutoka awamu",
+  "toStage": "Hadi awamu",
+  "selectFromStage": "Chagua awamu ya mwanzo",
+  "selectToStage": "Chagua awamu ya mwisho",
+  "selectProcedureMethod": "Chagua njia",
+  "eventDateRequired": "Tarehe ya tukio inahitajika",
+  "husbandryRequiredFields": "Tafadhali jaza sehemu zinazohitajika",
+  "husbandryFromToStageMismatch": "Awamu ya mwanzo na ya mwisho haziwezi kufanana",
+  "eventLogSavedSuccessfully": "Imehifadhiwa kwa mafanikio",
+  "saleWeight": "Uzito wa uuzaji (kg)",
+  "salePrice": "Bei ya uuzaji",
+  "buyerName": "Mnunuzi",
+  "stage": "Awamu",
+  "identificationStatus": "Hali ya utambuzi",
+  "identified": "Imetambuliwa",
+  "notIdentified": "Haijatambuliwa",
+  "birthEventOptional": "Tukio la kuzaliwa (si lazima)",
+  "birthEventOptionalHelper": "Unganisha mnyama huyu na tukio la kuzaliwa lililorekodiwa (farrowing/calving). Acha wazi kwa wanyama walionunuliwa, waliohamishwa, waliotolewa, au sajili nyingine zisizo za kuzaliwa.",
+  "addLivestockAllTypesReminder": "Ongeza Mifugo ni kwa wanyama wote: waliozaliwa wapya, walionunuliwa, waliohamishwa, waliotolewa, na wengine.",
+  "totalBorn": "Jumla waliozaliwa",
+  "aliveCount": "Walio hai",
+  "alive": "Hai",
+  "deadCount": "Walio kufa",
+  "dead": "Waliokufa",
+  "enterTotalBornOptional": "Ingiza jumla waliozaliwa (si lazima)",
+  "enterAliveCountOptional": "Ingiza idadi walio hai (si lazima)",
+  "enterDeadCountOptional": "Ingiza idadi walio kufa (si lazima)",
+  "valueMustBeZeroOrMore": "Thamani lazima iwe 0 au zaidi",
+  "aliveDeadExceedTotalBorn": "Walio hai + walio kufa haiwezi kuzidi jumla waliozaliwa.",
+  "deadCountDefaultsToZero": "Chaguo-msingi 0 (juu zaidi = jumla waliozaliwa)",
+  "aliveCountDerivedNote": "Inahesabiwa kwa kutoa walio kufa kutoka jumla waliozaliwa.",
+  "enterTotalBornToPreviewAlive": "Ingiza jumla waliozaliwa kuona idadi ya walio hai.",
+  "deadCountExceedsTotalBorn": "Idadi ya walio kufa haiwezi kuzidi jumla waliozaliwa.",
+  "farrowingPigletRegisterPromptTitle": "Sajili Nguruwe Wadogo?",
+  "farrowingPigletRegisterPromptMessage": "Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili nguruwe wadogo kutoka kwenye lita hii sasa?",
+  "farrowingPigletRegisterNow": "Sajili Nguruwe Wadogo",
+  "farrowingPigletRegisterSkip": "Ruka kwa Sasa",
+  "calvingRegisterPromptTitle": "Sajili Ndama?",
+  "calvingRegisterPromptMessage": "Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili ndama kutoka kwa kuzaa huku sasa?",
+  "calvingRegisterNow": "Sajili Ndama",
+  "birthEventRegisterPromptTitle": "Sajili Watoto wa Mifugo?",
+  "birthEventRegisterPromptMessage": "Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili watoto wa mifugo kutoka kwa kuzaa huku sasa?",
+  "birthEventRegisterNow": "Sajili Watoto wa Mifugo",
+  "prepuceConditionTitle": "Hali ya ndobolo (govi la uume)",
+  "prepuceConditionTypeLabel": "Aina ya hali",
+  "prepuceConditionSeverityLabel": "Ukali",
+  "prepuceConditionClinicalSignsLabel": "Dalili za kliniki",
+  "prepuceConditionTreatmentLabel": "Matibabu yaliyotolewa",
+  "prepuceConditionCauseLabel": "Sababu / hatari (si lazima)",
+  "prepuceConditionBreedingLabel": "Hali ya uzazi",
+  "prepuceConditionReportedByLabel": "Aliripoti",
+  "prepuceConditionAttendedByLabel": "Alihudumia (si lazima)",
+  "prepuceConditionHealingLabel": "Hali ya kupona (si lazima)",
+  "prepuceConditionFollowUpLabel": "Tarehe ya ufuatiliaji (si lazima)",
+  "prepuceConditionDrugNameLabel": "Jina la dawa (si lazima)",
+  "prepuceConditionRouteLabel": "Njia ya dawa (si lazima)",
+  "prepuceConditionDurationLabel": "Muda wa matibabu (si lazima)",
+  "prepuceConditionVetNameLabel": "Jina la daktari (si lazima)",
+  "prepuceConditionVetContactLabel": "Mawasiliano ya daktari (si lazima)",
+  "prepuceConditionFollowUpHint": "Chagua tarehe ya ufuatiliaji",
+  "prepuceConditionTreatmentRequired": "Chagua angalau matibabu moja",
+  "prepuceConditionSelectCodes": "Chagua chaguo hapo juu",
+  "viewEvents": "Tazama matukio"
 }

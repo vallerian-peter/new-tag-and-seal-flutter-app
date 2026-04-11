@@ -80,6 +80,12 @@ class EventsViewControl {
       case EventLogTypes.insemination:
       case EventLogTypes.dryoff:
       case EventLogTypes.transfer:
+      case EventLogTypes.teethClipping:
+      case EventLogTypes.tailDocking:
+      case EventLogTypes.ironInjection:
+      case EventLogTypes.livestockMarking:
+      case EventLogTypes.stageChange:
+      case EventLogTypes.prepuceCondition:
         final eventsProvider = Provider.of<EventsProvider>(
           context,
           listen: false,

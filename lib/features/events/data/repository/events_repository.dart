@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:drift/drift.dart';
@@ -17,6 +18,12 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregna
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/teeth_clipping_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/tail_docking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/iron_injection_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/livestock_marking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/stage_change_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/prepuce_condition_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/repo/events_repo.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
@@ -26,6 +33,15 @@ class EventsRepository implements EventsRepositoryInterface {
   final AppDatabase _database;
   late final EventDao _eventDao;
   final NotificationProvider? _notificationProvider;
+  static const Set<String> _earlyStageNames = {
+    'piglet',
+    'calf',
+    'kid',
+    'lamb',
+    'chick',
+    'newborn',
+    'neonate',
+  };
 
   EventsRepository(
     this._database, {
@@ -79,6 +95,12 @@ class EventsRepository implements EventsRepositoryInterface {
     await _syncInseminations(logs['inseminations']);
     await _syncDryoffs(logs['dryoffs']);
     await _syncTransfers(logs['transfers']);
+    await _syncTeethClippings(logs['teethClippings']);
+    await _syncTailDockings(logs['tailDockings']);
+    await _syncIronInjections(logs['ironInjections']);
+    await _syncLivestockMarkings(logs['livestockMarkings']);
+    await _syncStageChanges(logs['stageChanges']);
+    await _syncPrepuceConditions(logs['prepuceConditions']);
   }
 
   Future<void> _syncFeedings(dynamic payload) async {
@@ -576,9 +598,345 @@ class EventsRepository implements EventsRepositoryInterface {
     await _eventDao.deleteServerTransfersNotIn(remoteUuids);
   }
 
+  Future<void> _syncTeethClippings(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = TeethClippingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getTeethClippingByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertTeethClipping(_toTeethClippingCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            await _eventDao.upsertTeethClipping(
+              _toTeethClippingCompanion(
+                remote.copyWith(id: existing.id, syncAction: 'server-update'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing teeth clipping log: $e');
+      }
+    }
+    await _eventDao.deleteServerTeethClippingsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncTailDockings(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = TailDockingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getTailDockingByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertTailDocking(_toTailDockingCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            await _eventDao.upsertTailDocking(
+              _toTailDockingCompanion(
+                remote.copyWith(id: existing.id, syncAction: 'server-update'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing tail docking log: $e');
+      }
+    }
+    await _eventDao.deleteServerTailDockingsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncIronInjections(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = IronInjectionModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getIronInjectionByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertIronInjection(_toIronInjectionCompanion(remote));
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            await _eventDao.upsertIronInjection(
+              _toIronInjectionCompanion(
+                remote.copyWith(id: existing.id, syncAction: 'server-update'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing iron injection log: $e');
+      }
+    }
+    await _eventDao.deleteServerIronInjectionsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncLivestockMarkings(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = LivestockMarkingModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getLivestockMarkingByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertLivestockMarking(
+            _toLivestockMarkingCompanion(remote),
+          );
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            await _eventDao.upsertLivestockMarking(
+              _toLivestockMarkingCompanion(
+                remote.copyWith(id: existing.id, syncAction: 'server-update'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing livestock marking log: $e');
+      }
+    }
+    await _eventDao.deleteServerLivestockMarkingsNotIn(remoteUuids);
+  }
+
+  Future<void> _syncStageChanges(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = StageChangeModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getStageChangeByUuid(remote.uuid);
+        if (existing == null) {
+          await _eventDao.upsertStageChange(_toStageChangeCompanion(remote));
+          await _applyServerStageChangeToLivestock(remote);
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            final updated = remote.copyWith(
+              id: existing.id,
+              syncAction: 'server-update',
+            );
+            await _eventDao.upsertStageChange(_toStageChangeCompanion(updated));
+            await _applyServerStageChangeToLivestock(updated);
+          }
+        }
+      } catch (e) {
+        log('❌ Error syncing stage change log: $e');
+      }
+    }
+    await _eventDao.deleteServerStageChangesNotIn(remoteUuids);
+  }
+
+  Future<void> _syncPrepuceConditions(dynamic payload) async {
+    if (payload is! List) return;
+    final remoteUuids = <String>{};
+    for (final raw in payload.cast<Map<String, dynamic>>()) {
+      try {
+        final remote = PrepuceConditionModel.fromJson(
+          raw,
+        ).copyWith(synced: true, syncAction: 'server-create');
+        remoteUuids.add(remote.uuid);
+        final existing = await _eventDao.getPrepuceConditionByUuid(remote.uuid);
+        var wasInsertedOrUpdated = false;
+        if (existing == null) {
+          await _eventDao.upsertPrepuceCondition(
+            _toPrepuceConditionCompanion(remote),
+          );
+          wasInsertedOrUpdated = true;
+        } else {
+          final serverUpdated = DateTime.parse(remote.updatedAt);
+          final localUpdated = DateTime.parse(existing.updatedAt);
+          if (serverUpdated.isAfter(localUpdated)) {
+            await _eventDao.upsertPrepuceCondition(
+              _toPrepuceConditionCompanion(
+                remote.copyWith(id: existing.id, syncAction: 'server-update'),
+              ),
+            );
+            wasInsertedOrUpdated = true;
+          }
+        }
+        if (wasInsertedOrUpdated) {
+          await _applyPrepuceFollowUpNotification(remote);
+        }
+      } catch (e) {
+        log('❌ Error syncing prepuce condition log: $e');
+      }
+    }
+    await _eventDao.deleteServerPrepuceConditionsNotIn(remoteUuids);
+  }
+
+  Future<void> _applyServerStageChangeToLivestock(StageChangeModel model) async {
+    final to = model.toStageId;
+    if (to == null) return;
+    await _database.livestockDao.updateLivestockStageId(model.livestockUuid, to);
+
+    final stage = await _database.stageDao.getStageById(to);
+    if (stage == null) return;
+
+    final normalized = stage.name.trim().toLowerCase();
+    if (_earlyStageNames.contains(normalized)) {
+      await _database.livestockDao.updateLivestockIdentificationByUuid(
+        model.livestockUuid,
+        isIdentified: false,
+        dummyTagId: null,
+        barcodeTagId: null,
+        rfidTagId: null,
+      );
+    }
+  }
+
   // ===========================================================================
   // Notification creation helpers for sync
   // ===========================================================================
+
+  Future<void> _reloadNotificationCacheSafely() async {
+    final provider = _notificationProvider;
+    if (provider == null) return;
+    try {
+      await provider.loadNotifications();
+    } catch (_) {}
+  }
+
+  Future<bool> _existsInNotificationTable({
+    required String title,
+    required String scheduledAt,
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final existing = await _database.notificationDao.findByAttributes(
+      title: title,
+      scheduledAt: scheduledAt,
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return existing != null;
+  }
+
+  /// One local notification per prepuce log [uuid], keyed by [NotificationModel.prepuceFollowUpTitleForLog].
+  Future<void> _applyPrepuceFollowUpNotification(
+    PrepuceConditionModel model,
+  ) async {
+    final provider = _notificationProvider;
+    if (provider == null) return;
+
+    await _reloadNotificationCacheSafely();
+
+    final title = NotificationModel.prepuceFollowUpTitleForLog(model.uuid);
+    final trimmed = model.followUpDate?.trim();
+    final nextDate =
+        trimmed != null && trimmed.isNotEmpty ? DateTime.tryParse(trimmed) : null;
+    final now = DateTime.now();
+
+    Future<void> removeIncompleteWithTitle() async {
+      final ids = provider.notifications
+          .where((n) => n.title == title && !n.isCompleted && n.id != null)
+          .map((n) => n.id!)
+          .toList();
+      for (final id in ids) {
+        await provider.deleteNotification(id);
+      }
+    }
+
+    try {
+      if (nextDate == null || !nextDate.isAfter(now)) {
+        await removeIncompleteWithTitle();
+        return;
+      }
+
+      var incomplete = provider.notifications
+          .where((n) => n.title == title && !n.isCompleted)
+          .toList();
+
+      while (incomplete.length > 1) {
+        final id = incomplete.last.id;
+        if (id != null) await provider.deleteNotification(id);
+        await provider.loadNotifications();
+        incomplete = provider.notifications
+            .where((n) => n.title == title && !n.isCompleted)
+            .toList();
+      }
+
+      final scheduledIso = nextDate.toIso8601String();
+      final nowIso = DateTime.now().toIso8601String();
+
+      // Skip creating duplicates from repeated sync payloads.
+      if (incomplete.isEmpty &&
+          await _existsInNotificationTable(
+            title: title,
+            scheduledAt: scheduledIso,
+            farmUuid: model.farmUuid,
+            livestockUuid: model.livestockUuid,
+          )) {
+        return;
+      }
+
+      if (incomplete.isNotEmpty) {
+        final existing = incomplete.first;
+        await provider.saveNotification(
+          existing.copyWith(
+            scheduledAt: scheduledIso,
+            farmUuid: model.farmUuid,
+            livestockUuid: model.livestockUuid,
+            updatedAt: nowIso,
+            synced: false,
+            syncAction: existing.id != null ? 'update' : 'create',
+          ),
+        );
+        log(
+          '✅ Prepuce follow-up notification updated for ${model.uuid} at ${nextDate.toLocal()}',
+        );
+        return;
+      }
+
+      await provider.saveNotification(
+        NotificationModel(
+          farmUuid: model.farmUuid,
+          farmName: null,
+          livestockUuid: model.livestockUuid,
+          livestockName: null,
+          title: title,
+          description: NotificationModel.prepuceFollowUpDescriptionKey,
+          scheduledAt: scheduledIso,
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: nowIso,
+          updatedAt: nowIso,
+          repeatDaily: false,
+        ),
+      );
+      log(
+        '✅ Prepuce follow-up notification created for ${model.uuid} at ${nextDate.toLocal()}',
+      );
+    } catch (e) {
+      log('⚠️ Prepuce follow-up notification failed: $e');
+    }
+  }
 
   /// Create or update notification for feeding events during sync
   Future<void> _createFeedingNotificationFromSync(FeedingModel feeding) async {
@@ -589,7 +947,20 @@ class EventsRepository implements EventsRepositoryInterface {
       if (nextFeedingTime == null) return;
 
       final now = DateTime.now();
-      if (nextFeedingTime.isBefore(now)) return;
+      if (!nextFeedingTime.isAfter(now)) return;
+
+      await _reloadNotificationCacheSafely();
+      final scheduledIso = nextFeedingTime.toIso8601String();
+
+      // Skip duplicate notification that already exists in local NotificationTable.
+      if (await _existsInNotificationTable(
+        title: 'feeding_reminder',
+        scheduledAt: scheduledIso,
+        farmUuid: feeding.farmUuid,
+        livestockUuid: feeding.livestockUuid,
+      )) {
+        return;
+      }
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
@@ -604,7 +975,7 @@ class EventsRepository implements EventsRepositoryInterface {
       if (existingNotifications.isNotEmpty) {
         final existing = existingNotifications.first;
         notification = existing.copyWith(
-          scheduledAt: nextFeedingTime.toIso8601String(),
+          scheduledAt: scheduledIso,
           updatedAt: DateTime.now().toIso8601String(),
           synced: false,
           syncAction: 'update',
@@ -617,7 +988,7 @@ class EventsRepository implements EventsRepositoryInterface {
           livestockName: null,
           title: 'feeding_reminder',
           description: 'time_to_feed_livestock',
-          scheduledAt: nextFeedingTime.toIso8601String(),
+          scheduledAt: scheduledIso,
           isCompleted: false,
           synced: false,
           syncAction: 'create',
@@ -647,7 +1018,19 @@ class EventsRepository implements EventsRepositoryInterface {
       if (nextDate == null) return;
 
       final now = DateTime.now();
-      if (nextDate.isBefore(now)) return;
+      if (!nextDate.isAfter(now)) return;
+
+      await _reloadNotificationCacheSafely();
+      final scheduledIso = nextDate.toIso8601String();
+
+      if (await _existsInNotificationTable(
+        title: 'deworming_reminder',
+        scheduledAt: scheduledIso,
+        farmUuid: deworming.farmUuid,
+        livestockUuid: deworming.livestockUuid,
+      )) {
+        return;
+      }
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
@@ -662,7 +1045,7 @@ class EventsRepository implements EventsRepositoryInterface {
       if (existingNotifications.isNotEmpty) {
         final existing = existingNotifications.first;
         notification = existing.copyWith(
-          scheduledAt: nextDate.toIso8601String(),
+          scheduledAt: scheduledIso,
           updatedAt: DateTime.now().toIso8601String(),
           synced: false,
           syncAction: 'update',
@@ -675,7 +1058,7 @@ class EventsRepository implements EventsRepositoryInterface {
           livestockName: null,
           title: 'deworming_reminder',
           description: 'time_to_deworm_livestock',
-          scheduledAt: nextDate.toIso8601String(),
+          scheduledAt: scheduledIso,
           isCompleted: false,
           synced: false,
           syncAction: 'create',
@@ -705,7 +1088,19 @@ class EventsRepository implements EventsRepositoryInterface {
       if (nextDate == null) return;
 
       final now = DateTime.now();
-      if (nextDate.isBefore(now)) return;
+      if (!nextDate.isAfter(now)) return;
+
+      await _reloadNotificationCacheSafely();
+      final scheduledIso = nextDate.toIso8601String();
+
+      if (await _existsInNotificationTable(
+        title: 'treatment_reminder',
+        scheduledAt: scheduledIso,
+        farmUuid: treatment.farmUuid,
+        livestockUuid: treatment.livestockUuid,
+      )) {
+        return;
+      }
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
@@ -720,7 +1115,7 @@ class EventsRepository implements EventsRepositoryInterface {
       if (existingNotifications.isNotEmpty) {
         final existing = existingNotifications.first;
         notification = existing.copyWith(
-          scheduledAt: nextDate.toIso8601String(),
+          scheduledAt: scheduledIso,
           updatedAt: DateTime.now().toIso8601String(),
           synced: false,
           syncAction: 'update',
@@ -733,7 +1128,7 @@ class EventsRepository implements EventsRepositoryInterface {
           livestockName: null,
           title: 'treatment_reminder',
           description: 'time_to_treat_livestock',
-          scheduledAt: nextDate.toIso8601String(),
+          scheduledAt: scheduledIso,
           isCompleted: false,
           synced: false,
           syncAction: 'create',
@@ -1337,6 +1732,314 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
+  Future<TeethClippingModel> createTeethClipping(TeethClippingModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertTeethClipping(
+      _toTeethClippingCompanion(localModel),
+    );
+    return _mapTeethClippingEntity(inserted);
+  }
+
+  @override
+  Future<TeethClippingModel> updateTeethClippingLocally(
+    TeethClippingModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertTeethClipping(
+      _toTeethClippingCompanion(localModel),
+    );
+    return _mapTeethClippingEntity(updated);
+  }
+
+  @override
+  Future<List<TeethClippingModel>> getTeethClippings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getTeethClippings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapTeethClippingEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<TailDockingModel> createTailDocking(TailDockingModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertTailDocking(
+      _toTailDockingCompanion(localModel),
+    );
+    return _mapTailDockingEntity(inserted);
+  }
+
+  @override
+  Future<TailDockingModel> updateTailDockingLocally(TailDockingModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertTailDocking(
+      _toTailDockingCompanion(localModel),
+    );
+    return _mapTailDockingEntity(updated);
+  }
+
+  @override
+  Future<List<TailDockingModel>> getTailDockings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getTailDockings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapTailDockingEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<IronInjectionModel> createIronInjection(IronInjectionModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertIronInjection(
+      _toIronInjectionCompanion(localModel),
+    );
+    return _mapIronInjectionEntity(inserted);
+  }
+
+  @override
+  Future<IronInjectionModel> updateIronInjectionLocally(
+    IronInjectionModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertIronInjection(
+      _toIronInjectionCompanion(localModel),
+    );
+    return _mapIronInjectionEntity(updated);
+  }
+
+  @override
+  Future<List<IronInjectionModel>> getIronInjections({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getIronInjections(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapIronInjectionEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<LivestockMarkingModel> createLivestockMarking(
+    LivestockMarkingModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertLivestockMarking(
+      _toLivestockMarkingCompanion(localModel),
+    );
+    return _mapLivestockMarkingEntity(inserted);
+  }
+
+  @override
+  Future<LivestockMarkingModel> updateLivestockMarkingLocally(
+    LivestockMarkingModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertLivestockMarking(
+      _toLivestockMarkingCompanion(localModel),
+    );
+    return _mapLivestockMarkingEntity(updated);
+  }
+
+  @override
+  Future<List<LivestockMarkingModel>> getLivestockMarkings({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getLivestockMarkings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapLivestockMarkingEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<StageChangeModel> createStageChange(StageChangeModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertStageChange(
+      _toStageChangeCompanion(localModel),
+    );
+    return _mapStageChangeEntity(inserted);
+  }
+
+  @override
+  Future<StageChangeModel> updateStageChangeLocally(StageChangeModel model) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertStageChange(
+      _toStageChangeCompanion(localModel),
+    );
+    return _mapStageChangeEntity(updated);
+  }
+
+  @override
+  Future<List<StageChangeModel>> getStageChanges({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getStageChanges(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapStageChangeEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<PrepuceConditionModel> createPrepuceCondition(
+    PrepuceConditionModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
+      updatedAt: model.updatedAt.isNotEmpty ? model.updatedAt : now,
+      synced: false,
+      syncAction: 'create',
+    );
+    final inserted = await _eventDao.upsertPrepuceCondition(
+      _toPrepuceConditionCompanion(localModel),
+    );
+    final mapped = _mapPrepuceConditionEntity(inserted);
+    await _applyPrepuceFollowUpNotification(mapped);
+    return mapped;
+  }
+
+  @override
+  Future<PrepuceConditionModel> updatePrepuceConditionLocally(
+    PrepuceConditionModel model,
+  ) async {
+    final now = DateTime.now().toIso8601String();
+    final localModel = model.copyWith(
+      synced: false,
+      syncAction: model.syncAction == 'create'
+          ? 'create'
+          : model.syncAction == 'deleted'
+              ? 'deleted'
+              : 'update',
+      updatedAt: now,
+    );
+    final updated = await _eventDao.upsertPrepuceCondition(
+      _toPrepuceConditionCompanion(localModel),
+    );
+    final mapped = _mapPrepuceConditionEntity(updated);
+    await _applyPrepuceFollowUpNotification(mapped);
+    return mapped;
+  }
+
+  @override
+  Future<List<PrepuceConditionModel>> getPrepuceConditions({
+    String? farmUuid,
+    String? livestockUuid,
+  }) async {
+    final rows = await _eventDao.getPrepuceConditions(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    return rows
+        .map(_mapPrepuceConditionEntity)
+        .where((model) => model.syncAction != 'deleted')
+        .toList();
+  }
+
+  @override
+  Future<List<PrepuceConditionModel>> getAllPrepuceConditions() =>
+      getPrepuceConditions();
+
+  @override
   Future<List<FeedingModel>> getAllFeedings() => getFeedings();
 
   @override
@@ -1365,6 +2068,22 @@ class EventsRepository implements EventsRepositoryInterface {
 
   @override
   Future<List<TransferModel>> getAllTransfers() => getTransfers();
+
+  @override
+  Future<List<TeethClippingModel>> getAllTeethClippings() => getTeethClippings();
+
+  @override
+  Future<List<TailDockingModel>> getAllTailDockings() => getTailDockings();
+
+  @override
+  Future<List<IronInjectionModel>> getAllIronInjections() => getIronInjections();
+
+  @override
+  Future<List<LivestockMarkingModel>> getAllLivestockMarkings() =>
+      getLivestockMarkings();
+
+  @override
+  Future<List<StageChangeModel>> getAllStageChanges() => getStageChanges();
 
   @override
   Future<Map<String, int>> getLogCounts({
@@ -1423,6 +2142,30 @@ class EventsRepository implements EventsRepositoryInterface {
       farmUuid: farmUuid,
       livestockUuid: livestockUuid,
     );
+    final teethClippings = await getTeethClippings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final tailDockings = await getTailDockings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final ironInjections = await getIronInjections(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final livestockMarkings = await getLivestockMarkings(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final stageChanges = await getStageChanges(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
+    final prepuceConditions = await getPrepuceConditions(
+      farmUuid: farmUuid,
+      livestockUuid: livestockUuid,
+    );
 
     // Count calving and farrowing separately
     final calvingCount = birthEvents
@@ -1447,6 +2190,12 @@ class EventsRepository implements EventsRepositoryInterface {
       EventLogTypes.pregnancy: pregnancies.length,
       EventLogTypes.dryoff: dryoffs.length,
       EventLogTypes.transfer: transfers.length,
+      EventLogTypes.teethClipping: teethClippings.length,
+      EventLogTypes.tailDocking: tailDockings.length,
+      EventLogTypes.ironInjection: ironInjections.length,
+      EventLogTypes.livestockMarking: livestockMarkings.length,
+      EventLogTypes.stageChange: stageChanges.length,
+      EventLogTypes.prepuceCondition: prepuceConditions.length,
     };
   }
 
@@ -1465,6 +2214,12 @@ class EventsRepository implements EventsRepositoryInterface {
     final pregnanciesCount = (await getPregnancies()).length;
     final dryoffsCount = (await getDryoffs()).length;
     final transfersCount = (await getTransfers()).length;
+    final teethClippingsCount = (await getTeethClippings()).length;
+    final tailDockingsCount = (await getTailDockings()).length;
+    final ironInjectionsCount = (await getIronInjections()).length;
+    final livestockMarkingsCount = (await getLivestockMarkings()).length;
+    final stageChangesCount = (await getStageChanges()).length;
+    final prepuceConditionsCount = (await getPrepuceConditions()).length;
 
     // Count calving and farrowing separately from birthEvents
     final calvingCount = birthEvents
@@ -1490,6 +2245,12 @@ class EventsRepository implements EventsRepositoryInterface {
         EventLogTypes.pregnancy: pregnanciesCount,
         EventLogTypes.dryoff: dryoffsCount,
         EventLogTypes.transfer: transfersCount,
+        EventLogTypes.teethClipping: teethClippingsCount,
+        EventLogTypes.tailDocking: tailDockingsCount,
+        EventLogTypes.ironInjection: ironInjectionsCount,
+        EventLogTypes.livestockMarking: livestockMarkingsCount,
+        EventLogTypes.stageChange: stageChangesCount,
+        EventLogTypes.prepuceCondition: prepuceConditionsCount,
       },
     );
   }
@@ -1825,6 +2586,91 @@ class EventsRepository implements EventsRepositoryInterface {
       ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
       await _eventDao.upsertTransfer(_toTransferCompanion(model));
     }
+
+    for (final log in await _eventDao.getTeethClippings(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertTeethClipping(
+        _toTeethClippingCompanion(
+          _mapTeethClippingEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
+    for (final log in await _eventDao.getTailDockings(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertTailDocking(
+        _toTailDockingCompanion(
+          _mapTailDockingEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
+    for (final log in await _eventDao.getIronInjections(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertIronInjection(
+        _toIronInjectionCompanion(
+          _mapIronInjectionEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
+    for (final log in await _eventDao.getLivestockMarkings(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertLivestockMarking(
+        _toLivestockMarkingCompanion(
+          _mapLivestockMarkingEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
+    for (final log in await _eventDao.getStageChanges(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertStageChange(
+        _toStageChangeCompanion(
+          _mapStageChangeEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
+    for (final log in await _eventDao.getPrepuceConditions(
+      livestockUuid: livestockUuid,
+    )) {
+      final now = DateTime.now().toIso8601String();
+      await _eventDao.upsertPrepuceCondition(
+        _toPrepuceConditionCompanion(
+          _mapPrepuceConditionEntity(log).copyWith(
+            synced: false,
+            syncAction: 'deleted',
+            updatedAt: now,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -2097,6 +2943,11 @@ class EventsRepository implements EventsRepositoryInterface {
       remarks: model.remarks != null
           ? Value(model.remarks!)
           : const Value.absent(),
+      saleWeight: Value(model.saleWeight),
+      salePrice: Value(model.salePrice),
+      buyerName: model.buyerName != null
+          ? Value(model.buyerName!)
+          : const Value.absent(),
       status: Value(model.status),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -2212,7 +3063,295 @@ class EventsRepository implements EventsRepositoryInterface {
       disposalTypeId: entity.disposalTypeId,
       reasons: entity.reasons,
       remarks: entity.remarks,
+      saleWeight: entity.saleWeight,
+      salePrice: entity.salePrice,
+      buyerName: entity.buyerName,
       status: entity.status,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  TeethClippingsCompanion _toTeethClippingCompanion(TeethClippingModel model) {
+    return TeethClippingsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      method: model.method != null ? Value(model.method!) : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  TailDockingsCompanion _toTailDockingCompanion(TailDockingModel model) {
+    return TailDockingsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      method: model.method != null ? Value(model.method!) : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  IronInjectionsCompanion _toIronInjectionCompanion(IronInjectionModel model) {
+    return IronInjectionsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      dosage: model.dosage != null ? Value(model.dosage!) : const Value.absent(),
+      medicineId: model.medicineId != null
+          ? Value(model.medicineId!)
+          : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  LivestockMarkingsCompanion _toLivestockMarkingCompanion(
+    LivestockMarkingModel model,
+  ) {
+    return LivestockMarkingsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      markingType: Value(model.markingType),
+      description: model.description != null
+          ? Value(model.description!)
+          : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  StageChangesCompanion _toStageChangeCompanion(StageChangeModel model) {
+    return StageChangesCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      fromStageId: model.fromStageId != null
+          ? Value(model.fromStageId!)
+          : const Value.absent(),
+      toStageId: model.toStageId != null
+          ? Value(model.toStageId!)
+          : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  PrepuceConditionsCompanion _toPrepuceConditionCompanion(
+    PrepuceConditionModel model,
+  ) {
+    return PrepuceConditionsCompanion(
+      id: model.id != null ? Value(model.id!) : const Value.absent(),
+      uuid: Value(model.uuid),
+      eventDate: model.eventDate != null
+          ? Value(model.eventDate!)
+          : const Value.absent(),
+      farmUuid: Value(model.farmUuid),
+      livestockUuid: Value(model.livestockUuid),
+      conditionTypeId: Value(model.conditionTypeId),
+      severityId: Value(model.severityId),
+      clinicalSignIdsJson: Value(jsonEncode(model.clinicalSignIds)),
+      causeRiskId: model.causeRiskId != null
+          ? Value(model.causeRiskId!)
+          : const Value.absent(),
+      treatmentGivenIdsJson: Value(jsonEncode(model.treatmentGivenIds)),
+      medicineId: model.medicineId != null
+          ? Value(model.medicineId!)
+          : const Value.absent(),
+      administrationRouteId: model.administrationRouteId != null
+          ? Value(model.administrationRouteId!)
+          : const Value.absent(),
+      vetId: model.vetId != null ? Value(model.vetId!) : const Value.absent(),
+      extensionOfficerId: model.extensionOfficerId != null
+          ? Value(model.extensionOfficerId!)
+          : const Value.absent(),
+      quantity:
+          model.quantity != null ? Value(model.quantity!) : const Value.absent(),
+      dose: model.dose != null ? Value(model.dose!) : const Value.absent(),
+      breedingStatusId: Value(model.breedingStatusId),
+      healingStatusId: model.healingStatusId != null
+          ? Value(model.healingStatusId!)
+          : const Value.absent(),
+      followUpDate: model.followUpDate != null
+          ? Value(model.followUpDate!)
+          : const Value.absent(),
+      notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
+      synced: Value(model.synced),
+      syncAction: Value(model.syncAction),
+      createdAt: Value(model.createdAt),
+      updatedAt: Value(model.updatedAt),
+    );
+  }
+
+  TeethClippingModel _mapTeethClippingEntity(TeethClipping entity) {
+    return TeethClippingModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
+      method: entity.method,
+      notes: entity.notes,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  TailDockingModel _mapTailDockingEntity(TailDocking entity) {
+    return TailDockingModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
+      method: entity.method,
+      notes: entity.notes,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  IronInjectionModel _mapIronInjectionEntity(IronInjection entity) {
+    return IronInjectionModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
+      dosage: entity.dosage,
+      medicineId: entity.medicineId,
+      notes: entity.notes,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  LivestockMarkingModel _mapLivestockMarkingEntity(LivestockMarking entity) {
+    return LivestockMarkingModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
+      markingType: entity.markingType,
+      description: entity.description,
+      notes: entity.notes,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  StageChangeModel _mapStageChangeEntity(StageChange entity) {
+    return StageChangeModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      eventDate: entity.eventDate,
+      fromStageId: entity.fromStageId,
+      toStageId: entity.toStageId,
+      notes: entity.notes,
+      synced: entity.synced,
+      syncAction: entity.syncAction,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  List<int> _decodeJsonIntList(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        final out = <int>[];
+        for (final e in decoded) {
+          if (e == null) continue;
+          if (e is int) {
+            if (e > 0) out.add(e);
+          } else if (e is num) {
+            final i = e.toInt();
+            if (i > 0) out.add(i);
+          } else {
+            final i = int.tryParse(e.toString());
+            if (i != null && i > 0) out.add(i);
+          }
+        }
+        return out;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  PrepuceConditionModel _mapPrepuceConditionEntity(PrepuceCondition entity) {
+    return PrepuceConditionModel(
+      id: entity.id,
+      uuid: entity.uuid,
+      farmUuid: entity.farmUuid,
+      livestockUuid: entity.livestockUuid,
+      conditionTypeId: entity.conditionTypeId,
+      severityId: entity.severityId,
+      clinicalSignIds: _decodeJsonIntList(entity.clinicalSignIdsJson),
+      causeRiskId: entity.causeRiskId,
+      treatmentGivenIds: _decodeJsonIntList(entity.treatmentGivenIdsJson),
+      medicineId: entity.medicineId,
+      administrationRouteId: entity.administrationRouteId,
+      vetId: entity.vetId,
+      extensionOfficerId: entity.extensionOfficerId,
+      quantity: entity.quantity,
+      dose: entity.dose,
+      breedingStatusId: entity.breedingStatusId,
+      healingStatusId: entity.healingStatusId,
+      followUpDate: entity.followUpDate,
+      notes: entity.notes,
+      eventDate: entity.eventDate,
       synced: entity.synced,
       syncAction: entity.syncAction,
       createdAt: entity.createdAt,
@@ -2343,6 +3482,15 @@ class EventsRepository implements EventsRepositoryInterface {
       remarks: model.remarks != null
           ? Value(model.remarks!)
           : const Value.absent(),
+      totalBorn: model.totalBorn != null
+          ? Value(model.totalBorn!)
+          : const Value.absent(),
+      aliveCount: model.aliveCount != null
+          ? Value(model.aliveCount!)
+          : const Value.absent(),
+      deadCount: model.deadCount != null
+          ? Value(model.deadCount!)
+          : const Value.absent(),
       status: Value(model.status),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -2365,6 +3513,9 @@ class EventsRepository implements EventsRepositoryInterface {
       birthProblemsId: entity.birthProblemsId,
       reproductiveProblemId: entity.reproductiveProblemId,
       remarks: entity.remarks,
+      totalBorn: entity.totalBorn,
+      aliveCount: entity.aliveCount,
+      deadCount: entity.deadCount,
       status: entity.status,
       synced: entity.synced,
       syncAction: entity.syncAction,
@@ -3021,6 +4172,158 @@ class EventsRepository implements EventsRepositoryInterface {
     }
   }
 
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedTeethClippingsForApi() async {
+    final rows = await _eventDao.getUnsyncedTeethClippings();
+    if (rows.isEmpty) return [];
+    return rows.map((row) => _mapTeethClippingEntity(row).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markTeethClippingsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getTeethClippingByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteTeethClippingByUuid(uuid);
+      } else {
+        final model = _mapTeethClippingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertTeethClipping(_toTeethClippingCompanion(model));
+      }
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedTailDockingsForApi() async {
+    final rows = await _eventDao.getUnsyncedTailDockings();
+    if (rows.isEmpty) return [];
+    return rows.map((row) => _mapTailDockingEntity(row).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markTailDockingsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getTailDockingByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteTailDockingByUuid(uuid);
+      } else {
+        final model = _mapTailDockingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertTailDocking(_toTailDockingCompanion(model));
+      }
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedIronInjectionsForApi() async {
+    final rows = await _eventDao.getUnsyncedIronInjections();
+    if (rows.isEmpty) return [];
+    return rows.map((row) => _mapIronInjectionEntity(row).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markIronInjectionsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getIronInjectionByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteIronInjectionByUuid(uuid);
+      } else {
+        final model = _mapIronInjectionEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertIronInjection(_toIronInjectionCompanion(model));
+      }
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedLivestockMarkingsForApi() async {
+    final rows = await _eventDao.getUnsyncedLivestockMarkings();
+    if (rows.isEmpty) return [];
+    return rows
+        .map((row) => _mapLivestockMarkingEntity(row).toApiJson())
+        .toList();
+  }
+
+  @override
+  Future<void> markLivestockMarkingsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getLivestockMarkingByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteLivestockMarkingByUuid(uuid);
+      } else {
+        final model = _mapLivestockMarkingEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertLivestockMarking(
+          _toLivestockMarkingCompanion(model),
+        );
+      }
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedStageChangesForApi() async {
+    final rows = await _eventDao.getUnsyncedStageChanges();
+    if (rows.isEmpty) return [];
+    return rows.map((row) => _mapStageChangeEntity(row).toApiJson()).toList();
+  }
+
+  @override
+  Future<void> markStageChangesAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getStageChangeByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deleteStageChangeByUuid(uuid);
+      } else {
+        final model = _mapStageChangeEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertStageChange(_toStageChangeCompanion(model));
+      }
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsyncedPrepuceConditionsForApi() async {
+    final rows = await _eventDao.getUnsyncedPrepuceConditions();
+    if (rows.isEmpty) return [];
+    return rows
+        .map((row) => _mapPrepuceConditionEntity(row).toApiJson())
+        .toList();
+  }
+
+  @override
+  Future<void> markPrepuceConditionsAsSynced(List<String> uuids) async {
+    if (uuids.isEmpty) return;
+    for (final uuid in uuids.toSet()) {
+      final existing = await _eventDao.getPrepuceConditionByUuid(uuid);
+      if (existing == null) continue;
+      if (existing.syncAction == 'deleted') {
+        await _eventDao.deletePrepuceConditionByUuid(uuid);
+      } else {
+        final model = _mapPrepuceConditionEntity(
+          existing,
+        ).copyWith(synced: true, syncAction: existing.syncAction);
+        await _eventDao.upsertPrepuceCondition(
+          _toPrepuceConditionCompanion(model),
+        );
+      }
+    }
+  }
+
   /// Update livestock status to 'notActive' when a disposal is created.
   ///
   /// All disposal types (Dead, Slaughtered, Lost, Culled) indicate that the livestock
@@ -3069,6 +4372,9 @@ class EventsRepository implements EventsRepositoryInterface {
         dateOfBirth: livestock.dateOfBirth,
         motherUuid: livestock.motherUuid,
         fatherUuid: livestock.fatherUuid,
+        birthEventUuid: livestock.birthEventUuid,
+        stageId: livestock.stageId,
+        isIdentified: livestock.isIdentified,
         gender: livestock.gender,
         breedId: livestock.breedId,
         speciesId: livestock.speciesId,
@@ -3076,6 +4382,8 @@ class EventsRepository implements EventsRepositoryInterface {
         livestockObtainedMethodId: livestock.livestockObtainedMethodId,
         dateFirstEnteredToFarm: livestock.dateFirstEnteredToFarm,
         weightAsOnRegistration: livestock.weightAsOnRegistration,
+        primaryColor: livestock.primaryColor,
+        secondaryColor: livestock.secondaryColor,
         synced:
             false, // Mark as unsynced so status update gets synced to server
         syncAction: 'update', // Mark sync action as update

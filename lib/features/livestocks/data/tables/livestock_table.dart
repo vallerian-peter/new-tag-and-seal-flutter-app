@@ -15,6 +15,11 @@ class Livestocks extends Table {
   TextColumn get dateOfBirth => text()();
   TextColumn get motherUuid => text().nullable()();  // Mother livestock UUID reference
   TextColumn get fatherUuid => text().nullable()();  // Father livestock UUID reference
+  /// Links offspring to the birth event (litter / cohort); primary grouping for analytics.
+  TextColumn get birthEventUuid => text().nullable()();
+  IntColumn get stageId => integer().nullable()();
+  BoolColumn get isIdentified =>
+      boolean().withDefault(const Constant(true))();
   TextColumn get gender => text()();
   IntColumn get breedId => integer()();
   IntColumn get speciesId => integer()();

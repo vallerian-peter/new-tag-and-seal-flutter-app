@@ -18,4 +18,12 @@ mixin _$EventDaoMixin on DatabaseAccessor<AppDatabase> {
   $InseminationsTable get inseminations => attachedDatabase.inseminations;
   $DryoffsTable get dryoffs => attachedDatabase.dryoffs;
   $TransfersTable get transfers => attachedDatabase.transfers;
+  $TeethClippingsTable get teethClippings => attachedDatabase.teethClippings;
+  $TailDockingsTable get tailDockings => attachedDatabase.tailDockings;
+  $IronInjectionsTable get ironInjections => attachedDatabase.ironInjections;
+  $LivestockMarkingsTable get livestockMarkings =>
+      attachedDatabase.livestockMarkings;
+  $StageChangesTable get stageChanges => attachedDatabase.stageChanges;
+  $PrepuceConditionsTable get prepuceConditions =>
+      attachedDatabase.prepuceConditions;
 }

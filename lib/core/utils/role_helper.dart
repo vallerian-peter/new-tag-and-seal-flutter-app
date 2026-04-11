@@ -205,6 +205,8 @@ class RoleHelper {
         return 'milking-user';
       case 'transfer':
         return 'transfer-user';
+      case 'prepucecondition':
+        return 'prepuce-condition-user';
       default:
         return null;
     }

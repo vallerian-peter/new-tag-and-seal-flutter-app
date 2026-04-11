@@ -10,6 +10,9 @@ class BirthEventModel {
   final int? birthProblemsId; // Renamed from calvingProblemsId
   final int? reproductiveProblemId;
   final String? remarks;
+  final int? totalBorn;
+  final int? aliveCount;
+  final int? deadCount;
   final String status;
   final String? eventDate;
   final bool synced;
@@ -29,6 +32,9 @@ class BirthEventModel {
     this.birthProblemsId,
     this.reproductiveProblemId,
     this.remarks,
+    this.totalBorn,
+    this.aliveCount,
+    this.deadCount,
     this.status = 'active',
     this.eventDate,
     this.synced = false,
@@ -58,6 +64,9 @@ class BirthEventModel {
     int? birthProblemsId,
     int? reproductiveProblemId,
     String? remarks,
+    int? totalBorn,
+    int? aliveCount,
+    int? deadCount,
     String? status,
     String? eventDate,
     bool? synced,
@@ -78,6 +87,9 @@ class BirthEventModel {
       reproductiveProblemId:
           reproductiveProblemId ?? this.reproductiveProblemId,
       remarks: remarks ?? this.remarks,
+      totalBorn: totalBorn ?? this.totalBorn,
+      aliveCount: aliveCount ?? this.aliveCount,
+      deadCount: deadCount ?? this.deadCount,
       status: status ?? this.status,
       eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
@@ -100,6 +112,9 @@ class BirthEventModel {
       'birthProblemsId': birthProblemsId,
       'reproductiveProblemId': reproductiveProblemId,
       'remarks': remarks,
+      'totalBorn': totalBorn,
+      'aliveCount': aliveCount,
+      'deadCount': deadCount,
       'status': status,
       'eventDate': eventDate,
       'synced': synced,
@@ -125,6 +140,9 @@ class BirthEventModel {
                               (json['calvingProblemsId'] as int?), // Support both field names for migration
       reproductiveProblemId: json['reproductiveProblemId'] as int?,
       remarks: json['remarks'] as String?,
+      totalBorn: (json['totalBorn'] as num?)?.toInt(),
+      aliveCount: (json['aliveCount'] as num?)?.toInt(),
+      deadCount: (json['deadCount'] as num?)?.toInt(),
       status: json['status'] as String? ?? 'active',
       eventDate: json['eventDate'] as String?,
       synced: (json['synced'] as bool?) ?? true,
@@ -146,6 +164,9 @@ class BirthEventModel {
       'birthProblemsId': birthProblemsId,
       'reproductiveProblemId': reproductiveProblemId,
       'remarks': remarks,
+      'totalBorn': totalBorn,
+      'aliveCount': aliveCount,
+      'deadCount': deadCount,
       'status': status,
       'eventDate': eventDate,
       'synced': synced,

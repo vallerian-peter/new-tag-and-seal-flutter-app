@@ -75,6 +75,9 @@ class LivestockProvider extends ChangeNotifier {
     String genderFilter = 'All',
     String statusFilter = 'All',
     int? livestockTypeId,
+    int? stageId,
+    String? motherUuid,
+    String? fatherUuid,
   }) {
     // Start with all livestock
     List<Livestock> baseList = List<Livestock>.from(_allLivestock);
@@ -103,6 +106,24 @@ class LivestockProvider extends ChangeNotifier {
     if (livestockTypeId != null) {
       baseList = baseList
           .where((livestock) => livestock.livestockTypeId == livestockTypeId)
+          .toList();
+    }
+
+    if (stageId != null) {
+      baseList = baseList
+          .where((livestock) => livestock.stageId == stageId)
+          .toList();
+    }
+
+    if (motherUuid != null && motherUuid.isNotEmpty) {
+      baseList = baseList
+          .where((livestock) => livestock.motherUuid == motherUuid)
+          .toList();
+    }
+
+    if (fatherUuid != null && fatherUuid.isNotEmpty) {
+      baseList = baseList
+          .where((livestock) => livestock.fatherUuid == fatherUuid)
           .toList();
     }
 
@@ -289,6 +310,44 @@ class LivestockProvider extends ChangeNotifier {
       return livestock;
     } catch (e) {
       log('❌ LivestockProvider: Error creating livestock: $e');
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  Future<Set<String>> findExistingIdentificationNumbers(
+    Iterable<String> candidates,
+  ) {
+    return _livestockRepo.findExistingIdentificationNumbers(candidates);
+  }
+
+  /// Registers each piglet with [createLivestock], then refreshes the list once.
+  Future<List<Livestock>?> createLivestockBatch(
+    List<Map<String, dynamic>> items,
+  ) async {
+    if (items.isEmpty) return [];
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final created = <Livestock>[];
+      for (var i = 0; i < items.length; i++) {
+        log(
+          '📦 LivestockProvider: Registering ${i + 1} of ${items.length}…',
+        );
+        final row = await _livestockRepo.createLivestock(
+          Map<String, dynamic>.from(items[i]),
+        );
+        created.add(row);
+      }
+      await fetchAllLivestock();
+      _isLoading = false;
+      notifyListeners();
+      return created;
+    } catch (e) {
+      log('❌ LivestockProvider: Error during litter registration: $e');
       _error = e.toString();
       _isLoading = false;
       notifyListeners();

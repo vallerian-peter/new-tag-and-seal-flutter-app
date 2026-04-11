@@ -170,6 +170,45 @@ class AllAdditionalDataService {
     }
   }
 
+  /// Fetch additional data in raw map form for local database storage.
+  ///
+  /// Unlike `fetchAllAdditionalData()`, this returns JSON-like maps/lists
+  /// so repository upsert logic can write directly into Drift tables.
+  static Future<Map<String, dynamic>> fetchAllAdditionalDataRaw() async {
+    try {
+      final headers = await _buildHeaders();
+      final response = await http.get(
+        Uri.parse(ApiEndpoints.initialRegisterSync),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        if (json['status'] != true) {
+          final message = json['message'] ?? 'Unknown error';
+          throw Exception('API returned error: $message');
+        }
+        return _extractRawAdditionalData(json['data']);
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized: Please login again');
+      } else if (response.statusCode == 403) {
+        throw Exception('Forbidden: You do not have permission to access locations');
+      } else if (response.statusCode == 404) {
+        throw Exception('Location endpoint not found');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error: Please try again later');
+      } else {
+        throw Exception('Request failed with status: ${response.statusCode}');
+      }
+    } on http.ClientException catch (e) {
+      throw Exception('Network error: $e');
+    } on FormatException catch (e) {
+      throw Exception('Invalid response format: $e');
+    } catch (e) {
+      throw Exception('Failed to fetch raw additional data: $e');
+    }
+  }
+
   // ============================================================================
   // Helper Methods
   // ============================================================================
@@ -235,6 +274,9 @@ class AllAdditionalDataService {
         'livestockTypes': _parseLivestockTypes(livestockRef['livestockTypes'] ?? data['livestockTypes']),
         'livestockObtainedMethods': _parseLivestockObtainedMethods(livestockRef['livestockObtainedMethods'] ?? data['livestockObtainedMethods']),
         'breeds': _parseBreeds(livestockRef['breeds'] ?? data['breeds']),
+        // Keep raw stages list shape because stage parser/model is not needed here.
+        // Repository consumes this key for local Drift upserts.
+        'stages': (livestockRef['stages'] ?? data['stages']) ?? const [],
         'feedingTypes': _parseFeedingTypes(referenceData['feedingTypes']),
         'administrationRoutes': _parseAdministrationRoutes(referenceData['administrationRoutes']),
         'medicineTypes': _parseMedicineTypes(referenceData['medicineTypes']),
@@ -256,6 +298,41 @@ class AllAdditionalDataService {
     } catch (e) {
       throw Exception('Failed to parse location response: $e');
     }
+  }
+
+  static Map<String, dynamic> _extractRawAdditionalData(dynamic rawData) {
+    final data = rawData is Map ? Map<String, dynamic>.from(rawData) : <String, dynamic>{};
+    final locations = data['locations'] is Map
+        ? Map<String, dynamic>.from(data['locations'] as Map)
+        : <String, dynamic>{};
+    final referenceData = data['referenceData'] is Map
+        ? Map<String, dynamic>.from(data['referenceData'] as Map)
+        : <String, dynamic>{};
+    final livestockRef = data['livestockReferenceData'] is Map
+        ? Map<String, dynamic>.from(data['livestockReferenceData'] as Map)
+        : <String, dynamic>{};
+
+    return {
+      'countries': locations['countries'] ?? const [],
+      'regions': locations['regions'] ?? const [],
+      'districts': locations['districts'] ?? const [],
+      'wards': locations['wards'] ?? const [],
+      'villages': locations['villages'] ?? const [],
+      'streets': locations['streets'] ?? const [],
+      'divisions': locations['divisions'] ?? const [],
+      'identityCardTypes': referenceData['identityCardTypes'] ?? data['identityCardTypes'] ?? const [],
+      'schoolLevels': referenceData['schoolLevels'] ?? data['schoolLevels'] ?? const [],
+      'legalStatuses': referenceData['legalStatuses'] ?? const [],
+      'birthTypes': referenceData['birthTypes'] ?? const [],
+      'birthProblems': referenceData['birthProblems'] ?? const [],
+      'reproductiveProblems': referenceData['reproductiveProblems'] ?? const [],
+      'species': livestockRef['species'] ?? data['species'] ?? const [],
+      'livestockTypes': livestockRef['livestockTypes'] ?? data['livestockTypes'] ?? const [],
+      'livestockObtainedMethods': livestockRef['livestockObtainedMethods'] ?? data['livestockObtainedMethods'] ?? const [],
+      'breeds': livestockRef['breeds'] ?? data['breeds'] ?? const [],
+      'vaccineTypes': livestockRef['vaccineTypes'] ?? data['vaccineTypes'] ?? const [],
+      'stages': livestockRef['stages'] ?? data['stages'] ?? const [],
+    };
   }
 
   /// Parse identity card types from JSON array

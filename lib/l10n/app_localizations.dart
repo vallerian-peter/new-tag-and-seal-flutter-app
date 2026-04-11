@@ -812,6 +812,18 @@ abstract class AppLocalizations {
   /// **'Version: {version}'**
   String settingsVersionLabel(String version);
 
+  /// Version and build section title
+  ///
+  /// In en, this message translates to:
+  /// **'Version & Build'**
+  String get settingsVersionBuildTitle;
+
+  /// Version display subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'App version information'**
+  String get versionSubtitle;
+
   /// No description provided for @settingsAppDescription.
   ///
   /// In en, this message translates to:
@@ -3680,6 +3692,18 @@ abstract class AppLocalizations {
   /// **'Time to treat livestock'**
   String get timeToTreatLivestock;
 
+  /// Notification title for prepuce (sheath) condition follow-up reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Prepuce follow-up'**
+  String get prepuceConditionFollowUpReminder;
+
+  /// Notification body for prepuce condition follow-up reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled follow-up for this animal\'s prepuce (sheath) condition.'**
+  String get prepuceConditionFollowUpReminderBody;
+
   /// No description provided for @weightChange.
   ///
   /// In en, this message translates to:
@@ -4988,17 +5012,35 @@ abstract class AppLocalizations {
   /// **'Calving type is required'**
   String get calvingTypeRequired;
 
+  /// No description provided for @farrowingTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Farrowing type is required'**
+  String get farrowingTypeRequired;
+
   /// No description provided for @ensureCalvingDetailsAccuracy.
   ///
   /// In en, this message translates to:
   /// **'Ensure calving information is accurate before saving.'**
   String get ensureCalvingDetailsAccuracy;
 
+  /// No description provided for @ensureFarrowingDetailsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure farrowing information is accurate before saving.'**
+  String get ensureFarrowingDetailsAccuracy;
+
   /// No description provided for @calvingNotesInfo.
   ///
   /// In en, this message translates to:
   /// **'Add notes about calves, complications, or support provided.'**
   String get calvingNotesInfo;
+
+  /// No description provided for @farrowingNotesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes about piglets, complications, or support provided.'**
+  String get farrowingNotesInfo;
 
   /// No description provided for @confirmUpdateCalving.
   ///
@@ -5047,6 +5089,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try searching with a different term'**
   String get tryDifferentSearchTerm;
+
+  /// No description provided for @registerLivestockHowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register livestock'**
+  String get registerLivestockHowTitle;
+
+  /// No description provided for @registerLivestockSingleOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Single animal'**
+  String get registerLivestockSingleOption;
+
+  /// No description provided for @registerLivestockSingleOptionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Full form with tags and one ID'**
+  String get registerLivestockSingleOptionDesc;
+
+  /// No description provided for @registerPigletLitterOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Piglet litter'**
+  String get registerPigletLitterOption;
+
+  /// No description provided for @registerPigletLitterOptionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Same details for many piglets; IDs like YYYYMMDD-01'**
+  String get registerPigletLitterOptionDesc;
+
+  /// No description provided for @pigletBulkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register piglet litter'**
+  String get pigletBulkTitle;
+
+  /// App bar when finishing a birth log and litter in one flow
+  ///
+  /// In en, this message translates to:
+  /// **'Complete birth & offspring'**
+  String get pigletBulkCompleteBirthFlowTitle;
+
+  /// Info when user arrived from birth event form with litter
+  ///
+  /// In en, this message translates to:
+  /// **'The birth log will be saved together with the offspring when you tap Register all on the preview step. Review and adjust details below, then confirm.'**
+  String get pigletBulkDeferredBirthHint;
+
+  /// No description provided for @pigletBulkStepCommonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared details'**
+  String get pigletBulkStepCommonTitle;
+
+  /// No description provided for @pigletBulkStepCommonSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm, type, litter size, dates, parents'**
+  String get pigletBulkStepCommonSubtitle;
+
+  /// No description provided for @pigletBulkStepPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get pigletBulkStepPreviewTitle;
+
+  /// No description provided for @pigletBulkStepPreviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated IDs and sex per piglet'**
+  String get pigletBulkStepPreviewSubtitle;
+
+  /// No description provided for @pigletBulkNumberOfPiglets.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of piglets'**
+  String get pigletBulkNumberOfPiglets;
+
+  /// No description provided for @pigletBulkInvalidCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number from 1 to {max}.'**
+  String pigletBulkInvalidCount(int max);
+
+  /// No description provided for @pigletBulkNamePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Name prefix'**
+  String get pigletBulkNamePrefix;
+
+  /// No description provided for @pigletBulkNamePrefixHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Piglet (combined with number or nickname)'**
+  String get pigletBulkNamePrefixHint;
+
+  /// No description provided for @pigletBulkPreviewInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Each ID uses the date of birth as YYYYMMDD plus a sequence (01, 02, …). Young stages stay not identified until you add tags later.'**
+  String get pigletBulkPreviewInfo;
+
+  /// No description provided for @pigletBulkNicknameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname (optional)'**
+  String get pigletBulkNicknameOptional;
+
+  /// No description provided for @pigletBulkRegisterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Register all'**
+  String get pigletBulkRegisterAll;
+
+  /// No description provided for @pigletBulkSelectSexEach.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose male or female for every piglet.'**
+  String get pigletBulkSelectSexEach;
+
+  /// No description provided for @pigletBulkQuickSexTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick sex split'**
+  String get pigletBulkQuickSexTitle;
+
+  /// No description provided for @pigletBulkQuickSexSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to {alive}.'**
+  String pigletBulkQuickSexSubtitle(int alive);
+
+  /// No description provided for @pigletBulkQuickSexCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get pigletBulkQuickSexCountLabel;
+
+  /// No description provided for @pigletBulkApplySexSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to list'**
+  String get pigletBulkApplySexSplit;
+
+  /// No description provided for @pigletBulkSexCountMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Female + male + unknown must equal {expected} (all piglet rows). You entered {actual}.'**
+  String pigletBulkSexCountMismatch(int expected, int actual);
+
+  /// No description provided for @pigletBulkQuickSexOrderNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Order: first N rows = female, then male, then unknown across all rows (alive and dead). You can still change any row below.'**
+  String get pigletBulkQuickSexOrderNote;
+
+  /// No description provided for @pigletBulkPreviewSaveAllNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Every row—including dead at birth—is saved as livestock first. Disposals are created only after that, using the saved animal records.'**
+  String get pigletBulkPreviewSaveAllNote;
+
+  /// No description provided for @pigletBulkQuickFillSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick fill'**
+  String get pigletBulkQuickFillSectionTitle;
+
+  /// No description provided for @pigletBulkQuickFillSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.'**
+  String get pigletBulkQuickFillSectionSubtitle;
+
+  /// No description provided for @pigletBulkQuickNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nicknames'**
+  String get pigletBulkQuickNicknameTitle;
+
+  /// No description provided for @pigletBulkQuickNicknameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fills \"Name prefix 1\", \"Name prefix 2\", … using the name prefix from the previous step (same as default display names).'**
+  String get pigletBulkQuickNicknameSubtitle;
+
+  /// No description provided for @pigletBulkApplyNicknamePattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill name sequence'**
+  String get pigletBulkApplyNicknamePattern;
+
+  /// No description provided for @pigletBulkQuickWeightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weights (kg)'**
+  String get pigletBulkQuickWeightTitle;
+
+  /// No description provided for @pigletBulkQuickWeightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.'**
+  String get pigletBulkQuickWeightSubtitle;
+
+  /// No description provided for @pigletBulkWeightAliveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Alive'**
+  String get pigletBulkWeightAliveHint;
+
+  /// No description provided for @pigletBulkWeightDeadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead at birth'**
+  String get pigletBulkWeightDeadHint;
+
+  /// No description provided for @pigletBulkApplyWeights.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply weights to rows'**
+  String get pigletBulkApplyWeights;
+
+  /// No description provided for @pigletBulkWeightPerRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get pigletBulkWeightPerRowLabel;
+
+  /// No description provided for @pigletBulkWeightPerRowHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional; uses step 1 if empty'**
+  String get pigletBulkWeightPerRowHint;
+
+  /// No description provided for @pigletBulkBatchSizeMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected {expected} animals to save but got {actual}. Nothing was partially disposed; try again or contact support.'**
+  String pigletBulkBatchSizeMismatch(int expected, int actual);
+
+  /// No description provided for @pigletBulkQuickFillFooterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Sex split applies to alive rows only, in list order. Names and weights apply to every row unless you skip the action.'**
+  String get pigletBulkQuickFillFooterNote;
+
+  /// No description provided for @pigletBulkIdConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Some generated IDs already exist. Change the birth date or remove existing records, then try again.'**
+  String get pigletBulkIdConflict;
+
+  /// No description provided for @pigletBulkConflictingIds.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken: {ids}'**
+  String pigletBulkConflictingIds(String ids);
+
+  /// No description provided for @pigletBulkConfirmRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Register {count} piglets now? They are saved on this device and will sync when online.'**
+  String pigletBulkConfirmRegister(int count);
+
+  /// No description provided for @pigletBulkSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully registered {count} piglets.'**
+  String pigletBulkSuccess(int count);
+
+  /// No description provided for @pigletBulkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not register the litter. Please try again.'**
+  String get pigletBulkFailed;
+
+  /// No description provided for @pigletDefaultNamePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Piglet'**
+  String get pigletDefaultNamePrefix;
+
+  /// No description provided for @pigletBulkSavingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Registering piglets…'**
+  String get pigletBulkSavingMessage;
+
+  /// No description provided for @pigletBulkCountRangeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'1–{max}'**
+  String pigletBulkCountRangeHint(int max);
+
+  /// No description provided for @pigletBulkBirthEventLitterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.'**
+  String get pigletBulkBirthEventLitterHint;
+
+  /// No description provided for @pigletBulkSaveCheckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save check'**
+  String get pigletBulkSaveCheckTitle;
+
+  /// No description provided for @pigletBulkStatusReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get pigletBulkStatusReady;
+
+  /// No description provided for @pigletBulkStatusRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get pigletBulkStatusRequired;
+
+  /// No description provided for @pigletBulkStatusNotApplicable.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get pigletBulkStatusNotApplicable;
+
+  /// No description provided for @pigletBulkMotherRequiredForBirthFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother must remain selected for this birth flow.'**
+  String get pigletBulkMotherRequiredForBirthFlow;
+
+  /// No description provided for @pigletBulkLitterTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{totalBorn} born'**
+  String pigletBulkLitterTotal(int totalBorn);
+
+  /// No description provided for @pigletBulkLitterTotalDead.
+  ///
+  /// In en, this message translates to:
+  /// **'{totalBorn} born, {deadCount} dead'**
+  String pigletBulkLitterTotalDead(int totalBorn, int deadCount);
+
+  /// No description provided for @pigletBulkPreviewAliveDeadSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{alive} alive at birth · {dead} dead at birth (last IDs in the list).'**
+  String pigletBulkPreviewAliveDeadSummary(int alive, int dead);
+
+  /// No description provided for @pigletBulkDeadAtBirthChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead at birth'**
+  String get pigletBulkDeadAtBirthChip;
+
+  /// No description provided for @pigletBulkDisposalSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal for dead at birth'**
+  String get pigletBulkDisposalSectionTitle;
+
+  /// No description provided for @pigletBulkDisposalSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Required when registering stillborn piglets. A disposal log is created for each.'**
+  String get pigletBulkDisposalSectionSubtitle;
+
+  /// No description provided for @pigletBulkDisposalTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal type'**
+  String get pigletBulkDisposalTypeLabel;
+
+  /// No description provided for @pigletBulkSelectDisposalTypeForDead.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a disposal type for dead-at-birth piglets.'**
+  String get pigletBulkSelectDisposalTypeForDead;
+
+  /// No description provided for @pigletBulkDeadDisposalReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (e.g. stillborn / birth mortality)'**
+  String get pigletBulkDeadDisposalReasonHint;
+
+  /// No description provided for @pigletDeadAtBirthDisposalReasonDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead at birth (litter registration)'**
+  String get pigletDeadAtBirthDisposalReasonDefault;
+
+  /// No description provided for @pigletBulkGenderOptionalDead.
+  ///
+  /// In en, this message translates to:
+  /// **'Sex (optional)'**
+  String get pigletBulkGenderOptionalDead;
+
+  /// No description provided for @pigletBulkSuccessDisposals.
+  ///
+  /// In en, this message translates to:
+  /// **'Also logged {count} disposal records for stillborn piglets.'**
+  String pigletBulkSuccessDisposals(int count);
+
+  /// No description provided for @pigletBulkDisposalPartialFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock was saved but some disposal logs failed. Check records and add disposals manually if needed.'**
+  String get pigletBulkDisposalPartialFailure;
+
+  /// No description provided for @pigletGenderUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get pigletGenderUnknown;
 
   /// No description provided for @timeoutError.
   ///
@@ -5240,6 +5696,12 @@ abstract class AppLocalizations {
   /// **'Please select livestock type'**
   String get pleaseSelectLivestockType;
 
+  /// No description provided for @noStagesForThisType.
+  ///
+  /// In en, this message translates to:
+  /// **'No stages for this type'**
+  String get noStagesForThisType;
+
   /// No description provided for @speciesRequired.
   ///
   /// In en, this message translates to:
@@ -5305,6 +5767,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Father (Optional)'**
   String get fatherOptional;
+
+  /// No description provided for @filterByMother.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother'**
+  String get filterByMother;
+
+  /// No description provided for @filterByFather.
+  ///
+  /// In en, this message translates to:
+  /// **'Father'**
+  String get filterByFather;
+
+  /// No description provided for @parentFilterChildrenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} children'**
+  String parentFilterChildrenCount(int count);
 
   /// No description provided for @obtainedMethod.
   ///
@@ -5653,6 +6133,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save notification'**
   String get saveNotification;
+
+  /// Option to enter value manually
+  ///
+  /// In en, this message translates to:
+  /// **'Manual input'**
+  String get manualInput;
+
+  /// Option to choose value from list
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from list'**
+  String get chooseFromList;
 
   /// No description provided for @notificationChipToday.
   ///
@@ -6518,6 +7010,270 @@ abstract class AppLocalizations {
   /// **'Confirm Payment'**
   String get confirmPayment;
 
+  /// Income and expenditures report title
+  ///
+  /// In en, this message translates to:
+  /// **'Income and Expenditures Report'**
+  String get incomeExpenditureReport;
+
+  /// Generated on label
+  ///
+  /// In en, this message translates to:
+  /// **'Generated on'**
+  String get generatedOn;
+
+  /// Date range label
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get dateRange;
+
+  /// All time label
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get allTime;
+
+  /// No data message in report screen
+  ///
+  /// In en, this message translates to:
+  /// **'No records found for selected period'**
+  String get noRecordsFoundForSelectedPeriod;
+
+  /// Paid status label
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paidStatus;
+
+  /// Pending status label
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pendingStatus;
+
+  /// Role-based access denied message for report screen
+  ///
+  /// In en, this message translates to:
+  /// **'Access denied. Farmer or Farm Manager only.'**
+  String get accessDeniedFarmerOrFarmManagerOnly;
+
+  /// Tooltip/title for report action menu
+  ///
+  /// In en, this message translates to:
+  /// **'Report actions'**
+  String get reportActions;
+
+  /// Print report action
+  ///
+  /// In en, this message translates to:
+  /// **'Print Report'**
+  String get printReport;
+
+  /// Download report action
+  ///
+  /// In en, this message translates to:
+  /// **'Download Report'**
+  String get downloadReport;
+
+  /// Success message when report pdf is downloaded
+  ///
+  /// In en, this message translates to:
+  /// **'Report downloaded'**
+  String get reportDownloaded;
+
+  /// Menu: record a manual finance expense
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get addManualExpense;
+
+  /// Title for manual expense form
+  ///
+  /// In en, this message translates to:
+  /// **'Record expense'**
+  String get manualExpenseTitle;
+
+  /// Subtitle under manual expense header
+  ///
+  /// In en, this message translates to:
+  /// **'Record purchases and costs not tied to bills or transfers'**
+  String get manualExpenseDetailsSubtitle;
+
+  /// Stepper step 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'Expense details'**
+  String get manualExpenseBasicStep;
+
+  /// Stepper step 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Additional details'**
+  String get manualExpenseAdditionalStep;
+
+  /// Stepper step 2 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity, status, and notes'**
+  String get manualExpenseAdditionalStepSubtitle;
+
+  /// After saving manual expense
+  ///
+  /// In en, this message translates to:
+  /// **'Expense saved locally. Sync to update the server.'**
+  String get manualExpenseSavedSuccessfully;
+
+  /// Manual expense save error
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save expense. Please try again.'**
+  String get manualExpenseSaveFailed;
+
+  /// Confirm save manual expense
+  ///
+  /// In en, this message translates to:
+  /// **'Save this expense to your records?'**
+  String get confirmSaveManualExpense;
+
+  /// Label for expense description
+  ///
+  /// In en, this message translates to:
+  /// **'What was purchased'**
+  String get expenseSubject;
+
+  /// Hint for expense description
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Feed, fuel, equipment'**
+  String get expenseSubjectHint;
+
+  /// Validation expense description
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe the expense'**
+  String get expenseSubjectRequired;
+
+  /// Total cost label
+  ///
+  /// In en, this message translates to:
+  /// **'Total amount (TZS)'**
+  String get expenseAmount;
+
+  /// Total cost hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter total cost'**
+  String get expenseAmountHint;
+
+  /// Validation amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount greater than zero'**
+  String get expenseAmountRequired;
+
+  /// Expense date label
+  ///
+  /// In en, this message translates to:
+  /// **'Expense date'**
+  String get expenseDate;
+
+  /// Validation date
+  ///
+  /// In en, this message translates to:
+  /// **'Select a date'**
+  String get expenseDateRequired;
+
+  /// Open date picker
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectExpenseDate;
+
+  /// Quantity label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get expenseQuantity;
+
+  /// Quantity hint
+  ///
+  /// In en, this message translates to:
+  /// **'Units or items (defaults to 1)'**
+  String get expenseQuantityHint;
+
+  /// Notes label
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get expenseNotes;
+
+  /// Notes hint
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details'**
+  String get expenseNotesHint;
+
+  /// Paid vs pending
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get expensePaymentStatus;
+
+  /// Payment status hint
+  ///
+  /// In en, this message translates to:
+  /// **'Select payment status'**
+  String get selectExpensePaymentStatus;
+
+  /// Footer info on manual expense form
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure amounts and dates are correct for your income and expenditure report.'**
+  String get manualExpenseAccuracyNote;
+
+  /// Placeholder when a report/PDF table cell has no value
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get reportTableCellPlaceholder;
+
+  /// Section title with number of income/expenditure rows
+  ///
+  /// In en, this message translates to:
+  /// **'Expense entries ({count})'**
+  String incomeReportExpenseEntriesSectionTitle(int count);
+
+  /// PDF column: bill number or expense reference
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get incomeReportPdfColumnReference;
+
+  /// PDF column: expense date
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get incomeReportPdfColumnDate;
+
+  /// PDF column: expense description
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get incomeReportPdfColumnSubject;
+
+  /// PDF column: quantity
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get incomeReportPdfColumnQuantity;
+
+  /// PDF column: payment status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get incomeReportPdfColumnStatus;
+
   /// About Us page title
   ///
   /// In en, this message translates to:
@@ -6944,6 +7700,24 @@ abstract class AppLocalizations {
   /// **'Last 6 Months'**
   String get last6Months;
 
+  /// Time period filter for previous day
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// Time period filter for current month
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// Time period filter for last 6 years
+  ///
+  /// In en, this message translates to:
+  /// **'Last 6 Years'**
+  String get last6Years;
+
   /// Time period filter for last year
   ///
   /// In en, this message translates to:
@@ -6961,6 +7735,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maximum'**
   String get maximum;
+
+  /// Confirmation dialog question when changing livestock status from lost to active
+  ///
+  /// In en, this message translates to:
+  /// **'Is Livestock Found?'**
+  String get isLivestockFound;
+
+  /// Success message when livestock is found and disposal records are removed
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock status updated to active. Disposal records removed.'**
+  String get livestockStatusUpdatedAndDisposalRemoved;
+
+  /// Title for the confirmation dialog when marking lost livestock as found
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Livestock as Found'**
+  String get markLivestockAsFound;
+
+  /// Description in the confirmation dialog explaining that the livestock was lost
+  ///
+  /// In en, this message translates to:
+  /// **'This livestock was previously marked as lost. If the livestock has been found, you can mark it as active again.'**
+  String get livestockFoundConfirmationDescription;
+
+  /// Label indicating that the livestock was marked as lost
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock was marked as Lost'**
+  String get livestockWasMarkedAsLost;
+
+  /// Description of what will happen when user confirms
+  ///
+  /// In en, this message translates to:
+  /// **'By confirming, the livestock status will be changed to active and the disposal record will be removed.'**
+  String get livestockFoundActionDescription;
+
+  /// Label for date field
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// Copyright text suffix
+  ///
+  /// In en, this message translates to:
+  /// **'All Rights Reserved'**
+  String get copyrightText;
+
+  /// No description provided for @teethClipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Teeth clipping'**
+  String get teethClipping;
+
+  /// No description provided for @tailDocking.
+  ///
+  /// In en, this message translates to:
+  /// **'Tail docking'**
+  String get tailDocking;
+
+  /// No description provided for @ironInjection.
+  ///
+  /// In en, this message translates to:
+  /// **'Iron injection'**
+  String get ironInjection;
+
+  /// No description provided for @livestockMarking.
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock marking'**
+  String get livestockMarking;
+
+  /// No description provided for @stageChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage change'**
+  String get stageChange;
+
+  /// No description provided for @procedureMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get procedureMethod;
+
+  /// No description provided for @dosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get dosage;
+
+  /// No description provided for @markingType.
+  ///
+  /// In en, this message translates to:
+  /// **'Marking type'**
+  String get markingType;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @fromStage.
+  ///
+  /// In en, this message translates to:
+  /// **'From stage'**
+  String get fromStage;
+
+  /// No description provided for @toStage.
+  ///
+  /// In en, this message translates to:
+  /// **'To stage'**
+  String get toStage;
+
+  /// No description provided for @selectFromStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from stage'**
+  String get selectFromStage;
+
+  /// No description provided for @selectToStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select to stage'**
+  String get selectToStage;
+
+  /// No description provided for @selectProcedureMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Select method'**
+  String get selectProcedureMethod;
+
+  /// No description provided for @eventDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Event date is required'**
+  String get eventDateRequired;
+
+  /// No description provided for @husbandryRequiredFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill required fields'**
+  String get husbandryRequiredFields;
+
+  /// No description provided for @husbandryFromToStageMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'From and To stage cannot be the same'**
+  String get husbandryFromToStageMismatch;
+
+  /// No description provided for @eventLogSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved successfully'**
+  String get eventLogSavedSuccessfully;
+
+  /// No description provided for @saleWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale weight (kg)'**
+  String get saleWeight;
+
+  /// No description provided for @salePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale price'**
+  String get salePrice;
+
+  /// No description provided for @buyerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get buyerName;
+
+  /// No description provided for @stage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage'**
+  String get stage;
+
+  /// No description provided for @identificationStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Identification status'**
+  String get identificationStatus;
+
+  /// No description provided for @identified.
+  ///
+  /// In en, this message translates to:
+  /// **'Identified'**
+  String get identified;
+
+  /// No description provided for @notIdentified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not identified'**
+  String get notIdentified;
+
+  /// No description provided for @birthEventOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth event (optional)'**
+  String get birthEventOptional;
+
+  /// Helper text below optional birth event field in Add Livestock form
+  ///
+  /// In en, this message translates to:
+  /// **'Link this animal to a recorded birth event (farrowing/calving). Leave empty for purchased, transferred, donated, or other non-birth registrations.'**
+  String get birthEventOptionalHelper;
+
+  /// Reminder that Add Livestock is not only for newborn animals
+  ///
+  /// In en, this message translates to:
+  /// **'Add Livestock is for all animals: newborn, purchased, transferred, donated, and more.'**
+  String get addLivestockAllTypesReminder;
+
+  /// No description provided for @totalBorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Total born'**
+  String get totalBorn;
+
+  /// No description provided for @aliveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Alive count'**
+  String get aliveCount;
+
+  /// No description provided for @alive.
+  ///
+  /// In en, this message translates to:
+  /// **'Alive'**
+  String get alive;
+
+  /// No description provided for @deadCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead count'**
+  String get deadCount;
+
+  /// No description provided for @dead.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead'**
+  String get dead;
+
+  /// No description provided for @enterTotalBornOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter total born (optional)'**
+  String get enterTotalBornOptional;
+
+  /// No description provided for @enterAliveCountOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter alive count (optional)'**
+  String get enterAliveCountOptional;
+
+  /// No description provided for @enterDeadCountOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter dead count (optional)'**
+  String get enterDeadCountOptional;
+
+  /// No description provided for @valueMustBeZeroOrMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Value must be 0 or more'**
+  String get valueMustBeZeroOrMore;
+
+  /// No description provided for @aliveDeadExceedTotalBorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Alive + dead cannot exceed total born.'**
+  String get aliveDeadExceedTotalBorn;
+
+  /// No description provided for @deadCountDefaultsToZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults to 0 (max = total born)'**
+  String get deadCountDefaultsToZero;
+
+  /// No description provided for @aliveCountDerivedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated as total born minus dead.'**
+  String get aliveCountDerivedNote;
+
+  /// No description provided for @enterTotalBornToPreviewAlive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter total born to preview alive count.'**
+  String get enterTotalBornToPreviewAlive;
+
+  /// No description provided for @deadCountExceedsTotalBorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead count cannot exceed total born.'**
+  String get deadCountExceedsTotalBorn;
+
+  /// Dialog title after saving a farrowing event
+  ///
+  /// In en, this message translates to:
+  /// **'Register Piglets?'**
+  String get farrowingPigletRegisterPromptTitle;
+
+  /// Dialog body after saving farrowing
+  ///
+  /// In en, this message translates to:
+  /// **'The farrowing event has been saved. Would you like to register the piglets from this litter now?'**
+  String get farrowingPigletRegisterPromptMessage;
+
+  /// No description provided for @farrowingPigletRegisterNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Piglets'**
+  String get farrowingPigletRegisterNow;
+
+  /// No description provided for @farrowingPigletRegisterSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for Now'**
+  String get farrowingPigletRegisterSkip;
+
+  /// No description provided for @calvingRegisterPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Calves?'**
+  String get calvingRegisterPromptTitle;
+
+  /// No description provided for @calvingRegisterPromptMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The calving event has been saved. Would you like to register the calves from this birth now?'**
+  String get calvingRegisterPromptMessage;
+
+  /// No description provided for @calvingRegisterNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Calves'**
+  String get calvingRegisterNow;
+
+  /// No description provided for @birthEventRegisterPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Offspring?'**
+  String get birthEventRegisterPromptTitle;
+
+  /// No description provided for @birthEventRegisterPromptMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The birth event has been saved. Would you like to register the offspring from this birth now?'**
+  String get birthEventRegisterPromptMessage;
+
+  /// No description provided for @birthEventRegisterNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Register Offspring'**
+  String get birthEventRegisterNow;
+
+  /// No description provided for @prepuceConditionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepuce (sheath) condition'**
+  String get prepuceConditionTitle;
+
+  /// No description provided for @prepuceConditionTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition type'**
+  String get prepuceConditionTypeLabel;
+
+  /// No description provided for @prepuceConditionSeverityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity'**
+  String get prepuceConditionSeverityLabel;
+
+  /// No description provided for @prepuceConditionClinicalSignsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical signs'**
+  String get prepuceConditionClinicalSignsLabel;
+
+  /// No description provided for @prepuceConditionTreatmentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment given'**
+  String get prepuceConditionTreatmentLabel;
+
+  /// No description provided for @prepuceConditionCauseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cause / risk (optional)'**
+  String get prepuceConditionCauseLabel;
+
+  /// No description provided for @prepuceConditionBreedingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding status'**
+  String get prepuceConditionBreedingLabel;
+
+  /// No description provided for @prepuceConditionReportedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported by'**
+  String get prepuceConditionReportedByLabel;
+
+  /// No description provided for @prepuceConditionAttendedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Attended by (optional)'**
+  String get prepuceConditionAttendedByLabel;
+
+  /// No description provided for @prepuceConditionHealingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Healing status (optional)'**
+  String get prepuceConditionHealingLabel;
+
+  /// No description provided for @prepuceConditionFollowUpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow-up date (optional)'**
+  String get prepuceConditionFollowUpLabel;
+
+  /// No description provided for @prepuceConditionDrugNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Drug name (optional)'**
+  String get prepuceConditionDrugNameLabel;
+
+  /// No description provided for @prepuceConditionRouteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Route (optional)'**
+  String get prepuceConditionRouteLabel;
+
+  /// No description provided for @prepuceConditionDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (optional)'**
+  String get prepuceConditionDurationLabel;
+
+  /// No description provided for @prepuceConditionVetNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet name (optional)'**
+  String get prepuceConditionVetNameLabel;
+
+  /// No description provided for @prepuceConditionVetContactLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet contact (optional)'**
+  String get prepuceConditionVetContactLabel;
+
+  /// No description provided for @prepuceConditionFollowUpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select follow-up date'**
+  String get prepuceConditionFollowUpHint;
+
+  /// No description provided for @prepuceConditionTreatmentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one treatment'**
+  String get prepuceConditionTreatmentRequired;
+
+  /// No description provided for @prepuceConditionSelectCodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Select options above'**
+  String get prepuceConditionSelectCodes;
+
+  /// No description provided for @viewEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'View events'**
+  String get viewEvents;
 }
 
 class _AppLocalizationsDelegate

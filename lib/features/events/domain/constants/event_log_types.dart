@@ -16,6 +16,12 @@ class EventLogTypes {
   static const medication = treatment;
   static const milking = 'milking';
   static const transfer = 'transfer';
+  static const teethClipping = 'teethClipping';
+  static const tailDocking = 'tailDocking';
+  static const ironInjection = 'ironInjection';
+  static const livestockMarking = 'livestockMarking';
+  static const stageChange = 'stageChange';
+  static const prepuceCondition = 'prepuceCondition';
 
   /// Get the birth event type based on species name
   /// Returns 'farrowing' for pigs, 'calving' for others

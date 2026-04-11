@@ -9,6 +9,7 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
@@ -133,6 +134,58 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ); // Close the current bottom sheet
                         _showBulkActionsSheet(context, farm);
                         break;
+                      case _FarmAction.addLivestock:
+                        final authLivestock = Provider.of<AuthProvider>(
+                          context,
+                          listen: false,
+                        );
+                        if (!RoleHelper.checkCanCreateLivestock(
+                          context,
+                          l10n,
+                          authLivestock,
+                        )) {
+                          return;
+                        }
+                        Navigator.pop(context);
+                        Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LivestockFormScreen(
+                              preSelectedFarmUuid: farm['uuid'] as String,
+                            ),
+                          ),
+                        ).then((result) {
+                          if (result == true && onRefresh != null) {
+                            onRefresh!();
+                          }
+                        });
+                        break;
+                      case _FarmAction.addPigletLitter:
+                        final authPiglet = Provider.of<AuthProvider>(
+                          context,
+                          listen: false,
+                        );
+                        if (!RoleHelper.checkCanCreateLivestock(
+                          context,
+                          l10n,
+                          authPiglet,
+                        )) {
+                          return;
+                        }
+                        Navigator.pop(context);
+                        Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PigletBulkRegistrationScreen(
+                              preSelectedFarmUuid: farm['uuid'] as String,
+                            ),
+                          ),
+                        ).then((result) {
+                          if (result == true && onRefresh != null) {
+                            onRefresh!();
+                          }
+                        });
+                        break;
                       case _FarmAction.addVaccine:
                         final authProvider = Provider.of<AuthProvider>(
                           context,
@@ -160,6 +213,26 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                           const Icon(Icons.layers_outlined, size: 18),
                           const SizedBox(width: 12),
                           Text(l10n.bulkActions),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: _FarmAction.addLivestock,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.add_circle_outline, size: 18),
+                          const SizedBox(width: 12),
+                          Text(l10n.addLivestock),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: _FarmAction.addPigletLitter,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.groups_2_outlined, size: 18),
+                          const SizedBox(width: 12),
+                          Text(l10n.registerPigletLitterOption),
                         ],
                       ),
                     ),
@@ -228,65 +301,16 @@ class FarmDetailsBottomSheet extends StatelessWidget {
           // Livestock List Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Text(
-                  '${l10n.allLivestocksText} (${livestock.length})',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${l10n.allLivestocksText} (${livestock.length})',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
                 ),
-
-                const Spacer(),
-
-                TextButton.icon(
-                  onPressed: () async {
-                    final authProvider = Provider.of<AuthProvider>(
-                      context,
-                      listen: false,
-                    );
-                    if (!RoleHelper.checkCanCreateLivestock(
-                      context,
-                      l10n,
-                      authProvider,
-                    )) {
-                      return; // Access denied, toast already shown
-                    }
-
-                    Navigator.pop(context); // Close bottom sheet
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LivestockFormScreen(
-                          preSelectedFarmUuid: farm['uuid'] as String,
-                        ),
-                      ),
-                    );
-
-                    // Refresh dashboard if livestock was successfully registered
-                    if (result == true && onRefresh != null) {
-                      onRefresh!();
-                    }
-                  },
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(
-                    l10n.addLivestock,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Constants.primaryColor,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
 
@@ -720,7 +744,12 @@ class FarmDetailsBottomSheet extends StatelessWidget {
   }
 }
 
-enum _FarmAction { bulkActions, addVaccine }
+enum _FarmAction {
+  bulkActions,
+  addLivestock,
+  addPigletLitter,
+  addVaccine,
+}
 
 class _CopyFarmUuidWidget extends StatefulWidget {
   final String farmUuid;

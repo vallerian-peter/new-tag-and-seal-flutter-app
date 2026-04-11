@@ -12,6 +12,11 @@ class LivestockModel {
   final String dateOfBirth;
   final String? motherUuid;  // Mother livestock UUID reference
   final String? fatherUuid;  // Father livestock UUID reference
+  /// Same litter / birth event as other offspring (analytics grouping).
+  final String? birthEventUuid;
+  /// Production stage FK (species-specific: piglet, calf, etc.).
+  final int? stageId;
+  final bool isIdentified;
   final String gender;
   final int breedId;
   final int speciesId;
@@ -39,6 +44,9 @@ class LivestockModel {
     required this.dateOfBirth,
     this.motherUuid,  // Mother UUID
     this.fatherUuid,  // Father UUID
+    this.birthEventUuid,
+    this.stageId,
+    this.isIdentified = true,
     required this.gender,
     required this.breedId,
     required this.speciesId,
@@ -68,6 +76,9 @@ class LivestockModel {
     String? dateOfBirth,
     String? motherUuid,  // Mother UUID
     String? fatherUuid,  // Father UUID
+    String? birthEventUuid,
+    int? stageId,
+    bool? isIdentified,
     String? gender,
     int? breedId,
     int? speciesId,
@@ -95,6 +106,9 @@ class LivestockModel {
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       motherUuid: motherUuid ?? this.motherUuid,
       fatherUuid: fatherUuid ?? this.fatherUuid,
+      birthEventUuid: birthEventUuid ?? this.birthEventUuid,
+      stageId: stageId ?? this.stageId,
+      isIdentified: isIdentified ?? this.isIdentified,
       gender: gender ?? this.gender,
       breedId: breedId ?? this.breedId,
       speciesId: speciesId ?? this.speciesId,
@@ -130,6 +144,9 @@ class LivestockModel {
       'dateOfBirth': dateOfBirth,
       'motherUuid': motherUuid,
       'fatherUuid': fatherUuid,
+      'birthEventUuid': birthEventUuid,
+      'stageId': stageId,
+      'isIdentified': isIdentified,
       'gender': gender,
       'breedId': breedId,
       'speciesId': speciesId,
@@ -161,6 +178,9 @@ class LivestockModel {
       'dateOfBirth': dateOfBirth,
       'motherUuid': motherUuid,
       'fatherUuid': fatherUuid,
+      'birthEventUuid': birthEventUuid,
+      'stageId': stageId,
+      'isIdentified': isIdentified,
       'gender': gender,
       'breedId': breedId,
       'speciesId': speciesId,
@@ -189,15 +209,19 @@ class LivestockModel {
       id: json['id'] as int,
       farmUuid: json['farmUuid'] as String,  // Farm UUID
       uuid: json['uuid'] as String,
-      identificationNumber: json['identificationNumber'] as String,
-      dummyTagId: json['dummyTagId'] as String,
-      barcodeTagId: json['barcodeTagId'] as String,
-      rfidTagId: json['rfidTagId'] as String,
+      identificationNumber:
+          (json['identificationNumber'] as String?)?.trim() ?? '',
+      dummyTagId: json['dummyTagId'] as String? ?? '',
+      barcodeTagId: json['barcodeTagId'] as String? ?? '',
+      rfidTagId: json['rfidTagId'] as String? ?? '',
       livestockTypeId: json['livestockTypeId'] as int,
       name: json['name'] as String,
       dateOfBirth: json['dateOfBirth'] as String,
       motherUuid: json['motherUuid'] as String?,  // Mother UUID
       fatherUuid: json['fatherUuid'] as String?,  // Father UUID
+      birthEventUuid: json['birthEventUuid'] as String?,
+      stageId: json['stageId'] as int?,
+      isIdentified: json['isIdentified'] as bool? ?? true,
       gender: json['gender'] as String,
       breedId: json['breedId'] as int,
       speciesId: json['speciesId'] as int,

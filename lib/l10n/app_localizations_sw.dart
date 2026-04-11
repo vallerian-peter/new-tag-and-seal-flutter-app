@@ -31,48 +31,48 @@ class AppLocalizationsSw extends AppLocalizations {
   String get skip => 'Ruka';
 
   @override
-  String get sync => 'Sawazisha';
+  String get sync => 'Landanisha';
 
   @override
-  String get syncData => 'Sawazisha Data';
+  String get syncData => 'Landanisha Taarifa';
 
   @override
-  String get syncing => 'Inasawazisha...';
+  String get syncing => 'Inalandanisha...';
 
   @override
-  String get syncTitle => 'Inasawazisha Data';
+  String get syncTitle => 'Inalandanisha Taarifa';
 
   @override
-  String get syncStarting => 'Inaanza kusawazisha...';
+  String get syncStarting => 'Inaanza kulandanisha...';
 
   @override
-  String get syncAdditionalData => 'Inasawazisha data za ziada...';
+  String get syncAdditionalData => 'Inalandanisha data za ziada...';
 
   @override
-  String get syncLivestockReference => 'Inasawazisha data za mifugo...';
+  String get syncLivestockReference => 'Inalandanisha data za mifugo...';
 
   @override
-  String get syncLivestockData => 'Inasawazisha data za mifugo...';
+  String get syncLivestockData => 'Inalandanisha data za mifugo...';
 
   @override
-  String get syncFarmData => 'Inasawazisha data za shamba...';
+  String get syncFarmData => 'Inalandanisha data za shamba...';
 
   @override
-  String get syncCompleted => 'Kusawazisha kumekamilika!';
+  String get syncCompleted => 'Kulandanisha kumekamilika!';
 
   @override
-  String get syncSuccessful => 'Kusawazisha Kumefanikiwa';
+  String get syncSuccessful => 'Kulandanisha Kumefanikiwa';
 
   @override
   String get syncSuccessfulMessage =>
-      'Data zote zimesawazishwa kwa mafanikio. Programu yako ni ya kisasa.';
+      'Taarifa zote zimelandanishwa kwa mafanikio. Programu yako ni ya kisasa.';
 
   @override
-  String get syncFailed => 'Usawazishaji umeshindwa';
+  String get syncFailed => 'Ulandanishaji umeshindwa';
 
   @override
   String get syncFailedMessage =>
-      'Imeshindwa kusawazisha data. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.';
+      'Imeshindwa kulandanisha data. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.';
 
   @override
   String get retry => 'Jaribu tena';
@@ -187,7 +187,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get allText => 'Yote';
 
   @override
-  String get userDataAvailable => 'Data za mtumiaji zipo';
+  String get userDataAvailable => 'Taarifa za mtumiaji zipo';
 
   @override
   String get foundText => 'Imepatikana';
@@ -345,7 +345,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get readyOffline => 'Tayari bila mtandao';
 
   @override
-  String get unsyncedData => 'Data zisizosawazishwa';
+  String get unsyncedData => 'Taarifa zisizolandanishwa';
 
   @override
   String get settingsAppHeaderTitle => 'Mipangilio ya Programu';
@@ -391,6 +391,12 @@ class AppLocalizationsSw extends AppLocalizations {
   String settingsVersionLabel(String version) {
     return 'Toleo: $version';
   }
+
+  @override
+  String get settingsVersionBuildTitle => 'Toleo na Ujenzi';
+
+  @override
+  String get versionSubtitle => 'Taarifa za toleo la programu';
 
   @override
   String get settingsAppDescription =>
@@ -452,7 +458,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get dashboardSyncPrompt =>
-      'Gonga kitufe cha kusawazisha ili kupakua mashamba, mifugo na kumbukumbu mpya kabla ya kuanza kazi.';
+      'Gonga kitufe cha kulandanisha ili kupakua mashamba, mifugo na kumbukumbu mpya kabla ya kuanza kazi.';
 
   @override
   String get bulk => 'Kwa wingi';
@@ -557,7 +563,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get helpSupport => 'Msaada na Usaidizi';
 
   @override
-  String get farmDataNotFound => 'Data za Shamba Hazipo';
+  String get farmDataNotFound => 'Taarifa za Shamba Hazipo';
 
   @override
   String get fullNameText => 'Jina Kamili';
@@ -619,7 +625,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get offlineCapabilityDesc =>
-      'Fanya kazi bila mtandao na sawazisha data yako kiotomatiki wakati mtandao unapatikana';
+      'Fanya kazi bila mtandao na landanisha data yako kiotomatiki wakati mtandao unapatikana';
 
   @override
   String get registerFarm => 'Sajili Shamba Lako';
@@ -640,11 +646,11 @@ class AppLocalizationsSw extends AppLocalizations {
       'Rekodi matukio ya afya, uzalishaji, kulisha, na shughuli zingine';
 
   @override
-  String get syncAnalyze => 'Sawazisha na Chambua';
+  String get syncAnalyze => 'Landanisha na Chambua';
 
   @override
   String get syncAnalyzeDesc =>
-      'Sawazisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
+      'Landanisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
 
   @override
   String get gotIt => 'Nimeelewa!';
@@ -727,10 +733,10 @@ class AppLocalizationsSw extends AppLocalizations {
   String get inviteUsers => 'Karibisha Watumiaji na Maofisa';
 
   @override
-  String get loadingData => 'Inapakia data...';
+  String get loadingData => 'Inapakia taarifa...';
 
   @override
-  String get syncingData => 'Tafadhali subiri, inasawazisha data...';
+  String get syncingData => 'Tafadhali subiri, inalandanisha data...';
 
   @override
   String get success => 'Mafanikio';
@@ -748,16 +754,16 @@ class AppLocalizationsSw extends AppLocalizations {
   String get loading => 'Inapakia...';
 
   @override
-  String get noData => 'Hakuna data';
+  String get noData => 'Hakuna taarifa';
 
   @override
   String get tryAgain => 'Jaribu Tena';
 
   @override
-  String get syncSuccess => 'Usawazishaji umefanikiwa';
+  String get syncSuccess => 'Ulandanishaji umefanikiwa';
 
   @override
-  String get lastSync => 'Usawazishaji wa mwisho';
+  String get lastSync => 'Ulandanishaji wa mwisho';
 
   @override
   String get squareKilometers => 'Kilomita za Mraba';
@@ -1301,7 +1307,7 @@ class AppLocalizationsSw extends AppLocalizations {
       'Muunganisho ulipotea wakati wa uendeshaji. Tafadhali jaribu tena.';
 
   @override
-  String get fetchingData => 'Inapakua Data';
+  String get fetchingData => 'Inapakua Taarifa';
 
   @override
   String get loadingLocations => 'Inapakia Maeneo...';
@@ -1894,6 +1900,13 @@ class AppLocalizationsSw extends AppLocalizations {
   String get timeToTreatLivestock => 'Ni wakati wa kutibu mifugo';
 
   @override
+  String get prepuceConditionFollowUpReminder => 'Ufuatiliaji wa prepusi';
+
+  @override
+  String get prepuceConditionFollowUpReminderBody =>
+      'Ufuatiliaji uliopangwa kwa hali ya prepusi (sheath) ya mnyama huyu.';
+
+  @override
   String get weightChange => 'Mabadiliko ya Uzito';
 
   @override
@@ -2031,7 +2044,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get diseaseOptionsMissing =>
-      'Hakuna magonjwa. Sawazisha data ya marejeo kwanza.';
+      'Hakuna magonjwa. Landanisha data ya marejeo kwanza.';
 
   @override
   String get diseaseId => 'Ugonjwa';
@@ -2154,7 +2167,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get vaccineOptionsMissing =>
-      'Hakuna chanjo. Sawazisha data ya chanjo kwanza.';
+      'Hakuna chanjo. Landanisha data ya chanjo kwanza.';
 
   @override
   String get vaccineRequired => 'Chanjo inahitajika';
@@ -2180,7 +2193,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get disposalTypeOptionsMissing =>
-      'Aina za uondoaji hazipatikani. Sawazisha data rejea.';
+      'Aina za uondoaji hazipatikani. Landanisha data rejea.';
 
   @override
   String get disposalTypeId => 'Aina ya uondoaji';
@@ -2599,12 +2612,23 @@ class AppLocalizationsSw extends AppLocalizations {
   String get calvingTypeRequired => 'Aina ya kuzaa inahitajika';
 
   @override
+  String get farrowingTypeRequired => 'Aina ya kuzalisha nguruwe inahitajika';
+
+  @override
   String get ensureCalvingDetailsAccuracy =>
       'Hakikisha taarifa za kuzaa ni sahihi kabla ya kuhifadhi.';
 
   @override
+  String get ensureFarrowingDetailsAccuracy =>
+      'Hakikisha taarifa za kuzalisha nguruwe ni sahihi kabla ya kuhifadhi.';
+
+  @override
   String get calvingNotesInfo =>
       'Ongeza maelezo kuhusu ndama, usaidizi au matatizo yaliyotokea.';
+
+  @override
+  String get farrowingNotesInfo =>
+      'Ongeza maelezo kuhusu nguruwe wadogo, matatizo, au msaada uliotolewa.';
 
   @override
   String get confirmUpdateCalving => 'Sasisha rekodi ya kuzaa?';
@@ -2630,6 +2654,258 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get tryDifferentSearchTerm => 'Jaribu kutafuta kwa neno tofauti';
+
+  @override
+  String get registerLivestockHowTitle => 'Sajili mifugo';
+
+  @override
+  String get registerLivestockSingleOption => 'Mnyama mmoja';
+
+  @override
+  String get registerLivestockSingleOptionDesc =>
+      'Fomu kamili na lebo na kitambulisho kimoja';
+
+  @override
+  String get registerPigletLitterOption => 'Vizazi vya nguruwe wadogo';
+
+  @override
+  String get registerPigletLitterOptionDesc =>
+      'Maelezo sawa kwa wengi; vitambulisho kama TAREHE-01';
+
+  @override
+  String get pigletBulkTitle => 'Sajili vizazi vya nguruwe wadogo';
+
+  @override
+  String get pigletBulkCompleteBirthFlowTitle => 'Maliza kuzaa na watoto';
+
+  @override
+  String get pigletBulkDeferredBirthHint =>
+      'Rekodi ya kuzaa itahifadhiwa pamoja na watoto wa mifugo unaposajili wote baada ya hatua ya hakiki. Hakiki na urekebishe maelezo hapa chini, kisha thibitisha.';
+
+  @override
+  String get pigletBulkStepCommonTitle => 'Maelezo ya pamoja';
+
+  @override
+  String get pigletBulkStepCommonSubtitle =>
+      'Shamba, aina, idadi, tarehe, wazazi';
+
+  @override
+  String get pigletBulkStepPreviewTitle => 'Hakiki';
+
+  @override
+  String get pigletBulkStepPreviewSubtitle =>
+      'Vitambulisho na jinsia kwa kila nguruwe';
+
+  @override
+  String get pigletBulkNumberOfPiglets => 'Idadi ya nguruwe wadogo';
+
+  @override
+  String pigletBulkInvalidCount(int max) {
+    return 'Ingiza nambari kamili kati ya 1 hadi $max.';
+  }
+
+  @override
+  String get pigletBulkNamePrefix => 'Kiambishi cha jina';
+
+  @override
+  String get pigletBulkNamePrefixHint =>
+      'Mfano: Nguruwe (pamoja na nambari au jina)';
+
+  @override
+  String get pigletBulkPreviewInfo =>
+      'Kitambulisho kinatumia tarehe ya kuzaliwa (YYYYMMDD) na mfululizo (01, 02, …). Hatua za utoto hubaki bila kutambuliwa hadi uongeze lebo baadaye.';
+
+  @override
+  String get pigletBulkNicknameOptional => 'Jina la ziada (si lazima)';
+
+  @override
+  String get pigletBulkRegisterAll => 'Sajili wote';
+
+  @override
+  String get pigletBulkSelectSexEach => 'Chagua jinsia kwa kila nguruwe.';
+
+  @override
+  String get pigletBulkQuickSexTitle => 'Mgawanyo wa haraka wa jinsia';
+
+  @override
+  String pigletBulkQuickSexSubtitle(int alive) {
+    return 'Weka idadi ya nguruwe wa kike, kiume, au wasiojulikana kwa lita nzima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe $alive.';
+  }
+
+  @override
+  String get pigletBulkQuickSexCountLabel => 'Idadi';
+
+  @override
+  String get pigletBulkApplySexSplit => 'Tumia kwenye orodha';
+
+  @override
+  String pigletBulkSexCountMismatch(int expected, int actual) {
+    return 'Kike + kiume + wasiojulikana lazima iwe $expected (safu zote za nguruwe). Umeingiza $actual.';
+  }
+
+  @override
+  String get pigletBulkQuickSexOrderNote =>
+      'Mpangilio: safu za mwanzo = kike, kisha kiume, kisha wasiojulikana kwa safu zote (hai na waliokufa). Unaweza kubadilisha kila safu hapa chini.';
+
+  @override
+  String get pigletBulkPreviewSaveAllNote =>
+      'Kila safu—ikiwemo aliyekufa kuzaliwa—inahifadhiwa kama mnyama kwanza. Utupaji unafuatia na hutumia rekodi hizo zilizohifadhiwa.';
+
+  @override
+  String get pigletBulkQuickFillSectionTitle => 'Jaza haraka';
+
+  @override
+  String get pigletBulkQuickFillSectionSubtitle =>
+      'Weka kwa wingi maeneo yanayotofautiana kwa kila nguruwe. Haiyabadilishi idadi ya fahali. Unaweza kuhariri kila safu hapa chini.';
+
+  @override
+  String get pigletBulkQuickNicknameTitle => 'Majina';
+
+  @override
+  String get pigletBulkQuickNicknameSubtitle =>
+      'Inajaza \"Kiambishi cha jina 1\", \"2\", … kutoka hatua iliyopita (sawa na majina chaguomsingi).';
+
+  @override
+  String get pigletBulkApplyNicknamePattern => 'Jaza mfululizo wa majina';
+
+  @override
+  String get pigletBulkQuickWeightTitle => 'Uzito (kg)';
+
+  @override
+  String get pigletBulkQuickWeightSubtitle =>
+      'Weka uzito mmoja kwa nguruwe hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.';
+
+  @override
+  String get pigletBulkWeightAliveHint => 'Hai';
+
+  @override
+  String get pigletBulkWeightDeadHint => 'Aliyekufa kuzaliwa';
+
+  @override
+  String get pigletBulkApplyWeights => 'Weka uzito kwenye safu';
+
+  @override
+  String get pigletBulkWeightPerRowLabel => 'Uzito (kg)';
+
+  @override
+  String get pigletBulkWeightPerRowHint => 'Si lazima; hatua ya 1 kama tupu';
+
+  @override
+  String pigletBulkBatchSizeMismatch(int expected, int actual) {
+    return 'Kulitarajiwa $expected wanyama kuhifadhiwa lakini kumepatikana $actual. Hakuna utupaji wa kati; jaribu tena.';
+  }
+
+  @override
+  String get pigletBulkQuickFillFooterNote =>
+      'Mgawanyo wa jinsia ni kwa nguruwe hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.';
+
+  @override
+  String get pigletBulkIdConflict =>
+      'Baadhi ya vitambulisho tayari vipo. Badilisha tarehe ya kuzaliwa au futa rekodi, kisha jaribu tena.';
+
+  @override
+  String pigletBulkConflictingIds(String ids) {
+    return 'Zilizochukuliwa: $ids';
+  }
+
+  @override
+  String pigletBulkConfirmRegister(int count) {
+    return 'Sajili nguruwe $count sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.';
+  }
+
+  @override
+  String pigletBulkSuccess(int count) {
+    return 'Nguruwe $count wamesajiliwa kwa mafanikio.';
+  }
+
+  @override
+  String get pigletBulkFailed => 'Imeshindwa kusajili vizazi. Jaribu tena.';
+
+  @override
+  String get pigletDefaultNamePrefix => 'Nguruwe';
+
+  @override
+  String get pigletBulkSavingMessage => 'Inasajili nguruwe wadogo…';
+
+  @override
+  String pigletBulkCountRangeHint(int max) {
+    return '1–$max';
+  }
+
+  @override
+  String get pigletBulkBirthEventLitterHint =>
+      'Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza idadi na kuashiria nguruwe waliofariki hatua inayofuata.';
+
+  @override
+  String get pigletBulkSaveCheckTitle => 'Ukaguzi kabla ya kuhifadhi';
+
+  @override
+  String get pigletBulkStatusReady => 'Tayari';
+
+  @override
+  String get pigletBulkStatusRequired => 'Inahitajika';
+
+  @override
+  String get pigletBulkStatusNotApplicable => 'Haitumiki';
+
+  @override
+  String get pigletBulkMotherRequiredForBirthFlow =>
+      'Mama lazima abaki amechaguliwa kwa mtiririko huu wa kuzaa.';
+
+  @override
+  String pigletBulkLitterTotal(int totalBorn) {
+    return '$totalBorn waliozaliwa';
+  }
+
+  @override
+  String pigletBulkLitterTotalDead(int totalBorn, int deadCount) {
+    return '$totalBorn waliozaliwa, $deadCount waliokufa';
+  }
+
+  @override
+  String pigletBulkPreviewAliveDeadSummary(int alive, int dead) {
+    return '$alive hai kuzaliwa · $dead waliokufa (vitambulisho vya mwisho kwenye orodha).';
+  }
+
+  @override
+  String get pigletBulkDeadAtBirthChip => 'Aliyekufa kuzaliwa';
+
+  @override
+  String get pigletBulkDisposalSectionTitle => 'Utupaji kwa aliyekufa kuzaliwa';
+
+  @override
+  String get pigletBulkDisposalSectionSubtitle =>
+      'Inahitajika unaposajili nguruwe aliyekufa kuzaliwa. Rekodi ya utupaji itatengenezwa kwa kila mmoja.';
+
+  @override
+  String get pigletBulkDisposalTypeLabel => 'Aina ya utupaji';
+
+  @override
+  String get pigletBulkSelectDisposalTypeForDead =>
+      'Chagua aina ya utupaji kwa nguruwe aliyekufa kuzaliwa.';
+
+  @override
+  String get pigletBulkDeadDisposalReasonHint =>
+      'Sababu (mf. kufia tumboni / vifo vya kuzaliwa)';
+
+  @override
+  String get pigletDeadAtBirthDisposalReasonDefault =>
+      'Aliyekufa kuzaliwa (usajili wa fahali)';
+
+  @override
+  String get pigletBulkGenderOptionalDead => 'Jinsia (si lazima)';
+
+  @override
+  String pigletBulkSuccessDisposals(int count) {
+    return 'Pia kumbukumbu $count za utupaji zimeandikwa kwa aliyekufa kuzaliwa.';
+  }
+
+  @override
+  String get pigletBulkDisposalPartialFailure =>
+      'Mifugo imehifadhiwa lakini baadhi ya rekodi za utupaji zimeshindwa. Angalia na ongeza utupaji mwenyewe ikiwa inahitajika.';
+
+  @override
+  String get pigletGenderUnknown => 'Haijulikani';
 
   @override
   String get timeoutError => 'Hitilafu ya Muda';
@@ -2738,6 +3014,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get pleaseSelectLivestockType => 'Tafadhali chagua aina ya mifugo';
 
   @override
+  String get noStagesForThisType => 'Hakuna awamu za aina hii';
+
+  @override
   String get speciesRequired => 'Spishi inahitajika';
 
   @override
@@ -2770,6 +3049,17 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get fatherOptional => 'Baba (Si Lazima)';
+
+  @override
+  String get filterByMother => 'Mama';
+
+  @override
+  String get filterByFather => 'Baba';
+
+  @override
+  String parentFilterChildrenCount(int count) {
+    return 'Watoto $count';
+  }
 
   @override
   String get obtainedMethod => 'Njia ya Kupata';
@@ -2895,17 +3185,17 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get unsyncedDataWarning =>
-      'Una data ambayo haijasawazishwa. Hakikisha unasawazisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.';
+      'Una data ambayo haijalandanishwa. Hakikisha unalandanisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.';
 
   @override
   String get noUnsyncedDataMessage =>
-      'Hakuna data iliyosalia kusawazishwa. Unaweza kutoka salama.';
+      'Hakuna data iliyosalia kulandanisha. Unaweza kutoka salama.';
 
   @override
-  String get syncAndLogout => 'Sawazisha na utoke';
+  String get syncAndLogout => 'Landanisha na utoke';
 
   @override
-  String get syncingBeforeLogout => 'Kusawazisha data kabla ya kutoka...';
+  String get syncingBeforeLogout => 'Kulandanisha data kabla ya kutoka...';
 
   @override
   String get changeFarm => 'Badili Shamba';
@@ -2951,6 +3241,12 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get saveNotification => 'Hifadhi taarifa';
+
+  @override
+  String get manualInput => 'Ingiza kwa mkono';
+
+  @override
+  String get chooseFromList => 'Chagua kutoka kwenye orodha';
 
   @override
   String get notificationChipToday => 'Leo';
@@ -3130,7 +3426,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get vaccineTypesMissing =>
-      'Hakuna aina za chanjo. Sawazisha data ya marejeo kwanza.';
+      'Hakuna aina za chanjo. Landanisha data ya marejeo kwanza.';
 
   @override
   String get vaccineTypeRequired => 'Aina ya chanjo inahitajika';
@@ -3291,15 +3587,15 @@ class AppLocalizationsSw extends AppLocalizations {
       'Mifugo hii haipo hai. Nakala haziwezi kuongezwa kwa mifugo iliyotolewa.';
 
   @override
-  String get syncRequired => 'Sinkronisha Inahitajika';
+  String get syncRequired => 'Kulandanisha Kunahitajika';
 
   @override
   String syncRequiredMessage(int count) {
-    return 'Una vitu $count visivyosinkronishwa. Tafadhali sinkronisha data yako ili kuhakikisha taarifa zote ni za kisasa.';
+    return 'Una vitu $count visivyolandanishwa. Tafadhali landanisha data yako ili kuhakikisha taarifa zote ni za kisasa.';
   }
 
   @override
-  String get syncNow => 'Sinkronisha Sasa';
+  String get syncNow => 'Landanisha Sasa';
 
   @override
   String get enterAsExtensionOfficer => 'Ingia kama Bwana Shamba?';
@@ -3429,6 +3725,146 @@ class AppLocalizationsSw extends AppLocalizations {
   String get confirmPayment => 'Thibitisha Malipo';
 
   @override
+  String get incomeExpenditureReport => 'Ripoti ya Mapato na Matumizi';
+
+  @override
+  String get generatedOn => 'Imetengenezwa tarehe';
+
+  @override
+  String get dateRange => 'Kipindi cha tarehe';
+
+  @override
+  String get allTime => 'Muda wote';
+
+  @override
+  String get noRecordsFoundForSelectedPeriod =>
+      'Hakuna rekodi kwa kipindi kilichochaguliwa';
+
+  @override
+  String get paidStatus => 'Imelipwa';
+
+  @override
+  String get pendingStatus => 'Inasubiri';
+
+  @override
+  String get accessDeniedFarmerOrFarmManagerOnly =>
+      'Hairuhusiwi. Mkulima au Meneja wa Shamba pekee.';
+
+  @override
+  String get reportActions => 'Vitendo vya ripoti';
+
+  @override
+  String get printReport => 'Chapisha Ripoti';
+
+  @override
+  String get downloadReport => 'Pakua Ripoti';
+
+  @override
+  String get reportDownloaded => 'Ripoti imepakuliwa';
+
+  @override
+  String get addManualExpense => 'Ongeza matumizi';
+
+  @override
+  String get manualExpenseTitle => 'Rekodi matumizi';
+
+  @override
+  String get manualExpenseDetailsSubtitle =>
+      'Rekodi manunuzi na gharama zisizohusiana na bili au uhamisho';
+
+  @override
+  String get manualExpenseBasicStep => 'Maelezo ya matumizi';
+
+  @override
+  String get manualExpenseAdditionalStep => 'Maelezo ya ziada';
+
+  @override
+  String get manualExpenseAdditionalStepSubtitle => 'Idadi, hali, na maelezo';
+
+  @override
+  String get manualExpenseSavedSuccessfully =>
+      'Matumizi yamehifadhiwa kwenye kifaa. Sawazisha ili kusasisha seva.';
+
+  @override
+  String get manualExpenseSaveFailed =>
+      'Imeshindwa kuhifadhi matumizi. Jaribu tena.';
+
+  @override
+  String get confirmSaveManualExpense => 'Ungependa kuhifadhi matumizi haya?';
+
+  @override
+  String get expenseSubject => 'Kilichonunuliwa';
+
+  @override
+  String get expenseSubjectHint => 'Mf. chakula, mafuta, vifaa';
+
+  @override
+  String get expenseSubjectRequired => 'Tafadhali eleza matumizi';
+
+  @override
+  String get expenseAmount => 'Jumla (TZS)';
+
+  @override
+  String get expenseAmountHint => 'Ingiza jumla ya gharama';
+
+  @override
+  String get expenseAmountRequired => 'Ingiza kiasi halali zaidi ya sifuri';
+
+  @override
+  String get expenseDate => 'Tarehe ya matumizi';
+
+  @override
+  String get expenseDateRequired => 'Chagua tarehe';
+
+  @override
+  String get selectExpenseDate => 'Chagua tarehe';
+
+  @override
+  String get expenseQuantity => 'Idadi';
+
+  @override
+  String get expenseQuantityHint => 'Vipimo au vitu (chaguo-msingi 1)';
+
+  @override
+  String get expenseNotes => 'Maelezo';
+
+  @override
+  String get expenseNotesHint => 'Maelezo ya hiari';
+
+  @override
+  String get expensePaymentStatus => 'Hali ya malipo';
+
+  @override
+  String get selectExpensePaymentStatus => 'Chagua hali ya malipo';
+
+  @override
+  String get manualExpenseAccuracyNote =>
+      'Hakikisha kiasi na tarehe ni sahihi kwa ripoti ya mapato na matumizi.';
+
+  @override
+  String get reportTableCellPlaceholder => '—';
+
+  @override
+  String incomeReportExpenseEntriesSectionTitle(int count) {
+    return 'Matumizi ($count)';
+  }
+
+  @override
+  String get incomeReportPdfColumnReference => 'Rejea';
+
+  @override
+  String get incomeReportPdfColumnDate => 'Tarehe';
+
+  @override
+  String get incomeReportPdfColumnSubject => 'Kichwa';
+
+  @override
+  String get incomeReportPdfColumnQuantity => 'Idadi';
+
+  @override
+  String get incomeReportPdfColumnStatus => 'Hali';
+
+  @override
   String get aboutUs => 'Kuhusu Sisi';
 
   @override
@@ -3533,14 +3969,14 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get faq3Answer =>
-      'Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinasawazishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kusawazisha ili kusawazisha data kwa mikono.';
+      'Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinalandanishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kulandanisha ili kulandanisha data kwa mikono.';
 
   @override
-  String get faq4 => 'Ninawezaje kusawazisha data zangu?';
+  String get faq4 => 'Ninawezaje kulandanisha data zangu?';
 
   @override
   String get faq4Answer =>
-      'Bonyeza kitufe cha kusawazisha (ikoni ya kusasisha) kwenye Dashibodi. Programu itapakia mabadiliko ya ndani na kupakua sasisho kutoka kwa seva.';
+      'Bonyeza kitufe cha kulandanisha (ikoni ya kusasisha) kwenye Dashibodi. Programu itapakia mabadiliko ya ndani na kupakua sasisho kutoka kwa seva.';
 
   @override
   String get needMoreHelp => 'Unahitaji Msaada Zaidi?';
@@ -3667,6 +4103,15 @@ class AppLocalizationsSw extends AppLocalizations {
   String get last6Months => 'Miezi 6 Iliyopita';
 
   @override
+  String get yesterday => 'Jana';
+
+  @override
+  String get thisMonth => 'Mwezi Huu';
+
+  @override
+  String get last6Years => 'Miaka 6 Iliyopita';
+
+  @override
   String get lastYear => 'Mwaka Huu';
 
   @override
@@ -3674,4 +4119,261 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get maximum => 'Kiwango cha Juu';
+
+  @override
+  String get isLivestockFound => 'Je, Mifugo Imepatikana?';
+
+  @override
+  String get livestockStatusUpdatedAndDisposalRemoved =>
+      'Hali ya mifugo imesasishwa kuwa hai. Rekodi za uondoaji zimeondolewa.';
+
+  @override
+  String get markLivestockAsFound => 'Weka Mifugo Kama Imepatikana';
+
+  @override
+  String get livestockFoundConfirmationDescription =>
+      'Mifugo hii ilikuwa imewekwa kama iliyopotea. Ikiwa mifugo imepatikana, unaweza kuiweka kama hai tena.';
+
+  @override
+  String get livestockWasMarkedAsLost => 'Mifugo iliwekwa kama Imepotea';
+
+  @override
+  String get livestockFoundActionDescription =>
+      'Kwa kuthibitisha, hali ya mifugo itabadilishwa kuwa hai na rekodi ya uondoaji itaondolewa.';
+
+  @override
+  String get date => 'Tarehe';
+
+  @override
+  String get copyrightText => 'Haki Zote Zimehifadhiwa';
+
+  @override
+  String get teethClipping => 'Kukata meno';
+
+  @override
+  String get tailDocking => 'Kukata mkia';
+
+  @override
+  String get ironInjection => 'Sindano ya chuma';
+
+  @override
+  String get livestockMarking => 'Alama ya mifugo';
+
+  @override
+  String get stageChange => 'Mabadiliko ya awamu';
+
+  @override
+  String get procedureMethod => 'Njia';
+
+  @override
+  String get dosage => 'Kipimo dawa';
+
+  @override
+  String get markingType => 'Aina ya alama';
+
+  @override
+  String get description => 'Maelezo';
+
+  @override
+  String get fromStage => 'Kutoka awamu';
+
+  @override
+  String get toStage => 'Hadi awamu';
+
+  @override
+  String get selectFromStage => 'Chagua awamu ya mwanzo';
+
+  @override
+  String get selectToStage => 'Chagua awamu ya mwisho';
+
+  @override
+  String get selectProcedureMethod => 'Chagua njia';
+
+  @override
+  String get eventDateRequired => 'Tarehe ya tukio inahitajika';
+
+  @override
+  String get husbandryRequiredFields => 'Tafadhali jaza sehemu zinazohitajika';
+
+  @override
+  String get husbandryFromToStageMismatch =>
+      'Awamu ya mwanzo na ya mwisho haziwezi kufanana';
+
+  @override
+  String get eventLogSavedSuccessfully => 'Imehifadhiwa kwa mafanikio';
+
+  @override
+  String get saleWeight => 'Uzito wa uuzaji (kg)';
+
+  @override
+  String get salePrice => 'Bei ya uuzaji';
+
+  @override
+  String get buyerName => 'Mnunuzi';
+
+  @override
+  String get stage => 'Awamu';
+
+  @override
+  String get identificationStatus => 'Hali ya utambuzi';
+
+  @override
+  String get identified => 'Imetambuliwa';
+
+  @override
+  String get notIdentified => 'Haijatambuliwa';
+
+  @override
+  String get birthEventOptional => 'Tukio la kuzaliwa (si lazima)';
+
+  @override
+  String get birthEventOptionalHelper =>
+      'Unganisha mnyama huyu na tukio la kuzaliwa lililorekodiwa (farrowing/calving). Acha wazi kwa wanyama walionunuliwa, waliohamishwa, waliotolewa, au sajili nyingine zisizo za kuzaliwa.';
+
+  @override
+  String get addLivestockAllTypesReminder =>
+      'Ongeza Mifugo ni kwa wanyama wote: waliozaliwa wapya, walionunuliwa, waliohamishwa, waliotolewa, na wengine.';
+
+  @override
+  String get totalBorn => 'Jumla waliozaliwa';
+
+  @override
+  String get aliveCount => 'Walio hai';
+
+  @override
+  String get alive => 'Hai';
+
+  @override
+  String get deadCount => 'Walio kufa';
+
+  @override
+  String get dead => 'Waliokufa';
+
+  @override
+  String get enterTotalBornOptional => 'Ingiza jumla waliozaliwa (si lazima)';
+
+  @override
+  String get enterAliveCountOptional => 'Ingiza idadi walio hai (si lazima)';
+
+  @override
+  String get enterDeadCountOptional => 'Ingiza idadi walio kufa (si lazima)';
+
+  @override
+  String get valueMustBeZeroOrMore => 'Thamani lazima iwe 0 au zaidi';
+
+  @override
+  String get aliveDeadExceedTotalBorn =>
+      'Walio hai + walio kufa haiwezi kuzidi jumla waliozaliwa.';
+
+  @override
+  String get deadCountDefaultsToZero =>
+      'Chaguo-msingi 0 (juu zaidi = jumla waliozaliwa)';
+
+  @override
+  String get aliveCountDerivedNote =>
+      'Inahesabiwa kwa kutoa walio kufa kutoka jumla waliozaliwa.';
+
+  @override
+  String get enterTotalBornToPreviewAlive =>
+      'Ingiza jumla waliozaliwa kuona idadi ya walio hai.';
+
+  @override
+  String get deadCountExceedsTotalBorn =>
+      'Idadi ya walio kufa haiwezi kuzidi jumla waliozaliwa.';
+
+  @override
+  String get farrowingPigletRegisterPromptTitle => 'Sajili Nguruwe Wadogo?';
+
+  @override
+  String get farrowingPigletRegisterPromptMessage =>
+      'Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili nguruwe wadogo kutoka kwenye lita hii sasa?';
+
+  @override
+  String get farrowingPigletRegisterNow => 'Sajili Nguruwe Wadogo';
+
+  @override
+  String get farrowingPigletRegisterSkip => 'Ruka kwa Sasa';
+
+  @override
+  String get calvingRegisterPromptTitle => 'Sajili Ndama?';
+
+  @override
+  String get calvingRegisterPromptMessage =>
+      'Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili ndama kutoka kwa kuzaa huku sasa?';
+
+  @override
+  String get calvingRegisterNow => 'Sajili Ndama';
+
+  @override
+  String get birthEventRegisterPromptTitle => 'Sajili Watoto wa Mifugo?';
+
+  @override
+  String get birthEventRegisterPromptMessage =>
+      'Tukio la kuzaa limehifadhiwa. Je, ungependa kusajili watoto wa mifugo kutoka kwa kuzaa huku sasa?';
+
+  @override
+  String get birthEventRegisterNow => 'Sajili Watoto wa Mifugo';
+
+  @override
+  String get prepuceConditionTitle => 'Hali ya ndobolo (govi la uume)';
+
+  @override
+  String get prepuceConditionTypeLabel => 'Aina ya hali';
+
+  @override
+  String get prepuceConditionSeverityLabel => 'Ukali';
+
+  @override
+  String get prepuceConditionClinicalSignsLabel => 'Dalili za kliniki';
+
+  @override
+  String get prepuceConditionTreatmentLabel => 'Matibabu yaliyotolewa';
+
+  @override
+  String get prepuceConditionCauseLabel => 'Sababu / hatari (si lazima)';
+
+  @override
+  String get prepuceConditionBreedingLabel => 'Hali ya uzazi';
+
+  @override
+  String get prepuceConditionReportedByLabel => 'Aliripoti';
+
+  @override
+  String get prepuceConditionAttendedByLabel => 'Alihudumia (si lazima)';
+
+  @override
+  String get prepuceConditionHealingLabel => 'Hali ya kupona (si lazima)';
+
+  @override
+  String get prepuceConditionFollowUpLabel =>
+      'Tarehe ya ufuatiliaji (si lazima)';
+
+  @override
+  String get prepuceConditionDrugNameLabel => 'Jina la dawa (si lazima)';
+
+  @override
+  String get prepuceConditionRouteLabel => 'Njia ya dawa (si lazima)';
+
+  @override
+  String get prepuceConditionDurationLabel => 'Muda wa matibabu (si lazima)';
+
+  @override
+  String get prepuceConditionVetNameLabel => 'Jina la daktari (si lazima)';
+
+  @override
+  String get prepuceConditionVetContactLabel =>
+      'Mawasiliano ya daktari (si lazima)';
+
+  @override
+  String get prepuceConditionFollowUpHint => 'Chagua tarehe ya ufuatiliaji';
+
+  @override
+  String get prepuceConditionTreatmentRequired =>
+      'Chagua angalau matibabu moja';
+
+  @override
+  String get prepuceConditionSelectCodes => 'Chagua chaguo hapo juu';
+
+  @override
+  String get viewEvents => 'Tazama matukio';
 }

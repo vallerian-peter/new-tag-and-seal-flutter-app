@@ -44,7 +44,7 @@ class NotificationTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final scheduledLabel = DateFormat.yMMMd().add_jm().format(scheduled.toLocal());
-    final baseColor = _notificationColor(notification.title, theme);
+    final baseColor = _notificationColor(notification, theme);
     final dark = theme.brightness == Brightness.dark;
     final gradient = LinearGradient(
       colors: dark
@@ -53,7 +53,7 @@ class NotificationTile extends StatelessWidget {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
-    final icon = _notificationIcon(notification.title);
+    final icon = _notificationIcon(notification);
 
     final chips = <Widget>[];
     if (isToday) {
@@ -120,7 +120,10 @@ class NotificationTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          _localizeNotificationText(notification.title, l10n),
+                          _localizeNotificationText(
+                            notification.title,
+                            l10n,
+                          ),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             decoration: notification.isCompleted
@@ -208,8 +211,11 @@ class NotificationTile extends StatelessWidget {
     );
   }
 
-  static Color _notificationColor(String title, ThemeData theme) {
-    final lower = title.toLowerCase();
+  static Color _notificationColor(NotificationModel n, ThemeData theme) {
+    if (NotificationModel.isPrepuceFollowUpTitle(n.title)) {
+      return Colors.deepPurpleAccent;
+    }
+    final lower = n.title.toLowerCase();
     if (lower.contains('feed')) {
       return Colors.orangeAccent;
     } else if (lower.contains('deworm')) {
@@ -222,8 +228,11 @@ class NotificationTile extends StatelessWidget {
     return theme.colorScheme.primary;
   }
 
-  static IconData _notificationIcon(String title) {
-    final lower = title.toLowerCase();
+  static IconData _notificationIcon(NotificationModel n) {
+    if (NotificationModel.isPrepuceFollowUpTitle(n.title)) {
+      return Icons.healing_outlined;
+    }
+    final lower = n.title.toLowerCase();
     if (lower.contains('feed')) {
       return Icons.restaurant;
     } else if (lower.contains('deworm')) {
@@ -238,6 +247,9 @@ class NotificationTile extends StatelessWidget {
 
   /// Localizes notification text if it's a key, otherwise returns as-is
   static String _localizeNotificationText(String text, AppLocalizations l10n) {
+    if (NotificationModel.isPrepuceFollowUpTitle(text)) {
+      return l10n.prepuceConditionFollowUpReminder;
+    }
     switch (text.toLowerCase()) {
       case 'feeding_reminder':
         return l10n.feedingReminder;
@@ -247,6 +259,8 @@ class NotificationTile extends StatelessWidget {
         return l10n.dewormingReminder;
       case 'time_to_deworm_livestock':
         return l10n.timeToDewormLivestock;
+      case NotificationModel.prepuceFollowUpDescriptionKey:
+        return l10n.prepuceConditionFollowUpReminderBody;
       default:
         return text; // Return as-is if not a known key
     }

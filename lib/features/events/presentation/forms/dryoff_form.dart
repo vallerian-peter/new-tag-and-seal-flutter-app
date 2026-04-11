@@ -228,6 +228,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final title = widget.isEditMode
         ? '${l10n.edit} ${l10n.dryoff}'
@@ -235,14 +236,14 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
     final submitText = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,

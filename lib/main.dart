@@ -20,6 +20,8 @@ import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/f
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/provider/farm_user_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/data/repository/notification_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_expense_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_expense_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,7 +36,7 @@ void main() async {
 
   // Initialize database
   final database = AppDatabase();
-  
+
   final additionalDataRepo = AllAdditionalDataRepository(database);
   final farmRepo = FarmRepository(database);
   final livestockRepo = LivestockRepository(database);
@@ -43,20 +45,27 @@ void main() async {
   final vaccinesRepo = VaccinesRepository(database);
   final farmUserRepo = FarmUserRepository(database);
   final notificationRepo = NotificationRepository(database);
-  
+  final financeExpenseRepo = FinanceExpenseRepository(database);
+
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
   await themeProvider.initialize();
 
-  final additionalDataProvider = AdditionalDataProvider(additionalDataRepository: additionalDataRepo);
-  
+  final additionalDataProvider = AdditionalDataProvider(
+    additionalDataRepository: additionalDataRepo,
+  );
+
   final authRepo = AuthRepository();
-  final authProvider = AuthProvider(authRepository: authRepo, repository: authRepo);
+  final authProvider = AuthProvider(
+    authRepository: authRepo,
+    repository: authRepo,
+  );
   final syncProvider = SyncProvider(database: database);
   final farmProvider = FarmProvider(farmRepository: farmRepo);
   final livestockProvider = LivestockProvider(livestockRepo: livestockRepo);
-  final logAdditionalDataProvider =
-      LogAdditionalDataProvider(repository: logAdditionalDataRepo);
+  final logAdditionalDataProvider = LogAdditionalDataProvider(
+    repository: logAdditionalDataRepo,
+  );
   final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
   final farmUserProvider = FarmUserProvider(repository: farmUserRepo);
   final alarmManager = AppAlarmManager(
@@ -68,8 +77,11 @@ void main() async {
     repository: notificationRepo,
     alarmManager: alarmManager,
   );
+  final financeExpenseProvider = FinanceExpenseProvider(
+    repository: financeExpenseRepo,
+  );
   await notificationProvider.loadNotifications();
-  
+
   // Initialize EventsProvider with NotificationProvider for automatic notification creation
   final eventsProvider = EventsProvider(
     eventsRepository: eventsRepo,
@@ -92,6 +104,7 @@ void main() async {
         ChangeNotifierProvider.value(value: farmUserProvider),
         Provider<AppAlarmManager>.value(value: alarmManager),
         ChangeNotifierProvider.value(value: notificationProvider),
+        ChangeNotifierProvider.value(value: financeExpenseProvider),
       ],
       child: const MyApp(),
     ),
@@ -134,10 +147,10 @@ class _MyAppState extends State<MyApp> {
   // Change locale and save to SharedPreferences
   Future<void> changeLocale(Locale newLocale) async {
     if (_locale == newLocale) return;
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('app_language', newLocale.languageCode);
-    
+
     setState(() {
       _locale = newLocale;
     });
@@ -151,13 +164,13 @@ class _MyAppState extends State<MyApp> {
       title: 'Tag & Seal',
       debugShowCheckedModeBanner: false,
       navigatorKey: appNavigatorKey,
-      
+
       // Theme (persisted with SharedPreferences)
       theme: themeProvider.themeData,
-      
+
       // Locale (persisted with SharedPreferences)
       locale: _locale,
-      
+
       // Localization with Flutter l10n
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -169,7 +182,7 @@ class _MyAppState extends State<MyApp> {
         Locale('en'), // English
         Locale('sw'), // Swahili
       ],
-      
+
       // Initial route
       home: const SplashScreen(),
     );

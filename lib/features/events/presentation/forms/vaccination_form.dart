@@ -10,6 +10,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.d
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/vaccination_model.dart';
@@ -395,7 +396,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.farmRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.farmRequired);
       return;
     }
 
@@ -417,14 +418,14 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ToastAlerts.showError(context, message: l10n.livestockRequired);
+        ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.livestockRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return false;
     }
 
@@ -433,12 +434,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
   bool _hasValidVaccineSelection(AppLocalizations l10n) {
     if (_vaccineItems.isEmpty) {
-      ToastAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
+      ModernAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
       return false;
     }
 
     if (_selectedVaccineUuid == null || _selectedVaccineUuid!.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.vaccineRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.vaccineRequired);
       return false;
     }
 
@@ -457,6 +458,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final title = widget.isEditMode
         ? '${l10n.edit} ${l10n.vaccination}'
@@ -464,14 +466,14 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     final submitLabel = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -820,21 +822,21 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.farmRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.farmRequired);
       return;
     }
     if (livestockUuids.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.livestockRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return;
     }
 
     if (_vaccineItems.isEmpty) {
-      ToastAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
+      ModernAlerts.showWarning(context, message: l10n.vaccineOptionsMissing);
       return;
     }
 
     if (_selectedVaccineUuid == null || _selectedVaccineUuid!.isEmpty) {
-      ToastAlerts.showError(context, message: l10n.vaccineRequired);
+      ModernAlerts.showErrorToast(context, message: l10n.vaccineRequired);
       return;
     }
 

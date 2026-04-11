@@ -393,12 +393,18 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
 
     final isLoading = _isLoadingContext || _isLoadingReference;
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: theme.brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
           iconColor: theme.colorScheme.tertiary,

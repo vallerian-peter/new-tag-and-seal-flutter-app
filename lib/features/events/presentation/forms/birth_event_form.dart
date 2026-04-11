@@ -19,6 +19,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart' as models;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart' as models;
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -46,6 +47,8 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
 
   final _eventDateController = TextEditingController();
   final _remarksController = TextEditingController();
+  final _totalBornController = TextEditingController();
+  final _deadCountController = TextEditingController();
 
   int _currentStep = 0;
   bool _isLoadingData = true;
@@ -75,10 +78,19 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
   List<DropdownItem<int>> _birthProblemItems = const [];
   List<DropdownItem<int>> _reproductiveProblemItems = const [];
 
+  void _onLitterCountsChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     _prefillFormIfEditing();
+    if (widget.birthEvent == null) {
+      _deadCountController.text = '0';
+    }
+    _totalBornController.addListener(_onLitterCountsChanged);
+    _deadCountController.addListener(_onLitterCountsChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _initializeData();
@@ -106,6 +118,8 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     _selectedReproductiveProblemId = birthEvent.reproductiveProblemId;
     _selectedStatus = birthEvent.status;
     _remarksController.text = birthEvent.remarks ?? '';
+    _totalBornController.text = birthEvent.totalBorn?.toString() ?? '';
+    _deadCountController.text = birthEvent.deadCount?.toString() ?? '0';
 
     _startDate = DateTime.tryParse(birthEvent.startDate);
     _endDate = birthEvent.endDate != null
@@ -367,10 +381,17 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         .toList();
   }
 
+  int? _parsePositiveIntOrNull(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    return int.tryParse(trimmed);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     // Get dynamic labels based on species
     final eventName = _eventType != null
@@ -382,14 +403,14 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     final submitText = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -457,6 +478,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     final isFarmLocked = widget.farmUuid != null && widget.farmUuid!.isNotEmpty;
     final isLivestockLocked =
         widget.livestockUuid != null && widget.livestockUuid!.isNotEmpty;
+    final isFarrowing = _eventType == 'farrowing';
 
     // Labels for birth type/problem
     final birthTypeLabel = l10n.birthType;
@@ -552,6 +574,53 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
           onTap: () => _pickDate(isStartDate: false),
         ),
         const SizedBox(height: 16),
+        CustomTextField(
+          controller: _totalBornController,
+          label: l10n.totalBorn,
+          hintText: l10n.enterTotalBornOptional,
+          prefixIcon: Icons.numbers_outlined,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          validator: (value) {
+            final parsed = _parsePositiveIntOrNull(value ?? '');
+            if ((value ?? '').trim().isNotEmpty && parsed == null) {
+              return l10n.enterValidNumber;
+            }
+            if (parsed != null && parsed < 0) {
+              return l10n.valueMustBeZeroOrMore;
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        CustomTextField(
+          controller: _deadCountController,
+          label: l10n.deadCount,
+          hintText: l10n.deadCountDefaultsToZero,
+          prefixIcon: Icons.heart_broken_outlined,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          validator: (value) {
+            final trimmed = (value ?? '').trim();
+            if (trimmed.isNotEmpty) {
+              final parsed = int.tryParse(trimmed);
+              if (parsed == null) {
+                return l10n.enterValidNumber;
+              }
+              if (parsed < 0) {
+                return l10n.valueMustBeZeroOrMore;
+              }
+              final total = _parsePositiveIntOrNull(_totalBornController.text);
+              if (total != null && parsed > total) {
+                return l10n.deadCountExceedsTotalBorn;
+              }
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 12),
+        _buildDerivedAliveSummary(l10n),
+        const SizedBox(height: 16),
         CustomDropdown<int>(
           label: birthTypeLabel,
           hint: birthTypeLabel,
@@ -561,8 +630,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
           onChanged: (value) => setState(() => _selectedBirthTypeId = value),
           validator: (value) {
             if (value == null) {
-              // Reuse existing calving validation message for birth events
-              return l10n.calvingTypeRequired;
+              return isFarrowing
+                  ? l10n.farrowingTypeRequired
+                  : l10n.calvingTypeRequired;
             }
             return null;
           },
@@ -620,7 +690,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         const SizedBox(height: 24),
         _buildInfoCard(
           icon: Icons.info_outline,
-          message: l10n.ensureCalvingDetailsAccuracy,
+          message: isFarrowing
+              ? l10n.ensureFarrowingDetailsAccuracy
+              : l10n.ensureCalvingDetailsAccuracy,
           theme: theme,
         ),
       ],
@@ -628,6 +700,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
   }
 
   Widget _buildStepTwo(AppLocalizations l10n, ThemeData theme) {
+    final isFarrowing = _eventType == 'farrowing';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -643,7 +716,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         const SizedBox(height: 24),
         _buildInfoCard(
           icon: Icons.lightbulb_outline,
-          message: l10n.calvingNotesInfo,
+          message: isFarrowing
+              ? l10n.farrowingNotesInfo
+              : l10n.calvingNotesInfo,
           theme: theme,
         ),
       ],
@@ -723,10 +798,54 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     );
   }
 
+  Widget _buildDerivedAliveSummary(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final totalRaw = _totalBornController.text.trim();
+    final total = int.tryParse(totalRaw);
+    final deadRaw = _deadCountController.text.trim();
+    final dead = deadRaw.isEmpty ? 0 : (int.tryParse(deadRaw) ?? 0);
+
+    if (totalRaw.isEmpty || total == null) {
+      return Text(
+        l10n.enterTotalBornToPreviewAlive,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+        ),
+      );
+    }
+
+    final alive = total - dead;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${l10n.aliveCount}: $alive',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: alive < 0
+                ? theme.colorScheme.error
+                : theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.aliveCountDerivedNote,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
+    _totalBornController.removeListener(_onLitterCountsChanged);
+    _deadCountController.removeListener(_onLitterCountsChanged);
     _eventDateController.dispose();
     _remarksController.dispose();
+    _totalBornController.dispose();
+    _deadCountController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
     super.dispose();
@@ -915,7 +1034,6 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
       confirmText: widget.isEditMode ? l10n.update : l10n.save,
       cancelText: l10n.cancel,
       onConfirm: () async {
-        Navigator.of(context).pop(true);
         await _submit();
       },
     );
@@ -956,6 +1074,40 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     final startDateIso = _startDate?.toIso8601String();
     final endDateIso = _endDate?.toIso8601String();
     final birthTypeId = _selectedBirthTypeId!;
+    final totalBorn = _parsePositiveIntOrNull(_totalBornController.text);
+    final deadRaw = _deadCountController.text.trim();
+    int deadCount = 0;
+    if (deadRaw.isNotEmpty) {
+      final parsedDead = int.tryParse(deadRaw);
+      if (parsedDead == null) {
+        if (!mounted) return;
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.enterValidNumber,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+        return;
+      }
+      deadCount = parsedDead;
+    }
+
+    int? aliveCount;
+    if (totalBorn != null) {
+      if (deadCount > totalBorn) {
+        if (!mounted) return;
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.deadCountExceedsTotalBorn,
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+        return;
+      }
+      aliveCount = totalBorn - deadCount;
+    }
 
     try {
       if (widget.isEditMode) {
@@ -974,6 +1126,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
           remarks: _remarksController.text.trim().isEmpty
               ? null
               : _remarksController.text.trim(),
+          totalBorn: totalBorn,
+          aliveCount: aliveCount,
+          deadCount: deadCount,
           status: _selectedStatus,
           updatedAt: nowIso,
         );
@@ -1004,12 +1159,39 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
           remarks: _remarksController.text.trim().isEmpty
               ? null
               : _remarksController.text.trim(),
+          totalBorn: totalBorn,
+          aliveCount: aliveCount,
+          deadCount: deadCount,
           status: _selectedStatus,
           synced: false,
           syncAction: 'create',
           createdAt: nowIso,
           updatedAt: nowIso,
         );
+
+        final litterCount = totalBorn;
+        if (litterCount != null && litterCount > 0) {
+          if (!mounted) return;
+          final bulkSaved = await Navigator.of(context, rootNavigator: true).push<bool>(
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                body: SafeArea(
+                  child: PigletBulkRegistrationScreen(
+                    pendingBirthEventToPersist: newModel,
+                    preSelectedFarmUuid: selectedFarmUuid,
+                    preSelectedMotherUuid: selectedLivestockUuid,
+                  ),
+                ),
+              ),
+            ),
+          );
+          if (mounted && bulkSaved == true) {
+            Navigator.pop(context, true);
+          }
+          return;
+        }
 
         final created = await eventsProvider.addBirthEventWithDialog(
           context,

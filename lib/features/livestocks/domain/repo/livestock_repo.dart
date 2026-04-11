@@ -29,6 +29,11 @@ abstract class LivestockRepo {
   /// Create livestock
   Future<Livestock> createLivestock(Map<String, dynamic> livestockData);
 
+  /// Returns identification numbers from [candidates] that already exist.
+  Future<Set<String>> findExistingIdentificationNumbers(
+    Iterable<String> candidates,
+  );
+
   /// Update livestock
   Future<bool> updateLivestock(int id, Map<String, dynamic> livestockData);
 

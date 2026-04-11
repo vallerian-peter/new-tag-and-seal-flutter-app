@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_dropdown.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
@@ -275,6 +276,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final title = widget.isEditMode
         ? '${l10n.edit} ${l10n.weightChange}'
@@ -282,14 +284,14 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     final submitText = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -759,25 +761,20 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     final selectedLivestockUuid = widget.livestockUuid ?? _selectedLivestockUuid;
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.logContextMissing)),
-      );
+      ModernAlerts.showErrorToast(context, message: l10n.logContextMissing);
       return;
     }
 
     if (!_isBulk &&
         (selectedLivestockUuid == null || selectedLivestockUuid.isEmpty)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.logContextMissing)),
-      );
+      ModernAlerts.showErrorToast(context, message: l10n.logContextMissing);
       return;
     }
 
     final bulkLivestockUuids =
         _selectedBulkLivestock.map((item) => item.uuid).toList();
     if (_isBulk && bulkLivestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return;
     }
 
@@ -790,8 +787,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
 
       if (widget.isEditMode && _isBulk) {
         log('⚠️ Bulk editing not supported for weight changes.');
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
+        ModernAlerts.showWarning(context, message: l10n.comingSoon);
         return;
       }
 

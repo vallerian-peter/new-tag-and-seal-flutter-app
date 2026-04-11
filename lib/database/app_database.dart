@@ -21,12 +21,19 @@ import '../features/all.additional.data/data/local/tables/specie_table.dart';
 import '../features/all.additional.data/data/local/tables/livestock_type_table.dart';
 import '../features/all.additional.data/data/local/tables/breed_table.dart';
 import '../features/all.additional.data/data/local/tables/livestock_obtained_method_table.dart';
+import '../features/all.additional.data/data/local/tables/stage_table.dart';
 import '../features/events/data/tables/feeding_table.dart';
 import '../features/events/data/tables/weight_change_table.dart';
 import '../features/events/data/tables/deworming_table.dart';
 import '../features/events/data/tables/treatment_table.dart';
 import '../features/events/data/tables/vaccination_table.dart';
 import '../features/events/data/tables/disposal_table.dart';
+import '../features/events/data/tables/teeth_clipping_table.dart';
+import '../features/events/data/tables/tail_docking_table.dart';
+import '../features/events/data/tables/iron_injection_table.dart';
+import '../features/events/data/tables/livestock_marking_table.dart';
+import '../features/events/data/tables/stage_change_table.dart';
+import '../features/events/data/tables/prepuce_condition_table.dart';
 import '../features/events/data/tables/milking_table.dart';
 import '../features/events/data/tables/pregnancy_table.dart';
 import '../features/events/data/tables/insemination_table.dart';
@@ -34,6 +41,7 @@ import '../features/events/data/tables/dryoff_table.dart';
 import '../features/events/data/tables/transfer_table.dart';
 import '../features/vaccines/data/tables/vaccine_table.dart';
 import '../features/bills/data/tables/bill_table.dart';
+import '../features/reports/data/tables/finance_expense_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/feeding_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/administration_route_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/medicine_type_table.dart';
@@ -41,6 +49,14 @@ import '../features/all.logs.additional.data/data/local/tables/medicine_table.da
 import '../features/all.logs.additional.data/data/local/tables/disease_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/disposal_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/milking_method_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/teeth_clipping_method_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_condition_type_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_severity_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_clinical_sign_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_cause_risk_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_treatment_given_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_breeding_status_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/prepuce_healing_status_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/heat_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/insemination_service_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/semen_straw_type_table.dart';
@@ -72,6 +88,8 @@ import 'daos/log_reference_dao.dart';
 import 'daos/vaccine_dao.dart';
 import 'daos/vaccine_type_dao.dart';
 import 'daos/bill_dao.dart';
+import 'daos/finance_expense_dao.dart';
+import 'daos/stage_dao.dart';
 import '../features/notifications/data/dao/notification_dao.dart';
 import 'daos/farm_user_dao.dart';
 import '../features/extensionOfficer/data/dao/extension_officer_dao.dart';
@@ -97,6 +115,7 @@ part 'app_database.g.dart';
     LivestockTypes,
     Breeds,
     LivestockObtainedMethods,
+    Stages,
     FeedingTypes,
     AdministrationRoutes,
     MedicineTypes,
@@ -104,6 +123,14 @@ part 'app_database.g.dart';
     Diseases,
     DisposalTypes,
     MilkingMethods,
+    TeethClippingMethods,
+    PrepuceConditionTypes,
+    PrepuceSeverities,
+    PrepuceClinicalSigns,
+    PrepuceCauseRisks,
+    PrepuceTreatmentsGiven,
+    PrepuceBreedingStatuses,
+    PrepuceHealingStatuses,
     HeatTypes,
     InseminationServices,
     SemenStrawTypes,
@@ -128,9 +155,16 @@ part 'app_database.g.dart';
     Inseminations,
     Dryoffs,
     Transfers,
+    TeethClippings,
+    TailDockings,
+    IronInjections,
+    LivestockMarkings,
+    StageChanges,
+    PrepuceConditions,
     // Other feature tables
     Vaccines,
     Bills,
+    FinanceExpenses,
     FarmUsers,
     NotificationEntries,
     InvitedExtensionOfficers,
@@ -144,16 +178,18 @@ part 'app_database.g.dart';
     VaccineDao,
     VaccineTypeDao,
     BillDao,
+    FinanceExpenseDao,
     NotificationDao,
     FarmUserDao,
     ExtensionOfficerDao,
+    StageDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 28; // v28: add eventDate column to all log tables
+  int get schemaVersion => 37; // v37: add finance_expenses report cache table
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -313,6 +349,51 @@ class AppDatabase extends _$AppDatabase {
         // Version 28: Add eventDate column to all log tables
         await _migrateAddEventDateToLogTables(m);
       }
+      if (from < 29) {
+        await m.addColumn(livestocks, livestocks.birthEventUuid);
+        await m.addColumn(livestocks, livestocks.stageId);
+        await m.addColumn(livestocks, livestocks.isIdentified);
+        await m.addColumn(birthEvents, birthEvents.totalBorn);
+        await m.addColumn(birthEvents, birthEvents.aliveCount);
+        await m.addColumn(birthEvents, birthEvents.deadCount);
+        await _createTableIfMissing(m, stages);
+      }
+      if (from < 30) {
+        await _createTableIfMissing(m, teethClippings);
+        await _createTableIfMissing(m, tailDockings);
+        await _createTableIfMissing(m, ironInjections);
+        await _createTableIfMissing(m, livestockMarkings);
+        await _createTableIfMissing(m, stageChanges);
+        await _migrateDisposalSaleColumns();
+      }
+      if (from < 31) {
+        await _createTableIfMissing(m, teethClippingMethods);
+      }
+      if (from < 32) {
+        await _createTableIfMissing(m, prepuceConditionTypes);
+        await _createTableIfMissing(m, prepuceSeverities);
+        await _createTableIfMissing(m, prepuceClinicalSigns);
+        await _createTableIfMissing(m, prepuceCauseRisks);
+        await _createTableIfMissing(m, prepuceTreatmentsGiven);
+        await _createTableIfMissing(m, prepuceBreedingStatuses);
+        await _createTableIfMissing(m, prepuceHealingStatuses);
+        await _createTableIfMissing(m, prepuceConditions);
+      }
+      if (from < 33) {
+        await _migratePrepuceConditionsMedicineVetColumns();
+      }
+      if (from < 34) {
+        await _migratePrepuceConditionsTreatmentProviderColumns();
+      }
+      if (from < 35) {
+        await _migratePrepuceV35IdBasedSchema(m);
+      }
+      if (from < 36) {
+        await _migratePrepuceV36SplitReferenceTables(m);
+      }
+      if (from < 37) {
+        await _createTableIfMissing(m, financeExpenses);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
@@ -417,6 +498,7 @@ class AppDatabase extends _$AppDatabase {
   late final VaccineDao vaccineDao = VaccineDao(this);
   late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(this);
   late final BillDao billDao = BillDao(this);
+  late final FinanceExpenseDao financeExpenseDao = FinanceExpenseDao(this);
   late final NotificationDao notificationDao = NotificationDao(this);
   late final ExtensionOfficerDao extensionOfficerDao = ExtensionOfficerDao(
     this,
@@ -1025,6 +1107,39 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  Future<void> _migrateDisposalSaleColumns() async {
+    try {
+      final exists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('disposals'),
+        ],
+      ).get();
+      if (exists.isEmpty) return;
+
+      final info = await customSelect('PRAGMA table_info(disposals)').get();
+      final names = info.map((r) => r.data['name'] as String).toSet();
+      if (!names.contains('sale_weight')) {
+        await customStatement(
+          'ALTER TABLE disposals ADD COLUMN sale_weight REAL',
+        );
+      }
+      if (!names.contains('sale_price')) {
+        await customStatement(
+          'ALTER TABLE disposals ADD COLUMN sale_price REAL',
+        );
+      }
+      if (!names.contains('buyer_name')) {
+        await customStatement(
+          'ALTER TABLE disposals ADD COLUMN buyer_name TEXT',
+        );
+      }
+    } catch (e) {
+      log('disposals sale columns migration: $e');
+    }
+  }
+
   /// Migration to version 28: Add eventDate column to all log tables
   Future<void> _migrateAddEventDateToLogTables(Migrator m) async {
     final logTables = [
@@ -1078,6 +1193,258 @@ class AppDatabase extends _$AppDatabase {
         log('❌ Error adding eventDate to $tableName: $e');
         // Continue with other tables even if one fails
       }
+    }
+  }
+
+  /// v33: Drop duplicated drug/vet/route text columns; align with medicines + administration_routes + vetId.
+  Future<void> _migratePrepuceConditionsMedicineVetColumns() async {
+    try {
+      final exists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('prepuce_conditions'),
+        ],
+      ).get();
+      if (exists.isEmpty) return;
+
+      final info = await customSelect(
+        'PRAGMA table_info(prepuce_conditions)',
+      ).get();
+      final names = info.map((r) => r.data['name'] as String).toSet();
+      if (names.contains('medicine_id')) return;
+      if (!names.contains('drug_name')) return;
+
+      await transaction(() async {
+        await customStatement('''
+CREATE TABLE prepuce_conditions__new (
+  id INTEGER,
+  uuid TEXT NOT NULL,
+  event_date TEXT,
+  farm_uuid TEXT NOT NULL,
+  livestock_uuid TEXT NOT NULL,
+  condition_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  clinical_signs_json TEXT NOT NULL DEFAULT '[]',
+  cause_risk TEXT,
+  treatment_given_json TEXT NOT NULL DEFAULT '[]',
+  medicine_id INTEGER,
+  administration_route_id INTEGER,
+  vet_id TEXT,
+  quantity TEXT,
+  dose TEXT,
+  reported_by TEXT NOT NULL,
+  attended_by TEXT,
+  breeding_status TEXT NOT NULL,
+  healing_status TEXT,
+  follow_up_date TEXT,
+  notes TEXT,
+  synced INTEGER NOT NULL DEFAULT 0,
+  sync_action TEXT NOT NULL DEFAULT 'create',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (uuid)
+)''');
+
+        await customStatement(r'''
+INSERT INTO prepuce_conditions__new (
+  id, uuid, event_date, farm_uuid, livestock_uuid, condition_type, severity,
+  clinical_signs_json, cause_risk, treatment_given_json,
+  medicine_id, administration_route_id, vet_id, quantity, dose,
+  reported_by, attended_by, breeding_status, healing_status, follow_up_date,
+  notes, synced, sync_action, created_at, updated_at
+)
+SELECT
+  id, uuid, event_date, farm_uuid, livestock_uuid, condition_type, severity,
+  clinical_signs_json, cause_risk, treatment_given_json,
+  NULL, NULL, NULL, NULL, dosage,
+  reported_by, attended_by, breeding_status, healing_status, follow_up_date,
+  NULLIF(TRIM(COALESCE(notes, '') ||
+    CASE WHEN drug_name IS NOT NULL AND trim(drug_name) != '' THEN x'0a' || '[Legacy] drug: ' || drug_name ELSE '' END ||
+    CASE WHEN duration IS NOT NULL AND trim(duration) != '' THEN x'0a' || '[Legacy] duration: ' || duration ELSE '' END ||
+    CASE WHEN route IS NOT NULL AND trim(route) != '' THEN x'0a' || '[Legacy] route code: ' || route ELSE '' END ||
+    CASE WHEN vet_name IS NOT NULL AND trim(vet_name) != '' THEN x'0a' || '[Legacy] vet: ' || vet_name ELSE '' END ||
+    CASE WHEN vet_contact IS NOT NULL AND trim(vet_contact) != '' THEN x'0a' || '[Legacy] vet contact: ' || vet_contact ELSE '' END
+  ), ''),
+  synced, sync_action, created_at, updated_at
+FROM prepuce_conditions
+''');
+
+        await customStatement('DROP TABLE prepuce_conditions');
+        await customStatement(
+          'ALTER TABLE prepuce_conditions__new RENAME TO prepuce_conditions',
+        );
+      });
+      log(
+        '✅ Migrated prepuce_conditions to shared medicine / route / vet columns',
+      );
+    } catch (e, st) {
+      log('❌ prepuce_conditions v33 migration failed: $e', stackTrace: st);
+    }
+  }
+
+  /// v34: Remove reported_by / attended_by; add extension_officer_id (deworming-style provider).
+  Future<void> _migratePrepuceConditionsTreatmentProviderColumns() async {
+    try {
+      final exists = await customSelect(
+        'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+        variables: [
+          const Variable<String>('table'),
+          const Variable<String>('prepuce_conditions'),
+        ],
+      ).get();
+      if (exists.isEmpty) return;
+
+      final info = await customSelect(
+        'PRAGMA table_info(prepuce_conditions)',
+      ).get();
+      final names = info.map((r) => r.data['name'] as String).toSet();
+      if (names.contains('extension_officer_id')) return;
+      if (!names.contains('reported_by')) return;
+
+      await transaction(() async {
+        await customStatement('''
+CREATE TABLE prepuce_conditions__v34 (
+  id INTEGER,
+  uuid TEXT NOT NULL,
+  event_date TEXT,
+  farm_uuid TEXT NOT NULL,
+  livestock_uuid TEXT NOT NULL,
+  condition_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  clinical_signs_json TEXT NOT NULL DEFAULT '[]',
+  cause_risk TEXT,
+  treatment_given_json TEXT NOT NULL DEFAULT '[]',
+  medicine_id INTEGER,
+  administration_route_id INTEGER,
+  vet_id TEXT,
+  extension_officer_id TEXT,
+  quantity TEXT,
+  dose TEXT,
+  breeding_status TEXT NOT NULL,
+  healing_status TEXT,
+  follow_up_date TEXT,
+  notes TEXT,
+  synced INTEGER NOT NULL DEFAULT 0,
+  sync_action TEXT NOT NULL DEFAULT 'create',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (uuid)
+)''');
+
+        await customStatement(r'''
+INSERT INTO prepuce_conditions__v34 (
+  id, uuid, event_date, farm_uuid, livestock_uuid, condition_type, severity,
+  clinical_signs_json, cause_risk, treatment_given_json,
+  medicine_id, administration_route_id, vet_id, extension_officer_id, quantity, dose,
+  breeding_status, healing_status, follow_up_date,
+  notes, synced, sync_action, created_at, updated_at
+)
+SELECT
+  id, uuid, event_date, farm_uuid, livestock_uuid, condition_type, severity,
+  clinical_signs_json, cause_risk, treatment_given_json,
+  medicine_id, administration_route_id, vet_id, NULL, quantity, dose,
+  breeding_status, healing_status, follow_up_date,
+  NULLIF(TRIM(COALESCE(notes, '') ||
+    CASE WHEN reported_by IS NOT NULL AND trim(reported_by) != '' THEN x'0a' || '[Legacy] reported_by: ' || reported_by ELSE '' END ||
+    CASE WHEN attended_by IS NOT NULL AND trim(attended_by) != '' THEN x'0a' || '[Legacy] attended_by: ' || attended_by ELSE '' END
+  ), ''),
+  synced, sync_action, created_at, updated_at
+FROM prepuce_conditions
+''');
+
+        await customStatement('DROP TABLE prepuce_conditions');
+        await customStatement(
+          'ALTER TABLE prepuce_conditions__v34 RENAME TO prepuce_conditions',
+        );
+      });
+      log(
+        '✅ prepuce_conditions v34: extension officer id, dropped reported/attended',
+      );
+    } catch (e, st) {
+      log('❌ prepuce_conditions v34 migration failed: $e', stackTrace: st);
+    }
+  }
+
+  /// v35: Align with Laravel — integer FKs on logs; medicine-style reference rows.
+  Future<void> _migratePrepuceV35IdBasedSchema(Migrator m) async {
+    try {
+      await customStatement('DROP TABLE IF EXISTS prepuce_condition_lookups');
+      await _createTableIfMissing(m, prepuceConditionTypes);
+      await _createTableIfMissing(m, prepuceSeverities);
+      await _createTableIfMissing(m, prepuceClinicalSigns);
+      await _createTableIfMissing(m, prepuceCauseRisks);
+      await _createTableIfMissing(m, prepuceTreatmentsGiven);
+      await _createTableIfMissing(m, prepuceBreedingStatuses);
+      await _createTableIfMissing(m, prepuceHealingStatuses);
+      await customStatement('DROP TABLE IF EXISTS prepuce_conditions');
+      await m.createTable(prepuceConditions);
+      log('✅ v35: prepuce_conditions + split prepuce lookup tables (id-based)');
+    } catch (e, st) {
+      log('❌ prepuce v35 migration failed: $e', stackTrace: st);
+    }
+  }
+
+  /// v36: Split local prepuce lookup cache into backend-aligned individual tables.
+  Future<void> _migratePrepuceV36SplitReferenceTables(Migrator m) async {
+    try {
+      await _createTableIfMissing(m, prepuceConditionTypes);
+      await _createTableIfMissing(m, prepuceSeverities);
+      await _createTableIfMissing(m, prepuceClinicalSigns);
+      await _createTableIfMissing(m, prepuceCauseRisks);
+      await _createTableIfMissing(m, prepuceTreatmentsGiven);
+      await _createTableIfMissing(m, prepuceBreedingStatuses);
+      await _createTableIfMissing(m, prepuceHealingStatuses);
+
+      final oldExists = await customSelect(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='prepuce_reference_options' LIMIT 1",
+      ).get();
+      if (oldExists.isNotEmpty) {
+        final rows = await customSelect(
+          'SELECT kind, reference_id, name, name_sw FROM prepuce_reference_options',
+        ).get();
+        for (final row in rows) {
+          final kind = row.read<String>('kind');
+          final id = row.read<int>('reference_id');
+          final name = row.read<String>('name');
+          final nameSw = row.read<String?>('name_sw');
+
+          String table;
+          switch (kind) {
+            case 'condition_type':
+              table = 'prepuce_condition_types';
+              break;
+            case 'severity':
+              table = 'prepuce_severities';
+              break;
+            case 'clinical_sign':
+              table = 'prepuce_clinical_signs';
+              break;
+            case 'cause_risk':
+              table = 'prepuce_cause_risks';
+              break;
+            case 'treatment_given':
+              table = 'prepuce_treatments_given';
+              break;
+            case 'breeding_status':
+              table = 'prepuce_breeding_statuses';
+              break;
+            case 'healing_status':
+              table = 'prepuce_healing_statuses';
+              break;
+            default:
+              continue;
+          }
+          await customStatement(
+            'INSERT OR REPLACE INTO $table (id, name, name_sw) VALUES (?, ?, ?)',
+            [id, name, nameSw],
+          );
+        }
+        await customStatement('DROP TABLE IF EXISTS prepuce_reference_options');
+      }
+      log('✅ v36: split prepuce lookup tables migrated from local cache');
+    } catch (e, st) {
+      log('❌ prepuce v36 migration failed: $e', stackTrace: st);
     }
   }
 }

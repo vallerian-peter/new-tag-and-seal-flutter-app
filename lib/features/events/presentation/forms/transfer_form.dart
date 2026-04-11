@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_dropdown.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
@@ -246,8 +247,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ModernAlerts.showErrorToast(context, message: l10n.farmRequired);
       return;
     }
 
@@ -301,6 +301,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final title = widget.isEditMode
         ? '${l10n.edit} ${l10n.transfer}'
@@ -308,14 +309,14 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final submitLabel = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
-      backgroundColor: Constants.veryLightGreyColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         ),
         leading: CustomBackButton(
           isEnabledBgColor: false,
@@ -862,13 +863,11 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       return;
     }
     if (livestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return;
     }
     if (toFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.toFarmUuidRequired)));
+      ModernAlerts.showErrorToast(context, message: l10n.toFarmUuidRequired);
       return;
     }
 
@@ -877,9 +876,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     if (transporterIdText.isNotEmpty) {
       transporterId = int.tryParse(transporterIdText);
       if (transporterId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.invalidTransporterId)),
-        );
+        ModernAlerts.showErrorToast(context, message: l10n.invalidTransporterId);
         return;
       }
     }

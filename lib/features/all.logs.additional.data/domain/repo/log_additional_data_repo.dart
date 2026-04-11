@@ -1,4 +1,4 @@
-import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem;
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem, TeethClippingMethod;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/feeding_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/administration_route.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/medicine_type.dart';
@@ -15,6 +15,8 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/teeth_clipping_method.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 
 abstract class LogAdditionalDataRepositoryInterface {
   Future<Map<String, dynamic>> fetchRemoteLogAdditionalData();
@@ -28,6 +30,8 @@ abstract class LogAdditionalDataRepositoryInterface {
   Future<List<Disease>> getDiseases();
   Future<List<DisposalType>> getDisposalTypes();
   Future<List<MilkingMethod>> getMilkingMethods();
+  Future<List<TeethClippingMethod>> getTeethClippingMethods();
+  Future<List<PrepuceReferenceOption>> getPrepuceReferenceOptions();
   Future<List<HeatType>> getHeatTypes();
   Future<List<InseminationService>> getInseminationServices();
   Future<List<SemenStrawType>> getSemenStrawTypes();

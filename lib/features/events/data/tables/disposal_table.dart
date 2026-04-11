@@ -18,6 +18,12 @@ class Disposals extends Table {
 
   TextColumn get remarks => text().nullable()();
 
+  RealColumn get saleWeight => real().nullable()();
+
+  RealColumn get salePrice => real().nullable()();
+
+  TextColumn get buyerName => text().nullable()();
+
   TextColumn get status =>
       text().withDefault(const Constant<String>('completed'))();
 

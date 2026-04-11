@@ -31,7 +31,7 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
     
     <application
-        android:label="new_tag_and_seal_flutter_app"
+        android:label="Tag and Seal"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true"

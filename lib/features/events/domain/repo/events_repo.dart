@@ -11,6 +11,12 @@ import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/pregna
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/insemination_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/dryoff_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/teeth_clipping_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/tail_docking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/iron_injection_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/livestock_marking_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/stage_change_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/prepuce_condition_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/summary/event_summary.dart';
 
 /// Contract for all event (logs) repository operations.
@@ -307,6 +313,98 @@ abstract class EventsRepositoryInterface {
 
   /// Mark transfer logs as synced or delete them if marked for deletion.
   Future<void> markTransfersAsSynced(List<String> uuids);
+
+  // ============================================================================
+  // HUSBANDRY / NOTEBOOK (per-head procedures)
+  // ============================================================================
+
+  Future<TeethClippingModel> createTeethClipping(TeethClippingModel model);
+  Future<TeethClippingModel> updateTeethClippingLocally(
+    TeethClippingModel model,
+  );
+  Future<List<TeethClippingModel>> getTeethClippings({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<TeethClippingModel>> getAllTeethClippings();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedTeethClippingsForApi();
+
+  Future<void> markTeethClippingsAsSynced(List<String> uuids);
+
+  Future<TailDockingModel> createTailDocking(TailDockingModel model);
+  Future<TailDockingModel> updateTailDockingLocally(TailDockingModel model);
+  Future<List<TailDockingModel>> getTailDockings({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<TailDockingModel>> getAllTailDockings();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedTailDockingsForApi();
+
+  Future<void> markTailDockingsAsSynced(List<String> uuids);
+
+  Future<IronInjectionModel> createIronInjection(IronInjectionModel model);
+  Future<IronInjectionModel> updateIronInjectionLocally(IronInjectionModel model);
+  Future<List<IronInjectionModel>> getIronInjections({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<IronInjectionModel>> getAllIronInjections();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedIronInjectionsForApi();
+
+  Future<void> markIronInjectionsAsSynced(List<String> uuids);
+
+  Future<LivestockMarkingModel> createLivestockMarking(
+    LivestockMarkingModel model,
+  );
+  Future<LivestockMarkingModel> updateLivestockMarkingLocally(
+    LivestockMarkingModel model,
+  );
+  Future<List<LivestockMarkingModel>> getLivestockMarkings({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<LivestockMarkingModel>> getAllLivestockMarkings();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedLivestockMarkingsForApi();
+
+  Future<void> markLivestockMarkingsAsSynced(List<String> uuids);
+
+  Future<StageChangeModel> createStageChange(StageChangeModel model);
+  Future<StageChangeModel> updateStageChangeLocally(StageChangeModel model);
+  Future<List<StageChangeModel>> getStageChanges({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<StageChangeModel>> getAllStageChanges();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedStageChangesForApi();
+
+  Future<void> markStageChangesAsSynced(List<String> uuids);
+
+  Future<PrepuceConditionModel> createPrepuceCondition(PrepuceConditionModel model);
+
+  Future<PrepuceConditionModel> updatePrepuceConditionLocally(
+    PrepuceConditionModel model,
+  );
+
+  Future<List<PrepuceConditionModel>> getPrepuceConditions({
+    String? farmUuid,
+    String? livestockUuid,
+  });
+
+  Future<List<PrepuceConditionModel>> getAllPrepuceConditions();
+
+  Future<List<Map<String, dynamic>>> getUnsyncedPrepuceConditionsForApi();
+
+  Future<void> markPrepuceConditionsAsSynced(List<String> uuids);
 }
 
 

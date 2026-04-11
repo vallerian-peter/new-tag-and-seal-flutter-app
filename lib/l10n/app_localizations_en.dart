@@ -389,6 +389,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsVersionBuildTitle => 'Version & Build';
+
+  @override
+  String get versionSubtitle => 'App version information';
+
+  @override
   String get settingsAppDescription =>
       'A comprehensive livestock management application.';
 
@@ -1879,6 +1885,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeToTreatLivestock => 'Time to treat livestock';
 
   @override
+  String get prepuceConditionFollowUpReminder => 'Prepuce follow-up';
+
+  @override
+  String get prepuceConditionFollowUpReminderBody =>
+      'Scheduled follow-up for this animal\'s prepuce (sheath) condition.';
+
+  @override
   String get weightChange => 'Weight Change';
 
   @override
@@ -2580,12 +2593,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calvingTypeRequired => 'Calving type is required';
 
   @override
+  String get farrowingTypeRequired => 'Farrowing type is required';
+
+  @override
   String get ensureCalvingDetailsAccuracy =>
       'Ensure calving information is accurate before saving.';
 
   @override
+  String get ensureFarrowingDetailsAccuracy =>
+      'Ensure farrowing information is accurate before saving.';
+
+  @override
   String get calvingNotesInfo =>
       'Add notes about calves, complications, or support provided.';
+
+  @override
+  String get farrowingNotesInfo =>
+      'Add notes about piglets, complications, or support provided.';
 
   @override
   String get confirmUpdateCalving => 'Update calving log?';
@@ -2611,6 +2635,260 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tryDifferentSearchTerm => 'Try searching with a different term';
+
+  @override
+  String get registerLivestockHowTitle => 'Register livestock';
+
+  @override
+  String get registerLivestockSingleOption => 'Single animal';
+
+  @override
+  String get registerLivestockSingleOptionDesc =>
+      'Full form with tags and one ID';
+
+  @override
+  String get registerPigletLitterOption => 'Piglet litter';
+
+  @override
+  String get registerPigletLitterOptionDesc =>
+      'Same details for many piglets; IDs like YYYYMMDD-01';
+
+  @override
+  String get pigletBulkTitle => 'Register piglet litter';
+
+  @override
+  String get pigletBulkCompleteBirthFlowTitle => 'Complete birth & offspring';
+
+  @override
+  String get pigletBulkDeferredBirthHint =>
+      'The birth log will be saved together with the offspring when you tap Register all on the preview step. Review and adjust details below, then confirm.';
+
+  @override
+  String get pigletBulkStepCommonTitle => 'Shared details';
+
+  @override
+  String get pigletBulkStepCommonSubtitle =>
+      'Farm, type, litter size, dates, parents';
+
+  @override
+  String get pigletBulkStepPreviewTitle => 'Preview';
+
+  @override
+  String get pigletBulkStepPreviewSubtitle =>
+      'Generated IDs and sex per piglet';
+
+  @override
+  String get pigletBulkNumberOfPiglets => 'Number of piglets';
+
+  @override
+  String pigletBulkInvalidCount(int max) {
+    return 'Enter a whole number from 1 to $max.';
+  }
+
+  @override
+  String get pigletBulkNamePrefix => 'Name prefix';
+
+  @override
+  String get pigletBulkNamePrefixHint =>
+      'e.g. Piglet (combined with number or nickname)';
+
+  @override
+  String get pigletBulkPreviewInfo =>
+      'Each ID uses the date of birth as YYYYMMDD plus a sequence (01, 02, …). Young stages stay not identified until you add tags later.';
+
+  @override
+  String get pigletBulkNicknameOptional => 'Nickname (optional)';
+
+  @override
+  String get pigletBulkRegisterAll => 'Register all';
+
+  @override
+  String get pigletBulkSelectSexEach =>
+      'Choose male or female for every piglet.';
+
+  @override
+  String get pigletBulkQuickSexTitle => 'Quick sex split';
+
+  @override
+  String pigletBulkQuickSexSubtitle(int alive) {
+    return 'Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to $alive.';
+  }
+
+  @override
+  String get pigletBulkQuickSexCountLabel => 'Count';
+
+  @override
+  String get pigletBulkApplySexSplit => 'Apply to list';
+
+  @override
+  String pigletBulkSexCountMismatch(int expected, int actual) {
+    return 'Female + male + unknown must equal $expected (all piglet rows). You entered $actual.';
+  }
+
+  @override
+  String get pigletBulkQuickSexOrderNote =>
+      'Order: first N rows = female, then male, then unknown across all rows (alive and dead). You can still change any row below.';
+
+  @override
+  String get pigletBulkPreviewSaveAllNote =>
+      'Every row—including dead at birth—is saved as livestock first. Disposals are created only after that, using the saved animal records.';
+
+  @override
+  String get pigletBulkQuickFillSectionTitle => 'Quick fill';
+
+  @override
+  String get pigletBulkQuickFillSectionSubtitle =>
+      'Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.';
+
+  @override
+  String get pigletBulkQuickNicknameTitle => 'Nicknames';
+
+  @override
+  String get pigletBulkQuickNicknameSubtitle =>
+      'Fills \"Name prefix 1\", \"Name prefix 2\", … using the name prefix from the previous step (same as default display names).';
+
+  @override
+  String get pigletBulkApplyNicknamePattern => 'Fill name sequence';
+
+  @override
+  String get pigletBulkQuickWeightTitle => 'Weights (kg)';
+
+  @override
+  String get pigletBulkQuickWeightSubtitle =>
+      'Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.';
+
+  @override
+  String get pigletBulkWeightAliveHint => 'Alive';
+
+  @override
+  String get pigletBulkWeightDeadHint => 'Dead at birth';
+
+  @override
+  String get pigletBulkApplyWeights => 'Apply weights to rows';
+
+  @override
+  String get pigletBulkWeightPerRowLabel => 'Weight (kg)';
+
+  @override
+  String get pigletBulkWeightPerRowHint => 'Optional; uses step 1 if empty';
+
+  @override
+  String pigletBulkBatchSizeMismatch(int expected, int actual) {
+    return 'Expected $expected animals to save but got $actual. Nothing was partially disposed; try again or contact support.';
+  }
+
+  @override
+  String get pigletBulkQuickFillFooterNote =>
+      'Sex split applies to alive rows only, in list order. Names and weights apply to every row unless you skip the action.';
+
+  @override
+  String get pigletBulkIdConflict =>
+      'Some generated IDs already exist. Change the birth date or remove existing records, then try again.';
+
+  @override
+  String pigletBulkConflictingIds(String ids) {
+    return 'Taken: $ids';
+  }
+
+  @override
+  String pigletBulkConfirmRegister(int count) {
+    return 'Register $count piglets now? They are saved on this device and will sync when online.';
+  }
+
+  @override
+  String pigletBulkSuccess(int count) {
+    return 'Successfully registered $count piglets.';
+  }
+
+  @override
+  String get pigletBulkFailed =>
+      'Could not register the litter. Please try again.';
+
+  @override
+  String get pigletDefaultNamePrefix => 'Piglet';
+
+  @override
+  String get pigletBulkSavingMessage => 'Registering piglets…';
+
+  @override
+  String pigletBulkCountRangeHint(int max) {
+    return '1–$max';
+  }
+
+  @override
+  String get pigletBulkBirthEventLitterHint =>
+      'If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.';
+
+  @override
+  String get pigletBulkSaveCheckTitle => 'Save check';
+
+  @override
+  String get pigletBulkStatusReady => 'Ready';
+
+  @override
+  String get pigletBulkStatusRequired => 'Required';
+
+  @override
+  String get pigletBulkStatusNotApplicable => 'N/A';
+
+  @override
+  String get pigletBulkMotherRequiredForBirthFlow =>
+      'Mother must remain selected for this birth flow.';
+
+  @override
+  String pigletBulkLitterTotal(int totalBorn) {
+    return '$totalBorn born';
+  }
+
+  @override
+  String pigletBulkLitterTotalDead(int totalBorn, int deadCount) {
+    return '$totalBorn born, $deadCount dead';
+  }
+
+  @override
+  String pigletBulkPreviewAliveDeadSummary(int alive, int dead) {
+    return '$alive alive at birth · $dead dead at birth (last IDs in the list).';
+  }
+
+  @override
+  String get pigletBulkDeadAtBirthChip => 'Dead at birth';
+
+  @override
+  String get pigletBulkDisposalSectionTitle => 'Disposal for dead at birth';
+
+  @override
+  String get pigletBulkDisposalSectionSubtitle =>
+      'Required when registering stillborn piglets. A disposal log is created for each.';
+
+  @override
+  String get pigletBulkDisposalTypeLabel => 'Disposal type';
+
+  @override
+  String get pigletBulkSelectDisposalTypeForDead =>
+      'Select a disposal type for dead-at-birth piglets.';
+
+  @override
+  String get pigletBulkDeadDisposalReasonHint =>
+      'Reason (e.g. stillborn / birth mortality)';
+
+  @override
+  String get pigletDeadAtBirthDisposalReasonDefault =>
+      'Dead at birth (litter registration)';
+
+  @override
+  String get pigletBulkGenderOptionalDead => 'Sex (optional)';
+
+  @override
+  String pigletBulkSuccessDisposals(int count) {
+    return 'Also logged $count disposal records for stillborn piglets.';
+  }
+
+  @override
+  String get pigletBulkDisposalPartialFailure =>
+      'Livestock was saved but some disposal logs failed. Check records and add disposals manually if needed.';
+
+  @override
+  String get pigletGenderUnknown => 'Unknown';
 
   @override
   String get timeoutError => 'Timeout Error';
@@ -2719,6 +2997,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelectLivestockType => 'Please select livestock type';
 
   @override
+  String get noStagesForThisType => 'No stages for this type';
+
+  @override
   String get speciesRequired => 'Species is required';
 
   @override
@@ -2750,6 +3031,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fatherOptional => 'Father (Optional)';
+
+  @override
+  String get filterByMother => 'Mother';
+
+  @override
+  String get filterByFather => 'Father';
+
+  @override
+  String parentFilterChildrenCount(int count) {
+    return '$count children';
+  }
 
   @override
   String get obtainedMethod => 'Obtained Method';
@@ -2933,6 +3225,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveNotification => 'Save notification';
+
+  @override
+  String get manualInput => 'Manual input';
+
+  @override
+  String get chooseFromList => 'Choose from list';
 
   @override
   String get notificationChipToday => 'Today';
@@ -3410,6 +3708,147 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPayment => 'Confirm Payment';
 
   @override
+  String get incomeExpenditureReport => 'Income and Expenditures Report';
+
+  @override
+  String get generatedOn => 'Generated on';
+
+  @override
+  String get dateRange => 'Date range';
+
+  @override
+  String get allTime => 'All time';
+
+  @override
+  String get noRecordsFoundForSelectedPeriod =>
+      'No records found for selected period';
+
+  @override
+  String get paidStatus => 'Paid';
+
+  @override
+  String get pendingStatus => 'Pending';
+
+  @override
+  String get accessDeniedFarmerOrFarmManagerOnly =>
+      'Access denied. Farmer or Farm Manager only.';
+
+  @override
+  String get reportActions => 'Report actions';
+
+  @override
+  String get printReport => 'Print Report';
+
+  @override
+  String get downloadReport => 'Download Report';
+
+  @override
+  String get reportDownloaded => 'Report downloaded';
+
+  @override
+  String get addManualExpense => 'Add expense';
+
+  @override
+  String get manualExpenseTitle => 'Record expense';
+
+  @override
+  String get manualExpenseDetailsSubtitle =>
+      'Record purchases and costs not tied to bills or transfers';
+
+  @override
+  String get manualExpenseBasicStep => 'Expense details';
+
+  @override
+  String get manualExpenseAdditionalStep => 'Additional details';
+
+  @override
+  String get manualExpenseAdditionalStepSubtitle =>
+      'Quantity, status, and notes';
+
+  @override
+  String get manualExpenseSavedSuccessfully =>
+      'Expense saved locally. Sync to update the server.';
+
+  @override
+  String get manualExpenseSaveFailed =>
+      'Could not save expense. Please try again.';
+
+  @override
+  String get confirmSaveManualExpense => 'Save this expense to your records?';
+
+  @override
+  String get expenseSubject => 'What was purchased';
+
+  @override
+  String get expenseSubjectHint => 'e.g. Feed, fuel, equipment';
+
+  @override
+  String get expenseSubjectRequired => 'Please describe the expense';
+
+  @override
+  String get expenseAmount => 'Total amount (TZS)';
+
+  @override
+  String get expenseAmountHint => 'Enter total cost';
+
+  @override
+  String get expenseAmountRequired => 'Enter a valid amount greater than zero';
+
+  @override
+  String get expenseDate => 'Expense date';
+
+  @override
+  String get expenseDateRequired => 'Select a date';
+
+  @override
+  String get selectExpenseDate => 'Select date';
+
+  @override
+  String get expenseQuantity => 'Quantity';
+
+  @override
+  String get expenseQuantityHint => 'Units or items (defaults to 1)';
+
+  @override
+  String get expenseNotes => 'Notes';
+
+  @override
+  String get expenseNotesHint => 'Optional details';
+
+  @override
+  String get expensePaymentStatus => 'Payment status';
+
+  @override
+  String get selectExpensePaymentStatus => 'Select payment status';
+
+  @override
+  String get manualExpenseAccuracyNote =>
+      'Ensure amounts and dates are correct for your income and expenditure report.';
+
+  @override
+  String get reportTableCellPlaceholder => '—';
+
+  @override
+  String incomeReportExpenseEntriesSectionTitle(int count) {
+    return 'Expense entries ($count)';
+  }
+
+  @override
+  String get incomeReportPdfColumnReference => 'Reference';
+
+  @override
+  String get incomeReportPdfColumnDate => 'Date';
+
+  @override
+  String get incomeReportPdfColumnSubject => 'Subject';
+
+  @override
+  String get incomeReportPdfColumnQuantity => 'Qty';
+
+  @override
+  String get incomeReportPdfColumnStatus => 'Status';
+
+  @override
   String get aboutUs => 'About Us';
 
   @override
@@ -3647,6 +4086,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get last6Months => 'Last 6 Months';
 
   @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get last6Years => 'Last 6 Years';
+
+  @override
   String get lastYear => 'This Year';
 
   @override
@@ -3654,4 +4102,257 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maximum => 'Maximum';
+
+  @override
+  String get isLivestockFound => 'Is Livestock Found?';
+
+  @override
+  String get livestockStatusUpdatedAndDisposalRemoved =>
+      'Livestock status updated to active. Disposal records removed.';
+
+  @override
+  String get markLivestockAsFound => 'Mark Livestock as Found';
+
+  @override
+  String get livestockFoundConfirmationDescription =>
+      'This livestock was previously marked as lost. If the livestock has been found, you can mark it as active again.';
+
+  @override
+  String get livestockWasMarkedAsLost => 'Livestock was marked as Lost';
+
+  @override
+  String get livestockFoundActionDescription =>
+      'By confirming, the livestock status will be changed to active and the disposal record will be removed.';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get copyrightText => 'All Rights Reserved';
+
+  @override
+  String get teethClipping => 'Teeth clipping';
+
+  @override
+  String get tailDocking => 'Tail docking';
+
+  @override
+  String get ironInjection => 'Iron injection';
+
+  @override
+  String get livestockMarking => 'Livestock marking';
+
+  @override
+  String get stageChange => 'Stage change';
+
+  @override
+  String get procedureMethod => 'Method';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get markingType => 'Marking type';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get fromStage => 'From stage';
+
+  @override
+  String get toStage => 'To stage';
+
+  @override
+  String get selectFromStage => 'Select from stage';
+
+  @override
+  String get selectToStage => 'Select to stage';
+
+  @override
+  String get selectProcedureMethod => 'Select method';
+
+  @override
+  String get eventDateRequired => 'Event date is required';
+
+  @override
+  String get husbandryRequiredFields => 'Please fill required fields';
+
+  @override
+  String get husbandryFromToStageMismatch =>
+      'From and To stage cannot be the same';
+
+  @override
+  String get eventLogSavedSuccessfully => 'Saved successfully';
+
+  @override
+  String get saleWeight => 'Sale weight (kg)';
+
+  @override
+  String get salePrice => 'Sale price';
+
+  @override
+  String get buyerName => 'Buyer';
+
+  @override
+  String get stage => 'Stage';
+
+  @override
+  String get identificationStatus => 'Identification status';
+
+  @override
+  String get identified => 'Identified';
+
+  @override
+  String get notIdentified => 'Not identified';
+
+  @override
+  String get birthEventOptional => 'Birth event (optional)';
+
+  @override
+  String get birthEventOptionalHelper =>
+      'Link this animal to a recorded birth event (farrowing/calving). Leave empty for purchased, transferred, donated, or other non-birth registrations.';
+
+  @override
+  String get addLivestockAllTypesReminder =>
+      'Add Livestock is for all animals: newborn, purchased, transferred, donated, and more.';
+
+  @override
+  String get totalBorn => 'Total born';
+
+  @override
+  String get aliveCount => 'Alive count';
+
+  @override
+  String get alive => 'Alive';
+
+  @override
+  String get deadCount => 'Dead count';
+
+  @override
+  String get dead => 'Dead';
+
+  @override
+  String get enterTotalBornOptional => 'Enter total born (optional)';
+
+  @override
+  String get enterAliveCountOptional => 'Enter alive count (optional)';
+
+  @override
+  String get enterDeadCountOptional => 'Enter dead count (optional)';
+
+  @override
+  String get valueMustBeZeroOrMore => 'Value must be 0 or more';
+
+  @override
+  String get aliveDeadExceedTotalBorn =>
+      'Alive + dead cannot exceed total born.';
+
+  @override
+  String get deadCountDefaultsToZero => 'Defaults to 0 (max = total born)';
+
+  @override
+  String get aliveCountDerivedNote => 'Calculated as total born minus dead.';
+
+  @override
+  String get enterTotalBornToPreviewAlive =>
+      'Enter total born to preview alive count.';
+
+  @override
+  String get deadCountExceedsTotalBorn =>
+      'Dead count cannot exceed total born.';
+
+  @override
+  String get farrowingPigletRegisterPromptTitle => 'Register Piglets?';
+
+  @override
+  String get farrowingPigletRegisterPromptMessage =>
+      'The farrowing event has been saved. Would you like to register the piglets from this litter now?';
+
+  @override
+  String get farrowingPigletRegisterNow => 'Register Piglets';
+
+  @override
+  String get farrowingPigletRegisterSkip => 'Skip for Now';
+
+  @override
+  String get calvingRegisterPromptTitle => 'Register Calves?';
+
+  @override
+  String get calvingRegisterPromptMessage =>
+      'The calving event has been saved. Would you like to register the calves from this birth now?';
+
+  @override
+  String get calvingRegisterNow => 'Register Calves';
+
+  @override
+  String get birthEventRegisterPromptTitle => 'Register Offspring?';
+
+  @override
+  String get birthEventRegisterPromptMessage =>
+      'The birth event has been saved. Would you like to register the offspring from this birth now?';
+
+  @override
+  String get birthEventRegisterNow => 'Register Offspring';
+
+  @override
+  String get prepuceConditionTitle => 'Prepuce (sheath) condition';
+
+  @override
+  String get prepuceConditionTypeLabel => 'Condition type';
+
+  @override
+  String get prepuceConditionSeverityLabel => 'Severity';
+
+  @override
+  String get prepuceConditionClinicalSignsLabel => 'Clinical signs';
+
+  @override
+  String get prepuceConditionTreatmentLabel => 'Treatment given';
+
+  @override
+  String get prepuceConditionCauseLabel => 'Cause / risk (optional)';
+
+  @override
+  String get prepuceConditionBreedingLabel => 'Breeding status';
+
+  @override
+  String get prepuceConditionReportedByLabel => 'Reported by';
+
+  @override
+  String get prepuceConditionAttendedByLabel => 'Attended by (optional)';
+
+  @override
+  String get prepuceConditionHealingLabel => 'Healing status (optional)';
+
+  @override
+  String get prepuceConditionFollowUpLabel => 'Follow-up date (optional)';
+
+  @override
+  String get prepuceConditionDrugNameLabel => 'Drug name (optional)';
+
+  @override
+  String get prepuceConditionRouteLabel => 'Route (optional)';
+
+  @override
+  String get prepuceConditionDurationLabel => 'Duration (optional)';
+
+  @override
+  String get prepuceConditionVetNameLabel => 'Vet name (optional)';
+
+  @override
+  String get prepuceConditionVetContactLabel => 'Vet contact (optional)';
+
+  @override
+  String get prepuceConditionFollowUpHint => 'Select follow-up date';
+
+  @override
+  String get prepuceConditionTreatmentRequired =>
+      'Select at least one treatment';
+
+  @override
+  String get prepuceConditionSelectCodes => 'Select options above';
+
+  @override
+  String get viewEvents => 'View events';
 }

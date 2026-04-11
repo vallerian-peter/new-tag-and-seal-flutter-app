@@ -44,6 +44,22 @@ class LivestockDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
+  /// Which values in [candidates] already exist as identification numbers.
+  Future<Set<String>> findExistingIdentificationNumbers(
+    Iterable<String> candidates,
+  ) async {
+    final list = candidates
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList();
+    if (list.isEmpty) return {};
+    final rows = await (select(livestocks)
+          ..where((l) => l.identificationNumber.isIn(list)))
+        .get();
+    return rows.map((r) => r.identificationNumber.trim()).toSet();
+  }
+
   /// Find livestock by any supported tag identifier (dummy, barcode, RFID, identification number)
   Future<Livestock?> getLivestockByTagValue(String value) {
     final normalized = value.trim();
@@ -97,6 +113,30 @@ class LivestockDao extends DatabaseAccessor<AppDatabase>
   /// Update a livestock
   Future<bool> updateLivestock(Livestock entry) =>
       update(livestocks).replace(entry);
+
+  /// Set production stage (from synced stage-change logs).
+  Future<void> updateLivestockStageId(String uuid, int? stageId) async {
+    await (update(livestocks)..where((l) => l.uuid.equals(uuid))).write(
+      LivestocksCompanion(stageId: Value(stageId)),
+    );
+  }
+
+  Future<void> updateLivestockIdentificationByUuid(
+    String uuid, {
+    required bool isIdentified,
+    String? dummyTagId,
+    String? barcodeTagId,
+    String? rfidTagId,
+  }) async {
+    await (update(livestocks)..where((l) => l.uuid.equals(uuid))).write(
+      LivestocksCompanion(
+        isIdentified: Value(isIdentified),
+        dummyTagId: Value(dummyTagId),
+        barcodeTagId: Value(barcodeTagId),
+        rfidTagId: Value(rfidTagId),
+      ),
+    );
+  }
 
   /// Delete a livestock
   Future<int> deleteLivestock(int id) =>

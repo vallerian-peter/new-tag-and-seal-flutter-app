@@ -19,6 +19,9 @@ import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_cr
 import 'dart:developer';
 import 'package:new_tag_and_seal_flutter_app/features/scanner/presentation/scanner_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/data/repository/events_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
+import 'package:intl/intl.dart';
 
 /// Modern Livestock Registration/Edit Form Screen
 ///
@@ -64,11 +67,14 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   int? _selectedLivestockObtainedMethodId;
   String? _selectedMotherUuid;
   String? _selectedFatherUuid;
+  String? _selectedBirthEventUuid;
   DateTime? _selectedDateOfBirth;
   DateTime? _selectedDateFirstEnteredToFarm;
   String _selectedStatus = 'active';
   String? _selectedPrimaryColor;
   String? _selectedSecondaryColor;
+  int? _selectedStageId;
+  bool _isIdentified = true;
 
   // Local data
   List<Farm> _farms = [];
@@ -80,11 +86,26 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   List<LivestockObtainedMethod> _livestockObtainedMethods = [];
   List<Livestock> _eligibleMothers = [];
   List<Livestock> _eligibleFathers = [];
+  List<BirthEvent> _birthEvents = [];
+  List<Stage> _stages = [];
+  List<Stage> _filteredStages = [];
   // Keep all active livestock so we can filter eligible parents by livestock type
   List<Livestock> _allLivestock = [];
 
   bool _isLoadingData = true;
   bool _hasLoadedData = false;
+  bool _hasLostDisposal = false; // Track if livestock has disposal with reason='Lost'
+  DisposalModel? _lostDisposal; // Store the Lost disposal record for displaying details
+
+  static const Set<String> _earlyStageNames = {
+    'piglet',
+    'calf',
+    'kid',
+    'lamb',
+    'chick',
+    'newborn',
+    'neonate',
+  };
 
   @override
   void initState() {
@@ -150,6 +171,30 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     }
   }
 
+  Stage? _getSelectedStage() {
+    if (_selectedStageId == null) return null;
+    for (final stage in _stages) {
+      if (stage.id == _selectedStageId) return stage;
+    }
+    return null;
+  }
+
+  bool get _isEarlyStageSelected {
+    final stage = _getSelectedStage();
+    if (stage == null) return false;
+    return _earlyStageNames.contains(stage.name.trim().toLowerCase());
+  }
+
+  bool get _disableTagFields => _isEarlyStageSelected;
+
+  void _applyStageIdentificationRules() {
+    if (!_isEarlyStageSelected) return;
+    _isIdentified = false;
+    _dummyTagIdController.clear();
+    _barcodeTagIdController.clear();
+    _rfidTagIdController.clear();
+  }
+
   Widget _buildScanSuffixButton({
     required IconData icon,
     required String tooltip,
@@ -193,9 +238,12 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     _selectedLivestockObtainedMethodId = livestock.livestockObtainedMethodId;
     _selectedMotherUuid = livestock.motherUuid;
     _selectedFatherUuid = livestock.fatherUuid;
+    _selectedBirthEventUuid = livestock.birthEventUuid;
     _selectedDateOfBirth = DateTime.parse(livestock.dateOfBirth);
     _selectedDateFirstEnteredToFarm = livestock.dateFirstEnteredToFarm;
     _selectedStatus = livestock.status;
+    _selectedStageId = livestock.stageId;
+    _isIdentified = livestock.isIdentified;
 
     log('✅ Form pre-filled');
   }
@@ -223,8 +271,61 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       final breeds = await database.breedDao.getAllBreeds();
       final methods = await database.livestockObtainedMethodDao
           .getAllLivestockObtainedMethods();
+      final stages = await database.stageDao.getAllStages();
+      final birthEvents = await database.eventDao.getBirthEvents();
       final allLivestock = await database.livestockDao
           .getAllActiveLivestock(); // ✅ Only active livestock
+
+      // Check if livestock has disposal with disposalType='Lost' AND status='notActive' (only in edit mode)
+      bool hasLostDisposal = false;
+      if (isEditMode && widget.livestock != null) {
+        try {
+          // Check if livestock status is 'notActive'
+          final isNotActive = widget.livestock!.status.toLowerCase() == 'notactive';
+          
+          if (isNotActive) {
+            // Get all disposal types to find the "Lost" type
+            final disposalTypes = await database.logReferenceDao.getAllDisposalTypes();
+            DisposalType? lostDisposalType;
+            try {
+              lostDisposalType = disposalTypes.firstWhere(
+                (type) => type.name.toLowerCase() == 'lost',
+              );
+            } catch (e) {
+              log('⚠️ "Lost" disposal type not found in disposal types list');
+            }
+            
+            if (lostDisposalType != null) {
+              // Get disposals for this livestock
+              final eventsRepository = EventsRepository(database);
+              final disposals = await eventsRepository.getDisposals(
+                livestockUuid: widget.livestock!.uuid,
+              );
+              
+              // Find the disposal with disposalTypeId matching "Lost" disposal type
+              hasLostDisposal = disposals.any(
+                (disposal) => disposal.disposalTypeId == lostDisposalType!.id,
+              );
+              
+              if (hasLostDisposal) {
+                try {
+                  _lostDisposal = disposals.firstWhere(
+                    (disposal) => disposal.disposalTypeId == lostDisposalType!.id,
+                  );
+                } catch (e) {
+                  log('⚠️ Error finding lost disposal: $e');
+                }
+              }
+              
+              log(
+                '🔍 Checked disposals for livestock ${widget.livestock!.uuid}: hasLostDisposal=$hasLostDisposal, isNotActive=$isNotActive, lostDisposalTypeId=${lostDisposalType.id}',
+              );
+            }
+          }
+        } catch (e) {
+          log('❌ Error checking disposals: $e');
+        }
+      }
 
       setState(() {
         _farms = farms;
@@ -232,7 +333,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         _species = species;
         _breeds = breeds;
         _livestockObtainedMethods = methods;
+        _stages = stages;
+        _birthEvents = birthEvents;
         _allLivestock = allLivestock;
+        _hasLostDisposal = hasLostDisposal;
 
         // Filter species & breeds immediately if livestock type is already selected (edit mode)
         if (_selectedLivestockTypeId != null) {
@@ -248,12 +352,16 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             _filteredSpecies = species;
           }
           _autoSelectSpeciesForLivestockType();
+          _filterStagesByLivestockType();
+          _applyStageIdentificationRules();
           log(
             '✅ Filtered ${_filteredBreeds.length} breeds and ${_filteredSpecies.length} species for type $_selectedLivestockTypeId',
           );
         } else {
           _filteredSpecies = species;
           _filteredBreeds = breeds;
+          _filteredStages = stages;
+          _applyStageIdentificationRules();
         }
 
         _isLoadingData = false;
@@ -432,6 +540,28 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         '✅ Auto-selected species "${matchingSpecies.name}" for livestock type "${selectedType.name}"',
       );
     }
+  }
+
+  void _filterStagesByLivestockType() {
+    if (_selectedLivestockTypeId == null) {
+      setState(() {
+        _filteredStages = _stages;
+        _selectedStageId = null;
+      });
+      return;
+    }
+
+    final filtered = _stages
+        .where((stage) => stage.livestockTypeId == _selectedLivestockTypeId)
+        .toList();
+
+    setState(() {
+      _filteredStages = filtered;
+      if (_selectedStageId != null &&
+          !_filteredStages.any((s) => s.id == _selectedStageId)) {
+        _selectedStageId = null;
+      }
+    });
   }
 
   @override
@@ -649,6 +779,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         'dateOfBirth': _selectedDateOfBirth!.toIso8601String().split('T')[0],
         'motherUuid': _selectedMotherUuid,
         'fatherUuid': _selectedFatherUuid,
+        'birthEventUuid': _selectedBirthEventUuid,
         'gender': _selectedGender,
         'breedId': _selectedBreedId,
         'speciesId': selectedSpeciesId,
@@ -658,6 +789,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         'weightAsOnRegistration': double.parse(_weightController.text.trim()),
         'primaryColor': _selectedPrimaryColor,
         'secondaryColor': _selectedSecondaryColor,
+        'stageId': _selectedStageId,
+        'isIdentified': _isIdentified,
       };
 
       if (isEditMode) {
@@ -670,7 +803,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         // Close loading dialog
         if (mounted) Navigator.of(context).pop();
 
-        if (updatedLivestock != null) {
+        if (updatedLivestock) {
           log('✅ Livestock updated successfully');
 
           // Trigger bill creation for extension officers BEFORE success dialog
@@ -882,7 +1015,19 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             return DropdownItem<String>(value: farm.uuid, label: farm.name);
           }).toList(),
           onChanged: (value) {
-            setState(() => _selectedFarmUuid = value);
+            setState(() {
+              _selectedFarmUuid = value;
+              if (_selectedBirthEventUuid != null) {
+                final stillValid = _birthEvents.any(
+                  (event) =>
+                      event.uuid == _selectedBirthEventUuid &&
+                      event.farmUuid == value,
+                );
+                if (!stillValid) {
+                  _selectedBirthEventUuid = null;
+                }
+              }
+            });
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -904,7 +1049,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         // Livestock Name
         CustomTextField(
           controller: _nameController,
-          label: l10n.livestockName,
+          label: '${l10n.livestockName} *',
           hintText: l10n.enterLivestockName,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -918,7 +1063,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         // Identification Number
         CustomTextField(
           controller: _identificationNumberController,
-          label: l10n.identificationNumber,
+          label: '${l10n.identificationNumber} *',
           hintText: l10n.enterIdentificationNumber,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -926,76 +1071,6 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             }
             return null;
           },
-        ),
-        const SizedBox(height: 24),
-
-        // Section Title: Tag IDs
-        _buildSectionTitle(
-          icon: Icons.qr_code_2,
-          title: l10n.tagIdentification,
-          subtitle: l10n.optionalEnterTagIds,
-        ),
-        const SizedBox(height: 12),
-
-        // Dummy Tag ID
-        CustomTextField(
-          controller: _dummyTagIdController,
-          label: l10n.dummyTagId,
-          hintText: l10n.enterDummyTagId,
-          validator: (value) {
-            // Dummy tag is optional
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-
-        // Barcode Tag ID
-        CustomTextField(
-          controller: _barcodeTagIdController,
-          label: l10n.barcodeTagId,
-          hintText: l10n.enterBarcodeTagId,
-          onChanged: (value) {
-            // Keep barcode and RFID IDs in sync when typing or deleting
-            _updateTagIds(value);
-          },
-          // Optional: if needed, enforce uniqueness server-side; allow empty here
-          validator: (value) => null,
-          suffixIcon: _buildScanSuffixButton(
-            icon: Icons.qr_code_scanner,
-            tooltip: l10n.scanOptionBarcode,
-            onPressed: () => _handleScanForField(
-              _barcodeTagIdController,
-              TagScanMode.barcode,
-            ),
-          ),
-          suffixIconConstraints: const BoxConstraints(
-            minHeight: 48,
-            minWidth: 48,
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // RFID Tag ID
-        CustomTextField(
-          controller: _rfidTagIdController,
-          label: l10n.rfidTagId,
-          hintText: l10n.enterRfidTagId,
-          onChanged: (value) {
-            // Keep RFID and barcode IDs in sync when typing or deleting
-            _updateTagIds(value);
-          },
-          // Optional: if needed, enforce uniqueness server-side; allow empty here
-          validator: (value) => null,
-          suffixIcon: _buildScanSuffixButton(
-            icon: Icons.nfc,
-            tooltip: l10n.scanOptionRfid,
-            onPressed: () =>
-                _handleScanForField(_rfidTagIdController, TagScanMode.rfid),
-          ),
-          suffixIconConstraints: const BoxConstraints(
-            minHeight: 48,
-            minWidth: 48,
-          ),
         ),
       ],
     );
@@ -1028,6 +1103,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               _selectedLivestockTypeId = value;
               _filterBreedsByLivestockType();
             });
+            _filterStagesByLivestockType();
             // Also re-filter eligible parents by livestock type
             _updateEligibleParents();
           },
@@ -1142,10 +1218,126 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         ),
         const SizedBox(height: 16),
 
+        CustomDropdown<int>(
+          label: l10n.stage,
+          hint: _selectedLivestockTypeId == null
+              ? l10n.pleaseSelectLivestockType
+              : l10n.select,
+          icon: Icons.stacked_line_chart_outlined,
+          value: _selectedStageId,
+          enabled: _selectedLivestockTypeId != null,
+          dropdownItems: _filteredStages
+              .map(
+                (stage) => DropdownItem<int>(
+                  value: stage.id,
+                  label: stage.name,
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedStageId = value;
+              _applyStageIdentificationRules();
+            });
+          },
+          isRequired: false,
+        ),
+        const SizedBox(height: 16),
+
+        // Section Title: Tag IDs
+        _buildSectionTitle(
+          icon: Icons.qr_code_2,
+          title: l10n.tagIdentification,
+          subtitle: l10n.optionalEnterTagIds,
+        ),
+        const SizedBox(height: 12),
+
+        // Dummy Tag ID
+        CustomTextField(
+          controller: _dummyTagIdController,
+          label: l10n.dummyTagId,
+          hintText: l10n.enterDummyTagId,
+          enabled: !_disableTagFields,
+          validator: (value) => null,
+        ),
+        const SizedBox(height: 16),
+
+        // Barcode Tag ID
+        CustomTextField(
+          controller: _barcodeTagIdController,
+          label: l10n.barcodeTagId,
+          hintText: l10n.enterBarcodeTagId,
+          enabled: !_disableTagFields,
+          onChanged: (value) {
+            _updateTagIds(value);
+          },
+          validator: (value) => null,
+          suffixIcon: _disableTagFields
+              ? null
+              : _buildScanSuffixButton(
+                  icon: Icons.qr_code_scanner,
+                  tooltip: l10n.scanOptionBarcode,
+                  onPressed: () => _handleScanForField(
+                    _barcodeTagIdController,
+                    TagScanMode.barcode,
+                  ),
+                ),
+          suffixIconConstraints: const BoxConstraints(
+            minHeight: 48,
+            minWidth: 48,
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // RFID Tag ID
+        CustomTextField(
+          controller: _rfidTagIdController,
+          label: l10n.rfidTagId,
+          hintText: l10n.enterRfidTagId,
+          enabled: !_disableTagFields,
+          onChanged: (value) {
+            _updateTagIds(value);
+          },
+          validator: (value) => null,
+          suffixIcon: _disableTagFields
+              ? null
+              : _buildScanSuffixButton(
+                  icon: Icons.nfc,
+                  tooltip: l10n.scanOptionRfid,
+                  onPressed: () =>
+                      _handleScanForField(_rfidTagIdController, TagScanMode.rfid),
+                ),
+          suffixIconConstraints: const BoxConstraints(
+            minHeight: 48,
+            minWidth: 48,
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        CustomDropdown<String>(
+          label: l10n.identificationStatus,
+          hint: l10n.select,
+          icon: Icons.verified_outlined,
+          value: _isIdentified ? 'identified' : 'not_identified',
+          enabled: !_isEarlyStageSelected,
+          dropdownItems: [
+            DropdownItem<String>(value: 'identified', label: l10n.identified),
+            DropdownItem<String>(
+              value: 'not_identified',
+              label: l10n.notIdentified,
+            ),
+          ],
+          onChanged: (value) {
+            setState(() => _isIdentified = value == 'identified');
+          },
+          isRequired: false,
+        ),
+        const SizedBox(height: 16),
+
         // Weight with Bluetooth
         WeightInputWithBluetooth(
           controller: _weightController,
-          label: l10n.weightKg,
+          label: '${l10n.weightKg} *',
           hintText: l10n.enterWeightOrBluetooth,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -1213,6 +1405,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             });
           },
           validator: (value) => null, // Optional field
+          isRequired: false,
         ),
         const SizedBox(height: 16),
 
@@ -1233,6 +1426,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             setState(() => _selectedSecondaryColor = value);
           },
           validator: (value) => null, // Optional field
+          isRequired: false,
         ),
       ],
     );
@@ -1275,6 +1469,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           onChanged: (value) {
             setState(() => _selectedMotherUuid = value);
           },
+          isRequired: false,
         ),
         const SizedBox(height: 16),
 
@@ -1302,6 +1497,47 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           onChanged: (value) {
             setState(() => _selectedFatherUuid = value);
           },
+          isRequired: false,
+        ),
+        const SizedBox(height: 24),
+
+        CustomDropdown<String>(
+          label: l10n.birthEventOptional,
+          hint: l10n.select,
+          icon: Icons.child_friendly_outlined,
+          value: _selectedBirthEventUuid,
+          dropdownItems: _birthEvents
+              .where(
+                (event) =>
+                    _selectedFarmUuid == null || event.farmUuid == _selectedFarmUuid,
+              )
+              .map(
+                (event) => DropdownItem<String>(
+                  value: event.uuid,
+                  label:
+                      '${event.eventType.toUpperCase()} - ${event.startDate.split('T').first}',
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            setState(() => _selectedBirthEventUuid = value);
+          },
+          isRequired: false,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.birthEventOptionalHelper,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.addLivestockAllTypesReminder,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: 24),
 
@@ -1374,30 +1610,301 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         const SizedBox(height: 24),
 
         // Section Title: Status
-        _buildSectionTitle(
-          icon: Icons.check_circle_outline,
-          title: l10n.livestockStatus,
-          subtitle: l10n.setCurrentStatus,
-        ),
+        // Only show status field if:
+        // - Not in edit mode (for new livestock), OR
+        // - In edit mode AND livestock has disposal with reason='Lost' AND livestock status is 'notActive'
+        if (!isEditMode || (isEditMode && _hasLostDisposal)) ...[
+          _buildSectionTitle(
+            icon: Icons.check_circle_outline,
+            title: l10n.livestockStatus,
+            subtitle: l10n.setCurrentStatus,
+          ),
 
-        const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-        // Status
-        CustomDropdown<String>(
-          label: l10n.status,
-          hint: l10n.select,
-          icon: Icons.check_circle_outline,
-          value: _selectedStatus,
-          dropdownItems: [
-            DropdownItem(value: 'active', label: l10n.active),
-            DropdownItem(value: 'notActive', label: l10n.notActive),
-          ],
-          onChanged: (value) {
-            setState(() => _selectedStatus = value ?? 'active');
-          },
-        ),
+          // Status
+          CustomDropdown<String>(
+            label: l10n.status,
+            hint: l10n.select,
+            icon: Icons.check_circle_outline,
+            value: _selectedStatus,
+            enabled: !isEditMode || (isEditMode && _hasLostDisposal), // Only enable if not in edit mode or has Lost disposal
+            dropdownItems: [
+              DropdownItem(value: 'active', label: l10n.active),
+              DropdownItem(value: 'notActive', label: l10n.notActive),
+            ],
+            onChanged: (value) async {
+              final newStatus = value ?? 'active';
+              if (isEditMode && _hasLostDisposal && newStatus == 'active') {
+                // Temporarily update to show the selection
+                setState(() => _selectedStatus = newStatus);
+                // Show confirmation dialog when changing to 'active' for livestock with Lost disposal
+                final confirmed = await _showLivestockFoundConfirmation(newStatus);
+                // If user said No, set status to 'notActive'
+                if (confirmed != true) {
+                  setState(() => _selectedStatus = 'notActive');
+                }
+                // If user said Yes, status is already set to 'active' and disposal will be deleted
+              } else {
+                setState(() => _selectedStatus = newStatus);
+              }
+            },
+          ),
+        ],
       ],
     );
+  }
+
+  /// Show confirmation dialog when changing status to 'active' for livestock with Lost disposal
+  /// Returns true if user confirmed, false if cancelled
+  Future<bool> _showLivestockFoundConfirmation(String newStatus) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Format the disposal date
+    String formattedDate = '';
+    if (_lostDisposal != null) {
+      try {
+        final dateStr = _lostDisposal!.eventDate ?? _lostDisposal!.createdAt;
+        if (dateStr.isNotEmpty) {
+          final date = DateTime.parse(dateStr);
+          formattedDate = DateFormat('MMMM dd, yyyy', Localizations.localeOf(context).toString()).format(date);
+        }
+      } catch (e) {
+        log('❌ Error formatting disposal date: $e');
+        formattedDate = _lostDisposal!.eventDate ?? _lostDisposal!.createdAt;
+      }
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.help_outline,
+                color: Constants.primaryColor,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  l10n.markLivestockAsFound,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Description
+                Text(
+                  l10n.livestockFoundConfirmationDescription,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[300] : Colors.black87,
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Disposal details container
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[800] : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Lost status
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.livestockWasMarkedAsLost,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black87,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (formattedDate.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${l10n.date}: $formattedDate',
+                              style: TextStyle(
+                                color: isDark ? Colors.grey[300] : Colors.black87,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Action description
+                Text(
+                  l10n.livestockFoundActionDescription,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                l10n.no,
+                style: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                l10n.yes,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      // User confirmed: delete disposal records and set status to 'active'
+      await _handleLivestockFound();
+      return true;
+    }
+    // If confirmed == false or null, return false to revert status
+    return false;
+  }
+
+  /// Handle livestock found: delete disposal records and set status to 'active'
+  Future<void> _handleLivestockFound() async {
+    final l10n = AppLocalizations.of(context)!;
+    final database = Provider.of<AppDatabase>(context, listen: false);
+
+    try {
+      // Show loading dialog
+      AlertDialogs.showLoading(
+        context: context,
+        title: l10n.save,
+        message: l10n.loading,
+        isDismissible: false,
+      );
+
+      // Get all disposal records for this livestock
+      final eventsRepository = EventsRepository(database);
+      final disposals = await eventsRepository.getDisposals(
+        livestockUuid: widget.livestock!.uuid,
+      );
+
+      // Mark each disposal record as deleted for syncing (soft delete)
+      int deletedCount = 0;
+      for (final disposal in disposals) {
+        try {
+          await eventsRepository.markDisposalAsDeleted(disposal.uuid);
+          deletedCount++;
+          log('🗑️ Marked disposal record as deleted (pending sync): ${disposal.uuid}');
+        } catch (e) {
+          log('❌ Error marking disposal as deleted ${disposal.uuid}: $e');
+        }
+      }
+
+      log('✅ Marked $deletedCount disposal record(s) as deleted for livestock ${widget.livestock!.uuid}');
+
+      // Update status to 'active'
+      setState(() {
+        _selectedStatus = 'active';
+        _hasLostDisposal = false; // Update flag since disposals are deleted
+      });
+
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      // Show success message
+      if (mounted) {
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: l10n.livestockStatusUpdatedAndDisposalRemoved,
+          buttonText: l10n.ok,
+        );
+      }
+    } catch (e) {
+      log('❌ Error handling livestock found: $e');
+
+      // Close loading dialog if open
+      if (mounted) {
+        try {
+          Navigator.of(context).pop();
+        } catch (_) {
+          // Dialog might already be closed
+        }
+      }
+
+      // Show error message
+      if (mounted) {
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to update livestock status: ${e.toString()}',
+          buttonText: l10n.ok,
+        );
+      }
+    }
   }
 
   // Helper method to build section titles

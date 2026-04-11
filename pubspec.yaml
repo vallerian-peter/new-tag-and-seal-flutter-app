@@ -5,18 +5,7 @@ description: "LiveStock Tagging and Sealing App"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
-version: 1.1.2+0
+version: 1.1.2+4
 
 environment:
   sdk: ^3.9.2
@@ -88,6 +77,10 @@ dependencies:
   
   # Charts
   fl_chart: ^0.69.0
+
+  uuid: ^4.5.1
+  pdf: ^3.11.1
+  printing: ^5.13.4
 
 dev_dependencies:
   flutter_test:

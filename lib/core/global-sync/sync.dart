@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -14,6 +15,7 @@ import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/v
 import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/farm_user_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/data/repository/bills_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_expense_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 
 /// Global synchronization service for the application
@@ -21,6 +23,45 @@ import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation
 /// Handles all data sync operations between the mobile app and backend server.
 /// This service is responsible for fetching and storing data locally for offline access.
 class Sync {
+  // #region agent log
+  static void _agentDebugLog(
+    String location,
+    String message,
+    Map<String, Object?> data, {
+    String hypothesisId = 'H',
+    String runId = 'verify',
+  }) {
+    try {
+      final uri = Uri.parse(
+        Platform.isAndroid
+            ? 'http://10.0.2.2:7242/ingest/c1eea2b6-7d66-496d-9c04-06b3d492fc3f'
+            : 'http://127.0.0.1:7242/ingest/c1eea2b6-7d66-496d-9c04-06b3d492fc3f',
+      );
+      unawaited(
+        http
+            .post(
+              uri,
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': '4b9e2d',
+              },
+              body: jsonEncode({
+                'sessionId': '4b9e2d',
+                'location': location,
+                'message': message,
+                'data': data,
+                'timestamp': DateTime.now().millisecondsSinceEpoch,
+                'hypothesisId': hypothesisId,
+                'runId': runId,
+              }),
+            )
+            .then((_) {}, onError: (_, __) {}),
+      );
+    } catch (_) {}
+  }
+
+  // #endregion
+
   // ============================================================================
   // PUBLIC SYNC METHODS
   // ============================================================================
@@ -90,7 +131,11 @@ class Sync {
       );
 
       // 4. Store all data locally with conflict resolution
-      await _storeAllSyncData(database, data, notificationProvider: notificationProvider);
+      await _storeAllSyncData(
+        database,
+        data,
+        notificationProvider: notificationProvider,
+      );
 
       log('✅ Splash sync completed successfully');
     } catch (e) {
@@ -239,11 +284,16 @@ class Sync {
 
       final qp = <String, String>{};
 
-      final normalizedRole = role.toLowerCase().replaceAll(RegExp(r'[ _-]+'), '');
+      final normalizedRole = role.toLowerCase().replaceAll(
+        RegExp(r'[ _-]+'),
+        '',
+      );
       if (normalizedRole == 'extensionofficer') {
         final farmerId = await storage.read(key: 'extensionOfficerFarmerId');
         final inviteId = await storage.read(key: 'extensionOfficerInviteId');
-        final accessCode = await storage.read(key: 'extensionOfficerAccessCode');
+        final accessCode = await storage.read(
+          key: 'extensionOfficerAccessCode',
+        );
 
         if (farmerId != null && farmerId.isNotEmpty) {
           qp['farmerId'] = farmerId;
@@ -262,10 +312,7 @@ class Sync {
       final base = Uri.parse('${ApiEndpoints.splashSyncAll}/$userId');
       final uri = qp.isEmpty ? base : base.replace(queryParameters: qp);
 
-      final response = await http.get(
-        uri,
-        headers: headers,
-      );
+      final response = await http.get(uri, headers: headers);
 
       return _handleSyncResponse(response, 'splash sync');
     } on SocketException catch (e) {
@@ -292,7 +339,11 @@ class Sync {
     NotificationProvider? notificationProvider,
   }) async {
     await _storeLocationAndReferenceData(database, data);
-    await _storeUserSpecificData(database, data, notificationProvider: notificationProvider);
+    await _storeUserSpecificData(
+      database,
+      data,
+      notificationProvider: notificationProvider,
+    );
   }
 
   // ============================================================================
@@ -396,6 +447,25 @@ class Sync {
     final unsyncedTransfers = await eventsRepository
         .getUnsyncedTransfersForApi();
 
+    log('📤 Fetching unsynced teeth clippings for API...');
+    final unsyncedTeethClippings = await eventsRepository
+        .getUnsyncedTeethClippingsForApi();
+    log('📤 Fetching unsynced tail dockings for API...');
+    final unsyncedTailDockings = await eventsRepository
+        .getUnsyncedTailDockingsForApi();
+    log('📤 Fetching unsynced iron injections for API...');
+    final unsyncedIronInjections = await eventsRepository
+        .getUnsyncedIronInjectionsForApi();
+    log('📤 Fetching unsynced livestock markings for API...');
+    final unsyncedLivestockMarkings = await eventsRepository
+        .getUnsyncedLivestockMarkingsForApi();
+    log('📤 Fetching unsynced stage changes for API...');
+    final unsyncedStageChanges = await eventsRepository
+        .getUnsyncedStageChangesForApi();
+    log('📤 Fetching unsynced prepuce conditions for API...');
+    final unsyncedPrepuceConditions = await eventsRepository
+        .getUnsyncedPrepuceConditionsForApi();
+
     log('📤 Fetching unsynced vaccines for API...');
     final unsyncedVaccines = await vaccinesRepository
         .getUnsyncedVaccinesForApi();
@@ -406,6 +476,11 @@ class Sync {
 
     log('📤 Fetching unsynced bills for API...');
     final unsyncedBills = await billsRepository.getUnsyncedBillsForApi();
+
+    log('📤 Fetching unsynced manual finance expenses for API...');
+    final unsyncedFinanceExpenses = await FinanceExpenseRepository(
+      database,
+    ).getUnsyncedManualExpensesForApi();
 
     // TODO: Add other repositories as they're implemented
     // final vaccineRepository = VaccineRepository(database);
@@ -428,9 +503,16 @@ class Sync {
     log('  ✅ Logs - Inseminations: ${unsyncedInseminations.length}');
     log('  ✅ Logs - Dryoffs: ${unsyncedDryoffs.length}');
     log('  ✅ Logs - Transfers: ${unsyncedTransfers.length}');
+    log('  ✅ Logs - TeethClippings: ${unsyncedTeethClippings.length}');
+    log('  ✅ Logs - TailDockings: ${unsyncedTailDockings.length}');
+    log('  ✅ Logs - IronInjections: ${unsyncedIronInjections.length}');
+    log('  ✅ Logs - LivestockMarkings: ${unsyncedLivestockMarkings.length}');
+    log('  ✅ Logs - StageChanges: ${unsyncedStageChanges.length}');
+    log('  ✅ Logs - PrepuceConditions: ${unsyncedPrepuceConditions.length}');
     log('  ✅ Vaccines: ${unsyncedVaccines.length}');
     log('  ✅ FarmUsers: ${unsyncedFarmUsers.length}');
     log('  ✅ Bills: ${unsyncedBills.length}');
+    log('  ✅ Finance expenses (manual): ${unsyncedFinanceExpenses.length}');
 
     // Count total log types (now all 13 unique types are synced)
     final totalLogCount =
@@ -446,11 +528,15 @@ class Sync {
         unsyncedPregnancies.length +
         unsyncedInseminations.length +
         unsyncedDryoffs.length +
-        unsyncedTransfers.length;
+        unsyncedTransfers.length +
+        unsyncedTeethClippings.length +
+        unsyncedTailDockings.length +
+        unsyncedIronInjections.length +
+        unsyncedLivestockMarkings.length +
+        unsyncedStageChanges.length +
+        unsyncedPrepuceConditions.length;
 
-    log(
-      '  📊 Total unsynced logs: $totalLogCount (across 13 unique log types)',
-    );
+    log('  📊 Total unsynced logs: $totalLogCount (across log types)');
 
     // Note: Farm users will trigger email notifications when synced to backend
     if (unsyncedFarmUsers.isNotEmpty) {
@@ -477,9 +563,16 @@ class Sync {
         'inseminations': unsyncedInseminations,
         'dryoffs': unsyncedDryoffs,
         'transfers': unsyncedTransfers,
+        'teethClippings': unsyncedTeethClippings,
+        'tailDockings': unsyncedTailDockings,
+        'ironInjections': unsyncedIronInjections,
+        'livestockMarkings': unsyncedLivestockMarkings,
+        'stageChanges': unsyncedStageChanges,
+        'prepuceConditions': unsyncedPrepuceConditions,
       },
       'vaccines': unsyncedVaccines,
       'bills': unsyncedBills,
+      'financeExpenses': unsyncedFinanceExpenses,
       'farmUsers': unsyncedFarmUsers,
       // TODO: Add other collections here
       // 'vaccines': unsyncedVaccines,
@@ -532,6 +625,16 @@ class Sync {
         .getUnsyncedInseminationsForApi();
     final dryoffs = await eventsRepository.getUnsyncedDryoffsForApi();
     final transfers = await eventsRepository.getUnsyncedTransfersForApi();
+    final teethClippings = await eventsRepository
+        .getUnsyncedTeethClippingsForApi();
+    final tailDockings = await eventsRepository.getUnsyncedTailDockingsForApi();
+    final ironInjections = await eventsRepository
+        .getUnsyncedIronInjectionsForApi();
+    final livestockMarkings = await eventsRepository
+        .getUnsyncedLivestockMarkingsForApi();
+    final stageChanges = await eventsRepository.getUnsyncedStageChangesForApi();
+    final prepuceConditions = await eventsRepository
+        .getUnsyncedPrepuceConditionsForApi();
 
     log('📊 [PHASE 1.4] Checking unsynced vaccines...');
     final vaccines = await vaccinesRepository.getUnsyncedVaccinesForApi();
@@ -564,6 +667,12 @@ class Sync {
       EventLogTypes.milking: milkings.length,
       EventLogTypes.dryoff: dryoffs.length,
       EventLogTypes.transfer: transfers.length,
+      EventLogTypes.teethClipping: teethClippings.length,
+      EventLogTypes.tailDocking: tailDockings.length,
+      EventLogTypes.ironInjection: ironInjections.length,
+      EventLogTypes.livestockMarking: livestockMarkings.length,
+      EventLogTypes.stageChange: stageChanges.length,
+      EventLogTypes.prepuceCondition: prepuceConditions.length,
     }..removeWhere((_, count) => count == 0);
 
     log(
@@ -587,6 +696,7 @@ class Sync {
     final vaccines = payload['vaccines'] as List? ?? [];
     final farmUsers = payload['farmUsers'] as List? ?? [];
     final bills = payload['bills'] as List? ?? [];
+    final financeExpenses = payload['financeExpenses'] as List? ?? [];
 
     bool logsEmpty = true;
     if (logs.isNotEmpty) {
@@ -605,7 +715,8 @@ class Sync {
         logsEmpty &&
         vaccines.isEmpty &&
         farmUsers.isEmpty &&
-        bills.isEmpty;
+        bills.isEmpty &&
+        financeExpenses.isEmpty;
   }
 
   // OLD VERSION - COMMENTED OUT (had bug: double extraction of data['data'])
@@ -666,6 +777,16 @@ class Sync {
 
       log('✅ Response From Server Sync Post Data: ${response.body}');
       final data = _handleSyncResponse(response, 'post sync');
+      _agentDebugLog(
+        'sync.dart:_sendPostSyncData',
+        'post sync ok',
+        {
+          'keys': data.keys.join(','),
+          'hasSyncedLogs': (data['syncedLogs'] != null).toString(),
+        },
+        hypothesisId: 'H1',
+        runId: 'post-fix',
+      );
       log(
         '✅ Data synced successfully: ${data.entries.map((e) => '${e.key}: ${e.value}').join(', ')}',
       );
@@ -843,6 +964,39 @@ class Sync {
         await eventsRepository.markTransfersAsSynced(syncedTransfers);
         log('  ✅ Marked ${syncedTransfers.length} transfers as synced');
       }
+
+      final syncedTeeth = _extractUuids(syncedLogs['teethClippings']);
+      if (syncedTeeth.isNotEmpty) {
+        await eventsRepository.markTeethClippingsAsSynced(syncedTeeth);
+        log('  ✅ Marked ${syncedTeeth.length} teeth clippings as synced');
+      }
+      final syncedTail = _extractUuids(syncedLogs['tailDockings']);
+      if (syncedTail.isNotEmpty) {
+        await eventsRepository.markTailDockingsAsSynced(syncedTail);
+        log('  ✅ Marked ${syncedTail.length} tail dockings as synced');
+      }
+      final syncedIron = _extractUuids(syncedLogs['ironInjections']);
+      if (syncedIron.isNotEmpty) {
+        await eventsRepository.markIronInjectionsAsSynced(syncedIron);
+        log('  ✅ Marked ${syncedIron.length} iron injections as synced');
+      }
+      final syncedMarkings = _extractUuids(syncedLogs['livestockMarkings']);
+      if (syncedMarkings.isNotEmpty) {
+        await eventsRepository.markLivestockMarkingsAsSynced(syncedMarkings);
+        log('  ✅ Marked ${syncedMarkings.length} livestock markings as synced');
+      }
+      final syncedStages = _extractUuids(syncedLogs['stageChanges']);
+      if (syncedStages.isNotEmpty) {
+        await eventsRepository.markStageChangesAsSynced(syncedStages);
+        log('  ✅ Marked ${syncedStages.length} stage changes as synced');
+      }
+      final syncedPrepuce = _extractUuids(syncedLogs['prepuceConditions']);
+      if (syncedPrepuce.isNotEmpty) {
+        await eventsRepository.markPrepuceConditionsAsSynced(syncedPrepuce);
+        log(
+          '  ✅ Marked ${syncedPrepuce.length} prepuce condition log(s) as synced',
+        );
+      }
     }
 
     // Mark vaccines as synced (if backend returns them)
@@ -867,6 +1021,20 @@ class Sync {
       final billsRepository = BillsRepository(database);
       await billsRepository.markBillsAsSynced(syncedBillUuids);
       log('  ✅ Marked ${syncedBillUuids.length} bills as synced');
+    }
+
+    final syncedFinanceExpenseUuids =
+        (syncedData['syncedFinanceExpenses'] as List<dynamic>?)
+            ?.map((item) => item['uuid'] as String)
+            .toList() ??
+        [];
+    if (syncedFinanceExpenseUuids.isNotEmpty) {
+      await FinanceExpenseRepository(
+        database,
+      ).markManualExpensesAsSynced(syncedFinanceExpenseUuids);
+      log(
+        '  ✅ Marked ${syncedFinanceExpenseUuids.length} manual finance expense(s) as synced',
+      );
     }
 
     // Mark farm users as synced (if backend returns them)
@@ -1024,8 +1192,8 @@ class Sync {
       // Store log events (feedings, weight changes, dewormings)
       final rawLogs = userSpecificData['logs'];
       Map<String, dynamic> logs = const {};
-      if (rawLogs is Map<String, dynamic>) {
-        logs = rawLogs;
+      if (rawLogs is Map) {
+        logs = Map<String, dynamic>.from(rawLogs);
         final vaccinationsCount = (logs['vaccinations'] as List?)?.length ?? 0;
         log('  💉 Found $vaccinationsCount vaccination(s) in sync response');
       } else if (rawLogs == null || (rawLogs is List && rawLogs.isEmpty)) {
@@ -1050,11 +1218,20 @@ class Sync {
 
       // Store bills
       final bills =
-          (userSpecificData['bills'] as List?)
-              ?.cast<Map<String, dynamic>>() ??
+          (userSpecificData['bills'] as List?)?.cast<Map<String, dynamic>>() ??
           const <Map<String, dynamic>>[];
       await BillsRepository(database).syncBills(bills);
+      await FinanceExpenseRepository(
+        database,
+      ).rebuildBillExpensesFromLocalBills();
 
+      final financeExpensesFromServer =
+          (userSpecificData['financeExpenses'] as List?)
+                  ?.cast<Map<String, dynamic>>() ??
+              const <Map<String, dynamic>>[];
+      await FinanceExpenseRepository(
+        database,
+      ).mergeFromServer(financeExpensesFromServer);
 
       final farmUsers =
           (userSpecificData['farmUsers'] as List?)
@@ -1102,8 +1279,15 @@ class Sync {
       final disposalsCount = _safeGetLogCount('disposals');
       final birthEventsCount = _safeGetLogCount('birthEvents');
       final abortedPregnanciesCount = _safeGetLogCount('abortedPregnancies');
+      final teethClippingsCount = _safeGetLogCount('teethClippings');
+      final tailDockingsCount = _safeGetLogCount('tailDockings');
+      final ironInjectionsCount = _safeGetLogCount('ironInjections');
+      final livestockMarkingsCount = _safeGetLogCount('livestockMarkings');
+      final stageChangesCount = _safeGetLogCount('stageChanges');
+      final prepuceConditionsCount = _safeGetLogCount('prepuceConditions');
       final vaccinesCount = vaccines.length;
       final billsCount = bills.length;
+      final financeExpensesCount = financeExpensesFromServer.length;
       final farmUsersCount = farmUsers.length;
       final invitedOfficersCount = invitedExtensionOfficers.length;
       log(
@@ -1112,7 +1296,11 @@ class Sync {
         'Dewormings: $dewormingsCount, Treatments: $treatmentsCount, '
         'Vaccinations: $vaccinationsCount, Disposals: $disposalsCount, '
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
-        'Vaccines: $vaccinesCount, Bills: $billsCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
+        'TeethClippings: $teethClippingsCount, TailDockings: $tailDockingsCount, '
+        'IronInjections: $ironInjectionsCount, LivestockMarkings: $livestockMarkingsCount, '
+        'StageChanges: $stageChangesCount, '
+        'PrepuceConditions: $prepuceConditionsCount, '
+        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
       );
     } else if (userType == 'field_worker') {
       log(
@@ -1129,8 +1317,8 @@ class Sync {
       Map<String, dynamic> logs = const {};
       try {
         final rawLogs = userSpecificData['logs'];
-        if (rawLogs is Map<String, dynamic>) {
-          logs = rawLogs;
+        if (rawLogs is Map) {
+          logs = Map<String, dynamic>.from(rawLogs);
           final vaccinationsCount =
               (logs['vaccinations'] as List?)?.length ?? 0;
           log('  💉 Found $vaccinationsCount vaccination(s) in sync response');
@@ -1150,9 +1338,9 @@ class Sync {
 
       try {
         await EventsRepository(
-        database,
-        notificationProvider: notificationProvider,
-      ).syncLogs(logs.isEmpty ? null : logs);
+          database,
+          notificationProvider: notificationProvider,
+        ).syncLogs(logs.isEmpty ? null : logs);
       } catch (e, stackTrace) {
         log('⚠️ Error syncing logs: $e\n$stackTrace');
         rethrow;
@@ -1166,10 +1354,21 @@ class Sync {
       await VaccinesRepository(database).syncVaccines(vaccines);
 
       // Store bills
-      final bills = (userSpecificData['bills'] as List?)
-              ?.cast<Map<String, dynamic>>() ??
+      final bills =
+          (userSpecificData['bills'] as List?)?.cast<Map<String, dynamic>>() ??
           const <Map<String, dynamic>>[];
       await BillsRepository(database).syncBills(bills);
+      await FinanceExpenseRepository(
+        database,
+      ).rebuildBillExpensesFromLocalBills();
+
+      final financeExpensesFromServer =
+          (userSpecificData['financeExpenses'] as List?)
+                  ?.cast<Map<String, dynamic>>() ??
+              const <Map<String, dynamic>>[];
+      await FinanceExpenseRepository(
+        database,
+      ).mergeFromServer(financeExpensesFromServer);
 
       // Store farm user profile info (optional - for reference)
       final farmUserData =
@@ -1231,11 +1430,18 @@ class Sync {
       final inseminationsCount = _safeGetLogCount('inseminations');
       final dryoffsCount = _safeGetLogCount('dryoffs');
       final transfersCount = _safeGetLogCount('transfers');
+      final teethClippingsCount = _safeGetLogCount('teethClippings');
+      final tailDockingsCount = _safeGetLogCount('tailDockings');
+      final ironInjectionsCount = _safeGetLogCount('ironInjections');
+      final livestockMarkingsCount = _safeGetLogCount('livestockMarkings');
+      final stageChangesCount = _safeGetLogCount('stageChanges');
+      final prepuceConditionsCount = _safeGetLogCount('prepuceConditions');
 
       final farmsCount = userSpecificData['farmsCount'] ?? 0;
       final livestockCount = userSpecificData['livestockCount'] ?? 0;
       final vaccinesCount = vaccines.length;
       final billsCount = bills.length;
+      final financeExpensesCount = financeExpensesFromServer.length;
 
       log(
         '  ✅ Field worker data stored (Farms: $farmsCount, Livestock: $livestockCount, '
@@ -1245,7 +1451,11 @@ class Sync {
         'BirthEvents: $birthEventsCount, AbortedPregnancies: $abortedPregnanciesCount, '
         'Milkings: $milkingsCount, Pregnancies: $pregnanciesCount, '
         'Inseminations: $inseminationsCount, Dryoffs: $dryoffsCount, '
-        'Transfers: $transfersCount, Vaccines: $vaccinesCount, Bills: $billsCount)',
+        'Transfers: $transfersCount, TeethClippings: $teethClippingsCount, '
+        'TailDockings: $tailDockingsCount, IronInjections: $ironInjectionsCount, '
+        'LivestockMarkings: $livestockMarkingsCount, StageChanges: $stageChangesCount, '
+        'PrepuceConditions: $prepuceConditionsCount, '
+        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount)',
       );
     } else if (userType == 'system_user') {
       log(
