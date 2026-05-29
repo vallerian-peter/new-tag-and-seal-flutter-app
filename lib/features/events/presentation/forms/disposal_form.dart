@@ -20,6 +20,7 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_income_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 
@@ -88,8 +89,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   void _prefillIfEditing() {
     final disposal = widget.disposal;
     _selectedFarmUuid = widget.farmUuid ?? disposal?.farmUuid;
-    _selectedLivestockUuid =
-        _isBulk ? null : widget.livestockUuid ?? disposal?.livestockUuid;
+    _selectedLivestockUuid = _isBulk
+        ? null
+        : widget.livestockUuid ?? disposal?.livestockUuid;
 
     if (disposal == null) return;
 
@@ -97,7 +99,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       final parsed = DateTime.tryParse(disposal.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _reasonsController.text = disposal.reasons;
@@ -170,7 +174,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             .toList();
       } else {
         selectedBulkLivestock = selectedBulkLivestock
-            .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
+            .where(
+              (item) => livestock.any((animal) => animal.uuid == item.uuid),
+            )
             .toList();
       }
     }
@@ -236,7 +242,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (!_isBulk && _selectedLivestockUuid == null && livestock.isNotEmpty) {
+        if (!_isBulk &&
+            _selectedLivestockUuid == null &&
+            livestock.isNotEmpty) {
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
@@ -257,8 +265,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
 
@@ -280,16 +289,18 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return false;
     }
 
@@ -319,7 +330,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     final title = isEditMode
         ? '${l10n.edit} ${l10n.disposal}'
         : l10n.addDisposal;
-    
+
     // Button text changes based on edit mode and current step (same pattern as Farm form)
     final buttonText = _currentStep == 1
         ? (isEditMode ? l10n.update : l10n.save)
@@ -363,7 +374,8 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
                         onStepCancel: _onStepCancel,
                         continueButtonText: buttonText,
                         backButtonText: l10n.back,
-                        finalStepButtonText: null, // Use continueButtonText instead
+                        finalStepButtonText:
+                            null, // Use continueButtonText instead
                         steps: [
                           StepperStep(
                             title: l10n.basicInformation,
@@ -601,7 +613,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
   void _onStepContinue() async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Same pattern as Farm form: validate current step before moving forward
     if (_currentStep < 1) {
       if (_formKey.currentState!.validate() &&
@@ -612,7 +624,8 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     }
 
     // Final step - validate and show confirmation dialog (same pattern as Farm form)
-    if (_formKey.currentState!.validate() && _hasValidLivestockSelection(l10n)) {
+    if (_formKey.currentState!.validate() &&
+        _hasValidLivestockSelection(l10n)) {
       final isEditMode = widget.isEditMode;
 
       // Show confirmation dialog
@@ -641,6 +654,10 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
+    final financeIncomeProvider = Provider.of<FinanceIncomeProvider>(
+      context,
+      listen: false,
+    );
 
     final selectedFarmUuid = widget.farmUuid ?? _selectedFarmUuid;
     final livestockUuids = _isBulk
@@ -651,17 +668,19 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
               widget.livestockUuid!
             else if (_selectedLivestockUuid != null &&
                 _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
+              _selectedLivestockUuid!,
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
     if (livestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return;
     }
 
@@ -728,12 +747,14 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updateDisposal(updatedModel);
 
         if (mounted) {
           Navigator.of(context).pop();
-          
+
+          await financeIncomeProvider.upsertDisposalIncome(updated);
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.disposal,
@@ -742,7 +763,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -763,11 +784,12 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           message: l10n.bulkOperationInProgress,
           isDismissible: false,
         );
-        
+
         final created = <DisposalModel>[];
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
-          final uuid = 'disposal-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final uuid =
+              'disposal-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
           final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = DisposalModel(
             uuid: uuid,
@@ -788,10 +810,12 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           );
           created.add(await eventsProvider.addDisposal(model));
         }
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
+          await financeIncomeProvider.upsertDisposalIncomes(created);
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.disposal,
@@ -800,7 +824,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             quantity: 1,
             numberOfLivestock: livestockUuids.length,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -845,12 +869,14 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addDisposal(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
+          await financeIncomeProvider.upsertDisposalIncome(created);
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.disposal,
@@ -859,7 +885,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -896,9 +922,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
     final date = await showDatePicker(
@@ -987,7 +1011,9 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 

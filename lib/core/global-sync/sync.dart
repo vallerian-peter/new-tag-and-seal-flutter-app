@@ -16,6 +16,7 @@ import 'package:new_tag_and_seal_flutter_app/features/farmUser/data/repository/f
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/data/repository/bills_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_expense_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_income_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 
 /// Global synchronization service for the application
@@ -482,6 +483,11 @@ class Sync {
       database,
     ).getUnsyncedManualExpensesForApi();
 
+    log('📤 Fetching unsynced finance incomes for API...');
+    final unsyncedFinanceIncomes = await FinanceIncomeRepository(
+      database,
+    ).getUnsyncedIncomesForApi();
+
     // TODO: Add other repositories as they're implemented
     // final vaccineRepository = VaccineRepository(database);
     // final unsyncedVaccines = await vaccineRepository.getUnsyncedVaccinesForApi();
@@ -513,6 +519,7 @@ class Sync {
     log('  ✅ FarmUsers: ${unsyncedFarmUsers.length}');
     log('  ✅ Bills: ${unsyncedBills.length}');
     log('  ✅ Finance expenses (manual): ${unsyncedFinanceExpenses.length}');
+    log('  ✅ Finance incomes: ${unsyncedFinanceIncomes.length}');
 
     // Count total log types (now all 13 unique types are synced)
     final totalLogCount =
@@ -573,6 +580,7 @@ class Sync {
       'vaccines': unsyncedVaccines,
       'bills': unsyncedBills,
       'financeExpenses': unsyncedFinanceExpenses,
+      'financeIncomes': unsyncedFinanceIncomes,
       'farmUsers': unsyncedFarmUsers,
       // TODO: Add other collections here
       // 'vaccines': unsyncedVaccines,
@@ -583,7 +591,7 @@ class Sync {
   /// Returns a light-weight summary of unsynced entities for UI alerts.
   ///
   /// **Phase 1: Data Collection**
-  /// - Checks all 5 main data types (Farms, Livestock, Logs, Vaccines, FarmUsers)
+  /// - Checks all 6 main data types (Farms, Livestock, Logs, Vaccines, FarmUsers, FinanceExpenses)
   /// - Checks all 13 unique log types
   ///
   /// **Phase 2: Summary Creation**
@@ -642,6 +650,16 @@ class Sync {
     log('📊 [PHASE 1.5] Checking unsynced farm users...');
     final farmUsers = await farmUserRepository.getUnsyncedFarmUsersForApi();
 
+    log('📊 [PHASE 1.6] Checking unsynced manual finance expenses...');
+    final financeExpenses = await FinanceExpenseRepository(
+      database,
+    ).getUnsyncedManualExpensesForApi();
+
+    log('📊 [PHASE 1.7] Checking unsynced finance incomes...');
+    final financeIncomes = await FinanceIncomeRepository(
+      database,
+    ).getUnsyncedIncomesForApi();
+
     log('📊 [PHASE 2] Aggregating summary counts...');
     // Phase 2: Create summary with all log types
     // Count calving and farrowing separately by filtering birthEvents
@@ -676,7 +694,7 @@ class Sync {
     }..removeWhere((_, count) => count == 0);
 
     log(
-      '📊 [PHASE 2] Summary complete - Found: ${farms.length} farms, ${livestock.length} livestock, ${vaccines.length} vaccines, ${farmUsers.length} farmUsers, and ${logCounts.values.fold(0, (a, b) => a + b)} total logs across ${logCounts.length} log types',
+      '📊 [PHASE 2] Summary complete - Found: ${farms.length} farms, ${livestock.length} livestock, ${vaccines.length} vaccines, ${farmUsers.length} farmUsers, ${financeExpenses.length} finance expenses, ${financeIncomes.length} finance incomes, and ${logCounts.values.fold(0, (a, b) => a + b)} total logs across ${logCounts.length} log types',
     );
 
     return SyncUnsyncedSummary(
@@ -684,6 +702,8 @@ class Sync {
       livestock: livestock.length,
       vaccines: vaccines.length,
       farmUsers: farmUsers.length,
+      financeExpenses: financeExpenses.length,
+      financeIncomes: financeIncomes.length,
       logCounts: logCounts,
     );
   }
@@ -697,6 +717,7 @@ class Sync {
     final farmUsers = payload['farmUsers'] as List? ?? [];
     final bills = payload['bills'] as List? ?? [];
     final financeExpenses = payload['financeExpenses'] as List? ?? [];
+    final financeIncomes = payload['financeIncomes'] as List? ?? [];
 
     bool logsEmpty = true;
     if (logs.isNotEmpty) {
@@ -716,7 +737,8 @@ class Sync {
         vaccines.isEmpty &&
         farmUsers.isEmpty &&
         bills.isEmpty &&
-        financeExpenses.isEmpty;
+        financeExpenses.isEmpty &&
+        financeIncomes.isEmpty;
   }
 
   // OLD VERSION - COMMENTED OUT (had bug: double extraction of data['data'])
@@ -1037,6 +1059,20 @@ class Sync {
       );
     }
 
+    final syncedFinanceIncomeUuids =
+        (syncedData['syncedFinanceIncomes'] as List<dynamic>?)
+            ?.map((item) => item['uuid'] as String)
+            .toList() ??
+        [];
+    if (syncedFinanceIncomeUuids.isNotEmpty) {
+      await FinanceIncomeRepository(
+        database,
+      ).markIncomesAsSynced(syncedFinanceIncomeUuids);
+      log(
+        '  ✅ Marked ${syncedFinanceIncomeUuids.length} finance income(s) as synced',
+      );
+    }
+
     // Mark farm users as synced (if backend returns them)
     final syncedFarmUserUuids =
         (syncedData['syncedFarmUsers'] as List<dynamic>?)
@@ -1233,6 +1269,14 @@ class Sync {
         database,
       ).mergeFromServer(financeExpensesFromServer);
 
+      final financeIncomesFromServer =
+          (userSpecificData['financeIncomes'] as List?)
+                  ?.cast<Map<String, dynamic>>() ??
+              const <Map<String, dynamic>>[];
+      await FinanceIncomeRepository(
+        database,
+      ).mergeFromServer(financeIncomesFromServer);
+
       final farmUsers =
           (userSpecificData['farmUsers'] as List?)
               ?.cast<Map<String, dynamic>>() ??
@@ -1288,6 +1332,7 @@ class Sync {
       final vaccinesCount = vaccines.length;
       final billsCount = bills.length;
       final financeExpensesCount = financeExpensesFromServer.length;
+      final financeIncomesCount = financeIncomesFromServer.length;
       final farmUsersCount = farmUsers.length;
       final invitedOfficersCount = invitedExtensionOfficers.length;
       log(
@@ -1300,7 +1345,7 @@ class Sync {
         'IronInjections: $ironInjectionsCount, LivestockMarkings: $livestockMarkingsCount, '
         'StageChanges: $stageChangesCount, '
         'PrepuceConditions: $prepuceConditionsCount, '
-        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
+        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount, FinanceIncomes: $financeIncomesCount, FarmUsers: $farmUsersCount, InvitedOfficers: $invitedOfficersCount)',
       );
     } else if (userType == 'field_worker') {
       log(
@@ -1369,6 +1414,14 @@ class Sync {
       await FinanceExpenseRepository(
         database,
       ).mergeFromServer(financeExpensesFromServer);
+
+      final financeIncomesFromServer =
+          (userSpecificData['financeIncomes'] as List?)
+                  ?.cast<Map<String, dynamic>>() ??
+              const <Map<String, dynamic>>[];
+      await FinanceIncomeRepository(
+        database,
+      ).mergeFromServer(financeIncomesFromServer);
 
       // Store farm user profile info (optional - for reference)
       final farmUserData =
@@ -1442,6 +1495,7 @@ class Sync {
       final vaccinesCount = vaccines.length;
       final billsCount = bills.length;
       final financeExpensesCount = financeExpensesFromServer.length;
+      final financeIncomesCount = financeIncomesFromServer.length;
 
       log(
         '  ✅ Field worker data stored (Farms: $farmsCount, Livestock: $livestockCount, '
@@ -1455,7 +1509,7 @@ class Sync {
         'TailDockings: $tailDockingsCount, IronInjections: $ironInjectionsCount, '
         'LivestockMarkings: $livestockMarkingsCount, StageChanges: $stageChangesCount, '
         'PrepuceConditions: $prepuceConditionsCount, '
-        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount)',
+        'Vaccines: $vaccinesCount, Bills: $billsCount, FinanceExpenses: $financeExpensesCount, FinanceIncomes: $financeIncomesCount)',
       );
     } else if (userType == 'system_user') {
       log(
@@ -1474,6 +1528,8 @@ class SyncUnsyncedSummary {
   final int livestock;
   final int vaccines;
   final int farmUsers;
+  final int financeExpenses;
+  final int financeIncomes;
   final Map<String, int> logCounts;
 
   const SyncUnsyncedSummary({
@@ -1481,6 +1537,8 @@ class SyncUnsyncedSummary {
     required this.livestock,
     required this.vaccines,
     required this.farmUsers,
+    required this.financeExpenses,
+    required this.financeIncomes,
     required this.logCounts,
   });
 
@@ -1489,6 +1547,8 @@ class SyncUnsyncedSummary {
       livestock = 0,
       vaccines = 0,
       farmUsers = 0,
+      financeExpenses = 0,
+      financeIncomes = 0,
       logCounts = const {};
 
   int get totalPending =>
@@ -1496,6 +1556,8 @@ class SyncUnsyncedSummary {
       livestock +
       vaccines +
       farmUsers +
+      financeExpenses +
+      financeIncomes +
       logCounts.values.fold<int>(0, (acc, value) => acc + value);
 
   bool get hasPending => totalPending > 0;

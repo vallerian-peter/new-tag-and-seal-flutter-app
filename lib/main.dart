@@ -21,7 +21,9 @@ import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/prov
 import 'package:new_tag_and_seal_flutter_app/features/notifications/data/repository/notification_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_expense_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_income_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_expense_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_income_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,6 +48,7 @@ void main() async {
   final farmUserRepo = FarmUserRepository(database);
   final notificationRepo = NotificationRepository(database);
   final financeExpenseRepo = FinanceExpenseRepository(database);
+  final financeIncomeRepo = FinanceIncomeRepository(database);
 
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
@@ -80,6 +83,9 @@ void main() async {
   final financeExpenseProvider = FinanceExpenseProvider(
     repository: financeExpenseRepo,
   );
+  final financeIncomeProvider = FinanceIncomeProvider(
+    repository: financeIncomeRepo,
+  );
   await notificationProvider.loadNotifications();
 
   // Initialize EventsProvider with NotificationProvider for automatic notification creation
@@ -105,6 +111,7 @@ void main() async {
         Provider<AppAlarmManager>.value(value: alarmManager),
         ChangeNotifierProvider.value(value: notificationProvider),
         ChangeNotifierProvider.value(value: financeExpenseProvider),
+        ChangeNotifierProvider.value(value: financeIncomeProvider),
       ],
       child: const MyApp(),
     ),

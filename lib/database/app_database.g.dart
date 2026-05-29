@@ -31204,6 +31204,1013 @@ class FinanceExpensesCompanion extends UpdateCompanion<FinanceExpense> {
   }
 }
 
+class $FinanceIncomesTable extends FinanceIncomes
+    with TableInfo<$FinanceIncomesTable, FinanceIncome> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FinanceIncomesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceTypeMeta = const VerificationMeta(
+    'sourceType',
+  );
+  @override
+  late final GeneratedColumn<String> sourceType = GeneratedColumn<String>(
+    'source_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceUuidMeta = const VerificationMeta(
+    'sourceUuid',
+  );
+  @override
+  late final GeneratedColumn<String> sourceUuid = GeneratedColumn<String>(
+    'source_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _farmUuidMeta = const VerificationMeta(
+    'farmUuid',
+  );
+  @override
+  late final GeneratedColumn<String> farmUuid = GeneratedColumn<String>(
+    'farm_uuid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _farmerIdMeta = const VerificationMeta(
+    'farmerId',
+  );
+  @override
+  late final GeneratedColumn<int> farmerId = GeneratedColumn<int>(
+    'farmer_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _referenceNoMeta = const VerificationMeta(
+    'referenceNo',
+  );
+  @override
+  late final GeneratedColumn<String> referenceNo = GeneratedColumn<String>(
+    'reference_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _subjectTypeMeta = const VerificationMeta(
+    'subjectType',
+  );
+  @override
+  late final GeneratedColumn<String> subjectType = GeneratedColumn<String>(
+    'subject_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<int>(1),
+  );
+  static const VerificationMeta _unitAmountMeta = const VerificationMeta(
+    'unitAmount',
+  );
+  @override
+  late final GeneratedColumn<String> unitAmount = GeneratedColumn<String>(
+    'unit_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('0'),
+  );
+  static const VerificationMeta _totalAmountMeta = const VerificationMeta(
+    'totalAmount',
+  );
+  @override
+  late final GeneratedColumn<String> totalAmount = GeneratedColumn<String>(
+    'total_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('0'),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('pending'),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _incomeDateMeta = const VerificationMeta(
+    'incomeDate',
+  );
+  @override
+  late final GeneratedColumn<String> incomeDate = GeneratedColumn<String>(
+    'income_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _syncActionMeta = const VerificationMeta(
+    'syncAction',
+  );
+  @override
+  late final GeneratedColumn<String> syncAction = GeneratedColumn<String>(
+    'sync_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<String>('server-create'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    sourceType,
+    sourceUuid,
+    farmUuid,
+    farmerId,
+    referenceNo,
+    subjectType,
+    quantity,
+    unitAmount,
+    totalAmount,
+    status,
+    notes,
+    incomeDate,
+    createdAt,
+    updatedAt,
+    synced,
+    syncAction,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'finance_incomes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FinanceIncome> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('source_type')) {
+      context.handle(
+        _sourceTypeMeta,
+        sourceType.isAcceptableOrUnknown(data['source_type']!, _sourceTypeMeta),
+      );
+    }
+    if (data.containsKey('source_uuid')) {
+      context.handle(
+        _sourceUuidMeta,
+        sourceUuid.isAcceptableOrUnknown(data['source_uuid']!, _sourceUuidMeta),
+      );
+    }
+    if (data.containsKey('farm_uuid')) {
+      context.handle(
+        _farmUuidMeta,
+        farmUuid.isAcceptableOrUnknown(data['farm_uuid']!, _farmUuidMeta),
+      );
+    }
+    if (data.containsKey('farmer_id')) {
+      context.handle(
+        _farmerIdMeta,
+        farmerId.isAcceptableOrUnknown(data['farmer_id']!, _farmerIdMeta),
+      );
+    }
+    if (data.containsKey('reference_no')) {
+      context.handle(
+        _referenceNoMeta,
+        referenceNo.isAcceptableOrUnknown(
+          data['reference_no']!,
+          _referenceNoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('subject_type')) {
+      context.handle(
+        _subjectTypeMeta,
+        subjectType.isAcceptableOrUnknown(
+          data['subject_type']!,
+          _subjectTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
+    if (data.containsKey('unit_amount')) {
+      context.handle(
+        _unitAmountMeta,
+        unitAmount.isAcceptableOrUnknown(data['unit_amount']!, _unitAmountMeta),
+      );
+    }
+    if (data.containsKey('total_amount')) {
+      context.handle(
+        _totalAmountMeta,
+        totalAmount.isAcceptableOrUnknown(
+          data['total_amount']!,
+          _totalAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('income_date')) {
+      context.handle(
+        _incomeDateMeta,
+        incomeDate.isAcceptableOrUnknown(data['income_date']!, _incomeDateMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('sync_action')) {
+      context.handle(
+        _syncActionMeta,
+        syncAction.isAcceptableOrUnknown(data['sync_action']!, _syncActionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {uuid};
+  @override
+  FinanceIncome map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FinanceIncome(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      ),
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      sourceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_type'],
+      ),
+      sourceUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_uuid'],
+      ),
+      farmUuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farm_uuid'],
+      ),
+      farmerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}farmer_id'],
+      ),
+      referenceNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reference_no'],
+      ),
+      subjectType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject_type'],
+      ),
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+      unitAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit_amount'],
+      )!,
+      totalAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}total_amount'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      incomeDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}income_date'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      syncAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_action'],
+      )!,
+    );
+  }
+
+  @override
+  $FinanceIncomesTable createAlias(String alias) {
+    return $FinanceIncomesTable(attachedDatabase, alias);
+  }
+}
+
+class FinanceIncome extends DataClass implements Insertable<FinanceIncome> {
+  final int? id;
+  final String uuid;
+  final String? sourceType;
+  final String? sourceUuid;
+  final String? farmUuid;
+  final int? farmerId;
+  final String? referenceNo;
+  final String? subjectType;
+  final int quantity;
+  final String unitAmount;
+  final String totalAmount;
+  final String status;
+  final String? notes;
+  final String? incomeDate;
+  final String createdAt;
+  final String updatedAt;
+  final bool synced;
+  final String syncAction;
+  const FinanceIncome({
+    this.id,
+    required this.uuid,
+    this.sourceType,
+    this.sourceUuid,
+    this.farmUuid,
+    this.farmerId,
+    this.referenceNo,
+    this.subjectType,
+    required this.quantity,
+    required this.unitAmount,
+    required this.totalAmount,
+    required this.status,
+    this.notes,
+    this.incomeDate,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.synced,
+    required this.syncAction,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    map['uuid'] = Variable<String>(uuid);
+    if (!nullToAbsent || sourceType != null) {
+      map['source_type'] = Variable<String>(sourceType);
+    }
+    if (!nullToAbsent || sourceUuid != null) {
+      map['source_uuid'] = Variable<String>(sourceUuid);
+    }
+    if (!nullToAbsent || farmUuid != null) {
+      map['farm_uuid'] = Variable<String>(farmUuid);
+    }
+    if (!nullToAbsent || farmerId != null) {
+      map['farmer_id'] = Variable<int>(farmerId);
+    }
+    if (!nullToAbsent || referenceNo != null) {
+      map['reference_no'] = Variable<String>(referenceNo);
+    }
+    if (!nullToAbsent || subjectType != null) {
+      map['subject_type'] = Variable<String>(subjectType);
+    }
+    map['quantity'] = Variable<int>(quantity);
+    map['unit_amount'] = Variable<String>(unitAmount);
+    map['total_amount'] = Variable<String>(totalAmount);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || incomeDate != null) {
+      map['income_date'] = Variable<String>(incomeDate);
+    }
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['synced'] = Variable<bool>(synced);
+    map['sync_action'] = Variable<String>(syncAction);
+    return map;
+  }
+
+  FinanceIncomesCompanion toCompanion(bool nullToAbsent) {
+    return FinanceIncomesCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      uuid: Value(uuid),
+      sourceType: sourceType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceType),
+      sourceUuid: sourceUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceUuid),
+      farmUuid: farmUuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmUuid),
+      farmerId: farmerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmerId),
+      referenceNo: referenceNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceNo),
+      subjectType: subjectType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subjectType),
+      quantity: Value(quantity),
+      unitAmount: Value(unitAmount),
+      totalAmount: Value(totalAmount),
+      status: Value(status),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      incomeDate: incomeDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(incomeDate),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      synced: Value(synced),
+      syncAction: Value(syncAction),
+    );
+  }
+
+  factory FinanceIncome.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FinanceIncome(
+      id: serializer.fromJson<int?>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      sourceType: serializer.fromJson<String?>(json['sourceType']),
+      sourceUuid: serializer.fromJson<String?>(json['sourceUuid']),
+      farmUuid: serializer.fromJson<String?>(json['farmUuid']),
+      farmerId: serializer.fromJson<int?>(json['farmerId']),
+      referenceNo: serializer.fromJson<String?>(json['referenceNo']),
+      subjectType: serializer.fromJson<String?>(json['subjectType']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      unitAmount: serializer.fromJson<String>(json['unitAmount']),
+      totalAmount: serializer.fromJson<String>(json['totalAmount']),
+      status: serializer.fromJson<String>(json['status']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      incomeDate: serializer.fromJson<String?>(json['incomeDate']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      syncAction: serializer.fromJson<String>(json['syncAction']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int?>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'sourceType': serializer.toJson<String?>(sourceType),
+      'sourceUuid': serializer.toJson<String?>(sourceUuid),
+      'farmUuid': serializer.toJson<String?>(farmUuid),
+      'farmerId': serializer.toJson<int?>(farmerId),
+      'referenceNo': serializer.toJson<String?>(referenceNo),
+      'subjectType': serializer.toJson<String?>(subjectType),
+      'quantity': serializer.toJson<int>(quantity),
+      'unitAmount': serializer.toJson<String>(unitAmount),
+      'totalAmount': serializer.toJson<String>(totalAmount),
+      'status': serializer.toJson<String>(status),
+      'notes': serializer.toJson<String?>(notes),
+      'incomeDate': serializer.toJson<String?>(incomeDate),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'synced': serializer.toJson<bool>(synced),
+      'syncAction': serializer.toJson<String>(syncAction),
+    };
+  }
+
+  FinanceIncome copyWith({
+    Value<int?> id = const Value.absent(),
+    String? uuid,
+    Value<String?> sourceType = const Value.absent(),
+    Value<String?> sourceUuid = const Value.absent(),
+    Value<String?> farmUuid = const Value.absent(),
+    Value<int?> farmerId = const Value.absent(),
+    Value<String?> referenceNo = const Value.absent(),
+    Value<String?> subjectType = const Value.absent(),
+    int? quantity,
+    String? unitAmount,
+    String? totalAmount,
+    String? status,
+    Value<String?> notes = const Value.absent(),
+    Value<String?> incomeDate = const Value.absent(),
+    String? createdAt,
+    String? updatedAt,
+    bool? synced,
+    String? syncAction,
+  }) => FinanceIncome(
+    id: id.present ? id.value : this.id,
+    uuid: uuid ?? this.uuid,
+    sourceType: sourceType.present ? sourceType.value : this.sourceType,
+    sourceUuid: sourceUuid.present ? sourceUuid.value : this.sourceUuid,
+    farmUuid: farmUuid.present ? farmUuid.value : this.farmUuid,
+    farmerId: farmerId.present ? farmerId.value : this.farmerId,
+    referenceNo: referenceNo.present ? referenceNo.value : this.referenceNo,
+    subjectType: subjectType.present ? subjectType.value : this.subjectType,
+    quantity: quantity ?? this.quantity,
+    unitAmount: unitAmount ?? this.unitAmount,
+    totalAmount: totalAmount ?? this.totalAmount,
+    status: status ?? this.status,
+    notes: notes.present ? notes.value : this.notes,
+    incomeDate: incomeDate.present ? incomeDate.value : this.incomeDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    synced: synced ?? this.synced,
+    syncAction: syncAction ?? this.syncAction,
+  );
+  FinanceIncome copyWithCompanion(FinanceIncomesCompanion data) {
+    return FinanceIncome(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      sourceType: data.sourceType.present
+          ? data.sourceType.value
+          : this.sourceType,
+      sourceUuid: data.sourceUuid.present
+          ? data.sourceUuid.value
+          : this.sourceUuid,
+      farmUuid: data.farmUuid.present ? data.farmUuid.value : this.farmUuid,
+      farmerId: data.farmerId.present ? data.farmerId.value : this.farmerId,
+      referenceNo: data.referenceNo.present
+          ? data.referenceNo.value
+          : this.referenceNo,
+      subjectType: data.subjectType.present
+          ? data.subjectType.value
+          : this.subjectType,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      unitAmount: data.unitAmount.present
+          ? data.unitAmount.value
+          : this.unitAmount,
+      totalAmount: data.totalAmount.present
+          ? data.totalAmount.value
+          : this.totalAmount,
+      status: data.status.present ? data.status.value : this.status,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      incomeDate: data.incomeDate.present
+          ? data.incomeDate.value
+          : this.incomeDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      syncAction: data.syncAction.present
+          ? data.syncAction.value
+          : this.syncAction,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinanceIncome(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('sourceUuid: $sourceUuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('referenceNo: $referenceNo, ')
+          ..write('subjectType: $subjectType, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitAmount: $unitAmount, ')
+          ..write('totalAmount: $totalAmount, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes, ')
+          ..write('incomeDate: $incomeDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    sourceType,
+    sourceUuid,
+    farmUuid,
+    farmerId,
+    referenceNo,
+    subjectType,
+    quantity,
+    unitAmount,
+    totalAmount,
+    status,
+    notes,
+    incomeDate,
+    createdAt,
+    updatedAt,
+    synced,
+    syncAction,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FinanceIncome &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.sourceType == this.sourceType &&
+          other.sourceUuid == this.sourceUuid &&
+          other.farmUuid == this.farmUuid &&
+          other.farmerId == this.farmerId &&
+          other.referenceNo == this.referenceNo &&
+          other.subjectType == this.subjectType &&
+          other.quantity == this.quantity &&
+          other.unitAmount == this.unitAmount &&
+          other.totalAmount == this.totalAmount &&
+          other.status == this.status &&
+          other.notes == this.notes &&
+          other.incomeDate == this.incomeDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.synced == this.synced &&
+          other.syncAction == this.syncAction);
+}
+
+class FinanceIncomesCompanion extends UpdateCompanion<FinanceIncome> {
+  final Value<int?> id;
+  final Value<String> uuid;
+  final Value<String?> sourceType;
+  final Value<String?> sourceUuid;
+  final Value<String?> farmUuid;
+  final Value<int?> farmerId;
+  final Value<String?> referenceNo;
+  final Value<String?> subjectType;
+  final Value<int> quantity;
+  final Value<String> unitAmount;
+  final Value<String> totalAmount;
+  final Value<String> status;
+  final Value<String?> notes;
+  final Value<String?> incomeDate;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<bool> synced;
+  final Value<String> syncAction;
+  final Value<int> rowid;
+  const FinanceIncomesCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.sourceType = const Value.absent(),
+    this.sourceUuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.referenceNo = const Value.absent(),
+    this.subjectType = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.unitAmount = const Value.absent(),
+    this.totalAmount = const Value.absent(),
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.incomeDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FinanceIncomesCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    this.sourceType = const Value.absent(),
+    this.sourceUuid = const Value.absent(),
+    this.farmUuid = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.referenceNo = const Value.absent(),
+    this.subjectType = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.unitAmount = const Value.absent(),
+    this.totalAmount = const Value.absent(),
+    this.status = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.incomeDate = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.synced = const Value.absent(),
+    this.syncAction = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : uuid = Value(uuid),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FinanceIncome> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? sourceType,
+    Expression<String>? sourceUuid,
+    Expression<String>? farmUuid,
+    Expression<int>? farmerId,
+    Expression<String>? referenceNo,
+    Expression<String>? subjectType,
+    Expression<int>? quantity,
+    Expression<String>? unitAmount,
+    Expression<String>? totalAmount,
+    Expression<String>? status,
+    Expression<String>? notes,
+    Expression<String>? incomeDate,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<bool>? synced,
+    Expression<String>? syncAction,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (sourceType != null) 'source_type': sourceType,
+      if (sourceUuid != null) 'source_uuid': sourceUuid,
+      if (farmUuid != null) 'farm_uuid': farmUuid,
+      if (farmerId != null) 'farmer_id': farmerId,
+      if (referenceNo != null) 'reference_no': referenceNo,
+      if (subjectType != null) 'subject_type': subjectType,
+      if (quantity != null) 'quantity': quantity,
+      if (unitAmount != null) 'unit_amount': unitAmount,
+      if (totalAmount != null) 'total_amount': totalAmount,
+      if (status != null) 'status': status,
+      if (notes != null) 'notes': notes,
+      if (incomeDate != null) 'income_date': incomeDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (synced != null) 'synced': synced,
+      if (syncAction != null) 'sync_action': syncAction,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FinanceIncomesCompanion copyWith({
+    Value<int?>? id,
+    Value<String>? uuid,
+    Value<String?>? sourceType,
+    Value<String?>? sourceUuid,
+    Value<String?>? farmUuid,
+    Value<int?>? farmerId,
+    Value<String?>? referenceNo,
+    Value<String?>? subjectType,
+    Value<int>? quantity,
+    Value<String>? unitAmount,
+    Value<String>? totalAmount,
+    Value<String>? status,
+    Value<String?>? notes,
+    Value<String?>? incomeDate,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<bool>? synced,
+    Value<String>? syncAction,
+    Value<int>? rowid,
+  }) {
+    return FinanceIncomesCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      sourceType: sourceType ?? this.sourceType,
+      sourceUuid: sourceUuid ?? this.sourceUuid,
+      farmUuid: farmUuid ?? this.farmUuid,
+      farmerId: farmerId ?? this.farmerId,
+      referenceNo: referenceNo ?? this.referenceNo,
+      subjectType: subjectType ?? this.subjectType,
+      quantity: quantity ?? this.quantity,
+      unitAmount: unitAmount ?? this.unitAmount,
+      totalAmount: totalAmount ?? this.totalAmount,
+      status: status ?? this.status,
+      notes: notes ?? this.notes,
+      incomeDate: incomeDate ?? this.incomeDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      synced: synced ?? this.synced,
+      syncAction: syncAction ?? this.syncAction,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (sourceType.present) {
+      map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (sourceUuid.present) {
+      map['source_uuid'] = Variable<String>(sourceUuid.value);
+    }
+    if (farmUuid.present) {
+      map['farm_uuid'] = Variable<String>(farmUuid.value);
+    }
+    if (farmerId.present) {
+      map['farmer_id'] = Variable<int>(farmerId.value);
+    }
+    if (referenceNo.present) {
+      map['reference_no'] = Variable<String>(referenceNo.value);
+    }
+    if (subjectType.present) {
+      map['subject_type'] = Variable<String>(subjectType.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (unitAmount.present) {
+      map['unit_amount'] = Variable<String>(unitAmount.value);
+    }
+    if (totalAmount.present) {
+      map['total_amount'] = Variable<String>(totalAmount.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (incomeDate.present) {
+      map['income_date'] = Variable<String>(incomeDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (syncAction.present) {
+      map['sync_action'] = Variable<String>(syncAction.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinanceIncomesCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('sourceUuid: $sourceUuid, ')
+          ..write('farmUuid: $farmUuid, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('referenceNo: $referenceNo, ')
+          ..write('subjectType: $subjectType, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitAmount: $unitAmount, ')
+          ..write('totalAmount: $totalAmount, ')
+          ..write('status: $status, ')
+          ..write('notes: $notes, ')
+          ..write('incomeDate: $incomeDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('synced: $synced, ')
+          ..write('syncAction: $syncAction, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $FarmUsersTable extends FarmUsers
     with TableInfo<$FarmUsersTable, FarmUser> {
   @override
@@ -34358,6 +35365,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FinanceExpensesTable financeExpenses = $FinanceExpensesTable(
     this,
   );
+  late final $FinanceIncomesTable financeIncomes = $FinanceIncomesTable(this);
   late final $FarmUsersTable farmUsers = $FarmUsersTable(this);
   late final $NotificationEntriesTable notificationEntries =
       $NotificationEntriesTable(this);
@@ -34379,6 +35387,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final BillDao billDao = BillDao(this as AppDatabase);
   late final FinanceExpenseDao financeExpenseDao = FinanceExpenseDao(
+    this as AppDatabase,
+  );
+  late final FinanceIncomeDao financeIncomeDao = FinanceIncomeDao(
     this as AppDatabase,
   );
   late final NotificationDao notificationDao = NotificationDao(
@@ -34458,6 +35469,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vaccines,
     bills,
     financeExpenses,
+    financeIncomes,
     farmUsers,
     notificationEntries,
     invitedExtensionOfficers,
@@ -52697,6 +53709,471 @@ typedef $$FinanceExpensesTableProcessedTableManager =
       FinanceExpense,
       PrefetchHooks Function()
     >;
+typedef $$FinanceIncomesTableCreateCompanionBuilder =
+    FinanceIncomesCompanion Function({
+      Value<int?> id,
+      required String uuid,
+      Value<String?> sourceType,
+      Value<String?> sourceUuid,
+      Value<String?> farmUuid,
+      Value<int?> farmerId,
+      Value<String?> referenceNo,
+      Value<String?> subjectType,
+      Value<int> quantity,
+      Value<String> unitAmount,
+      Value<String> totalAmount,
+      Value<String> status,
+      Value<String?> notes,
+      Value<String?> incomeDate,
+      required String createdAt,
+      required String updatedAt,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<int> rowid,
+    });
+typedef $$FinanceIncomesTableUpdateCompanionBuilder =
+    FinanceIncomesCompanion Function({
+      Value<int?> id,
+      Value<String> uuid,
+      Value<String?> sourceType,
+      Value<String?> sourceUuid,
+      Value<String?> farmUuid,
+      Value<int?> farmerId,
+      Value<String?> referenceNo,
+      Value<String?> subjectType,
+      Value<int> quantity,
+      Value<String> unitAmount,
+      Value<String> totalAmount,
+      Value<String> status,
+      Value<String?> notes,
+      Value<String?> incomeDate,
+      Value<String> createdAt,
+      Value<String> updatedAt,
+      Value<bool> synced,
+      Value<String> syncAction,
+      Value<int> rowid,
+    });
+
+class $$FinanceIncomesTableFilterComposer
+    extends Composer<_$AppDatabase, $FinanceIncomesTable> {
+  $$FinanceIncomesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceUuid => $composableBuilder(
+    column: $table.sourceUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get referenceNo => $composableBuilder(
+    column: $table.referenceNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unitAmount => $composableBuilder(
+    column: $table.unitAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get totalAmount => $composableBuilder(
+    column: $table.totalAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FinanceIncomesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FinanceIncomesTable> {
+  $$FinanceIncomesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceUuid => $composableBuilder(
+    column: $table.sourceUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmUuid => $composableBuilder(
+    column: $table.farmUuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get referenceNo => $composableBuilder(
+    column: $table.referenceNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unitAmount => $composableBuilder(
+    column: $table.unitAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get totalAmount => $composableBuilder(
+    column: $table.totalAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FinanceIncomesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FinanceIncomesTable> {
+  $$FinanceIncomesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceUuid => $composableBuilder(
+    column: $table.sourceUuid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get farmUuid =>
+      $composableBuilder(column: $table.farmUuid, builder: (column) => column);
+
+  GeneratedColumn<int> get farmerId =>
+      $composableBuilder(column: $table.farmerId, builder: (column) => column);
+
+  GeneratedColumn<String> get referenceNo => $composableBuilder(
+    column: $table.referenceNo,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subjectType => $composableBuilder(
+    column: $table.subjectType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get unitAmount => $composableBuilder(
+    column: $table.unitAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get totalAmount => $composableBuilder(
+    column: $table.totalAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get syncAction => $composableBuilder(
+    column: $table.syncAction,
+    builder: (column) => column,
+  );
+}
+
+class $$FinanceIncomesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FinanceIncomesTable,
+          FinanceIncome,
+          $$FinanceIncomesTableFilterComposer,
+          $$FinanceIncomesTableOrderingComposer,
+          $$FinanceIncomesTableAnnotationComposer,
+          $$FinanceIncomesTableCreateCompanionBuilder,
+          $$FinanceIncomesTableUpdateCompanionBuilder,
+          (
+            FinanceIncome,
+            BaseReferences<_$AppDatabase, $FinanceIncomesTable, FinanceIncome>,
+          ),
+          FinanceIncome,
+          PrefetchHooks Function()
+        > {
+  $$FinanceIncomesTableTableManager(
+    _$AppDatabase db,
+    $FinanceIncomesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FinanceIncomesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FinanceIncomesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FinanceIncomesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String?> sourceType = const Value.absent(),
+                Value<String?> sourceUuid = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<int?> farmerId = const Value.absent(),
+                Value<String?> referenceNo = const Value.absent(),
+                Value<String?> subjectType = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<String> unitAmount = const Value.absent(),
+                Value<String> totalAmount = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<String?> incomeDate = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FinanceIncomesCompanion(
+                id: id,
+                uuid: uuid,
+                sourceType: sourceType,
+                sourceUuid: sourceUuid,
+                farmUuid: farmUuid,
+                farmerId: farmerId,
+                referenceNo: referenceNo,
+                subjectType: subjectType,
+                quantity: quantity,
+                unitAmount: unitAmount,
+                totalAmount: totalAmount,
+                status: status,
+                notes: notes,
+                incomeDate: incomeDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                syncAction: syncAction,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int?> id = const Value.absent(),
+                required String uuid,
+                Value<String?> sourceType = const Value.absent(),
+                Value<String?> sourceUuid = const Value.absent(),
+                Value<String?> farmUuid = const Value.absent(),
+                Value<int?> farmerId = const Value.absent(),
+                Value<String?> referenceNo = const Value.absent(),
+                Value<String?> subjectType = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<String> unitAmount = const Value.absent(),
+                Value<String> totalAmount = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<String?> incomeDate = const Value.absent(),
+                required String createdAt,
+                required String updatedAt,
+                Value<bool> synced = const Value.absent(),
+                Value<String> syncAction = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FinanceIncomesCompanion.insert(
+                id: id,
+                uuid: uuid,
+                sourceType: sourceType,
+                sourceUuid: sourceUuid,
+                farmUuid: farmUuid,
+                farmerId: farmerId,
+                referenceNo: referenceNo,
+                subjectType: subjectType,
+                quantity: quantity,
+                unitAmount: unitAmount,
+                totalAmount: totalAmount,
+                status: status,
+                notes: notes,
+                incomeDate: incomeDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                synced: synced,
+                syncAction: syncAction,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FinanceIncomesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FinanceIncomesTable,
+      FinanceIncome,
+      $$FinanceIncomesTableFilterComposer,
+      $$FinanceIncomesTableOrderingComposer,
+      $$FinanceIncomesTableAnnotationComposer,
+      $$FinanceIncomesTableCreateCompanionBuilder,
+      $$FinanceIncomesTableUpdateCompanionBuilder,
+      (
+        FinanceIncome,
+        BaseReferences<_$AppDatabase, $FinanceIncomesTable, FinanceIncome>,
+      ),
+      FinanceIncome,
+      PrefetchHooks Function()
+    >;
 typedef $$FarmUsersTableCreateCompanionBuilder =
     FarmUsersCompanion Function({
       Value<int?> id,
@@ -54252,6 +55729,8 @@ class $AppDatabaseManager {
       $$BillsTableTableManager(_db, _db.bills);
   $$FinanceExpensesTableTableManager get financeExpenses =>
       $$FinanceExpensesTableTableManager(_db, _db.financeExpenses);
+  $$FinanceIncomesTableTableManager get financeIncomes =>
+      $$FinanceIncomesTableTableManager(_db, _db.financeIncomes);
   $$FarmUsersTableTableManager get farmUsers =>
       $$FarmUsersTableTableManager(_db, _db.farmUsers);
   $$NotificationEntriesTableTableManager get notificationEntries =>

@@ -3574,7 +3574,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String syncRequiredMessage(int count) {
-    return 'You have $count unsynced items. Please sync your data to ensure all information is up to date.';
+    return 'You have $count unsynced items. Please sync your data.';
   }
 
   @override
@@ -3749,21 +3749,149 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addManualExpense => 'Add expense';
 
   @override
+  String get addManualIncome => 'Add income';
+
+  @override
   String get manualExpenseTitle => 'Record expense';
+
+  @override
+  String get manualIncomeTitle => 'Record income';
 
   @override
   String get manualExpenseDetailsSubtitle =>
       'Record purchases and costs not tied to bills or transfers';
 
   @override
+  String get manualIncomeDetailsSubtitle =>
+      'Record income not tied to bills or transfers';
+
+  @override
   String get manualExpenseBasicStep => 'Expense details';
+
+  @override
+  String get manualIncomeBasicStep => 'Income details';
+
+  @override
+  String get incomeSourceSectionTitle => 'Source details';
+
+  @override
+  String get incomeSourceSectionSubtitle =>
+      'Add a source only if this income came from another record';
+
+  @override
+  String get incomeHasSource => 'This income has a source';
+
+  @override
+  String get incomeHasSourceHint =>
+      'Turn on only when you want to link this record to a source type';
+
+  @override
+  String get incomeSourceType => 'Source type';
+
+  @override
+  String get selectIncomeSourceType => 'Select source type';
+
+  @override
+  String get incomeSourceTypeSale => 'Sale';
+
+  @override
+  String get incomeSourceTypeService => 'Service';
+
+  @override
+  String get incomeSourceTypeOther => 'Other source type';
+
+  @override
+  String get incomeSourceTypeOtherHint => 'Enter the source type manually';
+
+  @override
+  String get incomeSourceTypeRequired => 'Select a source type';
+
+  @override
+  String get incomeSourceTypeOtherRequired => 'Enter the custom source type';
 
   @override
   String get manualExpenseAdditionalStep => 'Additional details';
 
   @override
+  String get manualIncomeAdditionalStep => 'Additional details';
+
+  @override
   String get manualExpenseAdditionalStepSubtitle =>
       'Quantity, status, and notes';
+
+  @override
+  String get manualIncomeAdditionalStepSubtitle =>
+      'Quantity, status, and notes';
+
+  @override
+  String get manualIncomeSavedSuccessfully =>
+      'Income saved locally. Sync to update the server.';
+
+  @override
+  String get manualIncomeSaveFailed =>
+      'Could not save income. Please try again.';
+
+  @override
+  String get confirmSaveManualIncome => 'Save this income to your records?';
+
+  @override
+  String get incomeSubject => 'Income subject';
+
+  @override
+  String get incomeSubjectHint => 'e.g. Sale of livestock, produce, or service';
+
+  @override
+  String get incomeSubjectRequired => 'Please describe the income';
+
+  @override
+  String get incomeAmount => 'Total amount (TZS)';
+
+  @override
+  String get incomeAmountHint => 'Enter total income';
+
+  @override
+  String get incomeAmountRequired =>
+      'Enter a valid income amount greater than zero';
+
+  @override
+  String get incomeDate => 'Income date';
+
+  @override
+  String get incomeDateRequired => 'Select a date';
+
+  @override
+  String get selectIncomeDate => 'Select date';
+
+  @override
+  String get incomeQuantity => 'Quantity';
+
+  @override
+  String get incomeQuantityHint => 'Units or items (defaults to 1)';
+
+  @override
+  String get incomeQuantityRequired =>
+      'Enter a valid quantity greater than zero';
+
+  @override
+  String get incomeNotes => 'Notes';
+
+  @override
+  String get incomeNotesHint => 'Optional details';
+
+  @override
+  String get incomePaymentStatus => 'Income status';
+
+  @override
+  String get selectIncomeStatus => 'Select income status';
+
+  @override
+  String get receivedStatus => 'Received';
+
+  @override
+  String get incomeSaved => 'Income saved successfully';
+
+  @override
+  String get incomeSaveFailed => 'Could not save income. Please try again.';
 
   @override
   String get manualExpenseSavedSuccessfully =>
@@ -3810,6 +3938,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseQuantityHint => 'Units or items (defaults to 1)';
 
   @override
+  String get expenseQuantityRequired =>
+      'Enter a valid quantity greater than zero';
+
+  @override
   String get expenseNotes => 'Notes';
 
   @override
@@ -3826,12 +3958,48 @@ class AppLocalizationsEn extends AppLocalizations {
       'Ensure amounts and dates are correct for your income and expenditure report.';
 
   @override
+  String get manualIncomeAccuracyNote =>
+      'Ensure the amount and date are correct for your income and expenditure report.';
+
+  @override
   String get reportTableCellPlaceholder => '—';
+
+  @override
+  String incomeReportIncomeEntriesSectionTitle(int count) {
+    return 'Income entries ($count)';
+  }
 
   @override
   String incomeReportExpenseEntriesSectionTitle(int count) {
     return 'Expense entries ($count)';
   }
+
+  @override
+  String get incomeReportTotalIncome => 'Total income';
+
+  @override
+  String get incomeReportTotalExpenditure => 'Total expenditure';
+
+  @override
+  String get incomeReportNetBalance => 'Net balance';
+
+  @override
+  String get incomeReportFilterLabel => 'Filter by';
+
+  @override
+  String get incomeReportFilterAll => 'All';
+
+  @override
+  String get incomeReportFilterIncome => 'Income';
+
+  @override
+  String get incomeReportFilterExpense => 'Expenses';
+
+  @override
+  String get incomeReportIncomeLabel => 'Income';
+
+  @override
+  String get incomeReportExpenditureLabel => 'Expenditure';
 
   @override
   String get incomeReportPdfColumnReference => 'Reference';

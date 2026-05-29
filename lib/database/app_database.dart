@@ -42,6 +42,7 @@ import '../features/events/data/tables/transfer_table.dart';
 import '../features/vaccines/data/tables/vaccine_table.dart';
 import '../features/bills/data/tables/bill_table.dart';
 import '../features/reports/data/tables/finance_expense_table.dart';
+import '../features/reports/data/tables/finance_income_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/feeding_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/administration_route_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/medicine_type_table.dart';
@@ -89,6 +90,7 @@ import 'daos/vaccine_dao.dart';
 import 'daos/vaccine_type_dao.dart';
 import 'daos/bill_dao.dart';
 import 'daos/finance_expense_dao.dart';
+import 'daos/finance_income_dao.dart';
 import 'daos/stage_dao.dart';
 import '../features/notifications/data/dao/notification_dao.dart';
 import 'daos/farm_user_dao.dart';
@@ -165,6 +167,7 @@ part 'app_database.g.dart';
     Vaccines,
     Bills,
     FinanceExpenses,
+    FinanceIncomes,
     FarmUsers,
     NotificationEntries,
     InvitedExtensionOfficers,
@@ -179,6 +182,7 @@ part 'app_database.g.dart';
     VaccineTypeDao,
     BillDao,
     FinanceExpenseDao,
+    FinanceIncomeDao,
     NotificationDao,
     FarmUserDao,
     ExtensionOfficerDao,
@@ -189,7 +193,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 37; // v37: add finance_expenses report cache table
+  int get schemaVersion => 39; // v39: make finance_income source fields nullable
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -394,6 +398,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 37) {
         await _createTableIfMissing(m, financeExpenses);
       }
+      if (from < 38) {
+        await _createTableIfMissing(m, financeIncomes);
+      }
+      if (from < 39) {
+        await _migrateFinanceIncomesNullableSourceFields(m);
+      }
     },
     beforeOpen: (details) async {
       // Enable foreign key constraints
@@ -499,6 +509,7 @@ class AppDatabase extends _$AppDatabase {
   late final VaccineTypeDao vaccineTypeDao = VaccineTypeDao(this);
   late final BillDao billDao = BillDao(this);
   late final FinanceExpenseDao financeExpenseDao = FinanceExpenseDao(this);
+  late final FinanceIncomeDao financeIncomeDao = FinanceIncomeDao(this);
   late final NotificationDao notificationDao = NotificationDao(this);
   late final ExtensionOfficerDao extensionOfficerDao = ExtensionOfficerDao(
     this,
@@ -539,6 +550,80 @@ class AppDatabase extends _$AppDatabase {
     if (result.isEmpty) {
       await migrator.createTable(table);
     }
+  }
+
+  Future<void> _migrateFinanceIncomesNullableSourceFields(
+    Migrator migrator,
+  ) async {
+    final exists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('finance_incomes'),
+      ],
+    ).get();
+
+    if (exists.isEmpty) return;
+
+    final oldExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('finance_incomes_old'),
+      ],
+    ).get();
+
+    if (oldExists.isNotEmpty) {
+      await customStatement('DROP TABLE finance_incomes_old');
+    }
+
+    await customStatement(
+      'ALTER TABLE finance_incomes RENAME TO finance_incomes_old',
+    );
+    await migrator.createTable(financeIncomes);
+    await customStatement('''
+      INSERT INTO finance_incomes (
+        id,
+        uuid,
+        source_type,
+        source_uuid,
+        farm_uuid,
+        farmer_id,
+        reference_no,
+        subject_type,
+        quantity,
+        unit_amount,
+        total_amount,
+        status,
+        notes,
+        income_date,
+        created_at,
+        updated_at,
+        synced,
+        sync_action
+      )
+      SELECT
+        id,
+        uuid,
+        source_type,
+        source_uuid,
+        farm_uuid,
+        farmer_id,
+        reference_no,
+        subject_type,
+        quantity,
+        unit_amount,
+        total_amount,
+        status,
+        notes,
+        income_date,
+        created_at,
+        updated_at,
+        synced,
+        sync_action
+      FROM finance_incomes_old
+    ''');
+    await customStatement('DROP TABLE finance_incomes_old');
   }
 
   Future<void> _migrateDewormingProviderColumns(Migrator migrator) async {

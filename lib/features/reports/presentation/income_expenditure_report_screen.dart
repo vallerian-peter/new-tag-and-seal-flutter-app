@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:intl/intl.dart';
@@ -8,8 +7,11 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/number_formatter.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/domain/models/finance_expense_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/domain/models/finance_income_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/manual_expense_form_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/manual_income_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_expense_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_income_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -27,7 +29,28 @@ class IncomeExpenditureReportScreen extends StatefulWidget {
 
 class _IncomeExpenditureReportScreenState
     extends State<IncomeExpenditureReportScreen> {
+  _LedgerFilter _ledgerFilter = _LedgerFilter.all;
+
   String _formatAmount(double amount) => NumberFormatter.formatCurrency(amount);
+
+  Future<void> _refreshReportData({DateTimeRange? range}) async {
+    final financeProvider = context.read<FinanceExpenseProvider>();
+    final incomeProvider = context.read<FinanceIncomeProvider>();
+    final selectedRange = range ?? financeProvider.range;
+
+    if (range != null) {
+      await Future.wait([
+        financeProvider.setRange(range),
+        incomeProvider.setRange(range),
+      ]);
+      return;
+    }
+
+    await Future.wait([
+      financeProvider.refresh(),
+      incomeProvider.setRange(selectedRange),
+    ]);
+  }
 
   Future<DateTimeRange?> _showStyledDateRangePicker(
     BuildContext context,
@@ -84,8 +107,7 @@ class _IncomeExpenditureReportScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final provider = context.read<FinanceExpenseProvider>();
-      await provider.refresh();
+      await _refreshReportData();
     });
   }
 
@@ -98,26 +120,6 @@ class _IncomeExpenditureReportScreenState
     return roleTitle == 'farm-manager' || roleTitle == 'farmer_manager';
   }
 
-  double _sumAmount(List<FinanceExpenseModel> list, {String? status}) {
-    return list
-        .where(
-          (b) =>
-              status == null || b.status.toLowerCase() == status.toLowerCase(),
-        )
-        .fold(0.0, (sum, b) => sum + (double.tryParse(b.totalCost) ?? 0));
-  }
-
-  Color _statusColor(BuildContext context, String status) {
-    switch (status.toLowerCase()) {
-      case 'paid':
-        return Colors.green;
-      case 'pending':
-        return Colors.orange;
-      default:
-        return Theme.of(context).colorScheme.primary;
-    }
-  }
-
   String _localizedExpenseStatus(AppLocalizations l10n, String status) {
     switch (status.toLowerCase()) {
       case 'paid':
@@ -127,6 +129,108 @@ class _IncomeExpenditureReportScreenState
       default:
         return status;
     }
+  }
+
+  String _localizedIncomeStatus(AppLocalizations l10n, String status) {
+    switch (status.toLowerCase()) {
+      case 'received':
+        return l10n.receivedStatus;
+      case 'pending':
+        return l10n.pendingStatus;
+      default:
+        return status;
+    }
+  }
+
+  DateTime? _parseDate(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
+
+  String _shortReference(String? value) {
+    final normalized = (value ?? '').trim();
+    if (normalized.isEmpty) return '—';
+    if (normalized.length <= 8) return normalized.toUpperCase();
+    return normalized.substring(0, 8).toUpperCase();
+  }
+
+  List<_LedgerEntry> _filterLedgerEntries(
+    List<_LedgerEntry> entries,
+    _LedgerFilter filter,
+  ) {
+    switch (filter) {
+      case _LedgerFilter.all:
+        return entries;
+      case _LedgerFilter.income:
+        return entries
+            .where((entry) => entry.kind == _LedgerEntryKind.income)
+            .toList();
+      case _LedgerFilter.expense:
+        return entries
+            .where((entry) => entry.kind == _LedgerEntryKind.expenditure)
+            .toList();
+    }
+  }
+
+  List<_LedgerEntry> _buildIncomeEntries(
+    List<FinanceIncomeModel> incomes,
+    AppLocalizations l10n,
+  ) {
+    return incomes.map((d) {
+      final date = _parseDate(d.incomeDate ?? d.createdAt);
+      final subject = [
+        if ((d.subjectType ?? '').trim().isNotEmpty) d.subjectType!.trim(),
+        if ((d.referenceNo ?? '').trim().isNotEmpty) d.referenceNo!.trim(),
+      ].join(' • ');
+
+      return _LedgerEntry(
+        kind: _LedgerEntryKind.income,
+        reference: (d.referenceNo?.trim().isNotEmpty ?? false)
+            ? d.referenceNo!.trim()
+            : _shortReference(d.sourceUuid ?? d.uuid),
+        date: date,
+        subject: subject.isEmpty ? l10n.reportTableCellPlaceholder : subject,
+        quantity: d.quantity,
+        amount: double.tryParse(d.totalAmount) ?? 0,
+        status: _localizedIncomeStatus(l10n, d.status),
+      );
+    }).toList()..sort((a, b) {
+      final left = a.date ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final right = b.date ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return right.compareTo(left);
+    });
+  }
+
+  List<_LedgerEntry> _buildExpenditureEntries(
+    List<FinanceExpenseModel> expenses,
+    AppLocalizations l10n,
+  ) {
+    return expenses.map((b) {
+      final date = _parseDate(b.expenseDate ?? b.createdAt);
+      final reference = b.billNo?.trim().isNotEmpty == true
+          ? b.billNo!.trim()
+          : _shortReference(b.sourceUuid);
+
+      return _LedgerEntry(
+        kind: _LedgerEntryKind.expenditure,
+        reference: reference,
+        date: date,
+        subject: b.subjectType?.trim().isNotEmpty == true
+            ? b.subjectType!.trim()
+            : l10n.reportTableCellPlaceholder,
+        quantity: b.quantity,
+        amount: double.tryParse(b.totalCost) ?? 0,
+        status: _localizedExpenseStatus(l10n, b.status),
+      );
+    }).toList()..sort((a, b) {
+      final left = a.date ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final right = b.date ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return right.compareTo(left);
+    });
+  }
+
+  double _sumLedgerAmount(List<_LedgerEntry> entries) {
+    return entries.fold<double>(0, (sum, entry) => sum + entry.amount);
   }
 
   Widget _kpiCard({
@@ -184,8 +288,170 @@ class _IncomeExpenditureReportScreenState
     );
   }
 
+  Widget _filterPill({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final backgroundColor = selected
+        ? Constants.primaryColor
+        : (isDark ? theme.colorScheme.surfaceContainerHighest : Colors.white);
+    final foregroundColor = selected
+        ? Colors.white
+        : theme.colorScheme.onSurface;
+
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      showCheckmark: false,
+      backgroundColor: backgroundColor,
+      selectedColor: Constants.primaryColor,
+      labelStyle: theme.textTheme.labelLarge?.copyWith(
+        color: foregroundColor,
+        fontWeight: FontWeight.w700,
+      ),
+      side: BorderSide(
+        color: selected
+            ? Constants.primaryColor
+            : theme.colorScheme.outline.withValues(alpha: 0.22),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    );
+  }
+
+  Widget _ledgerEntryCard({
+    required BuildContext context,
+    required _LedgerEntry entry,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isIncome = entry.kind == _LedgerEntryKind.income;
+    final accentColor = isIncome ? Colors.green : Colors.orange;
+    final borderColor = accentColor.withValues(alpha: 0.2);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isIncome ? Icons.trending_up : Icons.trending_down,
+                  color: accentColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  entry.reference,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                _formatAmount(entry.amount),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: accentColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (entry.date != null) ...[
+            Text(
+              DateFormat('yyyy-MM-dd').format(entry.date!),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
+          Text(
+            entry.subject,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: accentColor.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  isIncome
+                      ? l10n.incomeReportIncomeLabel
+                      : l10n.incomeReportExpenditureLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: accentColor.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Text(
+                  entry.status,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<Uint8List> _buildReportPdfBytes(
-    List<FinanceExpenseModel> filtered,
+    List<_LedgerEntry> incomeEntries,
+    List<_LedgerEntry> expenditureEntries,
     DateTimeRange? range,
   ) async {
     final l10n = AppLocalizations.of(context)!;
@@ -195,9 +461,9 @@ class _IncomeExpenditureReportScreenState
         ? l10n.allTime
         : '${DateFormat('yyyy-MM-dd').format(range.start)} - ${DateFormat('yyyy-MM-dd').format(range.end)}';
 
-    final total = _sumAmount(filtered);
-    final paid = _sumAmount(filtered, status: 'paid');
-    final pending = _sumAmount(filtered, status: 'pending');
+    final totalIncome = _sumLedgerAmount(incomeEntries);
+    final totalExpenditure = _sumLedgerAmount(expenditureEntries);
+    final netBalance = totalIncome - totalExpenditure;
     final pdfBaseFont = await PdfGoogleFonts.notoSansRegular();
     final pdfBoldFont = await PdfGoogleFonts.notoSansBold();
 
@@ -215,38 +481,75 @@ class _IncomeExpenditureReportScreenState
           pw.Text('${l10n.generatedOn}: $printableDate'),
           pw.Text('${l10n.dateRange}: $period'),
           pw.SizedBox(height: 12),
-          pw.Text(l10n.incomeReportExpenseEntriesSectionTitle(filtered.length)),
-          pw.Text('${l10n.amount}: ${total.toStringAsFixed(2)}'),
-          pw.Text('${l10n.paidStatus}: ${paid.toStringAsFixed(2)}'),
-          pw.Text('${l10n.pendingStatus}: ${pending.toStringAsFixed(2)}'),
-          pw.SizedBox(height: 16),
-          pw.TableHelper.fromTextArray(
-            headers: [
-              l10n.incomeReportPdfColumnReference,
-              l10n.incomeReportPdfColumnDate,
-              l10n.incomeReportPdfColumnSubject,
-              l10n.incomeReportPdfColumnQuantity,
-              l10n.amount,
-              l10n.incomeReportPdfColumnStatus,
-            ],
-            data: filtered.map((b) {
-              final dt = DateTime.tryParse(b.expenseDate ?? b.createdAt);
-              final ref = b.billNo ??
-                  (b.sourceUuid.length >= 8
-                      ? b.sourceUuid.substring(0, 8).toUpperCase()
-                      : b.sourceUuid);
-              return [
-                ref,
-                dt != null
-                    ? DateFormat('yyyy-MM-dd').format(dt)
-                    : l10n.reportTableCellPlaceholder,
-                b.subjectType ?? l10n.reportTableCellPlaceholder,
-                '${b.quantity}',
-                b.totalCost,
-                _localizedExpenseStatus(l10n, b.status),
-              ];
-            }).toList(),
+          pw.Text(
+            '${l10n.incomeReportTotalIncome}: ${totalIncome.toStringAsFixed(2)}',
           ),
+          pw.Text(
+            '${l10n.incomeReportTotalExpenditure}: ${totalExpenditure.toStringAsFixed(2)}',
+          ),
+          pw.Text(
+            '${l10n.incomeReportNetBalance}: ${netBalance.toStringAsFixed(2)}',
+          ),
+          pw.SizedBox(height: 16),
+          if (incomeEntries.isNotEmpty) ...[
+            pw.Text(
+              l10n.incomeReportIncomeEntriesSectionTitle(incomeEntries.length),
+            ),
+            pw.SizedBox(height: 8),
+            pw.TableHelper.fromTextArray(
+              headers: [
+                l10n.incomeReportPdfColumnReference,
+                l10n.incomeReportPdfColumnDate,
+                l10n.incomeReportPdfColumnSubject,
+                l10n.incomeReportPdfColumnQuantity,
+                l10n.amount,
+                l10n.incomeReportPdfColumnStatus,
+              ],
+              data: incomeEntries.map((entry) {
+                return [
+                  entry.reference,
+                  entry.date != null
+                      ? DateFormat('yyyy-MM-dd').format(entry.date!)
+                      : l10n.reportTableCellPlaceholder,
+                  entry.subject,
+                  '${entry.quantity}',
+                  entry.amount.toStringAsFixed(2),
+                  entry.status,
+                ];
+              }).toList(),
+            ),
+            pw.SizedBox(height: 16),
+          ],
+          if (expenditureEntries.isNotEmpty) ...[
+            pw.Text(
+              l10n.incomeReportExpenseEntriesSectionTitle(
+                expenditureEntries.length,
+              ),
+            ),
+            pw.SizedBox(height: 8),
+            pw.TableHelper.fromTextArray(
+              headers: [
+                l10n.incomeReportPdfColumnReference,
+                l10n.incomeReportPdfColumnDate,
+                l10n.incomeReportPdfColumnSubject,
+                l10n.incomeReportPdfColumnQuantity,
+                l10n.amount,
+                l10n.incomeReportPdfColumnStatus,
+              ],
+              data: expenditureEntries.map((entry) {
+                return [
+                  entry.reference,
+                  entry.date != null
+                      ? DateFormat('yyyy-MM-dd').format(entry.date!)
+                      : l10n.reportTableCellPlaceholder,
+                  entry.subject,
+                  '${entry.quantity}',
+                  entry.amount.toStringAsFixed(2),
+                  entry.status,
+                ];
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );
@@ -255,20 +558,30 @@ class _IncomeExpenditureReportScreenState
   }
 
   Future<void> _printReport(
-    List<FinanceExpenseModel> filtered,
+    List<_LedgerEntry> incomeEntries,
+    List<_LedgerEntry> expenditureEntries,
     DateTimeRange? range,
   ) async {
-    final bytes = await _buildReportPdfBytes(filtered, range);
+    final bytes = await _buildReportPdfBytes(
+      incomeEntries,
+      expenditureEntries,
+      range,
+    );
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
 
   Future<void> _downloadReport(
-    List<FinanceExpenseModel> filtered,
+    List<_LedgerEntry> incomeEntries,
+    List<_LedgerEntry> expenditureEntries,
     DateTimeRange? range,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      final bytes = await _buildReportPdfBytes(filtered, range);
+      final bytes = await _buildReportPdfBytes(
+        incomeEntries,
+        expenditureEntries,
+        range,
+      );
       final fileName =
           'income_expenditures_report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.pdf';
 
@@ -277,10 +590,7 @@ class _IncomeExpenditureReportScreenState
       if (Platform.isIOS) {
         await Printing.sharePdf(bytes: bytes, filename: fileName);
         if (!mounted) return;
-        ModernAlerts.showSuccessToast(
-          context,
-          message: l10n.reportDownloaded,
-        );
+        ModernAlerts.showSuccessToast(context, message: l10n.reportDownloaded);
         return;
       }
 
@@ -315,11 +625,28 @@ class _IncomeExpenditureReportScreenState
     final isDark = theme.brightness == Brightness.dark;
     final auth = context.watch<AuthProvider>();
     final reportProvider = context.watch<FinanceExpenseProvider>();
+    final incomeProvider = context.watch<FinanceIncomeProvider>();
     final canAccess = _canAccessReport(auth);
-    final filtered = reportProvider.expenses;
-    final total = _sumAmount(filtered);
-    final paid = _sumAmount(filtered, status: 'paid');
-    final pending = _sumAmount(filtered, status: 'pending');
+    final allExpenditureEntries = _buildExpenditureEntries(
+      reportProvider.expenses,
+      l10n,
+    );
+    final allIncomeEntries = _buildIncomeEntries(incomeProvider.incomes, l10n);
+    final expenditureEntries = _filterLedgerEntries(
+      allExpenditureEntries,
+      _ledgerFilter,
+    );
+    final incomeEntries = _filterLedgerEntries(
+      allIncomeEntries,
+      _ledgerFilter,
+    );
+    final totalIncome = _sumLedgerAmount(allIncomeEntries);
+    final totalExpenditure = _sumLedgerAmount(allExpenditureEntries);
+    final netBalance = totalIncome - totalExpenditure;
+    final hasRecords =
+        allIncomeEntries.isNotEmpty || allExpenditureEntries.isNotEmpty;
+    final hasFilteredRecords =
+        incomeEntries.isNotEmpty || expenditureEntries.isNotEmpty;
     final rangeText = reportProvider.range == null
         ? l10n.allTime
         : '${DateFormat('yyyy-MM-dd').format(reportProvider.range!.start)} - ${DateFormat('yyyy-MM-dd').format(reportProvider.range!.end)}';
@@ -343,7 +670,7 @@ class _IncomeExpenditureReportScreenState
                       reportProvider.range,
                     );
                     if (picked == null || !mounted) return;
-                    await reportProvider.setRange(picked);
+                    await _refreshReportData(range: picked);
                   },
                 ),
                 Theme(
@@ -371,11 +698,22 @@ class _IncomeExpenditureReportScreenState
                           ),
                         );
                         if (mounted) {
-                          await reportProvider.refresh();
+                          await _refreshReportData();
                         }
                         return;
                       }
-                      if (filtered.isEmpty) {
+                      if (value == 'add_income') {
+                        await Navigator.of(context).push<bool>(
+                          MaterialPageRoute(
+                            builder: (_) => const ManualIncomeFormScreen(),
+                          ),
+                        );
+                        if (mounted) {
+                          await _refreshReportData();
+                        }
+                        return;
+                      }
+                      if (!hasRecords) {
                         ModernAlerts.showErrorToast(
                           context,
                           message: l10n.noRecordsFoundForSelectedPeriod,
@@ -383,9 +721,17 @@ class _IncomeExpenditureReportScreenState
                         return;
                       }
                       if (value == 'print') {
-                        await _printReport(filtered, reportProvider.range);
+                        await _printReport(
+                          incomeEntries,
+                          expenditureEntries,
+                          reportProvider.range,
+                        );
                       } else if (value == 'download') {
-                        await _downloadReport(filtered, reportProvider.range);
+                        await _downloadReport(
+                          incomeEntries,
+                          expenditureEntries,
+                          reportProvider.range,
+                        );
                       }
                     },
                     itemBuilder: (context) => [
@@ -401,6 +747,25 @@ class _IncomeExpenditureReportScreenState
                             const SizedBox(width: 10),
                             Text(
                               l10n.addManualExpense,
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'add_income',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.trending_up,
+                              size: 20,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              l10n.addManualIncome,
                               style: TextStyle(
                                 color: theme.colorScheme.onSurface,
                               ),
@@ -461,11 +826,11 @@ class _IncomeExpenditureReportScreenState
       ),
       body: !canAccess
           ? Center(child: Text(l10n.accessDeniedFarmerOrFarmManagerOnly))
-          : reportProvider.loading
+          : (reportProvider.loading || incomeProvider.loading)
           ? const Center(child: CircularProgressIndicator())
-          : filtered.isEmpty
+          : !hasRecords
           ? RefreshIndicator(
-              onRefresh: () => reportProvider.refresh(),
+              onRefresh: _refreshReportData,
               backgroundColor: theme.scaffoldBackgroundColor,
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
@@ -485,34 +850,63 @@ class _IncomeExpenditureReportScreenState
                   ),
                   const SizedBox(height: 28),
                   Center(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Constants.primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                      ),
-                      onPressed: () async {
-                        await Navigator.of(context).push<bool>(
-                          MaterialPageRoute(
-                            builder: (_) => const ManualExpenseFormScreen(),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Constants.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
                           ),
-                        );
-                        if (mounted) {
-                          await reportProvider.refresh();
-                        }
-                      },
-                      icon: const Icon(Icons.add_circle_outline),
-                      label: Text(l10n.addManualExpense),
+                          onPressed: () async {
+                            await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (_) => const ManualExpenseFormScreen(),
+                              ),
+                            );
+                            if (mounted) {
+                              await _refreshReportData();
+                            }
+                          },
+                          icon: const Icon(Icons.add_circle_outline),
+                          label: Text(l10n.addManualExpense),
+                        ),
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                          ),
+                          onPressed: () async {
+                            await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (_) => const ManualIncomeFormScreen(),
+                              ),
+                            );
+                            if (mounted) {
+                              await _refreshReportData();
+                            }
+                          },
+                          icon: const Icon(Icons.trending_up),
+                          label: Text(l10n.addManualIncome),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             )
           : RefreshIndicator(
-              onRefresh: () => reportProvider.refresh(),
+              onRefresh: _refreshReportData,
               backgroundColor: theme.scaffoldBackgroundColor,
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
@@ -574,133 +968,144 @@ class _IncomeExpenditureReportScreenState
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _kpiCard(
-                    context: context,
-                    icon: Icons.account_balance_wallet_outlined,
-                    title: l10n.amount,
-                    value: _formatAmount(total),
-                    color: Constants.primaryColor,
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _kpiCard(
+                          context: context,
+                          icon: Icons.trending_up,
+                          title: l10n.incomeReportTotalIncome,
+                          value: _formatAmount(totalIncome),
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _kpiCard(
+                          context: context,
+                          icon: Icons.trending_down,
+                          title: l10n.incomeReportTotalExpenditure,
+                          value: _formatAmount(totalExpenditure),
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   _kpiCard(
                     context: context,
-                    icon: Icons.check_circle_outline,
-                    title: l10n.paidStatus,
-                    value: _formatAmount(paid),
-                    color: Colors.green,
+                    icon: netBalance >= 0
+                        ? Icons.account_balance_wallet_outlined
+                        : Icons.warning_amber_outlined,
+                    title: l10n.incomeReportNetBalance,
+                    value: _formatAmount(netBalance),
+                    color: netBalance >= 0 ? Colors.green : Colors.red,
                   ),
-                  const SizedBox(height: 10),
-                  _kpiCard(
-                    context: context,
-                    icon: Icons.pending_actions_outlined,
-                    title: l10n.pendingStatus,
-                    value: _formatAmount(pending),
-                    color: Colors.orange,
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _filterPill(
+                        label: l10n.incomeReportFilterAll,
+                        selected: _ledgerFilter == _LedgerFilter.all,
+                        onTap: () => setState(
+                          () => _ledgerFilter = _LedgerFilter.all,
+                        ),
+                      ),
+                      _filterPill(
+                        label: l10n.incomeReportFilterIncome,
+                        selected: _ledgerFilter == _LedgerFilter.income,
+                        onTap: () => setState(
+                          () => _ledgerFilter = _LedgerFilter.income,
+                        ),
+                      ),
+                      _filterPill(
+                        label: l10n.incomeReportFilterExpense,
+                        selected: _ledgerFilter == _LedgerFilter.expense,
+                        onTap: () => setState(
+                          () => _ledgerFilter = _LedgerFilter.expense,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 18),
-                  Text(
-                    l10n.incomeReportExpenseEntriesSectionTitle(filtered.length),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ...filtered.map((b) {
-                    final amount = double.tryParse(b.totalCost) ?? 0;
-                    final eventDate = DateTime.tryParse(
-                      b.expenseDate ?? b.createdAt,
-                    );
-                    final statusColor = _statusColor(context, b.status);
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? theme.colorScheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.35)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: theme.colorScheme.outline.withValues(
-                            alpha: 0.2,
+                  if (!hasFilteredRecords)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 36),
+                      child: Center(
+                        child: Text(
+                          l10n.noRecordsFoundForSelectedPeriod,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.8,
+                            ),
                           ),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  b.billNo ??
-                                      b.sourceUuid
-                                          .substring(0, 8)
-                                          .toUpperCase(),
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                _formatAmount(amount),
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: Constants.primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              if (eventDate != null)
-                                Text(
-                                  DateFormat('yyyy-MM-dd').format(eventDate),
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.65),
-                                  ),
-                                ),
-                              if (eventDate != null) const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: statusColor.withValues(alpha: 0.25),
-                                  ),
-                                ),
-                                child: Text(
-                                  _localizedExpenseStatus(l10n, b.status),
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: statusColor,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            b.subjectType ?? l10n.reportTableCellPlaceholder,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(
-                                alpha: 0.85,
-                              ),
-                            ),
-                          ),
-                        ],
+                    )
+                  else ...[
+                    if (incomeEntries.isNotEmpty) ...[
+                    Text(
+                      l10n.incomeReportIncomeEntriesSectionTitle(
+                        incomeEntries.length,
                       ),
-                    );
-                  }),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...incomeEntries.map(
+                      (entry) =>
+                          _ledgerEntryCard(context: context, entry: entry),
+                    ),
+                    ],
+                    if (expenditureEntries.isNotEmpty) ...[
+                      if (incomeEntries.isNotEmpty) const SizedBox(height: 8),
+                      Text(
+                        l10n.incomeReportExpenseEntriesSectionTitle(
+                          expenditureEntries.length,
+                        ),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ...expenditureEntries.map(
+                        (entry) =>
+                            _ledgerEntryCard(context: context, entry: entry),
+                      ),
+                    ],
+                  ],
                 ],
               ),
             ),
     );
   }
+}
+
+enum _LedgerEntryKind { income, expenditure }
+
+enum _LedgerFilter { all, income, expense }
+
+class _LedgerEntry {
+  final _LedgerEntryKind kind;
+  final String reference;
+  final DateTime? date;
+  final String subject;
+  final int quantity;
+  final double amount;
+  final String status;
+
+  const _LedgerEntry({
+    required this.kind,
+    required this.reference,
+    required this.date,
+    required this.subject,
+    required this.quantity,
+    required this.amount,
+    required this.status,
+  });
 }

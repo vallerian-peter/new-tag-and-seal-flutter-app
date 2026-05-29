@@ -43,10 +43,8 @@ class EventsRepository implements EventsRepositoryInterface {
     'neonate',
   };
 
-  EventsRepository(
-    this._database, {
-    NotificationProvider? notificationProvider,
-  })  : _notificationProvider = notificationProvider {
+  EventsRepository(this._database, {NotificationProvider? notificationProvider})
+    : _notificationProvider = notificationProvider {
     _eventDao = _database.eventDao;
   }
 
@@ -132,7 +130,7 @@ class EventsRepository implements EventsRepositoryInterface {
             wasInsertedOrUpdated = true;
           }
         }
-        
+
         // Create/update notification for next feeding time if present and was inserted/updated
         if (wasInsertedOrUpdated) {
           await _createFeedingNotificationFromSync(remote);
@@ -210,7 +208,7 @@ class EventsRepository implements EventsRepositoryInterface {
             wasInsertedOrUpdated = true;
           }
         }
-        
+
         // Create/update notification for next administration date if present and was inserted/updated
         if (wasInsertedOrUpdated) {
           await _createDewormingNotificationFromSync(remote);
@@ -252,7 +250,7 @@ class EventsRepository implements EventsRepositoryInterface {
             wasInsertedOrUpdated = true;
           }
         }
-        
+
         // Create/update notification for next medication date if present and was inserted/updated
         if (wasInsertedOrUpdated) {
           await _createTreatmentNotificationFromSync(remote);
@@ -609,7 +607,9 @@ class EventsRepository implements EventsRepositoryInterface {
         remoteUuids.add(remote.uuid);
         final existing = await _eventDao.getTeethClippingByUuid(remote.uuid);
         if (existing == null) {
-          await _eventDao.upsertTeethClipping(_toTeethClippingCompanion(remote));
+          await _eventDao.upsertTeethClipping(
+            _toTeethClippingCompanion(remote),
+          );
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
@@ -669,7 +669,9 @@ class EventsRepository implements EventsRepositoryInterface {
         remoteUuids.add(remote.uuid);
         final existing = await _eventDao.getIronInjectionByUuid(remote.uuid);
         if (existing == null) {
-          await _eventDao.upsertIronInjection(_toIronInjectionCompanion(remote));
+          await _eventDao.upsertIronInjection(
+            _toIronInjectionCompanion(remote),
+          );
         } else {
           final serverUpdated = DateTime.parse(remote.updatedAt);
           final localUpdated = DateTime.parse(existing.updatedAt);
@@ -790,10 +792,15 @@ class EventsRepository implements EventsRepositoryInterface {
     await _eventDao.deleteServerPrepuceConditionsNotIn(remoteUuids);
   }
 
-  Future<void> _applyServerStageChangeToLivestock(StageChangeModel model) async {
+  Future<void> _applyServerStageChangeToLivestock(
+    StageChangeModel model,
+  ) async {
     final to = model.toStageId;
     if (to == null) return;
-    await _database.livestockDao.updateLivestockStageId(model.livestockUuid, to);
+    await _database.livestockDao.updateLivestockStageId(
+      model.livestockUuid,
+      to,
+    );
 
     final stage = await _database.stageDao.getStageById(to);
     if (stage == null) return;
@@ -848,8 +855,9 @@ class EventsRepository implements EventsRepositoryInterface {
 
     final title = NotificationModel.prepuceFollowUpTitleForLog(model.uuid);
     final trimmed = model.followUpDate?.trim();
-    final nextDate =
-        trimmed != null && trimmed.isNotEmpty ? DateTime.tryParse(trimmed) : null;
+    final nextDate = trimmed != null && trimmed.isNotEmpty
+        ? DateTime.tryParse(trimmed)
+        : null;
     final now = DateTime.now();
 
     Future<void> removeIncompleteWithTitle() async {
@@ -964,11 +972,13 @@ class EventsRepository implements EventsRepositoryInterface {
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'feeding_reminder' &&
-              n.farmUuid == feeding.farmUuid &&
-              n.livestockUuid == feeding.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'feeding_reminder' &&
+                n.farmUuid == feeding.farmUuid &&
+                n.livestockUuid == feeding.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -999,7 +1009,9 @@ class EventsRepository implements EventsRepositoryInterface {
       }
 
       await _notificationProvider.saveNotification(notification);
-      log('✅ Sync: Feeding notification created/updated for ${nextFeedingTime.toLocal()}');
+      log(
+        '✅ Sync: Feeding notification created/updated for ${nextFeedingTime.toLocal()}',
+      );
     } catch (e) {
       log('⚠️ Sync: Failed to create feeding notification: $e');
       // Don't rethrow - notification creation failure shouldn't fail sync
@@ -1007,7 +1019,9 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   /// Create or update notification for deworming events during sync
-  Future<void> _createDewormingNotificationFromSync(DewormingModel deworming) async {
+  Future<void> _createDewormingNotificationFromSync(
+    DewormingModel deworming,
+  ) async {
     if (_notificationProvider == null) return;
 
     try {
@@ -1034,11 +1048,13 @@ class EventsRepository implements EventsRepositoryInterface {
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'deworming_reminder' &&
-              n.farmUuid == deworming.farmUuid &&
-              n.livestockUuid == deworming.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'deworming_reminder' &&
+                n.farmUuid == deworming.farmUuid &&
+                n.livestockUuid == deworming.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -1069,7 +1085,9 @@ class EventsRepository implements EventsRepositoryInterface {
       }
 
       await _notificationProvider.saveNotification(notification);
-      log('✅ Sync: Deworming notification created/updated for ${nextDate.toLocal()}');
+      log(
+        '✅ Sync: Deworming notification created/updated for ${nextDate.toLocal()}',
+      );
     } catch (e) {
       log('⚠️ Sync: Failed to create deworming notification: $e');
       // Don't rethrow - notification creation failure shouldn't fail sync
@@ -1077,7 +1095,9 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   /// Create or update notification for treatment events during sync
-  Future<void> _createTreatmentNotificationFromSync(TreatmentModel treatment) async {
+  Future<void> _createTreatmentNotificationFromSync(
+    TreatmentModel treatment,
+  ) async {
     if (_notificationProvider == null) return;
 
     try {
@@ -1104,11 +1124,13 @@ class EventsRepository implements EventsRepositoryInterface {
 
       // Check if notification already exists
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'treatment_reminder' &&
-              n.farmUuid == treatment.farmUuid &&
-              n.livestockUuid == treatment.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'treatment_reminder' &&
+                n.farmUuid == treatment.farmUuid &&
+                n.livestockUuid == treatment.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -1139,7 +1161,9 @@ class EventsRepository implements EventsRepositoryInterface {
       }
 
       await _notificationProvider.saveNotification(notification);
-      log('✅ Sync: Treatment notification created/updated for ${nextDate.toLocal()}');
+      log(
+        '✅ Sync: Treatment notification created/updated for ${nextDate.toLocal()}',
+      );
     } catch (e) {
       log('⚠️ Sync: Failed to create treatment notification: $e');
       // Don't rethrow - notification creation failure shouldn't fail sync
@@ -1732,7 +1756,9 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<TeethClippingModel> createTeethClipping(TeethClippingModel model) async {
+  Future<TeethClippingModel> createTeethClipping(
+    TeethClippingModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
@@ -1756,8 +1782,8 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertTeethClipping(
@@ -1797,15 +1823,17 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<TailDockingModel> updateTailDockingLocally(TailDockingModel model) async {
+  Future<TailDockingModel> updateTailDockingLocally(
+    TailDockingModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertTailDocking(
@@ -1830,7 +1858,9 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<IronInjectionModel> createIronInjection(IronInjectionModel model) async {
+  Future<IronInjectionModel> createIronInjection(
+    IronInjectionModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       createdAt: model.createdAt.isNotEmpty ? model.createdAt : now,
@@ -1854,8 +1884,8 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertIronInjection(
@@ -1906,8 +1936,8 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertLivestockMarking(
@@ -1947,15 +1977,17 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<StageChangeModel> updateStageChangeLocally(StageChangeModel model) async {
+  Future<StageChangeModel> updateStageChangeLocally(
+    StageChangeModel model,
+  ) async {
     final now = DateTime.now().toIso8601String();
     final localModel = model.copyWith(
       synced: false,
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertStageChange(
@@ -2008,8 +2040,8 @@ class EventsRepository implements EventsRepositoryInterface {
       syncAction: model.syncAction == 'create'
           ? 'create'
           : model.syncAction == 'deleted'
-              ? 'deleted'
-              : 'update',
+          ? 'deleted'
+          : 'update',
       updatedAt: now,
     );
     final updated = await _eventDao.upsertPrepuceCondition(
@@ -2070,13 +2102,15 @@ class EventsRepository implements EventsRepositoryInterface {
   Future<List<TransferModel>> getAllTransfers() => getTransfers();
 
   @override
-  Future<List<TeethClippingModel>> getAllTeethClippings() => getTeethClippings();
+  Future<List<TeethClippingModel>> getAllTeethClippings() =>
+      getTeethClippings();
 
   @override
   Future<List<TailDockingModel>> getAllTailDockings() => getTailDockings();
 
   @override
-  Future<List<IronInjectionModel>> getAllIronInjections() => getIronInjections();
+  Future<List<IronInjectionModel>> getAllIronInjections() =>
+      getIronInjections();
 
   @override
   Future<List<LivestockMarkingModel>> getAllLivestockMarkings() =>
@@ -2593,11 +2627,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertTeethClipping(
         _toTeethClippingCompanion(
-          _mapTeethClippingEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapTeethClippingEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2607,11 +2639,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertTailDocking(
         _toTailDockingCompanion(
-          _mapTailDockingEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapTailDockingEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2621,11 +2651,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertIronInjection(
         _toIronInjectionCompanion(
-          _mapIronInjectionEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapIronInjectionEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2635,11 +2663,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertLivestockMarking(
         _toLivestockMarkingCompanion(
-          _mapLivestockMarkingEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapLivestockMarkingEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2649,11 +2675,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertStageChange(
         _toStageChangeCompanion(
-          _mapStageChangeEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapStageChangeEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2663,11 +2687,9 @@ class EventsRepository implements EventsRepositoryInterface {
       final now = DateTime.now().toIso8601String();
       await _eventDao.upsertPrepuceCondition(
         _toPrepuceConditionCompanion(
-          _mapPrepuceConditionEntity(log).copyWith(
-            synced: false,
-            syncAction: 'deleted',
-            updatedAt: now,
-          ),
+          _mapPrepuceConditionEntity(
+            log,
+          ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now),
         ),
       );
     }
@@ -2771,6 +2793,7 @@ class EventsRepository implements EventsRepositoryInterface {
       existing,
     ).copyWith(synced: false, syncAction: 'deleted', updatedAt: now);
     await _eventDao.upsertDisposal(_toDisposalCompanion(model));
+    await _database.financeIncomeDao.markDisposalIncomeAsDeleted(uuid);
     log('🗑️ Marked disposal log as deleted (pending sync): $uuid');
     return true;
   }
@@ -3083,7 +3106,9 @@ class EventsRepository implements EventsRepositoryInterface {
           : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      method: model.method != null ? Value(model.method!) : const Value.absent(),
+      method: model.method != null
+          ? Value(model.method!)
+          : const Value.absent(),
       notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -3101,7 +3126,9 @@ class EventsRepository implements EventsRepositoryInterface {
           : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      method: model.method != null ? Value(model.method!) : const Value.absent(),
+      method: model.method != null
+          ? Value(model.method!)
+          : const Value.absent(),
       notes: model.notes != null ? Value(model.notes!) : const Value.absent(),
       synced: Value(model.synced),
       syncAction: Value(model.syncAction),
@@ -3119,7 +3146,9 @@ class EventsRepository implements EventsRepositoryInterface {
           : const Value.absent(),
       farmUuid: Value(model.farmUuid),
       livestockUuid: Value(model.livestockUuid),
-      dosage: model.dosage != null ? Value(model.dosage!) : const Value.absent(),
+      dosage: model.dosage != null
+          ? Value(model.dosage!)
+          : const Value.absent(),
       medicineId: model.medicineId != null
           ? Value(model.medicineId!)
           : const Value.absent(),
@@ -3205,8 +3234,9 @@ class EventsRepository implements EventsRepositoryInterface {
       extensionOfficerId: model.extensionOfficerId != null
           ? Value(model.extensionOfficerId!)
           : const Value.absent(),
-      quantity:
-          model.quantity != null ? Value(model.quantity!) : const Value.absent(),
+      quantity: model.quantity != null
+          ? Value(model.quantity!)
+          : const Value.absent(),
       dose: model.dose != null ? Value(model.dose!) : const Value.absent(),
       breedingStatusId: Value(model.breedingStatusId),
       healingStatusId: model.healingStatusId != null
@@ -4245,7 +4275,8 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUnsyncedLivestockMarkingsForApi() async {
+  Future<List<Map<String, dynamic>>>
+  getUnsyncedLivestockMarkingsForApi() async {
     final rows = await _eventDao.getUnsyncedLivestockMarkings();
     if (rows.isEmpty) return [];
     return rows
@@ -4297,7 +4328,8 @@ class EventsRepository implements EventsRepositoryInterface {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUnsyncedPrepuceConditionsForApi() async {
+  Future<List<Map<String, dynamic>>>
+  getUnsyncedPrepuceConditionsForApi() async {
     final rows = await _eventDao.getUnsyncedPrepuceConditions();
     if (rows.isEmpty) return [];
     return rows

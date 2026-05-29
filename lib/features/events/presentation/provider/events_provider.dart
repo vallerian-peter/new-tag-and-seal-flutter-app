@@ -215,6 +215,23 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> loadAllDisposals() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _allDisposals = await _eventsRepository.getAllDisposals();
+      _isLoading = false;
+      _error = null;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
   Future<FeedingModel> addFeeding(FeedingModel model) async {
     try {
       log('📝 Creating feeding log locally: ${model.uuid}');
@@ -2950,4 +2967,3 @@ class EventsProvider extends ChangeNotifier {
   }
 
 }
-

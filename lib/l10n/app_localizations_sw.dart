@@ -46,16 +46,16 @@ class AppLocalizationsSw extends AppLocalizations {
   String get syncStarting => 'Inaanza kulandanisha...';
 
   @override
-  String get syncAdditionalData => 'Inalandanisha data za ziada...';
+  String get syncAdditionalData => 'Inalandanisha taarifa za ziada...';
 
   @override
-  String get syncLivestockReference => 'Inalandanisha data za mifugo...';
+  String get syncLivestockReference => 'Inalandanisha taarifa za mifugo...';
 
   @override
-  String get syncLivestockData => 'Inalandanisha data za mifugo...';
+  String get syncLivestockData => 'Inalandanisha taarifa za mifugo...';
 
   @override
-  String get syncFarmData => 'Inalandanisha data za shamba...';
+  String get syncFarmData => 'Inalandanisha taarifa za shamba...';
 
   @override
   String get syncCompleted => 'Kulandanisha kumekamilika!';
@@ -72,7 +72,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get syncFailedMessage =>
-      'Imeshindwa kulandanisha data. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.';
+      'Imeshindwa kulandanisha taarifa. Tafadhali angalia muunganisho wa mtandao na ujaribu tena.';
 
   @override
   String get retry => 'Jaribu tena';
@@ -141,7 +141,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get invalidServerResponseMessage =>
-      'Seva imerudisha data isiyotarajiwa. Tafadhali ujaribu tena.';
+      'Seva imerudisha taarifa isiyotarajiwa. Tafadhali ujaribu tena.';
 
   @override
   String get next => 'Ifuatayo';
@@ -447,7 +447,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get connected => 'Imeunganishwa';
 
   @override
-  String get waitingForWeightData => 'Inangoja data ya uzito...';
+  String get waitingForWeightData => 'Inangoja taarifa ya uzito...';
 
   @override
   String get placeOnScaleInstruction =>
@@ -625,7 +625,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get offlineCapabilityDesc =>
-      'Fanya kazi bila mtandao na landanisha data yako kiotomatiki wakati mtandao unapatikana';
+      'Fanya kazi bila mtandao na landanisha taarifa yako kiotomatiki wakati mtandao unapatikana';
 
   @override
   String get registerFarm => 'Sajili Shamba Lako';
@@ -650,7 +650,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get syncAnalyzeDesc =>
-      'Landanisha data yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
+      'Landanisha taarifa yako kwenye wingu na angalia uchambuzi wa utendaji wa shamba lako';
 
   @override
   String get gotIt => 'Nimeelewa!';
@@ -736,7 +736,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get loadingData => 'Inapakia taarifa...';
 
   @override
-  String get syncingData => 'Tafadhali subiri, inalandanisha data...';
+  String get syncingData => 'Tafadhali subiri, inalandanisha taarifa...';
 
   @override
   String get success => 'Mafanikio';
@@ -2044,7 +2044,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get diseaseOptionsMissing =>
-      'Hakuna magonjwa. Landanisha data ya marejeo kwanza.';
+      'Hakuna magonjwa. Landanisha taarifa ya marejeo kwanza.';
 
   @override
   String get diseaseId => 'Ugonjwa';
@@ -2167,7 +2167,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get vaccineOptionsMissing =>
-      'Hakuna chanjo. Landanisha data ya chanjo kwanza.';
+      'Hakuna chanjo. Landanisha taarifa ya chanjo kwanza.';
 
   @override
   String get vaccineRequired => 'Chanjo inahitajika';
@@ -2193,7 +2193,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get disposalTypeOptionsMissing =>
-      'Aina za uondoaji hazipatikani. Landanisha data rejea.';
+      'Aina za uondoaji hazipatikani. Landanisha taarifa rejea.';
 
   @override
   String get disposalTypeId => 'Aina ya uondoaji';
@@ -3185,17 +3185,17 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get unsyncedDataWarning =>
-      'Una data ambayo haijalandanishwa. Hakikisha unalandanisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.';
+      'Una taarifa ambayo haijalandanishwa. Hakikisha unalandanisha kabla ya kutoka ili kuepuka kupoteza mabadiliko.';
 
   @override
   String get noUnsyncedDataMessage =>
-      'Hakuna data iliyosalia kulandanisha. Unaweza kutoka salama.';
+      'Hakuna taarifa iliyosalia kulandanisha. Unaweza kutoka salama.';
 
   @override
   String get syncAndLogout => 'Landanisha na utoke';
 
   @override
-  String get syncingBeforeLogout => 'Kulandanisha data kabla ya kutoka...';
+  String get syncingBeforeLogout => 'Kulandanisha taarifa kabla ya kutoka...';
 
   @override
   String get changeFarm => 'Badili Shamba';
@@ -3426,7 +3426,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get vaccineTypesMissing =>
-      'Hakuna aina za chanjo. Landanisha data ya marejeo kwanza.';
+      'Hakuna aina za chanjo. Landanisha taarifa ya marejeo kwanza.';
 
   @override
   String get vaccineTypeRequired => 'Aina ya chanjo inahitajika';
@@ -3591,7 +3591,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String syncRequiredMessage(int count) {
-    return 'Una vitu $count visivyolandanishwa. Tafadhali landanisha data yako ili kuhakikisha taarifa zote ni za kisasa.';
+    return 'Una vitu $count visivyolandanishwa. Tafadhali landanisha taarifa zako.';
   }
 
   @override
@@ -3766,20 +3766,146 @@ class AppLocalizationsSw extends AppLocalizations {
   String get addManualExpense => 'Ongeza matumizi';
 
   @override
+  String get addManualIncome => 'Ongeza mapato';
+
+  @override
   String get manualExpenseTitle => 'Rekodi matumizi';
+
+  @override
+  String get manualIncomeTitle => 'Rekodi mapato';
 
   @override
   String get manualExpenseDetailsSubtitle =>
       'Rekodi manunuzi na gharama zisizohusiana na bili au uhamisho';
 
   @override
+  String get manualIncomeDetailsSubtitle =>
+      'Rekodi mapato yasiyohusiana na bili au uhamisho';
+
+  @override
   String get manualExpenseBasicStep => 'Maelezo ya matumizi';
+
+  @override
+  String get manualIncomeBasicStep => 'Maelezo ya mapato';
+
+  @override
+  String get incomeSourceSectionTitle => 'Maelezo ya chanzo';
+
+  @override
+  String get incomeSourceSectionSubtitle =>
+      'Ongeza chanzo tu ikiwa mapato haya yametoka kwenye rekodi nyingine';
+
+  @override
+  String get incomeHasSource => 'Mapato haya yana chanzo';
+
+  @override
+  String get incomeHasSourceHint =>
+      'Washa tu ikiwa unataka kuunganisha rekodi hii na aina ya chanzo';
+
+  @override
+  String get incomeSourceType => 'Aina ya chanzo';
+
+  @override
+  String get selectIncomeSourceType => 'Chagua aina ya chanzo';
+
+  @override
+  String get incomeSourceTypeSale => 'Mauzo';
+
+  @override
+  String get incomeSourceTypeService => 'Huduma';
+
+  @override
+  String get incomeSourceTypeOther => 'Aina nyingine ya chanzo';
+
+  @override
+  String get incomeSourceTypeOtherHint => 'Andika aina ya chanzo mwenyewe';
+
+  @override
+  String get incomeSourceTypeRequired => 'Chagua aina ya chanzo';
+
+  @override
+  String get incomeSourceTypeOtherRequired => 'Andika aina maalum ya chanzo';
 
   @override
   String get manualExpenseAdditionalStep => 'Maelezo ya ziada';
 
   @override
+  String get manualIncomeAdditionalStep => 'Maelezo ya ziada';
+
+  @override
   String get manualExpenseAdditionalStepSubtitle => 'Idadi, hali, na maelezo';
+
+  @override
+  String get manualIncomeAdditionalStepSubtitle => 'Idadi, hali, na maelezo';
+
+  @override
+  String get manualIncomeSavedSuccessfully =>
+      'Mapato yamehifadhiwa kwenye kifaa. Sawazisha ili kusasisha seva.';
+
+  @override
+  String get manualIncomeSaveFailed =>
+      'Imeshindwa kuhifadhi mapato. Jaribu tena.';
+
+  @override
+  String get confirmSaveManualIncome => 'Ungependa kuhifadhi mapato haya?';
+
+  @override
+  String get incomeSubject => 'Chanzo cha mapato';
+
+  @override
+  String get incomeSubjectHint => 'Mf. mauzo ya mifugo, mazao, au huduma';
+
+  @override
+  String get incomeSubjectRequired => 'Tafadhali eleza mapato';
+
+  @override
+  String get incomeAmount => 'Jumla (TZS)';
+
+  @override
+  String get incomeAmountHint => 'Ingiza jumla ya mapato';
+
+  @override
+  String get incomeAmountRequired =>
+      'Ingiza kiasi halali cha mapato zaidi ya sifuri';
+
+  @override
+  String get incomeDate => 'Tarehe ya mapato';
+
+  @override
+  String get incomeDateRequired => 'Chagua tarehe';
+
+  @override
+  String get selectIncomeDate => 'Chagua tarehe';
+
+  @override
+  String get incomeQuantity => 'Idadi';
+
+  @override
+  String get incomeQuantityHint => 'Vipimo au vitu (chaguo-msingi 1)';
+
+  @override
+  String get incomeQuantityRequired => 'Ingiza idadi sahihi zaidi ya sifuri';
+
+  @override
+  String get incomeNotes => 'Maelezo';
+
+  @override
+  String get incomeNotesHint => 'Maelezo ya hiari';
+
+  @override
+  String get incomePaymentStatus => 'Hali ya mapato';
+
+  @override
+  String get selectIncomeStatus => 'Chagua hali ya mapato';
+
+  @override
+  String get receivedStatus => 'Yamepokelewa';
+
+  @override
+  String get incomeSaved => 'Mapato yamehifadhiwa kikamilifu';
+
+  @override
+  String get incomeSaveFailed => 'Imeshindwa kuhifadhi mapato. Jaribu tena.';
 
   @override
   String get manualExpenseSavedSuccessfully =>
@@ -3826,6 +3952,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get expenseQuantityHint => 'Vipimo au vitu (chaguo-msingi 1)';
 
   @override
+  String get expenseQuantityRequired => 'Ingiza idadi sahihi zaidi ya sifuri';
+
+  @override
   String get expenseNotes => 'Maelezo';
 
   @override
@@ -3842,12 +3971,48 @@ class AppLocalizationsSw extends AppLocalizations {
       'Hakikisha kiasi na tarehe ni sahihi kwa ripoti ya mapato na matumizi.';
 
   @override
+  String get manualIncomeAccuracyNote =>
+      'Hakikisha kiasi na tarehe ni sahihi kwa ripoti ya mapato na matumizi.';
+
+  @override
   String get reportTableCellPlaceholder => '—';
+
+  @override
+  String incomeReportIncomeEntriesSectionTitle(int count) {
+    return 'Mapato ($count)';
+  }
 
   @override
   String incomeReportExpenseEntriesSectionTitle(int count) {
     return 'Matumizi ($count)';
   }
+
+  @override
+  String get incomeReportTotalIncome => 'Jumla ya mapato';
+
+  @override
+  String get incomeReportTotalExpenditure => 'Jumla ya matumizi';
+
+  @override
+  String get incomeReportNetBalance => 'Salio halisi';
+
+  @override
+  String get incomeReportFilterLabel => 'Chuja kwa';
+
+  @override
+  String get incomeReportFilterAll => 'Yote';
+
+  @override
+  String get incomeReportFilterIncome => 'Mapato';
+
+  @override
+  String get incomeReportFilterExpense => 'Matumizi';
+
+  @override
+  String get incomeReportIncomeLabel => 'Mapato';
+
+  @override
+  String get incomeReportExpenditureLabel => 'Matumizi';
 
   @override
   String get incomeReportPdfColumnReference => 'Rejea';
@@ -3969,10 +4134,10 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get faq3Answer =>
-      'Programu hii inafanya kazi nje ya mtandao. Data zote zimehifadhiwa ndani na zinalandanishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kulandanisha ili kulandanisha data kwa mikono.';
+      'Programu hii inafanya kazi nje ya mtandao. Taarifa zote zimehifadhiwa ndani na zinalandanishwa kiotomatiki unapokuwa na muunganisho wa intaneti. Bonyeza kitufe cha kulandanisha ili kulandanisha taarifa kwa mikono.';
 
   @override
-  String get faq4 => 'Ninawezaje kulandanisha data zangu?';
+  String get faq4 => 'Ninawezaje kulandanisha taarifa zangu?';
 
   @override
   String get faq4Answer =>
@@ -4000,7 +4165,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get privacyPolicyInformationWeCollectText =>
-      'Tunakusanya taarifa unazotoa moja kwa moja, pamoja na maelezo ya shamba, data ya mifugo, rekodi za afya, na taarifa za akaunti ya mtumiaji. Pia tunakusanya taarifa za kifaa, data ya eneo (kwa idhini yako), na takwimu za matumizi ili kuboresha huduma zetu.';
+      'Tunakusanya taarifa unazotoa moja kwa moja, pamoja na maelezo ya shamba, taarifa ya mifugo, rekodi za afya, na taarifa za akaunti ya mtumiaji. Pia tunakusanya taarifa za kifaa, taarifa ya eneo (kwa idhini yako), na takwimu za matumizi ili kuboresha huduma zetu.';
 
   @override
   String get privacyPolicyHowWeUseInformation =>
@@ -4011,18 +4176,18 @@ class AppLocalizationsSw extends AppLocalizations {
       'Tunatumia taarifa zilizokusanywa kutoa, kudumisha, na kuboresha huduma zetu, kushughulikia maombi yako, kukutuma arifa, na kuhakikisha utii wa kanuni za mifugo. Hatauza taarifa zako za kibinafsi kwa watu wa tatu.';
 
   @override
-  String get privacyPolicyDataSecurity => 'Usalama wa Data';
+  String get privacyPolicyDataSecurity => 'Usalama wa Taarifa';
 
   @override
   String get privacyPolicyDataSecurityText =>
-      'Tunatekeleza hatua za kiufundi na za kikundi zinazofaa kulinda taarifa zako za kibinafsi dhidi ya ufikiaji usioidhinishwa, mabadiliko, ufichuaji, au uharibifu. Data yako imesimbwa wakati wa usafiri na wakati wa kuhifadhiwa, na tunachunguza mara kwa mara mazoea yetu ya usalama.';
+      'Tunatekeleza hatua za kiufundi na za kikundi zinazofaa kulinda taarifa zako za kibinafsi dhidi ya ufikiaji usioidhinishwa, mabadiliko, ufichuaji, au uharibifu. Taarifa yako imesimbwa wakati wa usafiri na wakati wa kuhifadhiwa, na tunachunguza mara kwa mara mazoea yetu ya usalama.';
 
   @override
   String get privacyPolicyYourRights => 'Haki Zako';
 
   @override
   String get privacyPolicyYourRightsText =>
-      'Una haki ya kufikia, kusasisha, au kufuta taarifa zako za kibinafsi wakati wowote. Unaweza pia kuomba nakala ya data yako au kujiondoa kwa idhini ya usindikaji wa data. Ili kutekeleza haki hizi, tafadhali wasiliana nasi kwa kutumia taarifa zilizotolewa hapa chini.';
+      'Una haki ya kufikia, kusasisha, au kufuta taarifa zako za kibinafsi wakati wowote. Unaweza pia kuomba nakala ya taarifa yako au kujiondoa kwa idhini ya usindikaji wa taarifa. Ili kutekeleza haki hizi, tafadhali wasiliana nasi kwa kutumia taarifa zilizotolewa hapa chini.';
 
   @override
   String get privacyPolicyContactUs => 'Wasiliana Nasi';
@@ -4074,7 +4239,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get termsOfServiceLimitationOfLiabilityText =>
-      'Tag & Seal inatolewa \'kama ilivyo\' bila dhamana ya aina yoyote. Hatuna wajibu kwa uharibifu wowote unaotokana na matumizi yako ya huduma, pamoja na lakini si tu kupoteza data, kukatika kwa biashara, au uharibifu wa moja kwa moja.';
+      'Tag & Seal inatolewa \'kama ilivyo\' bila dhamana ya aina yoyote. Hatuna wajibu kwa uharibifu wowote unaotokana na matumizi yako ya huduma, pamoja na lakini si tu kupoteza taarifa, kukatika kwa biashara, au uharibifu wa moja kwa moja.';
 
   @override
   String get termsOfServiceChangesToTerms => 'Mabadiliko ya Masharti';

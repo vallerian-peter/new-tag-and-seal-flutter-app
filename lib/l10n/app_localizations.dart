@@ -6767,7 +6767,7 @@ abstract class AppLocalizations {
   /// Message for forced sync dialog
   ///
   /// In en, this message translates to:
-  /// **'You have {count} unsynced items. Please sync your data to ensure all information is up to date.'**
+  /// **'You have {count} unsynced items. Please sync your data.'**
   String syncRequiredMessage(int count);
 
   /// Button text for forced sync dialog
@@ -7088,11 +7088,23 @@ abstract class AppLocalizations {
   /// **'Add expense'**
   String get addManualExpense;
 
+  /// Menu: record a manual finance income
+  ///
+  /// In en, this message translates to:
+  /// **'Add income'**
+  String get addManualIncome;
+
   /// Title for manual expense form
   ///
   /// In en, this message translates to:
   /// **'Record expense'**
   String get manualExpenseTitle;
+
+  /// Title for manual income form
+  ///
+  /// In en, this message translates to:
+  /// **'Record income'**
+  String get manualIncomeTitle;
 
   /// Subtitle under manual expense header
   ///
@@ -7100,11 +7112,95 @@ abstract class AppLocalizations {
   /// **'Record purchases and costs not tied to bills or transfers'**
   String get manualExpenseDetailsSubtitle;
 
+  /// Subtitle under manual income header
+  ///
+  /// In en, this message translates to:
+  /// **'Record income not tied to bills or transfers'**
+  String get manualIncomeDetailsSubtitle;
+
   /// Stepper step 1 title
   ///
   /// In en, this message translates to:
   /// **'Expense details'**
   String get manualExpenseBasicStep;
+
+  /// Stepper step 1 title for manual income
+  ///
+  /// In en, this message translates to:
+  /// **'Income details'**
+  String get manualIncomeBasicStep;
+
+  /// Title for the optional source section
+  ///
+  /// In en, this message translates to:
+  /// **'Source details'**
+  String get incomeSourceSectionTitle;
+
+  /// Subtitle for optional source section
+  ///
+  /// In en, this message translates to:
+  /// **'Add a source only if this income came from another record'**
+  String get incomeSourceSectionSubtitle;
+
+  /// Switch label to show source fields
+  ///
+  /// In en, this message translates to:
+  /// **'This income has a source'**
+  String get incomeHasSource;
+
+  /// Helper text for source switch
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on only when you want to link this record to a source type'**
+  String get incomeHasSourceHint;
+
+  /// Label for income source type dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Source type'**
+  String get incomeSourceType;
+
+  /// Hint for source type dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Select source type'**
+  String get selectIncomeSourceType;
+
+  /// Source type option: sale
+  ///
+  /// In en, this message translates to:
+  /// **'Sale'**
+  String get incomeSourceTypeSale;
+
+  /// Source type option: service
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get incomeSourceTypeService;
+
+  /// Label for custom source type text field
+  ///
+  /// In en, this message translates to:
+  /// **'Other source type'**
+  String get incomeSourceTypeOther;
+
+  /// Hint for custom source type text field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the source type manually'**
+  String get incomeSourceTypeOtherHint;
+
+  /// Validation for source type dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Select a source type'**
+  String get incomeSourceTypeRequired;
+
+  /// Validation for custom source type field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the custom source type'**
+  String get incomeSourceTypeOtherRequired;
 
   /// Stepper step 2 title
   ///
@@ -7112,11 +7208,155 @@ abstract class AppLocalizations {
   /// **'Additional details'**
   String get manualExpenseAdditionalStep;
 
+  /// Stepper step 2 title for manual income
+  ///
+  /// In en, this message translates to:
+  /// **'Additional details'**
+  String get manualIncomeAdditionalStep;
+
   /// Stepper step 2 subtitle
   ///
   /// In en, this message translates to:
   /// **'Quantity, status, and notes'**
   String get manualExpenseAdditionalStepSubtitle;
+
+  /// Stepper step 2 subtitle for manual income
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity, status, and notes'**
+  String get manualIncomeAdditionalStepSubtitle;
+
+  /// After saving manual income
+  ///
+  /// In en, this message translates to:
+  /// **'Income saved locally. Sync to update the server.'**
+  String get manualIncomeSavedSuccessfully;
+
+  /// Manual income save error
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save income. Please try again.'**
+  String get manualIncomeSaveFailed;
+
+  /// Confirm save manual income
+  ///
+  /// In en, this message translates to:
+  /// **'Save this income to your records?'**
+  String get confirmSaveManualIncome;
+
+  /// Label for income description
+  ///
+  /// In en, this message translates to:
+  /// **'Income subject'**
+  String get incomeSubject;
+
+  /// Hint for income description
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Sale of livestock, produce, or service'**
+  String get incomeSubjectHint;
+
+  /// Validation income description
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe the income'**
+  String get incomeSubjectRequired;
+
+  /// Total income label
+  ///
+  /// In en, this message translates to:
+  /// **'Total amount (TZS)'**
+  String get incomeAmount;
+
+  /// Total income hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter total income'**
+  String get incomeAmountHint;
+
+  /// Validation income amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid income amount greater than zero'**
+  String get incomeAmountRequired;
+
+  /// Income date label
+  ///
+  /// In en, this message translates to:
+  /// **'Income date'**
+  String get incomeDate;
+
+  /// Validation income date
+  ///
+  /// In en, this message translates to:
+  /// **'Select a date'**
+  String get incomeDateRequired;
+
+  /// Open income date picker
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectIncomeDate;
+
+  /// Income quantity label
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get incomeQuantity;
+
+  /// Income quantity hint
+  ///
+  /// In en, this message translates to:
+  /// **'Units or items (defaults to 1)'**
+  String get incomeQuantityHint;
+
+  /// Validation for manual income quantity
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid quantity greater than zero'**
+  String get incomeQuantityRequired;
+
+  /// Income notes label
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get incomeNotes;
+
+  /// Income notes hint
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details'**
+  String get incomeNotesHint;
+
+  /// Received vs pending
+  ///
+  /// In en, this message translates to:
+  /// **'Income status'**
+  String get incomePaymentStatus;
+
+  /// Income status hint
+  ///
+  /// In en, this message translates to:
+  /// **'Select income status'**
+  String get selectIncomeStatus;
+
+  /// Received status label
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get receivedStatus;
+
+  /// Toast after saving income
+  ///
+  /// In en, this message translates to:
+  /// **'Income saved successfully'**
+  String get incomeSaved;
+
+  /// Income save error
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save income. Please try again.'**
+  String get incomeSaveFailed;
 
   /// After saving manual expense
   ///
@@ -7202,6 +7442,12 @@ abstract class AppLocalizations {
   /// **'Units or items (defaults to 1)'**
   String get expenseQuantityHint;
 
+  /// Validation for manual expense quantity
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid quantity greater than zero'**
+  String get expenseQuantityRequired;
+
   /// Notes label
   ///
   /// In en, this message translates to:
@@ -7232,17 +7478,83 @@ abstract class AppLocalizations {
   /// **'Ensure amounts and dates are correct for your income and expenditure report.'**
   String get manualExpenseAccuracyNote;
 
+  /// Footer info on manual income form
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure the amount and date are correct for your income and expenditure report.'**
+  String get manualIncomeAccuracyNote;
+
   /// Placeholder when a report/PDF table cell has no value
   ///
   /// In en, this message translates to:
   /// **'—'**
   String get reportTableCellPlaceholder;
 
+  /// Section title for income rows
+  ///
+  /// In en, this message translates to:
+  /// **'Income entries ({count})'**
+  String incomeReportIncomeEntriesSectionTitle(int count);
+
   /// Section title with number of income/expenditure rows
   ///
   /// In en, this message translates to:
   /// **'Expense entries ({count})'**
   String incomeReportExpenseEntriesSectionTitle(int count);
+
+  /// Total income KPI label
+  ///
+  /// In en, this message translates to:
+  /// **'Total income'**
+  String get incomeReportTotalIncome;
+
+  /// Total expenditure KPI label
+  ///
+  /// In en, this message translates to:
+  /// **'Total expenditure'**
+  String get incomeReportTotalExpenditure;
+
+  /// Net balance KPI label
+  ///
+  /// In en, this message translates to:
+  /// **'Net balance'**
+  String get incomeReportNetBalance;
+
+  /// Label for the income and expenditure filter pills
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by'**
+  String get incomeReportFilterLabel;
+
+  /// Filter pill label showing all ledger entries
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get incomeReportFilterAll;
+
+  /// Filter pill label showing income entries only
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get incomeReportFilterIncome;
+
+  /// Filter pill label showing expense entries only
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get incomeReportFilterExpense;
+
+  /// Badge label for income rows
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get incomeReportIncomeLabel;
+
+  /// Badge label for expenditure rows
+  ///
+  /// In en, this message translates to:
+  /// **'Expenditure'**
+  String get incomeReportExpenditureLabel;
 
   /// PDF column: bill number or expense reference
   ///

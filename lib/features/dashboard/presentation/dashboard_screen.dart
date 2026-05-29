@@ -22,6 +22,8 @@ import 'package:new_tag_and_seal_flutter_app/features/farmUser/presentation/farm
 import 'package:new_tag_and_seal_flutter_app/features/extensionOfficer/presentation/extension_officer_invite_form_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/farms/presentation/provider/farm_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_income_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/presentation/provider/finance_expense_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/notification_screen.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +36,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
   static const String _syncPromptStorageKey = 'dashboard_sync_prompt_shown';
   bool _isSyncing = false;
   final _secureStorage = const FlutterSecureStorage();
@@ -44,6 +47,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   SyncUnsyncedSummary _unsyncedSummary = const SyncUnsyncedSummary.empty();
   bool _isLogoutDialogOpen = false;
   FarmProvider? _farmProvider; // Store reference for cleanup
+  FinanceExpenseProvider? _financeExpenseProvider;
+  FinanceIncomeProvider? _financeIncomeProvider;
 
   String _userName = '';
   String _userEmail = '';
@@ -52,6 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadUserData();
     getALlFarmsWithThereLivestocks();
     _loadEventSummary();
@@ -63,6 +69,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         _farmProvider = Provider.of<FarmProvider>(context, listen: false);
         _farmProvider?.addListener(_onFarmProviderChanged);
+        _financeExpenseProvider = Provider.of<FinanceExpenseProvider>(
+          context,
+          listen: false,
+        );
+        _financeExpenseProvider?.addListener(_onFinanceExpenseProviderChanged);
+        _financeIncomeProvider = Provider.of<FinanceIncomeProvider>(
+          context,
+          listen: false,
+        );
+        _financeIncomeProvider?.addListener(_onFinanceIncomeProviderChanged);
       }
     });
   }
@@ -71,7 +87,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void dispose() {
     // Remove listener to prevent memory leaks
     _farmProvider?.removeListener(_onFarmProviderChanged);
+    _financeExpenseProvider?.removeListener(
+      _onFinanceExpenseProviderChanged,
+    );
+    _financeIncomeProvider?.removeListener(_onFinanceIncomeProviderChanged);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      getALlFarmsWithThereLivestocks();
+      _loadEventSummary();
+      _loadUnsyncedSummary();
+    }
   }
 
   /// Called when FarmProvider notifies listeners (e.g., after farm creation)
@@ -80,6 +110,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       debugPrint('🔄 FarmProvider changed - refreshing dashboard...');
       getALlFarmsWithThereLivestocks();
       _loadEventSummary();
+    }
+  }
+
+  /// Called when manual expenses change so the unsynced banner stays current.
+  void _onFinanceExpenseProviderChanged() {
+    if (mounted) {
+      debugPrint('🔄 FinanceExpenseProvider changed - refreshing unsynced summary...');
+      _loadUnsyncedSummary();
+    }
+  }
+
+  /// Called when manual incomes change so the unsynced banner stays current.
+  void _onFinanceIncomeProviderChanged() {
+    if (mounted) {
+      debugPrint('🔄 FinanceIncomeProvider changed - refreshing unsynced summary...');
+      _loadUnsyncedSummary();
     }
   }
 
@@ -671,6 +717,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+
             if (_unsyncedSummary.hasPending)
               Positioned(
                 left: 12,
@@ -705,7 +752,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
+                              color: Colors.black,
                             ),
                           ),
                         ),

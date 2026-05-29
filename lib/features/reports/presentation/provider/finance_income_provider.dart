@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
-import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_expense_repository.dart';
-import 'package:new_tag_and_seal_flutter_app/features/reports/domain/models/finance_expense_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/disposal_model.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/data/repository/finance_income_repository.dart';
+import 'package:new_tag_and_seal_flutter_app/features/reports/domain/models/finance_income_model.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 
-class FinanceExpenseProvider extends ChangeNotifier {
-  final FinanceExpenseRepository _repository;
+class FinanceIncomeProvider extends ChangeNotifier {
+  final FinanceIncomeRepository _repository;
 
-  FinanceExpenseProvider({required FinanceExpenseRepository repository})
+  FinanceIncomeProvider({required FinanceIncomeRepository repository})
     : _repository = repository;
 
   bool _loading = false;
@@ -16,14 +17,13 @@ class FinanceExpenseProvider extends ChangeNotifier {
   DateTimeRange? _range;
   DateTimeRange? get range => _range;
 
-  List<FinanceExpenseModel> _expenses = const [];
-  List<FinanceExpenseModel> get expenses => _expenses;
+  List<FinanceIncomeModel> _incomes = const [];
+  List<FinanceIncomeModel> get incomes => _incomes;
 
   Future<void> refresh({String? farmUuid, int? farmerId}) async {
     _loading = true;
     notifyListeners();
-    await _repository.rebuildBillExpensesFromLocalBills();
-    _expenses = await _repository.getExpenses(
+    _incomes = await _repository.getIncomes(
       farmUuid: farmUuid,
       farmerId: farmerId,
       range: _range,
@@ -41,18 +41,20 @@ class FinanceExpenseProvider extends ChangeNotifier {
     await refresh(farmUuid: farmUuid, farmerId: farmerId);
   }
 
-  /// Save a manual expense locally (loading/success/error via [ModernAlerts]).
-  Future<bool> addManualExpenseWithDialog(
+  Future<bool> addManualIncomeWithDialog(
     BuildContext context, {
     required String uuid,
     required String farmUuid,
     int? farmerId,
+    String? sourceType,
+    String? sourceUuid,
+    String? referenceNo,
     required String subjectType,
-    required double totalCost,
+    required double totalAmount,
     int quantity = 1,
-    String status = 'paid',
+    String status = 'received',
     String? notes,
-    required DateTime expenseDate,
+    required DateTime incomeDate,
   }) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -64,25 +66,29 @@ class FinanceExpenseProvider extends ChangeNotifier {
     );
 
     try {
-      await _repository.insertManualExpense(
+      await _repository.insertManualIncome(
         uuid: uuid,
         farmUuid: farmUuid,
         farmerId: farmerId,
+        sourceType: sourceType,
+        sourceUuid: sourceUuid,
+        referenceNo: referenceNo,
         subjectType: subjectType,
-        totalCost: totalCost,
+        totalAmount: totalAmount,
         quantity: quantity,
         status: status,
         notes: notes,
-        expenseDate: expenseDate,
+        incomeDate: incomeDate,
       );
-      await refresh();
-
       if (context.mounted) {
         Navigator.of(context).pop();
+      }
+      await refresh(farmUuid: farmUuid, farmerId: farmerId);
+      if (context.mounted) {
         await ModernAlerts.showSuccess(
           context: context,
           title: l10n.success,
-          message: l10n.manualExpenseSavedSuccessfully,
+          message: l10n.incomeSaved,
           buttonText: l10n.ok,
         );
       }
@@ -90,14 +96,21 @@ class FinanceExpenseProvider extends ChangeNotifier {
     } catch (e) {
       if (context.mounted) {
         Navigator.of(context).pop();
-        await ModernAlerts.showError(
-          context: context,
-          title: l10n.error,
-          message: l10n.manualExpenseSaveFailed,
-          buttonText: l10n.ok,
-        );
+      }
+      if (context.mounted) {
+        ModernAlerts.showErrorToast(context, message: '${l10n.error}: $e');
       }
       return false;
     }
+  }
+
+  Future<void> upsertDisposalIncome(DisposalModel disposal) async {
+    await _repository.upsertDisposalIncomeFromDisposal(disposal);
+    await refresh();
+  }
+
+  Future<void> upsertDisposalIncomes(List<DisposalModel> disposals) async {
+    await _repository.upsertDisposalIncomesFromDisposals(disposals);
+    await refresh();
   }
 }
