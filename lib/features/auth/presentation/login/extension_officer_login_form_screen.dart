@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/network_status_banner.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
@@ -83,6 +84,10 @@ class _ExtensionOfficerLoginFormScreenState
         final accessNumber = _farmerAccessNumberController.text.trim();
         if (accessNumber.isNotEmpty) {
           await authProvider.storeExtensionOfficerAccessNumber(accessNumber);
+        }
+
+        if (!mounted) {
+          return;
         }
 
         // Call dedicated Extension Officer login (email + access_code + password)
@@ -256,6 +261,8 @@ class _ExtensionOfficerLoginFormScreenState
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          const NetworkStatusBanner(),
+
                           // Farmer Access Number Field
                           CustomTextField(
                             label: l10n.farmerAccessNumber,

@@ -47,6 +47,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   SyncUnsyncedSummary _unsyncedSummary = const SyncUnsyncedSummary.empty();
   bool _isLogoutDialogOpen = false;
   FarmProvider? _farmProvider; // Store reference for cleanup
+  EventsProvider? _eventsProvider;
   FinanceExpenseProvider? _financeExpenseProvider;
   FinanceIncomeProvider? _financeIncomeProvider;
 
@@ -69,6 +70,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       if (mounted) {
         _farmProvider = Provider.of<FarmProvider>(context, listen: false);
         _farmProvider?.addListener(_onFarmProviderChanged);
+        _eventsProvider = Provider.of<EventsProvider>(context, listen: false);
+        _eventsProvider?.addListener(_onEventsProviderChanged);
         _financeExpenseProvider = Provider.of<FinanceExpenseProvider>(
           context,
           listen: false,
@@ -87,9 +90,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   void dispose() {
     // Remove listener to prevent memory leaks
     _farmProvider?.removeListener(_onFarmProviderChanged);
-    _financeExpenseProvider?.removeListener(
-      _onFinanceExpenseProviderChanged,
-    );
+    _eventsProvider?.removeListener(_onEventsProviderChanged);
+    _financeExpenseProvider?.removeListener(_onFinanceExpenseProviderChanged);
     _financeIncomeProvider?.removeListener(_onFinanceIncomeProviderChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -109,14 +111,24 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (mounted) {
       debugPrint('🔄 FarmProvider changed - refreshing dashboard...');
       getALlFarmsWithThereLivestocks();
+    }
+  }
+
+  /// Called when events change so the dashboard counts stay current.
+  void _onEventsProviderChanged() {
+    if (mounted) {
+      debugPrint('🔄 EventsProvider changed - refreshing dashboard counts...');
       _loadEventSummary();
+      _loadUnsyncedSummary();
     }
   }
 
   /// Called when manual expenses change so the unsynced banner stays current.
   void _onFinanceExpenseProviderChanged() {
     if (mounted) {
-      debugPrint('🔄 FinanceExpenseProvider changed - refreshing unsynced summary...');
+      debugPrint(
+        '🔄 FinanceExpenseProvider changed - refreshing unsynced summary...',
+      );
       _loadUnsyncedSummary();
     }
   }
@@ -124,7 +136,9 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// Called when manual incomes change so the unsynced banner stays current.
   void _onFinanceIncomeProviderChanged() {
     if (mounted) {
-      debugPrint('🔄 FinanceIncomeProvider changed - refreshing unsynced summary...');
+      debugPrint(
+        '🔄 FinanceIncomeProvider changed - refreshing unsynced summary...',
+      );
       _loadUnsyncedSummary();
     }
   }
@@ -302,6 +316,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         farmsWithLivestock = [];
       });
     }
+
+    await _loadEventSummary();
+    await _loadUnsyncedSummary();
   }
 
   @override
@@ -616,7 +633,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         if (result == true && mounted) {
                           debugPrint('🔄 Refreshing dashboard data...');
                           await getALlFarmsWithThereLivestocks();
-                          await _loadEventSummary();
                           debugPrint('✅ Dashboard refresh completed');
                         } else {
                           debugPrint(

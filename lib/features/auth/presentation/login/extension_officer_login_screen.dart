@@ -6,6 +6,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_button.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/network_status_banner.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
@@ -18,13 +19,15 @@ class ExtensionOfficerLoginScreen extends StatefulWidget {
   const ExtensionOfficerLoginScreen({super.key});
 
   @override
-  State<ExtensionOfficerLoginScreen> createState() => _ExtensionOfficerLoginScreenState();
+  State<ExtensionOfficerLoginScreen> createState() =>
+      _ExtensionOfficerLoginScreenState();
 }
 
-class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScreen> {
+class _ExtensionOfficerLoginScreenState
+    extends State<ExtensionOfficerLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _secureStorage = const FlutterSecureStorage();
-  
+
   final _farmerAccessNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -50,7 +53,7 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
     try {
       final email = await _secureStorage.read(key: 'email');
       final password = await _secureStorage.read(key: 'password');
-      
+
       if (mounted) {
         setState(() {
           if (email != null && email.isNotEmpty) {
@@ -70,16 +73,16 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       setState(() {
         _isLoading = true;
       });
 
       final l10n = AppLocalizations.of(context)!;
-      
+
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        
+
         // Call auth provider login method
         // Note: This will need to be updated to handle Extension Officer login
         // with farmer access number in the backend
@@ -88,12 +91,12 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
           username: _emailController.text,
           password: _passwordController.text,
         );
-        
+
         if (success && mounted) {
           setState(() {
             _isLoading = false;
           });
-          
+
           // Navigate to home screen
           Navigator.pushReplacement(
             context,
@@ -111,11 +114,14 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
           setState(() {
             _isLoading = false;
           });
-          
+
           // Show user-friendly error dialog
-          final errorMessage = ErrorHelper.formatErrorMessage(e.toString(), l10n);
+          final errorMessage = ErrorHelper.formatErrorMessage(
+            e.toString(),
+            l10n,
+          );
           final errorTitle = ErrorHelper.getErrorTitle(e.toString(), l10n);
-          
+
           await AlertDialogs.showError(
             context: context,
             title: errorTitle,
@@ -134,11 +140,13 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+    );
 
     return Scaffold(
       body: Stack(
@@ -154,7 +162,7 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
               height: size.height * 0.35,
             ),
           ),
-          
+
           // Gradient Overlay
           Positioned(
             top: 0,
@@ -175,7 +183,7 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
               ),
             ),
           ),
-        
+
           // Main Content
           SafeArea(
             child: SingleChildScrollView(
@@ -189,7 +197,7 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                       Navigator.pop(context);
                     },
                   ),
-                  
+
                   // Logo
                   Hero(
                     tag: 'app-logo',
@@ -199,9 +207,9 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                       height: size.height * 0.08,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 15),
-                  
+
                   Text(
                     l10n.extensionOfficerLogin,
                     style: TextStyle(
@@ -217,9 +225,9 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 6),
-                  
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
@@ -239,15 +247,13 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 30),
-                  
+
                   // Login Form Card
                   Container(
                     width: double.infinity,
-                    constraints: BoxConstraints(
-                      minHeight: size.height * 0.55,
-                    ),
+                    constraints: BoxConstraints(minHeight: size.height * 0.55),
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor,
                       borderRadius: const BorderRadius.only(
@@ -271,19 +277,23 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 color: theme.colorScheme.onSurface,
                               ),
                             ),
-                            
+
                             const SizedBox(height: 6),
-                            
+
                             Text(
                               l10n.extensionOfficerLoginSubtitle,
                               style: TextStyle(
                                 fontSize: Constants.textSize,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
                             ),
-                            
-                            const SizedBox(height: 24),
-                            
+
+                            const SizedBox(height: 16),
+
+                            const NetworkStatusBanner(),
+
                             // Farmer Access Number Field
                             CustomTextField(
                               label: l10n.farmerAccessNumber,
@@ -298,9 +308,9 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 return null;
                               },
                             ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             // Email Field
                             CustomTextField(
                               label: l10n.email,
@@ -312,15 +322,17 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 if (value == null || value.isEmpty) {
                                   return l10n.pleaseEnterEmail;
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
                                   return l10n.pleaseEnterValidEmail;
                                 }
                                 return null;
                               },
                             ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             // Password Field
                             CustomTextField(
                               label: l10n.password,
@@ -338,28 +350,37 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 return null;
                               },
                             ),
-                            
+
                             const SizedBox(height: 8),
-                            
+
                             // Forgot Password
                             Align(
                               alignment: Alignment.centerRight,
                               child: GestureDetector(
                                 onTap: () async {
-                                  final recoveryMethod = await ForgotPasswordBottomSheet.show(context);
-                                  if (recoveryMethod != null && mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ForgotPasswordInputScreen(
-                                          recoveryMethod: recoveryMethod,
-                                        ),
-                                      ),
-                                    );
+                                  final navigator = Navigator.of(context);
+                                  final recoveryMethod =
+                                      await ForgotPasswordBottomSheet.show(
+                                        context,
+                                      );
+                                  if (!mounted || recoveryMethod == null) {
+                                    return;
                                   }
+
+                                  navigator.push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ForgotPasswordInputScreen(
+                                            recoveryMethod: recoveryMethod,
+                                          ),
+                                    ),
+                                  );
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   child: Text(
                                     l10n.forgotPassword,
                                     style: TextStyle(
@@ -372,9 +393,9 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
                                 ),
                               ),
                             ),
-                            
+
                             const SizedBox(height: 20),
-                            
+
                             // Login Button
                             SizedBox(
                               width: double.infinity,
@@ -399,9 +420,3 @@ class _ExtensionOfficerLoginScreenState extends State<ExtensionOfficerLoginScree
     );
   }
 }
-
-
-
-
-
-

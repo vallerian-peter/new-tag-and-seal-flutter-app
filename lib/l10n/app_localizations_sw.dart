@@ -1238,7 +1238,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get otpWillBeSentToEmail =>
-      'Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye anwani yako ya barua pepe';
+      'Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye namba yako ya simu iliosajiliwa na anwani hii ya barua pepe';
 
   @override
   String get otpWillBeSentToPhone =>
@@ -1258,7 +1258,13 @@ class AppLocalizationsSw extends AppLocalizations {
   String get enterOtpCode => 'Ingiza Msimbo wa OTP';
 
   @override
-  String get otpSentTo => 'OTP imetumwa kwa';
+  String get otpSentTo =>
+      'OTP imetumwa kwenye namba ya simu iliosajiliwa na hii barua pepe *';
+
+  @override
+  String otpSendToPhone(String phone) {
+    return 'OTP imetumwa kwenye $phone';
+  }
 
   @override
   String get verify => 'Thibitisha';
@@ -1362,13 +1368,13 @@ class AppLocalizationsSw extends AppLocalizations {
   String get userProfile => 'Wasifu wa Mtumiaji';
 
   @override
-  String get scanQRCode => 'Skeni Msimbo wa QR';
+  String get scanQRCode => 'Skani Msimbo wa QR';
 
   @override
-  String get qrScanner => 'Skena ya QR';
+  String get qrScanner => 'Skana ya QR';
 
   @override
-  String get qrScannerDescription => 'Utendaji wa skena utatekelezwa hapa';
+  String get qrScannerDescription => 'Utendaji wa skana utatekelezwa hapa';
 
   @override
   String get dashboardScreen => 'Skrini ya Dashibodi';
@@ -2666,14 +2672,24 @@ class AppLocalizationsSw extends AppLocalizations {
       'Fomu kamili na lebo na kitambulisho kimoja';
 
   @override
-  String get registerPigletLitterOption => 'Vizazi vya nguruwe wadogo';
+  String get registerPigletLitterOption => 'Mifugo midogo';
+
+  @override
+  String get registerSmallLivestockOption => 'Mifugo midogo';
 
   @override
   String get registerPigletLitterOptionDesc =>
-      'Maelezo sawa kwa wengi; vitambulisho kama TAREHE-01';
+      'Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01';
 
   @override
-  String get pigletBulkTitle => 'Sajili vizazi vya nguruwe wadogo';
+  String get registerSmallLivestockOptionDesc =>
+      'Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01';
+
+  @override
+  String get pigletBulkTitle => 'Sajili mifugo midogo';
+
+  @override
+  String get smallLivestockBulkTitle => 'Sajili mifugo midogo';
 
   @override
   String get pigletBulkCompleteBirthFlowTitle => 'Maliza kuzaa na watoto';
@@ -2687,17 +2703,62 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkStepCommonSubtitle =>
-      'Shamba, aina, idadi, tarehe, wazazi';
+      'Shamba, aina, idadi ya kundi, tarehe, wazazi';
 
   @override
   String get pigletBulkStepPreviewTitle => 'Hakiki';
 
   @override
   String get pigletBulkStepPreviewSubtitle =>
-      'Vitambulisho na jinsia kwa kila nguruwe';
+      'Vitambulisho na jinsia kwa kila mnyama';
 
   @override
-  String get pigletBulkNumberOfPiglets => 'Idadi ya nguruwe wadogo';
+  String get pigletBulkNumberOfPiglets => 'Wanyama wangapi?';
+
+  @override
+  String get pigletBulkNumberOfPigletsHelp =>
+      'Ingiza jumla ya wanyama katika kundi hili. Tumia 1 kwa mnyama mmoja.';
+
+  @override
+  String get pigletBulkSameAsBatch => 'Kama kundi';
+
+  @override
+  String get pigletBulkIndividualDetails => 'Maelezo ya mnyama mmoja';
+
+  @override
+  String get pigletBulkOverrideBatchDefaults => 'Badilisha maelezo ya kundi';
+
+  @override
+  String get pigletBulkIndividualDetailsHelp =>
+      'Badilisha sehemu zinazotofautiana kwa mnyama huyu tu. Sehemu tupu zitatumia maelezo ya kundi.';
+
+  @override
+  String get pigletBulkUseBatchDefaults => 'Tumia maelezo ya kundi';
+
+  @override
+  String get pigletBulkInactiveDisposalHelp =>
+      'Mnyama asiye hai anahitaji rekodi ya uondoaji ili historia ionyeshe kilichotokea.';
+
+  @override
+  String get pigletBulkDisposalDate => 'Tarehe ya uondoaji';
+
+  @override
+  String get pigletBulkDisposalDateHint => 'Chagua tarehe ya uondoaji';
+
+  @override
+  String pigletBulkInactiveDisposalRequired(int index) {
+    return 'Mnyama $index si hai. Chagua aina ya uondoaji.';
+  }
+
+  @override
+  String pigletBulkInactiveReasonRequired(int index) {
+    return 'Mnyama $index si hai. Ingiza sababu ya uondoaji.';
+  }
+
+  @override
+  String pigletBulkInactiveDateRequired(int index) {
+    return 'Mnyama $index si hai. Chagua tarehe ya uondoaji.';
+  }
 
   @override
   String pigletBulkInvalidCount(int max) {
@@ -2709,7 +2770,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkNamePrefixHint =>
-      'Mfano: Nguruwe (pamoja na nambari au jina)';
+      'Mfano: Mifugo midogo (pamoja na nambari au jina)';
 
   @override
   String get pigletBulkPreviewInfo =>
@@ -2722,14 +2783,14 @@ class AppLocalizationsSw extends AppLocalizations {
   String get pigletBulkRegisterAll => 'Sajili wote';
 
   @override
-  String get pigletBulkSelectSexEach => 'Chagua jinsia kwa kila nguruwe.';
+  String get pigletBulkSelectSexEach => 'Chagua jinsia kwa kila mnyama.';
 
   @override
   String get pigletBulkQuickSexTitle => 'Mgawanyo wa haraka wa jinsia';
 
   @override
   String pigletBulkQuickSexSubtitle(int alive) {
-    return 'Weka idadi ya nguruwe wa kike, kiume, au wasiojulikana kwa lita nzima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe $alive.';
+    return 'Weka idadi ya wanyama wa kike, kiume, au wasiojulikana kwa kundi zima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe $alive.';
   }
 
   @override
@@ -2740,7 +2801,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String pigletBulkSexCountMismatch(int expected, int actual) {
-    return 'Kike + kiume + wasiojulikana lazima iwe $expected (safu zote za nguruwe). Umeingiza $actual.';
+    return 'Kike + kiume + wasiojulikana lazima iwe $expected (safu zote za wanyama). Umeingiza $actual.';
   }
 
   @override
@@ -2756,7 +2817,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkQuickFillSectionSubtitle =>
-      'Weka kwa wingi maeneo yanayotofautiana kwa kila nguruwe. Haiyabadilishi idadi ya fahali. Unaweza kuhariri kila safu hapa chini.';
+      'Weka kwa wingi maeneo yanayotofautiana kwa kila mnyama. Haiyabadilishi ukubwa wa kundi. Unaweza kuhariri kila safu hapa chini.';
 
   @override
   String get pigletBulkQuickNicknameTitle => 'Majina';
@@ -2773,7 +2834,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkQuickWeightSubtitle =>
-      'Weka uzito mmoja kwa nguruwe hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.';
+      'Weka uzito mmoja kwa wanyama hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.';
 
   @override
   String get pigletBulkWeightAliveHint => 'Hai';
@@ -2797,7 +2858,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkQuickFillFooterNote =>
-      'Mgawanyo wa jinsia ni kwa nguruwe hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.';
+      'Mgawanyo wa jinsia ni kwa wanyama hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.';
 
   @override
   String get pigletBulkIdConflict =>
@@ -2810,22 +2871,25 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String pigletBulkConfirmRegister(int count) {
-    return 'Sajili nguruwe $count sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.';
+    return 'Sajili wanyama $count sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.';
   }
 
   @override
   String pigletBulkSuccess(int count) {
-    return 'Nguruwe $count wamesajiliwa kwa mafanikio.';
+    return 'Wanyama $count wamesajiliwa kwa mafanikio.';
   }
 
   @override
-  String get pigletBulkFailed => 'Imeshindwa kusajili vizazi. Jaribu tena.';
+  String get pigletBulkFailed => 'Imeshindwa kusajili kundi. Jaribu tena.';
 
   @override
-  String get pigletDefaultNamePrefix => 'Nguruwe';
+  String get pigletDefaultNamePrefix => 'Mifugo midogo';
 
   @override
-  String get pigletBulkSavingMessage => 'Inasajili nguruwe wadogo…';
+  String get smallLivestockDefaultNamePrefix => 'Mifugo midogo';
+
+  @override
+  String get pigletBulkSavingMessage => 'Inasajili mifugo midogo…';
 
   @override
   String pigletBulkCountRangeHint(int max) {
@@ -2834,7 +2898,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkBirthEventLitterHint =>
-      'Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza idadi na kuashiria nguruwe waliofariki hatua inayofuata.';
+      'Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza ukubwa wa kundi na kuashiria wanyama waliofariki hatua inayofuata.';
 
   @override
   String get pigletBulkSaveCheckTitle => 'Ukaguzi kabla ya kuhifadhi';
@@ -2875,14 +2939,14 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkDisposalSectionSubtitle =>
-      'Inahitajika unaposajili nguruwe aliyekufa kuzaliwa. Rekodi ya utupaji itatengenezwa kwa kila mmoja.';
+      'Inahitajika unaposajili wanyama wasio hai. Rekodi ya utupaji itatengenezwa kwa kila mmoja.';
 
   @override
   String get pigletBulkDisposalTypeLabel => 'Aina ya utupaji';
 
   @override
   String get pigletBulkSelectDisposalTypeForDead =>
-      'Chagua aina ya utupaji kwa nguruwe aliyekufa kuzaliwa.';
+      'Chagua aina ya utupaji kwa wanyama waliokufa kuzaliwa.';
 
   @override
   String get pigletBulkDeadDisposalReasonHint =>
@@ -2897,7 +2961,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String pigletBulkSuccessDisposals(int count) {
-    return 'Pia kumbukumbu $count za utupaji zimeandikwa kwa aliyekufa kuzaliwa.';
+    return 'Pia kumbukumbu $count za utupaji zimeandikwa kwa wanyama wasio hai.';
   }
 
   @override

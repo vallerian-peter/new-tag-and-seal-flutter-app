@@ -2447,7 +2447,7 @@ abstract class AppLocalizations {
   /// No description provided for @otpWillBeSentToEmail.
   ///
   /// In en, this message translates to:
-  /// **'We\'ll send a 6-digit OTP code to your email address'**
+  /// **'We\'ll send a 6-digit OTP code to your phone number registered with this email address'**
   String get otpWillBeSentToEmail;
 
   /// No description provided for @otpWillBeSentToPhone.
@@ -2483,8 +2483,14 @@ abstract class AppLocalizations {
   /// No description provided for @otpSentTo.
   ///
   /// In en, this message translates to:
-  /// **'OTP sent to'**
+  /// **'OTP sent to the phoneNumber registered with this email *'**
   String get otpSentTo;
+
+  /// Message shown on the OTP verification screen for phone recovery
+  ///
+  /// In en, this message translates to:
+  /// **'OTP sent to {phone}'**
+  String otpSendToPhone(String phone);
 
   /// No description provided for @verify.
   ///
@@ -5111,20 +5117,38 @@ abstract class AppLocalizations {
   /// No description provided for @registerPigletLitterOption.
   ///
   /// In en, this message translates to:
-  /// **'Piglet litter'**
+  /// **'Small livestock'**
   String get registerPigletLitterOption;
+
+  /// No description provided for @registerSmallLivestockOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Small livestock'**
+  String get registerSmallLivestockOption;
 
   /// No description provided for @registerPigletLitterOptionDesc.
   ///
   /// In en, this message translates to:
-  /// **'Same details for many piglets; IDs like YYYYMMDD-01'**
+  /// **'Same details for many animals; IDs like YYYYMMDD-01'**
   String get registerPigletLitterOptionDesc;
+
+  /// No description provided for @registerSmallLivestockOptionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Same details for many animals; IDs like YYYYMMDD-01'**
+  String get registerSmallLivestockOptionDesc;
 
   /// No description provided for @pigletBulkTitle.
   ///
   /// In en, this message translates to:
-  /// **'Register piglet litter'**
+  /// **'Register small livestock'**
   String get pigletBulkTitle;
+
+  /// No description provided for @smallLivestockBulkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register small livestock'**
+  String get smallLivestockBulkTitle;
 
   /// App bar when finishing a birth log and litter in one flow
   ///
@@ -5147,7 +5171,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkStepCommonSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Farm, type, litter size, dates, parents'**
+  /// **'Farm, type, batch size, dates, parents'**
   String get pigletBulkStepCommonSubtitle;
 
   /// No description provided for @pigletBulkStepPreviewTitle.
@@ -5159,14 +5183,86 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkStepPreviewSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Generated IDs and sex per piglet'**
+  /// **'Generated IDs and sex per animal'**
   String get pigletBulkStepPreviewSubtitle;
 
   /// No description provided for @pigletBulkNumberOfPiglets.
   ///
   /// In en, this message translates to:
-  /// **'Number of piglets'**
+  /// **'How many animals?'**
   String get pigletBulkNumberOfPiglets;
+
+  /// No description provided for @pigletBulkNumberOfPigletsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the total number in this batch. Use 1 for a single animal.'**
+  String get pigletBulkNumberOfPigletsHelp;
+
+  /// No description provided for @pigletBulkSameAsBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as batch'**
+  String get pigletBulkSameAsBatch;
+
+  /// No description provided for @pigletBulkIndividualDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual details'**
+  String get pigletBulkIndividualDetails;
+
+  /// No description provided for @pigletBulkOverrideBatchDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Override batch defaults'**
+  String get pigletBulkOverrideBatchDefaults;
+
+  /// No description provided for @pigletBulkIndividualDetailsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Change only the fields that differ for this animal. Blank fields use the shared batch values.'**
+  String get pigletBulkIndividualDetailsHelp;
+
+  /// No description provided for @pigletBulkUseBatchDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Use batch defaults'**
+  String get pigletBulkUseBatchDefaults;
+
+  /// No description provided for @pigletBulkInactiveDisposalHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive animals need a disposal record so the history explains what happened.'**
+  String get pigletBulkInactiveDisposalHelp;
+
+  /// No description provided for @pigletBulkDisposalDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal date'**
+  String get pigletBulkDisposalDate;
+
+  /// No description provided for @pigletBulkDisposalDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select disposal date'**
+  String get pigletBulkDisposalDateHint;
+
+  /// No description provided for @pigletBulkInactiveDisposalRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal {index} is inactive. Select a disposal type.'**
+  String pigletBulkInactiveDisposalRequired(int index);
+
+  /// No description provided for @pigletBulkInactiveReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal {index} is inactive. Enter the disposal reason.'**
+  String pigletBulkInactiveReasonRequired(int index);
+
+  /// No description provided for @pigletBulkInactiveDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal {index} is inactive. Select the disposal date.'**
+  String pigletBulkInactiveDateRequired(int index);
 
   /// No description provided for @pigletBulkInvalidCount.
   ///
@@ -5183,7 +5279,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkNamePrefixHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Piglet (combined with number or nickname)'**
+  /// **'e.g. Small livestock (combined with number or nickname)'**
   String get pigletBulkNamePrefixHint;
 
   /// No description provided for @pigletBulkPreviewInfo.
@@ -5207,7 +5303,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkSelectSexEach.
   ///
   /// In en, this message translates to:
-  /// **'Choose male or female for every piglet.'**
+  /// **'Choose male or female for every animal.'**
   String get pigletBulkSelectSexEach;
 
   /// No description provided for @pigletBulkQuickSexTitle.
@@ -5219,7 +5315,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkQuickSexSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to {alive}.'**
+  /// **'Enter how many animals are female, male, or unknown across the full batch (alive and dead). The three numbers must add up to {alive}.'**
   String pigletBulkQuickSexSubtitle(int alive);
 
   /// No description provided for @pigletBulkQuickSexCountLabel.
@@ -5237,7 +5333,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkSexCountMismatch.
   ///
   /// In en, this message translates to:
-  /// **'Female + male + unknown must equal {expected} (all piglet rows). You entered {actual}.'**
+  /// **'Female + male + unknown must equal {expected} (all animal rows). You entered {actual}.'**
   String pigletBulkSexCountMismatch(int expected, int actual);
 
   /// No description provided for @pigletBulkQuickSexOrderNote.
@@ -5261,7 +5357,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkQuickFillSectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.'**
+  /// **'Bulk-set fields that differ per animal. This does not change batch size. You can still edit any row below.'**
   String get pigletBulkQuickFillSectionSubtitle;
 
   /// No description provided for @pigletBulkQuickNicknameTitle.
@@ -5291,7 +5387,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkQuickWeightSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.'**
+  /// **'Apply one weight for all live animals and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.'**
   String get pigletBulkQuickWeightSubtitle;
 
   /// No description provided for @pigletBulkWeightAliveHint.
@@ -5351,31 +5447,37 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkConfirmRegister.
   ///
   /// In en, this message translates to:
-  /// **'Register {count} piglets now? They are saved on this device and will sync when online.'**
+  /// **'Register {count} animals now? They are saved on this device and will sync when online.'**
   String pigletBulkConfirmRegister(int count);
 
   /// No description provided for @pigletBulkSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Successfully registered {count} piglets.'**
+  /// **'Successfully registered {count} animals.'**
   String pigletBulkSuccess(int count);
 
   /// No description provided for @pigletBulkFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not register the litter. Please try again.'**
+  /// **'Could not register the batch. Please try again.'**
   String get pigletBulkFailed;
 
   /// No description provided for @pigletDefaultNamePrefix.
   ///
   /// In en, this message translates to:
-  /// **'Piglet'**
+  /// **'Small livestock'**
   String get pigletDefaultNamePrefix;
+
+  /// No description provided for @smallLivestockDefaultNamePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Small livestock'**
+  String get smallLivestockDefaultNamePrefix;
 
   /// No description provided for @pigletBulkSavingMessage.
   ///
   /// In en, this message translates to:
-  /// **'Registering piglets…'**
+  /// **'Registering animals…'**
   String get pigletBulkSavingMessage;
 
   /// No description provided for @pigletBulkCountRangeHint.
@@ -5387,7 +5489,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkBirthEventLitterHint.
   ///
   /// In en, this message translates to:
-  /// **'If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.'**
+  /// **'If the birth event includes total born and dead counts, selecting it fills the batch size and marks dead animals on the next step.'**
   String get pigletBulkBirthEventLitterHint;
 
   /// No description provided for @pigletBulkSaveCheckTitle.
@@ -5453,7 +5555,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkDisposalSectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Required when registering stillborn piglets. A disposal log is created for each.'**
+  /// **'Required when registering inactive animals. A disposal log is created for each.'**
   String get pigletBulkDisposalSectionSubtitle;
 
   /// No description provided for @pigletBulkDisposalTypeLabel.
@@ -5465,7 +5567,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkSelectDisposalTypeForDead.
   ///
   /// In en, this message translates to:
-  /// **'Select a disposal type for dead-at-birth piglets.'**
+  /// **'Select a disposal type for dead-at-birth animals.'**
   String get pigletBulkSelectDisposalTypeForDead;
 
   /// No description provided for @pigletBulkDeadDisposalReasonHint.
@@ -5489,7 +5591,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkSuccessDisposals.
   ///
   /// In en, this message translates to:
-  /// **'Also logged {count} disposal records for stillborn piglets.'**
+  /// **'Also logged {count} disposal records for inactive animals.'**
   String pigletBulkSuccessDisposals(int count);
 
   /// No description provided for @pigletBulkDisposalPartialFailure.

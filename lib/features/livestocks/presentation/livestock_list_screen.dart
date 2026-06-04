@@ -14,7 +14,7 @@ import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livesto
 import 'package:provider/provider.dart';
 
 /// Livestock List Screen
-/// 
+///
 /// Architecture Flow:
 /// Screen → Provider → Domain Repo → Data Repository → DAO
 class LivestockListScreen extends StatefulWidget {
@@ -69,10 +69,13 @@ class _LivestockListScreenState extends State<LivestockListScreen>
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestockProvider =
-          Provider.of<LivestockProvider>(context, listen: false);
+      final livestockProvider = Provider.of<LivestockProvider>(
+        context,
+        listen: false,
+      );
 
-      final livestockTypes = await database.livestockTypeDao.getAllLivestockTypes();
+      final livestockTypes = await database.livestockTypeDao
+          .getAllLivestockTypes();
       final stages = await database.stageDao.getAllStages();
 
       if (!mounted) return;
@@ -94,8 +97,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
   }
 
   Future<void> _fetchData() async {
-    final livestockProvider =
-        Provider.of<LivestockProvider>(context, listen: false);
+    final livestockProvider = Provider.of<LivestockProvider>(
+      context,
+      listen: false,
+    );
     final database = Provider.of<AppDatabase>(context, listen: false);
 
     // Fetch livestock through provider
@@ -152,8 +157,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
   }
 
   void _applyFilters() {
-    final livestockProvider =
-        Provider.of<LivestockProvider>(context, listen: false);
+    final livestockProvider = Provider.of<LivestockProvider>(
+      context,
+      listen: false,
+    );
     livestockProvider.filterLivestock(
       _currentSearchQuery,
       genderFilter: _selectedGenderFilter,
@@ -186,8 +193,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
   }
 
   void _onSortSelected(String sortOption) {
-    final livestockProvider =
-        Provider.of<LivestockProvider>(context, listen: false);
+    final livestockProvider = Provider.of<LivestockProvider>(
+      context,
+      listen: false,
+    );
     livestockProvider.sortLivestock(sortOption);
   }
 
@@ -200,7 +209,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       builder: (ctx) {
         final sheetTheme = Theme.of(ctx);
 
@@ -212,8 +221,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Text(
                     l10n.registerLivestockHowTitle,
                     style: sheetTheme.textTheme.titleMedium?.copyWith(
@@ -236,7 +247,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                     if (result == true && mounted) await _fetchData();
                   },
                 ),
-                
+
                 Divider(
                   color: Theme.of(context).colorScheme.tertiary.withAlpha(30),
                 ),
@@ -246,8 +257,8 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                     Icons.groups_2_outlined,
                     color: Constants.primaryColor,
                   ),
-                  title: Text(l10n.registerPigletLitterOption),
-                  subtitle: Text(l10n.registerPigletLitterOptionDesc),
+                  title: Text(l10n.registerSmallLivestockOption),
+                  subtitle: Text(l10n.registerSmallLivestockOptionDesc),
                   onTap: () async {
                     Navigator.pop(ctx);
                     final result = await Navigator.push<bool>(
@@ -285,12 +296,11 @@ class _LivestockListScreenState extends State<LivestockListScreen>
               onRefresh: _fetchData,
               child: CustomScrollView(
                 slivers: [
-
                   // Header
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20, 
-                      vertical: 5
+                      horizontal: 20,
+                      vertical: 5,
                     ),
                     sliver: SliverToBoxAdapter(
                       child: Column(
@@ -306,18 +316,18 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                       l10n.allLivestocksText,
                                       style: theme.textTheme.headlineMedium
                                           ?.copyWith(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       l10n.manageAndTrackLivestockText,
-                                      style:
-                                          theme.textTheme.bodyMedium?.copyWith(
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
-                                      ),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.6),
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -355,7 +365,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   },
                                 ),
                               ),
-                              
+
                               const SizedBox(width: 12),
 
                               Expanded(
@@ -367,7 +377,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   isSelected: _selectedGenderFilter == 'Male',
                                   onTap: () {
                                     setState(() {
-                                      _selectedGenderFilter = _selectedGenderFilter == 'Male' ? 'All' : 'Male';
+                                      _selectedGenderFilter =
+                                          _selectedGenderFilter == 'Male'
+                                          ? 'All'
+                                          : 'Male';
                                     });
                                     _applyFilters();
                                   },
@@ -375,7 +388,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                               ),
 
                               const SizedBox(width: 12),
-                              
+
                               Expanded(
                                 child: LivestockStatCard(
                                   title: l10n.female,
@@ -385,7 +398,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   isSelected: _selectedGenderFilter == 'Female',
                                   onTap: () {
                                     setState(() {
-                                      _selectedGenderFilter = _selectedGenderFilter == 'Female' ? 'All' : 'Female';
+                                      _selectedGenderFilter =
+                                          _selectedGenderFilter == 'Female'
+                                          ? 'All'
+                                          : 'Female';
                                     });
                                     _applyFilters();
                                   },
@@ -450,17 +466,21 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                       onSelected: _onSortSelected,
                                       itemBuilder: (context) => [
                                         PopupMenuItem(
-                                            value: 'A to Z',
-                                            child: Text(l10n.sortAtoZ)),
+                                          value: 'A to Z',
+                                          child: Text(l10n.sortAtoZ),
+                                        ),
                                         PopupMenuItem(
-                                            value: 'Z to A',
-                                            child: Text(l10n.sortZtoA)),
+                                          value: 'Z to A',
+                                          child: Text(l10n.sortZtoA),
+                                        ),
                                         PopupMenuItem(
-                                            value: 'Newest First',
-                                            child: Text(l10n.newestFirst)),
+                                          value: 'Newest First',
+                                          child: Text(l10n.newestFirst),
+                                        ),
                                         PopupMenuItem(
-                                            value: 'Oldest First',
-                                            child: Text(l10n.oldestFirst)),
+                                          value: 'Oldest First',
+                                          child: Text(l10n.oldestFirst),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -507,7 +527,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   isSelected: _selectedGenderFilter == 'Male',
                                   onTap: () {
                                     setState(() {
-                                      _selectedGenderFilter = _selectedGenderFilter == 'Male' ? 'All' : 'Male';
+                                      _selectedGenderFilter =
+                                          _selectedGenderFilter == 'Male'
+                                          ? 'All'
+                                          : 'Male';
                                     });
                                     _applyFilters();
                                   },
@@ -519,7 +542,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   isSelected: _selectedGenderFilter == 'Female',
                                   onTap: () {
                                     setState(() {
-                                      _selectedGenderFilter = _selectedGenderFilter == 'Female' ? 'All' : 'Female';
+                                      _selectedGenderFilter =
+                                          _selectedGenderFilter == 'Female'
+                                          ? 'All'
+                                          : 'Female';
                                     });
                                     _applyFilters();
                                   },
@@ -558,7 +584,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                   isSelected: _selectedStatusFilter == 'active',
                                   onTap: () {
                                     setState(() {
-                                      _selectedStatusFilter = _selectedStatusFilter == 'active' ? 'All' : 'active';
+                                      _selectedStatusFilter =
+                                          _selectedStatusFilter == 'active'
+                                          ? 'All'
+                                          : 'active';
                                     });
                                     _applyFilters();
                                   },
@@ -567,10 +596,14 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                 _buildFilterPill(
                                   context,
                                   label: l10n.notActive,
-                                  isSelected: _selectedStatusFilter == 'notActive',
+                                  isSelected:
+                                      _selectedStatusFilter == 'notActive',
                                   onTap: () {
                                     setState(() {
-                                      _selectedStatusFilter = _selectedStatusFilter == 'notActive' ? 'All' : 'notActive';
+                                      _selectedStatusFilter =
+                                          _selectedStatusFilter == 'notActive'
+                                          ? 'All'
+                                          : 'notActive';
                                     });
                                     _applyFilters();
                                   },
@@ -579,12 +612,18 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                 // Livestock type + stage (stage options depend on type)
                                 SizedBox(
                                   width: 148,
-                                  child: _buildLivestockTypeDropdown(context, l10n),
+                                  child: _buildLivestockTypeDropdown(
+                                    context,
+                                    l10n,
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 SizedBox(
                                   width: 152,
-                                  child: _buildStageFilterDropdown(context, l10n),
+                                  child: _buildStageFilterDropdown(
+                                    context,
+                                    l10n,
+                                  ),
                                 ),
                               ],
                             ),
@@ -708,23 +747,21 @@ class _LivestockListScreenState extends State<LivestockListScreen>
       // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 80),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final livestock = livestockProvider.filteredLivestock[index];
-            return LivestockCard(
-              livestock: livestock,
-              farmName: livestockProvider.farmNames[livestock.farmUuid] ??
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final livestock = livestockProvider.filteredLivestock[index];
+          return LivestockCard(
+            livestock: livestock,
+            farmName:
+                livestockProvider.farmNames[livestock.farmUuid] ??
                 l10n.unknownFarm,
-              onTap: () => LivestockDetailsModal.show(
-                context: context,
-                livestock: livestock,
-                farmNames: livestockProvider.farmNames,
-                onRefresh: _fetchData,
-              ),
-            );
-          },
-          childCount: livestockProvider.filteredLivestock.length,
-        ),
+            onTap: () => LivestockDetailsModal.show(
+              context: context,
+              livestock: livestock,
+              farmNames: livestockProvider.farmNames,
+              onRefresh: _fetchData,
+            ),
+          );
+        }, childCount: livestockProvider.filteredLivestock.length),
       ),
     );
   }
@@ -787,7 +824,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
       return an.toLowerCase().compareTo(bn.toLowerCase());
     });
 
-    final selectedUuid = isMother ? _selectedMotherFilterUuid : _selectedFatherFilterUuid;
+    final selectedUuid = isMother
+        ? _selectedMotherFilterUuid
+        : _selectedFatherFilterUuid;
     final searchController = TextEditingController();
     String query = '';
 
@@ -805,7 +844,8 @@ class _LivestockListScreenState extends State<LivestockListScreen>
               final n = p.name.isNotEmpty ? p.name : '#${p.id}';
               final idNo = p.identificationNumber;
               final q = query.toLowerCase();
-              return n.toLowerCase().contains(q) || idNo.toLowerCase().contains(q);
+              return n.toLowerCase().contains(q) ||
+                  idNo.toLowerCase().contains(q);
             }).toList();
 
             int childrenCountFor(String parentUuid) {
@@ -869,7 +909,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                         child: ListView.separated(
                           itemCount: filtered.length,
                           separatorBuilder: (_, __) => Divider(
-                            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                            color: theme.colorScheme.outline.withValues(
+                              alpha: 0.2,
+                            ),
                             height: 1,
                           ),
                           itemBuilder: (_, i) {
@@ -885,8 +927,8 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                                 vertical: 2,
                               ),
                               selected: isSelected,
-                              selectedTileColor:
-                                  Constants.primaryColor.withValues(alpha: 0.08),
+                              selectedTileColor: Constants.primaryColor
+                                  .withValues(alpha: 0.08),
                               title: Text(
                                 parentLabel,
                                 maxLines: 1,
@@ -897,7 +939,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                               ),
                               trailing: Icon(
                                 Icons.chevron_right_rounded,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                               onTap: () {
                                 setState(() {
@@ -933,7 +977,8 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     required bool enabled,
     required bool selectionActive,
     required ValueChanged<int?> onSelected,
-    required List<PopupMenuEntry<int?>> Function(BuildContext context) itemBuilder,
+    required List<PopupMenuEntry<int?>> Function(BuildContext context)
+    itemBuilder,
   }) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -969,7 +1014,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: selectionActive ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: selectionActive
+                      ? FontWeight.w600
+                      : FontWeight.w500,
                   color: selectionActive
                       ? theme.colorScheme.onSurface
                       : theme.colorScheme.onSurface.withOpacity(0.55),
@@ -979,7 +1026,9 @@ class _LivestockListScreenState extends State<LivestockListScreen>
             Icon(
               Icons.arrow_drop_down_rounded,
               size: 22,
-              color: theme.colorScheme.onSurface.withOpacity(enabled ? 0.5 : 0.25),
+              color: theme.colorScheme.onSurface.withOpacity(
+                enabled ? 0.5 : 0.25,
+              ),
             ),
           ],
         ),
@@ -987,7 +1036,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     );
   }
 
-  Widget _buildLivestockTypeDropdown(BuildContext context, AppLocalizations l10n) {
+  Widget _buildLivestockTypeDropdown(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     String displayText = l10n.livestockType;
     if (_selectedLivestockTypeId != null && _livestockTypes.isNotEmpty) {
       for (final type in _livestockTypes) {
@@ -1024,7 +1076,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     );
   }
 
-  Widget _buildStageFilterDropdown(BuildContext context, AppLocalizations l10n) {
+  Widget _buildStageFilterDropdown(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final stages = _stagesForSelectedType;
     final typeSelected = _selectedLivestockTypeId != null;
     final hasStages = stages.isNotEmpty;

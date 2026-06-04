@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -86,14 +87,16 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final transfer = widget.transfer;
 
     _selectedFarmUuid = widget.farmUuid ?? transfer?.farmUuid;
-    _selectedLivestockUuid =
-        _isBulk ? null : widget.livestockUuid ?? transfer?.livestockUuid;
+    _selectedLivestockUuid = _isBulk
+        ? null
+        : widget.livestockUuid ?? transfer?.livestockUuid;
 
     if (transfer == null) {
       final now = DateTime.now();
       _selectedTransferDate = now;
-      _transferDateController.text =
-          DateFormat.yMMMd().add_jm().format(now.toLocal());
+      _transferDateController.text = DateFormat.yMMMd().add_jm().format(
+        now.toLocal(),
+      );
       return;
     }
 
@@ -101,12 +104,15 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       final parsed = DateTime.tryParse(transfer.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _toFarmUuidController.text = transfer.toFarmUuid ?? '';
-    _transporterIdController.text =
-        transfer.transporterId != null ? '${transfer.transporterId}' : '';
+    _transporterIdController.text = transfer.transporterId != null
+        ? '${transfer.transporterId}'
+        : '';
     _reasonController.text = transfer.reason ?? '';
     _priceController.text = transfer.price ?? '';
     _remarksController.text = transfer.remarks ?? '';
@@ -117,8 +123,9 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
     if (transfer.price != null && transfer.price!.isNotEmpty) {
       final price = transfer.price!;
-      final match = RegExp(r'^([0-9]+(?:\.[0-9]+)?)\s?([A-Za-z$£€]+)$')
-          .firstMatch(price);
+      final match = RegExp(
+        r'^([0-9]+(?:\.[0-9]+)?)\s?([A-Za-z$£€]+)$',
+      ).firstMatch(price);
       if (match != null) {
         _priceController.text = match.group(1)!;
         _selectedCurrency = match.group(2)!;
@@ -130,8 +137,9 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final parsedDate = DateTime.tryParse(transfer.transferDate);
     if (parsedDate != null) {
       _selectedTransferDate = parsedDate;
-      _transferDateController.text =
-          DateFormat.yMMMd().add_jm().format(parsedDate.toLocal());
+      _transferDateController.text = DateFormat.yMMMd().add_jm().format(
+        parsedDate.toLocal(),
+      );
     }
   }
 
@@ -189,7 +197,9 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
             .toList();
       } else {
         selectedBulkLivestock = selectedBulkLivestock
-            .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
+            .where(
+              (item) => livestock.any((animal) => animal.uuid == item.uuid),
+            )
             .toList();
       }
     }
@@ -218,8 +228,8 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock =
-          await database.livestockDao.getActiveLivestockByFarmUuid(value);
+      final livestock = await database.livestockDao
+          .getActiveLivestockByFarmUuid(value);
 
       if (!mounted) return;
       setState(() {
@@ -269,16 +279,18 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return false;
     }
 
@@ -608,12 +620,10 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -699,7 +709,9 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -707,13 +719,11 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final now = DateTime.now();
     final initialDate = _selectedTransferDate ?? now;
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(now.year - 5),
@@ -799,8 +809,9 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
     setState(() {
       _selectedTransferDate = combined;
-      _transferDateController.text =
-          DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _transferDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -853,13 +864,14 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
               widget.livestockUuid!
             else if (_selectedLivestockUuid != null &&
                 _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
+              _selectedLivestockUuid!,
           ];
 
     final toFarmUuid = _toFarmUuidController.text.trim();
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
     if (livestockUuids.isEmpty) {
@@ -876,7 +888,10 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     if (transporterIdText.isNotEmpty) {
       transporterId = int.tryParse(transporterIdText);
       if (transporterId == null) {
-        ModernAlerts.showErrorToast(context, message: l10n.invalidTransporterId);
+        ModernAlerts.showErrorToast(
+          context,
+          message: l10n.invalidTransporterId,
+        );
         return;
       }
     }
@@ -890,7 +905,8 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         ? null
         : _remarksController.text.trim();
     final transferDateIso =
-        _selectedTransferDate?.toIso8601String() ?? DateTime.now().toIso8601String();
+        _selectedTransferDate?.toIso8601String() ??
+        DateTime.now().toIso8601String();
 
     try {
       if (widget.isEditMode && !_isBulk) {
@@ -1003,16 +1019,15 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final backgroundColor = tone == InfoBannerTone.warning
         ? (isDark
-            ? Colors.orange.withOpacity(0.15)
-            : Colors.orange.withOpacity(0.1))
-        : (isDark
-            ? theme.colorScheme.surface.withOpacity(0.6)
-            : Colors.white);
+              ? Colors.orange.withOpacity(0.15)
+              : Colors.orange.withOpacity(0.1))
+        : (isDark ? theme.colorScheme.surface.withOpacity(0.6) : Colors.white);
     final borderColor = tone == InfoBannerTone.warning
         ? Colors.orange.withOpacity(0.3)
         : theme.colorScheme.outline.withOpacity(0.12);
-    final iconColor =
-        tone == InfoBannerTone.warning ? Colors.orange : theme.colorScheme.primary;
+    final iconColor = tone == InfoBannerTone.warning
+        ? Colors.orange
+        : theme.colorScheme.primary;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1042,4 +1057,3 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 }
 
 enum InfoBannerTone { neutral, warning }
-

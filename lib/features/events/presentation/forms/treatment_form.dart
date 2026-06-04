@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -101,8 +102,9 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   void _prefillIfEditing() {
     final treatment = widget.treatment;
     _selectedFarmUuid = widget.farmUuid ?? treatment?.farmUuid;
-    _selectedLivestockUuid =
-        _isBulk ? null : widget.livestockUuid ?? treatment?.livestockUuid;
+    _selectedLivestockUuid = _isBulk
+        ? null
+        : widget.livestockUuid ?? treatment?.livestockUuid;
 
     if (treatment == null) return;
 
@@ -111,12 +113,13 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
     _remarksController.text = treatment.remarks ?? '';
     _selectedDiseaseId = treatment.diseaseId;
 
-    if (treatment.eventDate != null &&
-        treatment.eventDate!.trim().isNotEmpty) {
+    if (treatment.eventDate != null && treatment.eventDate!.trim().isNotEmpty) {
       final parsed = DateTime.tryParse(treatment.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
 
@@ -190,12 +193,12 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
 
     String? livestockUuid = _selectedLivestockUuid;
     if (!_isBulk) {
-    if (livestockUuid != null &&
-        livestock.every((item) => item.uuid != livestockUuid)) {
-      livestockUuid = null;
-    }
-    if (livestockUuid == null && livestock.isNotEmpty) {
-      livestockUuid = livestock.first.uuid;
+      if (livestockUuid != null &&
+          livestock.every((item) => item.uuid != livestockUuid)) {
+        livestockUuid = null;
+      }
+      if (livestockUuid == null && livestock.isNotEmpty) {
+        livestockUuid = livestock.first.uuid;
       }
     }
 
@@ -208,7 +211,9 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
             .toList();
       } else {
         selectedBulkLivestock = selectedBulkLivestock
-            .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
+            .where(
+              (item) => livestock.any((animal) => animal.uuid == item.uuid),
+            )
             .toList();
       }
     }
@@ -229,7 +234,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
         context,
         listen: false,
       );
-      
+
       log('🔄 Medication form: Ensuring reference data is loaded...');
       await provider.ensureLoaded();
       log('✅ Medication form: Reference data loading completed');
@@ -274,8 +279,10 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           _selectedDiseaseId = null;
         }
       });
-      
-      log('✅ Medication form: Reference data loaded - Medicines: ${_medicineItems.length}, Diseases: ${_diseaseItems.length}');
+
+      log(
+        '✅ Medication form: Reference data loaded - Medicines: ${_medicineItems.length}, Diseases: ${_diseaseItems.length}',
+      );
     } catch (e, stackTrace) {
       log(
         '❌ Failed to load reference data for medication form: $e',
@@ -311,7 +318,9 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (!_isBulk && _selectedLivestockUuid == null && livestock.isNotEmpty) {
+        if (!_isBulk &&
+            _selectedLivestockUuid == null &&
+            livestock.isNotEmpty) {
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
@@ -332,8 +341,9 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid ?? widget.farmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
 
@@ -355,16 +365,18 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   bool _hasValidLivestockSelection(AppLocalizations l10n) {
     if (_isBulk) {
       if (_selectedBulkLivestock.isEmpty) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
         return false;
       }
       return true;
     }
 
     if (_selectedLivestockUuid == null || _selectedLivestockUuid!.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return false;
     }
 
@@ -700,7 +712,8 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
         CustomTextField(
           controller: _nextMedicationDateController,
           label: l10n.nextMedicationDate ?? 'Next Medication Date',
-          hintText: l10n.selectNextMedicationDate ?? 'Select Next Medication Date',
+          hintText:
+              l10n.selectNextMedicationDate ?? 'Select Next Medication Date',
           prefixIcon: Icons.calendar_today_outlined,
           readOnly: true,
           onTap: _pickNextMedicationDate,
@@ -726,13 +739,11 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   Future<void> _pickNextMedicationDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedNextMedicationDate ?? DateTime.now();
     final now = DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(now.year, now.month, now.day),
@@ -827,12 +838,10 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -927,12 +936,10 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   Future<void> _pickMedicationDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedMedicationDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -1072,17 +1079,19 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
               widget.livestockUuid!
             else if (_selectedLivestockUuid != null &&
                 _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
+              _selectedLivestockUuid!,
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
     if (livestockUuids.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.livestockRequired)));
       return;
     }
 
@@ -1102,7 +1111,8 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           : _remarksController.text.trim();
       final eventDateIso = _selectedEventDate?.toIso8601String();
       final medicationDateIso = _selectedMedicationDate?.toIso8601String();
-      final nextMedicationDateIso = _selectedNextMedicationDate?.toIso8601String();
+      final nextMedicationDateIso = _selectedNextMedicationDate
+          ?.toIso8601String();
 
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.treatment!;
@@ -1115,7 +1125,8 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           withdrawalPeriod: withdrawal,
           eventDate: eventDateIso ?? existing.eventDate,
           medicationDate: medicationDateIso ?? existing.medicationDate,
-          nextMedicationDate: nextMedicationDateIso ?? existing.nextMedicationDate,
+          nextMedicationDate:
+              nextMedicationDateIso ?? existing.nextMedicationDate,
           remarks: remarks,
           synced: false,
           syncAction: existing.syncAction == 'create' ? 'create' : 'update',
@@ -1129,12 +1140,12 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updateTreatment(updatedModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop(); // Close loading
-          
+
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
@@ -1144,7 +1155,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           // Then show success
           if (mounted) {
             await AlertDialogs.showSuccess(
@@ -1166,12 +1177,13 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           message: l10n.bulkOperationInProgress,
           isDismissible: false,
         );
-        
+
         // Create batch manually
         final created = <TreatmentModel>[];
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
-          final uuid = 'treatment-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final uuid =
+              'treatment-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
           final model = TreatmentModel(
             uuid: uuid,
             farmUuid: selectedFarmUuid,
@@ -1194,7 +1206,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
 
         if (mounted) {
           Navigator.of(context).pop(); // Close loading
-          
+
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
@@ -1204,7 +1216,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
             quantity: 1,
             numberOfLivestock: livestockUuids.length,
           );
-          
+
           // Then show success
           if (mounted) {
             await AlertDialogs.showSuccess(
@@ -1248,12 +1260,12 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addTreatment(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop(); // Close loading
-          
+
           // Show bill dialog first (if extension officer)
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
@@ -1263,7 +1275,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           // Then show success
           if (mounted) {
             await AlertDialogs.showSuccess(

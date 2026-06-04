@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -16,8 +17,10 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
-import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart' as models;
-import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart' as models;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_type.dart'
+    as models;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart'
+    as models;
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
@@ -105,11 +108,14 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
 
     if (birthEvent == null) return;
 
-    if (birthEvent.eventDate != null && birthEvent.eventDate!.trim().isNotEmpty) {
+    if (birthEvent.eventDate != null &&
+        birthEvent.eventDate!.trim().isNotEmpty) {
       final parsed = DateTime.tryParse(birthEvent.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _eventType = birthEvent.eventType;
@@ -142,7 +148,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
       // _loadContextData() will call _loadLivestockSpecies() and _loadReferenceData()
       // after livestock is loaded, so we don't need to call _loadReferenceData() again here
       await _loadContextData();
-      
+
       // If livestock wasn't loaded in _loadContextData() (e.g., no livestockUuid provided),
       // still load reference data with all items as fallback
       if (_selectedLivestock == null) {
@@ -160,12 +166,15 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await database.livestockDao
-          .getLivestockByUuid(_selectedLivestockUuid!);
+      final livestock = await database.livestockDao.getLivestockByUuid(
+        _selectedLivestockUuid!,
+      );
 
       if (livestock == null) return;
 
-      final species = await database.specieDao.getSpecieById(livestock.speciesId);
+      final species = await database.specieDao.getSpecieById(
+        livestock.speciesId,
+      );
 
       if (!mounted) return;
       setState(() {
@@ -173,7 +182,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         _speciesName = species?.name ?? 'cattle';
         // Determine eventType if not already set
         if (_eventType == null) {
-          _eventType = EventLogTypes.getBirthEventType(_speciesName ?? 'cattle');
+          _eventType = EventLogTypes.getBirthEventType(
+            _speciesName ?? 'cattle',
+          );
         }
       });
     } catch (e) {
@@ -189,22 +200,26 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     await provider.ensureLoaded();
 
     if (!mounted) return;
-    
+
     // Use birth types/problems if available, otherwise fallback to calving types/problems
-    final birthTypes = provider.birthTypes.isNotEmpty 
-        ? provider.birthTypes 
-        : provider.calvingTypes.map((ct) => models.BirthType(id: ct.id, name: ct.name)).toList();
-    
-    final birthProblems = provider.birthProblems.isNotEmpty 
-        ? provider.birthProblems 
-        : provider.calvingProblems.map((cp) => models.BirthProblem(id: cp.id, name: cp.name)).toList();
-    
+    final birthTypes = provider.birthTypes.isNotEmpty
+        ? provider.birthTypes
+        : provider.calvingTypes
+              .map((ct) => models.BirthType(id: ct.id, name: ct.name))
+              .toList();
+
+    final birthProblems = provider.birthProblems.isNotEmpty
+        ? provider.birthProblems
+        : provider.calvingProblems
+              .map((cp) => models.BirthProblem(id: cp.id, name: cp.name))
+              .toList();
+
     // Filter by livestock type if available
     int? livestockTypeId;
     if (_selectedLivestock != null) {
       livestockTypeId = _selectedLivestock!.livestockTypeId;
     }
-    
+
     setState(() {
       // Filter birth types by livestock type
       // If livestockTypeId is null (not loaded yet), show all items as fallback
@@ -216,16 +231,21 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
               return true;
             }
             // Show items matching livestock type or generic items
-            return type.livestockTypeId == null || type.livestockTypeId == livestockTypeId;
+            return type.livestockTypeId == null ||
+                type.livestockTypeId == livestockTypeId;
           })
           .map((type) => DropdownItem<int>(value: type.id, label: type.name))
           .toList();
-      
+
       // Fallback: if filtered list is empty, show all items
       _birthTypeItems = filteredBirthTypes.isEmpty
-          ? birthTypes.map((type) => DropdownItem<int>(value: type.id, label: type.name)).toList()
+          ? birthTypes
+                .map(
+                  (type) => DropdownItem<int>(value: type.id, label: type.name),
+                )
+                .toList()
           : filteredBirthTypes;
-      
+
       // Filter birth problems by livestock type
       final filteredBirthProblems = birthProblems
           .where((problem) {
@@ -234,19 +254,25 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
               return true;
             }
             // Show items matching livestock type or generic items
-            return problem.livestockTypeId == null || problem.livestockTypeId == livestockTypeId;
+            return problem.livestockTypeId == null ||
+                problem.livestockTypeId == livestockTypeId;
           })
           .map(
             (problem) =>
                 DropdownItem<int>(value: problem.id, label: problem.name),
           )
           .toList();
-      
+
       // Fallback: if filtered list is empty, show all items
       _birthProblemItems = filteredBirthProblems.isEmpty
-          ? birthProblems.map((problem) => DropdownItem<int>(value: problem.id, label: problem.name)).toList()
+          ? birthProblems
+                .map(
+                  (problem) =>
+                      DropdownItem<int>(value: problem.id, label: problem.name),
+                )
+                .toList()
           : filteredBirthProblems;
-      
+
       // Reproductive problems are generic and apply to all livestock types - no filtering needed
       _reproductiveProblemItems = provider.reproductiveProblems
           .map(
@@ -293,7 +319,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         _selectedFarmUuid = farmUuid;
         _selectedLivestockUuid = livestockUuid;
       });
-      
+
       // Load species after livestock is selected
       if (livestockUuid != null) {
         await _loadLivestockSpecies();
@@ -329,7 +355,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
-      
+
       // Load species for selected livestock
       if (_selectedLivestockUuid != null) {
         await _loadLivestockSpecies();
@@ -353,7 +379,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
       _speciesName = null;
       _eventType = null;
     });
-    
+
     // Load species for selected livestock
     await _loadLivestockSpecies();
     // Reload reference data to filter by livestock type
@@ -397,9 +423,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     final eventName = _eventType != null
         ? (_eventType == 'farrowing' ? l10n.farrowing : l10n.calving)
         : l10n.birthEvent;
-    final title = widget.isEditMode
-        ? '${l10n.edit} $eventName'
-        : eventName;
+    final title = widget.isEditMode ? '${l10n.edit} $eventName' : eventName;
     final submitText = widget.isEditMode ? l10n.update : l10n.save;
 
     return Scaffold(
@@ -854,12 +878,10 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -945,7 +967,9 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -956,10 +980,8 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         : (_endDate ?? _startDate ?? DateTime.now());
 
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
-    final date = await showDatePicker(
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
@@ -1024,9 +1046,11 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     // Use correct confirmation message based on event type (calving or farrowing)
     final isFarrowing = _eventType == 'farrowing';
     final confirmationMessage = widget.isEditMode
-        ? (isFarrowing ? l10n.confirmUpdateFarrowing : l10n.confirmUpdateCalving)
+        ? (isFarrowing
+              ? l10n.confirmUpdateFarrowing
+              : l10n.confirmUpdateCalving)
         : (isFarrowing ? l10n.confirmSaveFarrowing : l10n.confirmSaveCalving);
-    
+
     await AlertDialogs.showConfirmation(
       context: context,
       title: widget.isEditMode ? l10n.update : l10n.save,
@@ -1172,21 +1196,22 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
         final litterCount = totalBorn;
         if (litterCount != null && litterCount > 0) {
           if (!mounted) return;
-          final bulkSaved = await Navigator.of(context, rootNavigator: true).push<bool>(
-            MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => Scaffold(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                body: SafeArea(
-                  child: PigletBulkRegistrationScreen(
-                    pendingBirthEventToPersist: newModel,
-                    preSelectedFarmUuid: selectedFarmUuid,
-                    preSelectedMotherUuid: selectedLivestockUuid,
+          final bulkSaved = await Navigator.of(context, rootNavigator: true)
+              .push<bool>(
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (_) => Scaffold(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    body: SafeArea(
+                      child: PigletBulkRegistrationScreen(
+                        pendingBirthEventToPersist: newModel,
+                        preSelectedFarmUuid: selectedFarmUuid,
+                        preSelectedMotherUuid: selectedLivestockUuid,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
+              );
           if (mounted && bulkSaved == true) {
             Navigator.pop(context, true);
           }
@@ -1214,4 +1239,3 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
     }
   }
 }
-

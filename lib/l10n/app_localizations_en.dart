@@ -1231,7 +1231,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get otpWillBeSentToEmail =>
-      'We\'ll send a 6-digit OTP code to your email address';
+      'We\'ll send a 6-digit OTP code to your phone number registered with this email address';
 
   @override
   String get otpWillBeSentToPhone =>
@@ -1250,7 +1250,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterOtpCode => 'Enter OTP Code';
 
   @override
-  String get otpSentTo => 'OTP sent to';
+  String get otpSentTo =>
+      'OTP sent to the phoneNumber registered with this email *';
+
+  @override
+  String otpSendToPhone(String phone) {
+    return 'OTP sent to $phone';
+  }
 
   @override
   String get verify => 'Verify';
@@ -2647,14 +2653,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Full form with tags and one ID';
 
   @override
-  String get registerPigletLitterOption => 'Piglet litter';
+  String get registerPigletLitterOption => 'Small livestock';
+
+  @override
+  String get registerSmallLivestockOption => 'Small livestock';
 
   @override
   String get registerPigletLitterOptionDesc =>
-      'Same details for many piglets; IDs like YYYYMMDD-01';
+      'Same details for many animals; IDs like YYYYMMDD-01';
 
   @override
-  String get pigletBulkTitle => 'Register piglet litter';
+  String get registerSmallLivestockOptionDesc =>
+      'Same details for many animals; IDs like YYYYMMDD-01';
+
+  @override
+  String get pigletBulkTitle => 'Register small livestock';
+
+  @override
+  String get smallLivestockBulkTitle => 'Register small livestock';
 
   @override
   String get pigletBulkCompleteBirthFlowTitle => 'Complete birth & offspring';
@@ -2668,17 +2684,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkStepCommonSubtitle =>
-      'Farm, type, litter size, dates, parents';
+      'Farm, type, batch size, dates, parents';
 
   @override
   String get pigletBulkStepPreviewTitle => 'Preview';
 
   @override
   String get pigletBulkStepPreviewSubtitle =>
-      'Generated IDs and sex per piglet';
+      'Generated IDs and sex per animal';
 
   @override
-  String get pigletBulkNumberOfPiglets => 'Number of piglets';
+  String get pigletBulkNumberOfPiglets => 'How many animals?';
+
+  @override
+  String get pigletBulkNumberOfPigletsHelp =>
+      'Enter the total number in this batch. Use 1 for a single animal.';
+
+  @override
+  String get pigletBulkSameAsBatch => 'Same as batch';
+
+  @override
+  String get pigletBulkIndividualDetails => 'Individual details';
+
+  @override
+  String get pigletBulkOverrideBatchDefaults => 'Override batch defaults';
+
+  @override
+  String get pigletBulkIndividualDetailsHelp =>
+      'Change only the fields that differ for this animal. Blank fields use the shared batch values.';
+
+  @override
+  String get pigletBulkUseBatchDefaults => 'Use batch defaults';
+
+  @override
+  String get pigletBulkInactiveDisposalHelp =>
+      'Inactive animals need a disposal record so the history explains what happened.';
+
+  @override
+  String get pigletBulkDisposalDate => 'Disposal date';
+
+  @override
+  String get pigletBulkDisposalDateHint => 'Select disposal date';
+
+  @override
+  String pigletBulkInactiveDisposalRequired(int index) {
+    return 'Animal $index is inactive. Select a disposal type.';
+  }
+
+  @override
+  String pigletBulkInactiveReasonRequired(int index) {
+    return 'Animal $index is inactive. Enter the disposal reason.';
+  }
+
+  @override
+  String pigletBulkInactiveDateRequired(int index) {
+    return 'Animal $index is inactive. Select the disposal date.';
+  }
 
   @override
   String pigletBulkInvalidCount(int max) {
@@ -2690,7 +2751,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkNamePrefixHint =>
-      'e.g. Piglet (combined with number or nickname)';
+      'e.g. Small livestock (combined with number or nickname)';
 
   @override
   String get pigletBulkPreviewInfo =>
@@ -2704,14 +2765,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkSelectSexEach =>
-      'Choose male or female for every piglet.';
+      'Choose male or female for every animal.';
 
   @override
   String get pigletBulkQuickSexTitle => 'Quick sex split';
 
   @override
   String pigletBulkQuickSexSubtitle(int alive) {
-    return 'Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to $alive.';
+    return 'Enter how many animals are female, male, or unknown across the full batch (alive and dead). The three numbers must add up to $alive.';
   }
 
   @override
@@ -2722,7 +2783,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pigletBulkSexCountMismatch(int expected, int actual) {
-    return 'Female + male + unknown must equal $expected (all piglet rows). You entered $actual.';
+    return 'Female + male + unknown must equal $expected (all animal rows). You entered $actual.';
   }
 
   @override
@@ -2738,7 +2799,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkQuickFillSectionSubtitle =>
-      'Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.';
+      'Bulk-set fields that differ per animal. This does not change batch size. You can still edit any row below.';
 
   @override
   String get pigletBulkQuickNicknameTitle => 'Nicknames';
@@ -2755,7 +2816,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkQuickWeightSubtitle =>
-      'Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.';
+      'Apply one weight for all live animals and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.';
 
   @override
   String get pigletBulkWeightAliveHint => 'Alive';
@@ -2792,23 +2853,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pigletBulkConfirmRegister(int count) {
-    return 'Register $count piglets now? They are saved on this device and will sync when online.';
+    return 'Register $count animals now? They are saved on this device and will sync when online.';
   }
 
   @override
   String pigletBulkSuccess(int count) {
-    return 'Successfully registered $count piglets.';
+    return 'Successfully registered $count animals.';
   }
 
   @override
   String get pigletBulkFailed =>
-      'Could not register the litter. Please try again.';
+      'Could not register the batch. Please try again.';
 
   @override
-  String get pigletDefaultNamePrefix => 'Piglet';
+  String get pigletDefaultNamePrefix => 'Small livestock';
 
   @override
-  String get pigletBulkSavingMessage => 'Registering piglets…';
+  String get smallLivestockDefaultNamePrefix => 'Small livestock';
+
+  @override
+  String get pigletBulkSavingMessage => 'Registering animals…';
 
   @override
   String pigletBulkCountRangeHint(int max) {
@@ -2817,7 +2881,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkBirthEventLitterHint =>
-      'If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.';
+      'If the birth event includes total born and dead counts, selecting it fills the batch size and marks dead animals on the next step.';
 
   @override
   String get pigletBulkSaveCheckTitle => 'Save check';
@@ -2858,14 +2922,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkDisposalSectionSubtitle =>
-      'Required when registering stillborn piglets. A disposal log is created for each.';
+      'Required when registering inactive animals. A disposal log is created for each.';
 
   @override
   String get pigletBulkDisposalTypeLabel => 'Disposal type';
 
   @override
   String get pigletBulkSelectDisposalTypeForDead =>
-      'Select a disposal type for dead-at-birth piglets.';
+      'Select a disposal type for dead-at-birth animals.';
 
   @override
   String get pigletBulkDeadDisposalReasonHint =>
@@ -2880,7 +2944,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pigletBulkSuccessDisposals(int count) {
-    return 'Also logged $count disposal records for stillborn piglets.';
+    return 'Also logged $count disposal records for inactive animals.';
   }
 
   @override

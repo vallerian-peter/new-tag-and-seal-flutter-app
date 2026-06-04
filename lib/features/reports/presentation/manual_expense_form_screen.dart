@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
@@ -83,15 +84,15 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
       if (!mounted) return;
       setState(() => _isLoadingData = false);
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.farmsLoadFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmsLoadFailed)));
     }
   }
 
   Future<void> _pickExpenseDate(AppLocalizations l10n) async {
     final theme = Theme.of(context);
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _expenseDate,
       firstDate: DateTime(DateTime.now().year - 10),
@@ -155,8 +156,9 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
                   currentStep: _currentStep,
                   onStepContinue: _onStepContinue,
                   onStepCancel: _onStepCancel,
-                  continueButtonText:
-                      _currentStep == 0 ? l10n.continueButton : null,
+                  continueButtonText: _currentStep == 0
+                      ? l10n.continueButton
+                      : null,
                   backButtonText: l10n.back,
                   finalStepButtonText: l10n.save,
                   steps: [
@@ -230,12 +232,7 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
 
   Widget _buildBasicStep(AppLocalizations l10n, ThemeData theme) {
     final farmItems = _farms
-        .map(
-          (farm) => DropdownItem<String>(
-            value: farm.uuid,
-            label: farm.name,
-          ),
-        )
+        .map((farm) => DropdownItem<String>(value: farm.uuid, label: farm.name))
         .toList();
     final hasFarm = _farms.isNotEmpty;
     final dateLabel = DateFormat.yMMMd().format(_expenseDate);
@@ -253,11 +250,7 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
         ),
         const SizedBox(height: 12),
         if (!hasFarm)
-          _buildInfoMessage(
-            theme,
-            l10n.noFarmsFound,
-            icon: Icons.info_outline,
-          )
+          _buildInfoMessage(theme, l10n.noFarmsFound, icon: Icons.info_outline)
         else
           CustomDropdown<String>(
             label: l10n.selectFarm,
@@ -473,9 +466,9 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     final farmUuid = _selectedFarmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.farmRequired)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
 
@@ -491,8 +484,10 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
       return;
     }
     final database = Provider.of<AppDatabase>(context, listen: false);
-    final provider =
-        Provider.of<FinanceExpenseProvider>(context, listen: false);
+    final provider = Provider.of<FinanceExpenseProvider>(
+      context,
+      listen: false,
+    );
 
     final farm = await database.farmDao.getFarmByUuid(farmUuid);
     final farmerId = farm?.farmerId;
@@ -597,10 +592,7 @@ class _ManualExpenseFormScreenState extends State<ManualExpenseFormScreen> {
       decoration: BoxDecoration(
         color: primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: primary.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: primary.withValues(alpha: 0.2), width: 1),
       ),
       child: Row(
         children: [

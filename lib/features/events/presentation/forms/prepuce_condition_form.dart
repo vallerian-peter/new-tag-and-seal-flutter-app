@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,8 @@ class PrepuceConditionFormScreen extends StatefulWidget {
       _PrepuceConditionFormScreenState();
 }
 
-class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen> {
+class _PrepuceConditionFormScreenState
+    extends State<PrepuceConditionFormScreen> {
   final _uuid = const Uuid();
   final _formKey = GlobalKey<FormState>();
   final _eventDateController = TextEditingController();
@@ -91,8 +93,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     _selectedFarmUuid = widget.farmUuid;
     _selectedLivestockUuid = widget.livestockUuid;
     _selectedEventDate = DateTime.now();
-    _eventDateController.text =
-        DateFormat.yMMMd().add_jm().format(_selectedEventDate!.toLocal());
+    _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+      _selectedEventDate!.toLocal(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
 
@@ -155,14 +158,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     if (!mounted) return;
     setState(() {
       _administrationRouteItems = data.administrationRoutes
-          .map(
-            (r) => DropdownItem<int>(value: r.id, label: r.name),
-          )
+          .map((r) => DropdownItem<int>(value: r.id, label: r.name))
           .toList();
       _medicineItems = data.medicines
-          .map(
-            (m) => DropdownItem<int>(value: m.id, label: m.name),
-          )
+          .map((m) => DropdownItem<int>(value: m.id, label: m.name))
           .toList();
     });
   }
@@ -172,13 +171,14 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     String kind,
   ) {
     final list = [...data.prepuceOptionsForKind(kind)]
-      ..sort(
-        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-      );
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return list;
   }
 
-  List<DropdownItem<int>> _dropdownItems(LogAdditionalDataProvider data, String kind) {
+  List<DropdownItem<int>> _dropdownItems(
+    LogAdditionalDataProvider data,
+    String kind,
+  ) {
     final lc = Localizations.localeOf(context).languageCode;
     return _sortedOptions(data, kind)
         .map(
@@ -210,7 +210,8 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
         livestockUuid = null;
       }
       livestockUuid ??=
-          widget.livestockUuid ?? (livestock.isNotEmpty ? livestock.first.uuid : null);
+          widget.livestockUuid ??
+          (livestock.isNotEmpty ? livestock.first.uuid : null);
     }
 
     List<Livestock> selectedBulk = _selectedBulkLivestock;
@@ -240,7 +241,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     });
     try {
       final db = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await db.livestockDao.getActiveLivestockByFarmUuid(value);
+      final livestock = await db.livestockDao.getActiveLivestockByFarmUuid(
+        value,
+      );
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
@@ -306,11 +309,17 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
       return false;
     }
     if (_clinicalSignIds.isEmpty) {
-      ModernAlerts.showErrorToast(context, message: l10n.prepuceConditionSelectCodes);
+      ModernAlerts.showErrorToast(
+        context,
+        message: l10n.prepuceConditionSelectCodes,
+      );
       return false;
     }
     if (_treatmentGivenIds.isEmpty) {
-      ModernAlerts.showErrorToast(context, message: l10n.prepuceConditionTreatmentRequired);
+      ModernAlerts.showErrorToast(
+        context,
+        message: l10n.prepuceConditionTreatmentRequired,
+      );
       return false;
     }
     return true;
@@ -333,7 +342,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
       return false;
     }
     if (_clinicalSignIds.isEmpty) {
-      ModernAlerts.showErrorToast(context, message: l10n.prepuceConditionSelectCodes);
+      ModernAlerts.showErrorToast(
+        context,
+        message: l10n.prepuceConditionSelectCodes,
+      );
       return false;
     }
     return true;
@@ -383,7 +395,7 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -423,7 +435,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
       time?.minute ?? initial.minute,
     );
     setState(() => _selectedEventDate = picked);
-    _eventDateController.text = DateFormat.yMMMd().add_jm().format(picked.toLocal());
+    _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+      picked.toLocal(),
+    );
   }
 
   Future<void> _pickFollowUp() async {
@@ -434,7 +448,7 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
     final minDate = DateTime(eventBase.year, eventBase.month, eventBase.day);
     final rawInitial = _followUpDate ?? minDate;
     final initial = rawInitial.isBefore(minDate) ? minDate : rawInitial;
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: minDate,
@@ -536,8 +550,8 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
         : null;
     final extensionOfficerId =
         _treatmentProvider == _PrepuceTreatmentProvider.extensionOfficer
-            ? (license.isEmpty ? null : license)
-            : null;
+        ? (license.isEmpty ? null : license)
+        : null;
 
     try {
       AlertDialogs.showLoading(
@@ -616,10 +630,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
         Text(
           title,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontSize: Constants.textSize,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
+            fontSize: Constants.textSize,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -724,7 +738,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           icon: Icons.agriculture_outlined,
                           value: _selectedFarmUuid,
                           dropdownItems: _farms
-                              .map((f) => DropdownItem(value: f.uuid, label: f.name))
+                              .map(
+                                (f) =>
+                                    DropdownItem(value: f.uuid, label: f.name),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value == null || value.isEmpty) return;
@@ -738,15 +755,16 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                             onTap: () async {
                               final farmUuid = _selectedFarmUuid;
                               if (farmUuid == null || farmUuid.isEmpty) return;
-                              final picked =
-                                  await Navigator.of(context).push<List<Livestock>>(
-                                MaterialPageRoute(
-                                  builder: (_) => BulkLivestockSelectorPage(
-                                    farmUuid: farmUuid,
-                                    preselectedLivestock: _selectedBulkLivestock,
-                                  ),
-                                ),
-                              );
+                              final picked = await Navigator.of(context)
+                                  .push<List<Livestock>>(
+                                    MaterialPageRoute(
+                                      builder: (_) => BulkLivestockSelectorPage(
+                                        farmUuid: farmUuid,
+                                        preselectedLivestock:
+                                            _selectedBulkLivestock,
+                                      ),
+                                    ),
+                                  );
                               if (picked == null || !mounted) return;
                               setState(() => _selectedBulkLivestock = picked);
                             },
@@ -771,7 +789,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                                       )
                                       .toList(),
                                   onChanged: (value) {
-                                    setState(() => _selectedLivestockUuid = value);
+                                    setState(
+                                      () => _selectedLivestockUuid = value,
+                                    );
                                   },
                                 ),
                         ],
@@ -792,8 +812,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           readOnly: true,
                           prefixIcon: Icons.calendar_today,
                           onTap: _pickEventDate,
-                          validator: (v) =>
-                              (v == null || v.trim().isEmpty) ? l10n.eventDateRequired : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? l10n.eventDateRequired
+                              : null,
                         ),
                         const SizedBox(height: 16),
                         CustomDropdown<int>(
@@ -801,8 +822,12 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           hint: l10n.prepuceConditionSelectCodes,
                           icon: Icons.category_outlined,
                           value: _conditionTypeId,
-                          dropdownItems: _dropdownItems(refData, PrepuceReferenceKind.conditionType),
-                          onChanged: (v) => setState(() => _conditionTypeId = v),
+                          dropdownItems: _dropdownItems(
+                            refData,
+                            PrepuceReferenceKind.conditionType,
+                          ),
+                          onChanged: (v) =>
+                              setState(() => _conditionTypeId = v),
                           validator: (v) =>
                               v == null ? l10n.husbandryRequiredFields : null,
                         ),
@@ -812,7 +837,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           hint: l10n.prepuceConditionSelectCodes,
                           icon: Icons.warning_amber_outlined,
                           value: _severityId,
-                          dropdownItems: _dropdownItems(refData, PrepuceReferenceKind.severity),
+                          dropdownItems: _dropdownItems(
+                            refData,
+                            PrepuceReferenceKind.severity,
+                          ),
                           onChanged: (v) => setState(() => _severityId = v),
                           validator: (v) =>
                               v == null ? l10n.husbandryRequiredFields : null,
@@ -820,7 +848,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                         const SizedBox(height: 8),
                         _chipSection(
                           l10n.prepuceConditionClinicalSignsLabel,
-                          _sortedOptions(refData, PrepuceReferenceKind.clinicalSign),
+                          _sortedOptions(
+                            refData,
+                            PrepuceReferenceKind.clinicalSign,
+                          ),
                           _clinicalSignIds,
                         ),
                         CustomDropdown<int>(
@@ -829,7 +860,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           icon: Icons.help_outline,
                           isRequired: false,
                           value: _causeRiskId,
-                          dropdownItems: _dropdownItems(refData, PrepuceReferenceKind.causeRisk),
+                          dropdownItems: _dropdownItems(
+                            refData,
+                            PrepuceReferenceKind.causeRisk,
+                          ),
                           onChanged: (v) => setState(() => _causeRiskId = v),
                         ),
                       ],
@@ -844,7 +878,10 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                       children: [
                         _chipSection(
                           l10n.prepuceConditionTreatmentLabel,
-                          _sortedOptions(refData, PrepuceReferenceKind.treatmentGiven),
+                          _sortedOptions(
+                            refData,
+                            PrepuceReferenceKind.treatmentGiven,
+                          ),
                           _treatmentGivenIds,
                         ),
                         CustomDropdown<int>(
@@ -854,8 +891,9 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           isRequired: false,
                           value: _selectedAdministrationRouteId,
                           dropdownItems: _administrationRouteItems,
-                          onChanged: (v) =>
-                              setState(() => _selectedAdministrationRouteId = v),
+                          onChanged: (v) => setState(
+                            () => _selectedAdministrationRouteId = v,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         CustomDropdown<int>(
@@ -865,7 +903,8 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           isRequired: false,
                           value: _selectedMedicineId,
                           dropdownItems: _medicineItems,
-                          onChanged: (v) => setState(() => _selectedMedicineId = v),
+                          onChanged: (v) =>
+                              setState(() => _selectedMedicineId = v),
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(
@@ -946,9 +985,12 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           hint: l10n.prepuceConditionSelectCodes,
                           icon: Icons.pets,
                           value: _breedingStatusId,
-                          dropdownItems:
-                              _dropdownItems(refData, PrepuceReferenceKind.breedingStatus),
-                          onChanged: (v) => setState(() => _breedingStatusId = v),
+                          dropdownItems: _dropdownItems(
+                            refData,
+                            PrepuceReferenceKind.breedingStatus,
+                          ),
+                          onChanged: (v) =>
+                              setState(() => _breedingStatusId = v),
                           validator: (v) =>
                               v == null ? l10n.husbandryRequiredFields : null,
                         ),
@@ -959,9 +1001,12 @@ class _PrepuceConditionFormScreenState extends State<PrepuceConditionFormScreen>
                           icon: Icons.healing_outlined,
                           isRequired: false,
                           value: _healingStatusId,
-                          dropdownItems:
-                              _dropdownItems(refData, PrepuceReferenceKind.healingStatus),
-                          onChanged: (v) => setState(() => _healingStatusId = v),
+                          dropdownItems: _dropdownItems(
+                            refData,
+                            PrepuceReferenceKind.healingStatus,
+                          ),
+                          onChanged: (v) =>
+                              setState(() => _healingStatusId = v),
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(

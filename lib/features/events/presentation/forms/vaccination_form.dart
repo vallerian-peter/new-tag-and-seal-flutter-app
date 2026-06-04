@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_back_button.dart';
@@ -92,8 +93,9 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   void _prefillIfEditing() {
     final vaccination = widget.vaccination;
     _selectedFarmUuid = widget.farmUuid ?? vaccination?.farmUuid;
-    _selectedLivestockUuid =
-        _isBulk ? null : widget.livestockUuid ?? vaccination?.livestockUuid;
+    _selectedLivestockUuid = _isBulk
+        ? null
+        : widget.livestockUuid ?? vaccination?.livestockUuid;
 
     if (vaccination == null) return;
 
@@ -120,11 +122,14 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     if (vaccination.status.isNotEmpty) {
       _selectedStatus = vaccination.status;
     }
-    if (vaccination.eventDate != null && vaccination.eventDate!.trim().isNotEmpty) {
+    if (vaccination.eventDate != null &&
+        vaccination.eventDate!.trim().isNotEmpty) {
       final parsed = DateTime.tryParse(vaccination.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
   }
@@ -180,12 +185,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
     String? livestockUuid = _selectedLivestockUuid;
     if (!_isBulk) {
-    if (livestockUuid != null &&
-        livestock.every((item) => item.uuid != livestockUuid)) {
-      livestockUuid = null;
-    }
-    if (livestockUuid == null && livestock.isNotEmpty) {
-      livestockUuid = livestock.first.uuid;
+      if (livestockUuid != null &&
+          livestock.every((item) => item.uuid != livestockUuid)) {
+        livestockUuid = null;
+      }
+      if (livestockUuid == null && livestock.isNotEmpty) {
+        livestockUuid = livestock.first.uuid;
       }
     }
 
@@ -198,7 +203,9 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             .toList();
       } else {
         selectedBulkLivestock = selectedBulkLivestock
-            .where((item) => livestock.any((animal) => animal.uuid == item.uuid))
+            .where(
+              (item) => livestock.any((animal) => animal.uuid == item.uuid),
+            )
             .toList();
       }
     }
@@ -216,19 +223,25 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   Future<void> _loadVaccines(AppDatabase database) async {
     log('💉 Loading vaccines from database...');
     final vaccines = await database.vaccineDao.getVaccines();
-    log('💉 Loaded ${vaccines.length} vaccines from database for vaccination form');
-    
+    log(
+      '💉 Loaded ${vaccines.length} vaccines from database for vaccination form',
+    );
+
     // Filter out deleted vaccines (same as vaccine_screen.dart)
     final activeVaccines = vaccines
         .where((v) => v.syncAction != 'deleted')
         .toList();
-    
+
     log('💉 Active vaccines (excluding deleted): ${activeVaccines.length}');
-    
+
     if (activeVaccines.isEmpty) {
-      log('⚠️ No active vaccines found in database - vaccines may need to be created first');
+      log(
+        '⚠️ No active vaccines found in database - vaccines may need to be created first',
+      );
     } else {
-      log('💉 Vaccine details: ${activeVaccines.map((v) => '${v.name} (farm: ${v.farmUuid}, id: ${v.id})').join(', ')}');
+      log(
+        '💉 Vaccine details: ${activeVaccines.map((v) => '${v.name} (farm: ${v.farmUuid}, id: ${v.id})').join(', ')}',
+      );
     }
 
     if (!mounted) return;
@@ -265,31 +278,31 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     final filtered = _allVaccines.where((vaccine) {
       // Don't filter out vaccines without id - they're local and valid
       // if (vaccine.id == null) return false; // REMOVED: Allow vaccines without id
-      
+
       // Filter by farmUuid
       if (farmUuid == null || farmUuid.isEmpty) {
         return vaccine.farmUuid == null || vaccine.farmUuid!.isEmpty;
       }
       return vaccine.farmUuid == farmUuid;
     }).toList();
-    
-    log('💉 Filtered vaccines for farm $farmUuid: ${filtered.length} (from ${_allVaccines.length} total)');
+
+    log(
+      '💉 Filtered vaccines for farm $farmUuid: ${filtered.length} (from ${_allVaccines.length} total)',
+    );
 
     filtered.sort((a, b) => (b.updatedAt).compareTo(a.updatedAt));
 
     // Create dropdown items using UUID as value
     final items = filtered
         .map(
-          (vaccine) => DropdownItem<String>(
-            value: vaccine.uuid,
-            label: vaccine.name,
-          ),
+          (vaccine) =>
+              DropdownItem<String>(value: vaccine.uuid, label: vaccine.name),
         )
         .toList();
 
     // Find the selected vaccine by UUID
     String? selectedUuid = _selectedVaccineUuid;
-    
+
     if (selectedUuid != null) {
       final matchingVaccine = filtered.firstWhere(
         (v) => v.uuid == selectedUuid,
@@ -301,12 +314,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           updatedAt: '',
         ),
       );
-      
+
       if (matchingVaccine.uuid.isEmpty) {
         selectedUuid = null;
+      }
     }
-    }
-    
+
     if (selectedUuid == null && items.isNotEmpty) {
       selectedUuid = filtered.first.uuid;
     }
@@ -350,7 +363,6 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
     }
   }
 
-
   Future<void> _onFarmSelected(String value) async {
     setState(() {
       _selectedFarmUuid = value;
@@ -371,7 +383,9 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
-        if (!_isBulk && _selectedLivestockUuid == null && livestock.isNotEmpty) {
+        if (!_isBulk &&
+            _selectedLivestockUuid == null &&
+            livestock.isNotEmpty) {
           _selectedLivestockUuid = livestock.first.uuid;
         }
       });
@@ -741,8 +755,8 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           isRequired: false,
         ),
         if (_selectedProviderType != _TreatmentProviderType.none) ...[
-        const SizedBox(height: 16),
-        CustomTextField(
+          const SizedBox(height: 16),
+          CustomTextField(
             controller: _medicalLicenseController,
             label: l10n.medicalLicenseNumber,
             hintText: l10n.enterMedicalLicenseNumber,
@@ -756,7 +770,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
               }
               return null;
             },
-        ),
+          ),
         ],
         const SizedBox(height: 24),
         _buildInfoBanner(
@@ -818,7 +832,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
               widget.livestockUuid!
             else if (_selectedLivestockUuid != null &&
                 _selectedLivestockUuid!.isNotEmpty)
-              _selectedLivestockUuid!
+              _selectedLivestockUuid!,
           ];
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
@@ -852,7 +866,8 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
       final licenseText = _medicalLicenseController.text.trim();
       if (_selectedProviderType == _TreatmentProviderType.vet) {
         vetId = licenseText.isEmpty ? null : licenseText;
-      } else if (_selectedProviderType == _TreatmentProviderType.extensionOfficer) {
+      } else if (_selectedProviderType ==
+          _TreatmentProviderType.extensionOfficer) {
         extensionOfficerId = licenseText.isEmpty ? null : licenseText;
       }
 
@@ -880,12 +895,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updateVaccination(updatedModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.vaccination,
@@ -894,7 +909,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -914,11 +929,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           message: l10n.bulkOperationInProgress,
           isDismissible: false,
         );
-        
+
         final created = <VaccinationModel>[];
         for (final animalUuid in livestockUuids) {
           final now = DateTime.now().toIso8601String();
-          final uuid = 'vaccination-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
+          final uuid =
+              'vaccination-${DateTime.now().microsecondsSinceEpoch}-${animalUuid.hashCode}';
           final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = VaccinationModel(
             uuid: uuid,
@@ -941,7 +957,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.vaccination,
@@ -950,7 +966,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             quantity: 1,
             numberOfLivestock: livestockUuids.length,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -992,12 +1008,12 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addVaccination(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.vaccination,
@@ -1006,7 +1022,7 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -1036,12 +1052,10 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -1127,7 +1141,9 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -1177,8 +1193,4 @@ class _VaccinationFormScreenState extends State<VaccinationFormScreen> {
 
 enum InfoBannerTone { neutral, warning }
 
-enum _TreatmentProviderType {
-  none,
-  vet,
-  extensionOfficer,
-}
+enum _TreatmentProviderType { none, vet, extensionOfficer }

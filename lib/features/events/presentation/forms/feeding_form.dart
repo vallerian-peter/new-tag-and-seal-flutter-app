@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
@@ -109,7 +110,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     }
     _selectedNextFeedingTime = DateTime.tryParse(feeding.nextFeedingTime);
     if (_selectedNextFeedingTime != null) {
-      _nextFeedingTimeController.text = _formatDisplayDateTime(_selectedNextFeedingTime!);
+      _nextFeedingTimeController.text = _formatDisplayDateTime(
+        _selectedNextFeedingTime!,
+      );
     } else {
       _nextFeedingTimeController.clear();
     }
@@ -118,8 +121,10 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
   Future<void> _loadFeedingTypes() async {
     try {
-      final logAdditionalProvider =
-          Provider.of<LogAdditionalDataProvider>(context, listen: false);
+      final logAdditionalProvider = Provider.of<LogAdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       await logAdditionalProvider.loadFromLocal();
 
       final feedingTypes = logAdditionalProvider.feedingTypes;
@@ -130,12 +135,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       if (!mounted) return;
       setState(() {
         _feedingTypeItems = feedingTypes
-            .map(
-              (type) => DropdownItem<int>(
-                value: type.id,
-                label: type.name,
-              ),
-            )
+            .map((type) => DropdownItem<int>(value: type.id, label: type.name))
             .toList();
       });
     } catch (e) {
@@ -181,8 +181,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
       List<Livestock> livestock = [];
       if (farmUuid != null && farmUuid.isNotEmpty) {
-        livestock =
-            await database.livestockDao.getActiveLivestockByFarmUuid(farmUuid);
+        livestock = await database.livestockDao.getActiveLivestockByFarmUuid(
+          farmUuid,
+        );
       }
 
       String? livestockUuid = _selectedLivestockUuid;
@@ -200,7 +201,8 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         _farmLivestock = livestock;
         _selectedFarmUuid = farmUuid;
         if (_isBulk) {
-          final initialSelectionUuids = widget.bulkLivestockUuids ??
+          final initialSelectionUuids =
+              widget.bulkLivestockUuids ??
               _selectedBulkLivestock.map((item) => item.uuid).toList();
           _selectedBulkLivestock = livestock
               .where((item) => initialSelectionUuids.contains(item.uuid))
@@ -227,8 +229,8 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock =
-          await database.livestockDao.getActiveLivestockByFarmUuid(value);
+      final livestock = await database.livestockDao
+          .getActiveLivestockByFarmUuid(value);
 
       if (!mounted) return;
       setState(() {
@@ -243,8 +245,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
             _selectedLivestockUuid = livestock.first.uuid;
           } else if (_selectedLivestockUuid != null &&
               livestock.every((item) => item.uuid != _selectedLivestockUuid)) {
-            _selectedLivestockUuid =
-                livestock.isNotEmpty ? livestock.first.uuid : null;
+            _selectedLivestockUuid = livestock.isNotEmpty
+                ? livestock.first.uuid
+                : null;
           }
         }
       });
@@ -267,8 +270,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
 
@@ -306,16 +310,13 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
   List<DropdownItem<String>> _buildFarmDropdownItems() {
     return _farms
-        .map(
-          (farm) => DropdownItem<String>(
-            value: farm.uuid,
-            label: farm.name,
-          ),
-        )
+        .map((farm) => DropdownItem<String>(value: farm.uuid, label: farm.name))
         .toList();
   }
 
-  List<DropdownItem<String>> _buildLivestockDropdownItems(AppLocalizations l10n) {
+  List<DropdownItem<String>> _buildLivestockDropdownItems(
+    AppLocalizations l10n,
+  ) {
     return _farmLivestock
         .map(
           (item) => DropdownItem<String>(
@@ -344,10 +345,12 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
     final isDark = theme.brightness == Brightness.dark;
 
-    final title =
-        widget.isEditMode ? '${l10n.edit} ${l10n.feeding}' : l10n.addFeeding;
-    final submitText =
-        widget.isEditMode ? l10n.update : l10n.save; // localization required
+    final title = widget.isEditMode
+        ? '${l10n.edit} ${l10n.feeding}'
+        : l10n.addFeeding;
+    final submitText = widget.isEditMode
+        ? l10n.update
+        : l10n.save; // localization required
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -382,27 +385,27 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
                   children: [
                     Expanded(
                       child: CustomStepper(
-                    key: _stepperKey,
-                    currentStep: _currentStep,
-                    onStepContinue: _onStepContinue,
-                    onStepCancel: _onStepCancel,
-                    continueButtonText: null,
-                    backButtonText: l10n.back,
-                    finalStepButtonText: submitText,
-                    steps: [
-                      StepperStep(
-                        title: l10n.basicInformation,
-                        subtitle: l10n.feedingDetailsSubtitle,
-                        icon: Icons.restaurant_outlined,
-                        content: _buildStepOne(l10n, theme),
-                      ),
-                      StepperStep(
-                        title: l10n.additionalDetails,
-                        subtitle: l10n.feedingNotesSubtitle,
-                        icon: Icons.note_alt_outlined,
-                        content: _buildStepTwo(l10n, theme),
-                      ),
-                    ],
+                        key: _stepperKey,
+                        currentStep: _currentStep,
+                        onStepContinue: _onStepContinue,
+                        onStepCancel: _onStepCancel,
+                        continueButtonText: null,
+                        backButtonText: l10n.back,
+                        finalStepButtonText: submitText,
+                        steps: [
+                          StepperStep(
+                            title: l10n.basicInformation,
+                            subtitle: l10n.feedingDetailsSubtitle,
+                            icon: Icons.restaurant_outlined,
+                            content: _buildStepOne(l10n, theme),
+                          ),
+                          StepperStep(
+                            title: l10n.additionalDetails,
+                            subtitle: l10n.feedingNotesSubtitle,
+                            icon: Icons.note_alt_outlined,
+                            content: _buildStepTwo(l10n, theme),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -632,11 +635,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Constants.primaryColor,
-            size: 24,
-          ),
+          Icon(icon, color: Constants.primaryColor, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -662,10 +661,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       ),
       child: Text(
         l10n.logContextMissing,
-        style: TextStyle(
-          color: theme.colorScheme.onSurface,
-          fontSize: 14,
-        ),
+        style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       ),
     );
   }
@@ -692,11 +688,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
     final initialDate = _selectedEventDate ?? DateTime.now();
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
@@ -783,18 +777,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
   }
 
   Future<void> _pickNextFeedingDateTime() async {
-    final initialDate = _selectedNextFeedingTime ??
+    final initialDate =
+        _selectedNextFeedingTime ??
         (widget.feeding != null
             ? DateTime.parse(widget.feeding!.nextFeedingTime)
             : DateTime.now());
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(initialDate.year, initialDate.month, initialDate.day),
@@ -916,14 +909,15 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
     final feedingTypeId = _selectedFeedingTypeId!;
     final amount = _amountController.text.trim();
-    final amountWithUnit =
-        amount.isNotEmpty ? '$amount$_selectedUnit' : amount;
-    final nextFeedingTimeIso = _selectedNextFeedingTime?.toIso8601String() ?? '';
+    final amountWithUnit = amount.isNotEmpty ? '$amount$_selectedUnit' : amount;
+    final nextFeedingTimeIso =
+        _selectedNextFeedingTime?.toIso8601String() ?? '';
     final remarks = _remarksController.text.trim().isEmpty
         ? null
         : _remarksController.text.trim();
     final selectedFarmUuid = widget.farmUuid ?? _selectedFarmUuid;
-    final selectedLivestockUuid = widget.livestockUuid ?? _selectedLivestockUuid;
+    final selectedLivestockUuid =
+        widget.livestockUuid ?? _selectedLivestockUuid;
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
       ModernAlerts.showErrorToast(context, message: l10n.logContextMissing);
@@ -936,8 +930,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
       return;
     }
 
-    final bulkLivestockUuids =
-        _selectedBulkLivestock.map((livestock) => livestock.uuid).toList();
+    final bulkLivestockUuids = _selectedBulkLivestock
+        .map((livestock) => livestock.uuid)
+        .toList();
     if (_isBulk && bulkLivestockUuids.isEmpty) {
       ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return;
@@ -952,8 +947,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
 
       if (widget.isEditMode) {
         final existing = widget.feeding!;
-        final effectiveNextFeedingTime =
-            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : existing.nextFeedingTime;
+        final effectiveNextFeedingTime = nextFeedingTimeIso.isNotEmpty
+            ? nextFeedingTimeIso
+            : existing.nextFeedingTime;
         final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           feedingTypeId: feedingTypeId,
@@ -966,14 +962,17 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
           updatedAt: DateTime.now().toIso8601String(),
         );
 
-        final updated =
-            await eventsProvider.updateFeedingWithDialog(context, updatedModel);
+        final updated = await eventsProvider.updateFeedingWithDialog(
+          context,
+          updatedModel,
+        );
         if (updated != null && mounted) {
           Navigator.pop(context, updated);
         }
       } else if (_isBulk) {
-        final effectiveNextFeedingTime =
-            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : DateTime.now().toIso8601String();
+        final effectiveNextFeedingTime = nextFeedingTimeIso.isNotEmpty
+            ? nextFeedingTimeIso
+            : DateTime.now().toIso8601String();
         await eventsProvider.addFeedingBatchWithDialog(
           context: context,
           farmUuid: selectedFarmUuid,
@@ -988,8 +987,9 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         }
       } else {
         final now = DateTime.now().toIso8601String();
-        final effectiveNextFeedingTime =
-            nextFeedingTimeIso.isNotEmpty ? nextFeedingTimeIso : now;
+        final effectiveNextFeedingTime = nextFeedingTimeIso.isNotEmpty
+            ? nextFeedingTimeIso
+            : now;
         final uuid =
             '${DateTime.now().millisecondsSinceEpoch}-${selectedLivestockUuid.hashCode}-$feedingTypeId';
 
@@ -1009,7 +1009,10 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
           updatedAt: now,
         );
 
-        final created = await eventsProvider.addFeedingWithDialog(context, newModel);
+        final created = await eventsProvider.addFeedingWithDialog(
+          context,
+          newModel,
+        );
         if (created != null && mounted) {
           Navigator.pop(context, created);
         }

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -105,7 +106,7 @@ class _ManualIncomeFormScreenState extends State<ManualIncomeFormScreen> {
 
   Future<void> _pickIncomeDate(AppLocalizations l10n) async {
     final theme = Theme.of(context);
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _incomeDate,
       firstDate: DateTime(DateTime.now().year - 10),

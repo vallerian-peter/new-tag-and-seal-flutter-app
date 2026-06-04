@@ -8,6 +8,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/network_status_banner.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/error_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
@@ -124,7 +125,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Constants.veryLightGreyColor,
       appBar: AppBar(
-        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: CustomBackButton(
@@ -149,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (additionalDataProvider.isLoadingLocations) {
             return const Center(child: LoadingIndicator());
           }
-          
+
           // Show error message if data failed to load
           if (additionalDataProvider.locationError != null) {
             return Center(
@@ -158,7 +161,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
                     Icon(
                       Icons.error_outline,
                       size: 64,
@@ -166,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     const SizedBox(height: 16),
-                    
+
                     Text(
                       l10n.networkError,
                       style: TextStyle(
@@ -177,18 +179,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     const SizedBox(height: 8),
-                    
+
                     Text(
                       additionalDataProvider.locationError!,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: Constants.textSize,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                     ),
 
-                    const SizedBox(height: 24), 
-                    
+                    const SizedBox(height: 24),
+
                     ElevatedButton.icon(
                       onPressed: () => _loadLocationsIfNeeded(),
                       icon: const Icon(Icons.refresh),
@@ -202,13 +206,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
             );
           }
-          
+
           // Show loading if data is not yet loaded
           if (!additionalDataProvider.hasLocationData) {
             return const Center(child: LoadingIndicator());
@@ -219,6 +222,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               key: _formKey,
               child: Column(
                 children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
+                    child: NetworkStatusBanner(),
+                  ),
                   Expanded(
                     child: CustomStepper(
                       currentStep: _currentStep,
@@ -342,7 +349,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
-        
+
         const SizedBox(height: 16),
 
         CustomDatePicker(
@@ -407,7 +414,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
 
         const SizedBox(height: 16),
-        
+
         CustomTextField(
           controller: _phone2Controller,
           label: '${l10n.phone2} (${l10n.optional})',
@@ -558,7 +565,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             return null;
           },
         ),
-        
+
         const SizedBox(height: 16),
 
         // Region Dropdown
@@ -717,7 +724,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Step 5: Additional Information
   Widget _buildAdditionalInfoStep() {
     final l10n = AppLocalizations.of(context)!;
-    final additionalDataProvider = Provider.of<AdditionalDataProvider>(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -752,9 +758,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Constants.primaryColor.withOpacity(0.1),
+            color: Constants.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Constants.primaryColor.withOpacity(0.3)),
+            border: Border.all(
+              color: Constants.primaryColor.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             children: [
@@ -808,7 +816,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           confirmText: l10n.registerText,
           cancelText: l10n.cancel,
           onConfirm: () async {
-        await _submitRegistration();
+            await _submitRegistration();
           },
         );
       }
@@ -844,9 +852,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'phone2': _phone2Controller.text,
         'physicalAddress': _physicalAddressController.text,
         'farmerOrganizationMembership': _farmerOrganizationController.text,
-        'dateOfBirth': _dateOfBirthController.text, // Backend converts DD/MM/YYYY to YYYY-MM-DD
+        'dateOfBirth': _dateOfBirthController
+            .text, // Backend converts DD/MM/YYYY to YYYY-MM-DD
         'gender': _selectedGender, // Already lowercase: 'male' or 'female'
-
         // Identity information
         'identityCardTypeId': _selectedIdentityCardTypeId,
         'identityNumber': _identityNumberController.text,
@@ -861,7 +869,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'countryId': _selectedCountryId,
 
         // Farmer information
-        'farmerType': _selectedFarmerType, // Already lowercase: 'individual' or 'organization'
+        'farmerType':
+            _selectedFarmerType, // Already lowercase: 'individual' or 'organization'
       };
 
       final isRegistered = await authProvider.registerFarmer(
@@ -872,15 +881,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (isRegistered && mounted) {
         // Verify auth state is set correctly
         if (!authProvider.isAuthenticated) {
-          log('⚠️ WARNING: Auth state not set after registration, checking auth status...');
+          log(
+            '⚠️ WARNING: Auth state not set after registration, checking auth status...',
+          );
           await authProvider.checkAuthStatus();
         }
-        
-        log('🔐 DEBUG: Auth state after registration - isAuthenticated: ${authProvider.isAuthenticated}');
-        
+
+        log(
+          '🔐 DEBUG: Auth state after registration - isAuthenticated: ${authProvider.isAuthenticated}',
+        );
+
         if (mounted && authProvider.isAuthenticated) {
           log('🔐 DEBUG: Navigating to HomeScreen - user is authenticated');
-          
+
           // Close loading dialog BEFORE navigation
           if (context.mounted) {
             try {
@@ -892,24 +905,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
               log('⚠️ WARNING: Error closing loading dialog: $e');
             }
           }
-          
+
           // Small delay to ensure dialog is fully closed before navigation
           await Future.delayed(const Duration(milliseconds: 100));
-          
+
           // Navigate directly to HomeScreen using appNavigatorKey to ensure app-level navigation
           // This bypasses any route guards and goes directly to HomeScreen
           if (appNavigatorKey.currentState != null) {
             appNavigatorKey.currentState!.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false, // Remove all previous routes including SplashScreen and GetStartedScreen
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) =>
+                  false, // Remove all previous routes including SplashScreen and GetStartedScreen
             );
             log('🔐 DEBUG: Navigation to HomeScreen completed');
           } else {
-            log('⚠️ WARNING: appNavigatorKey.currentState is null, cannot navigate');
+            log(
+              '⚠️ WARNING: appNavigatorKey.currentState is null, cannot navigate',
+            );
           }
         } else if (mounted) {
-          log('⚠️ WARNING: Cannot navigate - auth state not authenticated. isAuthenticated: ${authProvider.isAuthenticated}');
-          
+          log(
+            '⚠️ WARNING: Cannot navigate - auth state not authenticated. isAuthenticated: ${authProvider.isAuthenticated}',
+          );
+
           // Close loading dialog even if navigation fails
           if (context.mounted) {
             try {
@@ -917,7 +935,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Navigator.of(context).pop();
               }
             } catch (e) {
-              log('⚠️ WARNING: Error closing loading dialog after failed navigation: $e');
+              log(
+                '⚠️ WARNING: Error closing loading dialog after failed navigation: $e',
+              );
             }
           }
         }

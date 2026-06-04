@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// A reusable date picker component with consistent styling
-/// 
+///
 /// Usage Examples:
-/// 
+///
 /// 1. With DateTime (new API):
 /// ```dart
 /// CustomDatePicker(
@@ -25,7 +26,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 ///   },
 /// )
 /// ```
-/// 
+///
 /// 2. With TextEditingController (legacy API):
 /// ```dart
 /// CustomDatePicker(
@@ -105,16 +106,16 @@ class CustomDatePicker extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: _getCurrentDate() ?? DateTime.now(),
       firstDate: firstDate ?? DateTime(1900),
       lastDate: lastDate ?? DateTime.now(),
       builder: (context, child) {
-        final backgroundColor = isDark 
-            ? theme.scaffoldBackgroundColor 
+        final backgroundColor = isDark
+            ? theme.scaffoldBackgroundColor
             : whiteColor;
-            
+
         return Theme(
           data: theme.copyWith(
             colorScheme: theme.colorScheme.copyWith(
@@ -145,7 +146,7 @@ class CustomDatePicker extends StatelessWidget {
 
     if (date != null) {
       final formattedDate = '${date.day}/${date.month}/${date.year}';
-      
+
       if (onDateSelected != null) {
         // Call the callback first (may handle controller update itself)
         await onDateSelected!(date);
@@ -160,7 +161,7 @@ class CustomDatePicker extends StatelessWidget {
       // Note: If both controller and onDateSelected are provided with autoFillValue=false,
       // the callback is responsible for updating the controller
     }
-    
+
     return date;
   }
 
@@ -179,11 +180,10 @@ class CustomDatePicker extends StatelessWidget {
     return '';
   }
 
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // If using controller, wrap in FormField for proper validation integration
     if (controller != null) {
       return FormField<String>(
@@ -210,24 +210,24 @@ class CustomDatePicker extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-              InkWell(
-                onTap: enabled
-                    ? () async {
-                        final selectedDate = await _showDatePicker(context);
-                        if (selectedDate != null) {
-                          // Controller is already updated in _showDatePicker (or by onDateSelected callback)
-                          // Update form field value after date selection
-                          field.didChange(controller!.text);
-                          // Validate the field
-                          field.validate();
-                        }
-                      }
-                    : null,
+                  InkWell(
+                    onTap: enabled
+                        ? () async {
+                            final selectedDate = await _showDatePicker(context);
+                            if (selectedDate != null) {
+                              // Controller is already updated in _showDatePicker (or by onDateSelected callback)
+                              // Update form field value after date selection
+                              field.didChange(controller!.text);
+                              // Validate the field
+                              field.validate();
+                            }
+                          }
+                        : null,
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.brightness == Brightness.dark 
-                            ? theme.scaffoldBackgroundColor 
+                        color: theme.brightness == Brightness.dark
+                            ? theme.scaffoldBackgroundColor
                             : null,
                         border: Border.all(
                           color: hasError
@@ -273,7 +273,7 @@ class CustomDatePicker extends StatelessWidget {
         },
       );
     }
-    
+
     // For DateTime-based API (without controller)
     // Wrap in FormField for proper validation integration
     if (onDateSelected != null || selectedDate != null) {
@@ -282,18 +282,20 @@ class CustomDatePicker extends StatelessWidget {
         validator: dateValidator != null
             ? (value) => dateValidator!(value)
             : validator != null
-                ? (value) {
-                    if (value == null) {
-                      final dateStr = '';
-                      return validator!(dateStr.isEmpty ? null : dateStr);
-                    }
-                    final dateStr = _formatDate(value);
-                    return validator!(dateStr.isEmpty ? null : dateStr);
-                  }
-                : null,
+            ? (value) {
+                if (value == null) {
+                  final dateStr = '';
+                  return validator!(dateStr.isEmpty ? null : dateStr);
+                }
+                final dateStr = _formatDate(value);
+                return validator!(dateStr.isEmpty ? null : dateStr);
+              }
+            : null,
         builder: (FormFieldState<DateTime> field) {
           final currentDate = field.value ?? selectedDate;
-          final displayText = currentDate != null ? _formatDate(currentDate) : '';
+          final displayText = currentDate != null
+              ? _formatDate(currentDate)
+              : '';
           final isEmpty = displayText.isEmpty;
           final hasError = field.hasError;
 
@@ -328,8 +330,8 @@ class CustomDatePicker extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark 
-                        ? theme.scaffoldBackgroundColor 
+                    color: theme.brightness == Brightness.dark
+                        ? theme.scaffoldBackgroundColor
                         : null,
                     border: Border.all(
                       color: hasError
@@ -349,10 +351,7 @@ class CustomDatePicker extends StatelessWidget {
                               : theme.colorScheme.onSurface,
                         ),
                       ),
-                      Icon(
-                        Icons.calendar_today,
-                        color: Constants.primaryColor,
-                      ),
+                      Icon(Icons.calendar_today, color: Constants.primaryColor),
                     ],
                   ),
                 ),
@@ -395,8 +394,8 @@ class CustomDatePicker extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.brightness == Brightness.dark 
-                  ? theme.scaffoldBackgroundColor 
+              color: theme.brightness == Brightness.dark
+                  ? theme.scaffoldBackgroundColor
                   : null,
               border: Border.all(
                 color: theme.colorScheme.onSurface.withOpacity(0.3),
@@ -414,10 +413,7 @@ class CustomDatePicker extends StatelessWidget {
                         : theme.colorScheme.onSurface,
                   ),
                 ),
-                Icon(
-                  Icons.calendar_today,
-                  color: Constants.primaryColor,
-                ),
+                Icon(Icons.calendar_today, color: Constants.primaryColor),
               ],
             ),
           ),

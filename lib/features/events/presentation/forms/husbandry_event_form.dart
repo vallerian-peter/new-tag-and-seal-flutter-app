@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +54,8 @@ class HusbandryEventFormScreen extends StatefulWidget {
   });
 
   @override
-  State<HusbandryEventFormScreen> createState() => _HusbandryEventFormScreenState();
+  State<HusbandryEventFormScreen> createState() =>
+      _HusbandryEventFormScreenState();
 }
 
 class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
@@ -100,8 +102,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     _selectedFarmUuid = widget.farmUuid;
     _selectedLivestockUuid = widget.livestockUuid;
     _selectedEventDate = DateTime.now();
-    _eventDateController.text =
-        DateFormat.yMMMd().add_jm().format(_selectedEventDate!.toLocal());
+    _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+      _selectedEventDate!.toLocal(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
 
@@ -154,7 +157,8 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
         livestockUuid = null;
       }
       livestockUuid ??=
-          widget.livestockUuid ?? (livestock.isNotEmpty ? livestock.first.uuid : null);
+          widget.livestockUuid ??
+          (livestock.isNotEmpty ? livestock.first.uuid : null);
     }
 
     List<Livestock> selectedBulk = _selectedBulkLivestock;
@@ -185,7 +189,8 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     );
     await dataProvider.ensureLoaded();
     final stageRows = await db.stageDao.getAllStages();
-    final teethMethodRows = await db.logReferenceDao.getAllTeethClippingMethods();
+    final teethMethodRows = await db.logReferenceDao
+        .getAllTeethClippingMethods();
 
     if (!mounted) return;
     setState(() {
@@ -200,8 +205,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
       _stageItems = stageRows
           .map((s) => DropdownItem<int>(value: s.id, label: s.name))
           .toList();
-      _selectedMedicineId ??=
-          _medicineItems.isNotEmpty ? _medicineItems.first.value : null;
+      _selectedMedicineId ??= _medicineItems.isNotEmpty
+          ? _medicineItems.first.value
+          : null;
       _selectedTeethClippingMethod ??= _teethClippingMethodItems.isNotEmpty
           ? _teethClippingMethodItems.first.value
           : null;
@@ -212,23 +218,27 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     });
 
     final markingRows = await db.eventDao.getLivestockMarkings();
-    final syncedTypes = markingRows
-        .map((row) => row.markingType.trim())
-        .where((type) => type.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final syncedTypes =
+        markingRows
+            .map((row) => row.markingType.trim())
+            .where((type) => type.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
     final allTypes = syncedTypes;
     if (!mounted) return;
     setState(() {
       _markingTypeItems = allTypes
-          .map((type) => DropdownItem<String>(
-                value: type,
-                label: type.replaceAll('_', ' '),
-              ))
+          .map(
+            (type) => DropdownItem<String>(
+              value: type,
+              label: type.replaceAll('_', ' '),
+            ),
+          )
           .toList();
-      _selectedMarkingType ??=
-          _markingTypeItems.isNotEmpty ? _markingTypeItems.first.value : null;
+      _selectedMarkingType ??= _markingTypeItems.isNotEmpty
+          ? _markingTypeItems.first.value
+          : null;
     });
   }
 
@@ -251,7 +261,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     });
     try {
       final db = Provider.of<AppDatabase>(context, listen: false);
-      final livestock = await db.livestockDao.getActiveLivestockByFarmUuid(value);
+      final livestock = await db.livestockDao.getActiveLivestockByFarmUuid(
+        value,
+      );
       if (!mounted) return;
       setState(() {
         _farmLivestock = livestock;
@@ -293,13 +305,19 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
       if (widget.eventType == HusbandryEventType.teethClipping &&
           (_selectedTeethClippingMethod == null ||
               _selectedTeethClippingMethod!.trim().isEmpty)) {
-        ModernAlerts.showErrorToast(context, message: l10n.husbandryRequiredFields);
+        ModernAlerts.showErrorToast(
+          context,
+          message: l10n.husbandryRequiredFields,
+        );
         return false;
       }
       if (widget.eventType == HusbandryEventType.tailDocking &&
           (_selectedTailDockingMethod == null ||
               _selectedTailDockingMethod!.trim().isEmpty)) {
-        ModernAlerts.showErrorToast(context, message: l10n.husbandryRequiredFields);
+        ModernAlerts.showErrorToast(
+          context,
+          message: l10n.husbandryRequiredFields,
+        );
         return false;
       }
     }
@@ -307,18 +325,27 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
       if (_dosageController.text.trim().isEmpty ||
           _selectedDosageUnit == null ||
           _selectedMedicineId == null) {
-        ModernAlerts.showErrorToast(context, message: l10n.husbandryRequiredFields);
+        ModernAlerts.showErrorToast(
+          context,
+          message: l10n.husbandryRequiredFields,
+        );
         return false;
       }
     }
     if (widget.eventType == HusbandryEventType.livestockMarking &&
         (_selectedMarkingType == null || _selectedMarkingType!.isEmpty)) {
-      ModernAlerts.showErrorToast(context, message: l10n.husbandryRequiredFields);
+      ModernAlerts.showErrorToast(
+        context,
+        message: l10n.husbandryRequiredFields,
+      );
       return false;
     }
     if (widget.eventType == HusbandryEventType.stageChange &&
         _selectedToStageId == null) {
-      ModernAlerts.showErrorToast(context, message: l10n.husbandryRequiredFields);
+      ModernAlerts.showErrorToast(
+        context,
+        message: l10n.husbandryRequiredFields,
+      );
       return false;
     }
     if (widget.eventType == HusbandryEventType.stageChange &&
@@ -362,7 +389,7 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -402,7 +429,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
       time?.minute ?? initial.minute,
     );
     setState(() => _selectedEventDate = picked);
-    _eventDateController.text = DateFormat.yMMMd().add_jm().format(picked.toLocal());
+    _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+      picked.toLocal(),
+    );
   }
 
   void _onStepCancel() {
@@ -470,7 +499,8 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
                 uuid: _uuid.v4(),
                 farmUuid: farmUuid,
                 livestockUuid: livestockUuid,
-                dosage: '${_dosageController.text.trim()} ${_selectedDosageUnit!.trim()}',
+                dosage:
+                    '${_dosageController.text.trim()} ${_selectedDosageUnit!.trim()}',
                 medicineId: _selectedMedicineId,
                 notes: _notesController.text.trim().isEmpty
                     ? null
@@ -677,7 +707,8 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
           readOnly: true,
           prefixIcon: Icons.calendar_today,
           onTap: _pickEventDate,
-          validator: (v) => (v == null || v.trim().isEmpty) ? l10n.eventDateRequired : null,
+          validator: (v) =>
+              (v == null || v.trim().isEmpty) ? l10n.eventDateRequired : null,
         ),
         const SizedBox(height: 16),
         if (_isMethodRequired) ...[
@@ -688,7 +719,8 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
               icon: Icons.build_outlined,
               value: _selectedTeethClippingMethod,
               dropdownItems: _teethClippingMethodItems,
-              onChanged: (v) => setState(() => _selectedTeethClippingMethod = v),
+              onChanged: (v) =>
+                  setState(() => _selectedTeethClippingMethod = v),
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? l10n.doseRequired : null,
             ),
@@ -716,8 +748,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
                   controller: _dosageController,
                   label: '${l10n.dose} *',
                   hintText: l10n.enterDose,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.doseRequired : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.doseRequired
+                      : null,
                 ),
               ),
               const SizedBox(width: 12),
@@ -760,8 +793,9 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
             value: _selectedMarkingType,
             dropdownItems: _markingTypeItems,
             onChanged: (v) => setState(() => _selectedMarkingType = v),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? l10n.identityTypeRequired : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? l10n.identityTypeRequired
+                : null,
           ),
           const SizedBox(height: 16),
           CustomTextField(

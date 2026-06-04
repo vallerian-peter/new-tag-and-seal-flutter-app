@@ -23,6 +23,7 @@ import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provid
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 String _pigletIdentificationSerial(DateTime dob, int index1Based, int total) {
   final prefix = DateFormat('yyyyMMdd').format(dob);
@@ -33,18 +34,32 @@ String _pigletIdentificationSerial(DateTime dob, int index1Based, int total) {
 class _PigletRowDraft {
   _PigletRowDraft({
     required this.identificationNumber,
+    this.uuid,
     required this.nicknameController,
     required this.weightController,
-    required bool isDeadAtBirth,
-  }) : _isDeadAtBirth = isDeadAtBirth;
+    required this.disposalReasonController,
+    required this.disposalRemarksController,
+    required this.isDeadAtBirth,
+  });
 
   final String identificationNumber;
-  bool _isDeadAtBirth;
-  bool get isDeadAtBirth => _isDeadAtBirth;
-  set isDeadAtBirth(bool value) => _isDeadAtBirth = value;
+  String? uuid;
+  bool isDeadAtBirth;
   String? gender;
+  String? statusOverride;
+  String? motherUuidOverride;
+  String? fatherUuidOverride;
+  int? obtainedMethodIdOverride;
+  DateTime? dateEnteredFarmOverride;
+  String? primaryColorOverride;
+  String? secondaryColorOverride;
+  int? disposalTypeId;
+  DateTime? disposalDate;
+  bool individualDetailsExpanded = false;
   final TextEditingController nicknameController;
   final TextEditingController weightController;
+  final TextEditingController disposalReasonController;
+  final TextEditingController disposalRemarksController;
 }
 
 /// Register many piglets with shared metadata and per-row sex (and optional nicknames).
@@ -59,11 +74,14 @@ class PigletBulkRegistrationScreen extends StatefulWidget {
   });
 
   final String? preSelectedFarmUuid;
+
   /// When provided the matching birth event will be pre-selected in the form
   /// and its litter size / dead count will be applied automatically.
   final String? preSelectedBirthEventUuid;
+
   /// When provided this livestock UUID will be pre-selected as the mother.
   final String? preSelectedMotherUuid;
+
   /// When set, the birth log is **not** in the database yet. It is created on
   /// the same final Save as the offspring batch (after preview). Implies farm
   /// is fixed to [BirthEventModel.farmUuid] and the birth-event dropdown is hidden.
@@ -173,8 +191,7 @@ class _PigletBulkRegistrationScreenState
   void initState() {
     super.initState();
     final pending = widget.pendingBirthEventToPersist;
-    _selectedFarmUuid =
-        widget.preSelectedFarmUuid ?? pending?.farmUuid;
+    _selectedFarmUuid = widget.preSelectedFarmUuid ?? pending?.farmUuid;
     _selectedMotherUuid =
         widget.preSelectedMotherUuid ?? pending?.livestockUuid;
   }
@@ -199,6 +216,8 @@ class _PigletBulkRegistrationScreenState
     for (final row in _pigletRows) {
       row.nicknameController.dispose();
       row.weightController.dispose();
+      row.disposalReasonController.dispose();
+      row.disposalRemarksController.dispose();
     }
     _pigletRows = [];
   }
@@ -209,7 +228,7 @@ class _PigletBulkRegistrationScreenState
     if (!_l10nPrefixApplied) {
       _l10nPrefixApplied = true;
       final l10n = AppLocalizations.of(context)!;
-      _namePrefixController.text = l10n.pigletDefaultNamePrefix;
+      _namePrefixController.text = l10n.smallLivestockDefaultNamePrefix;
     }
     if (!_deadDisposalReasonL10nApplied) {
       _deadDisposalReasonL10nApplied = true;
@@ -290,7 +309,8 @@ class _PigletBulkRegistrationScreenState
                 break;
               }
             }
-            _selectedStageId = earlyStage?.id ??
+            _selectedStageId =
+                earlyStage?.id ??
                 (_filteredStages.isNotEmpty ? _filteredStages.first.id : null);
           }
           for (final m in _livestockObtainedMethods) {
@@ -371,10 +391,12 @@ class _PigletBulkRegistrationScreenState
       base = base.where((l) => l.livestockTypeId == typeId);
     }
     setState(() {
-      _eligibleMothers =
-          base.where((l) => l.gender.toLowerCase() == 'female').toList();
-      _eligibleFathers =
-          base.where((l) => l.gender.toLowerCase() == 'male').toList();
+      _eligibleMothers = base
+          .where((l) => l.gender.toLowerCase() == 'female')
+          .toList();
+      _eligibleFathers = base
+          .where((l) => l.gender.toLowerCase() == 'male')
+          .toList();
     });
   }
 
@@ -409,6 +431,7 @@ class _PigletBulkRegistrationScreenState
     _selectedBirthEventUuid = uuid;
     final e = _birthEventByUuid(uuid);
     if (e == null) return;
+    _selectedMotherUuid = e.livestockUuid;
     if (e.totalBorn != null && e.totalBorn! > 0) {
       final c = e.totalBorn!.clamp(1, _maxPiglets);
       _pigletCountController.text = '$c';
@@ -483,17 +506,13 @@ class _PigletBulkRegistrationScreenState
     final deadExpected = deadIndices.length;
     if (_pigletRows.isEmpty) return;
 
-    int parseCount(TextEditingController c) =>
-        int.tryParse(c.text.trim()) ?? 0;
+    int parseCount(TextEditingController c) => int.tryParse(c.text.trim()) ?? 0;
 
     final femaleAlive = parseCount(_quickSexFemaleController);
     final maleAlive = parseCount(_quickSexMaleController);
     final femaleDead = parseCount(_quickSexFemaleDeadController);
     final maleDead = parseCount(_quickSexMaleDeadController);
-    if (femaleAlive < 0 ||
-        maleAlive < 0 ||
-        femaleDead < 0 ||
-        maleDead < 0) {
+    if (femaleAlive < 0 || maleAlive < 0 || femaleDead < 0 || maleDead < 0) {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
@@ -551,6 +570,49 @@ class _PigletBulkRegistrationScreenState
     return n;
   }
 
+  String _newLivestockUuid() => const Uuid().v4();
+
+  bool get _hasBirthEventLink =>
+      widget.pendingBirthEventToPersist != null ||
+      (_selectedBirthEventUuid != null && _selectedBirthEventUuid!.isNotEmpty);
+
+  String? _effectiveMotherUuid(_PigletRowDraft row) => _hasBirthEventLink
+      ? _selectedMotherUuid
+      : row.motherUuidOverride ?? _selectedMotherUuid;
+
+  String? _effectiveFatherUuid(_PigletRowDraft row) =>
+      row.fatherUuidOverride ?? _selectedFatherUuid;
+
+  int? _effectiveObtainedMethodId(_PigletRowDraft row) =>
+      row.obtainedMethodIdOverride ?? _selectedLivestockObtainedMethodId;
+
+  DateTime? _effectiveDateEnteredFarm(_PigletRowDraft row) =>
+      row.dateEnteredFarmOverride ?? _selectedDateFirstEnteredToFarm;
+
+  String? _effectivePrimaryColor(_PigletRowDraft row) =>
+      row.primaryColorOverride ?? _selectedPrimaryColor;
+
+  String? _effectiveSecondaryColor(_PigletRowDraft row) =>
+      row.secondaryColorOverride ?? _selectedSecondaryColor;
+
+  String _effectiveStatus(_PigletRowDraft row) =>
+      row.isDeadAtBirth ? 'notActive' : (row.statusOverride ?? _selectedStatus);
+
+  bool _isRowInactive(_PigletRowDraft row) =>
+      _effectiveStatus(row) == 'notActive';
+
+  String _labelForLivestock(String? uuid) {
+    if (uuid == null || uuid.isEmpty) return '';
+    for (final livestock in _allLivestock) {
+      if (livestock.uuid == uuid) {
+        return livestock.name.isNotEmpty
+            ? livestock.name
+            : 'Livestock #${livestock.id}';
+      }
+    }
+    return '';
+  }
+
   void _buildPreviewRows(int count) {
     _disposeRowControllers();
     _quickSexFemaleController.clear();
@@ -565,8 +627,11 @@ class _PigletBulkRegistrationScreenState
       count,
       (i) => _PigletRowDraft(
         identificationNumber: _pigletIdentificationSerial(dob, i + 1, count),
+        uuid: _newLivestockUuid(),
         nicknameController: TextEditingController(),
         weightController: TextEditingController(),
+        disposalReasonController: TextEditingController(),
+        disposalRemarksController: TextEditingController(),
         isDeadAtBirth: i >= count - deadSlots,
       ),
     );
@@ -575,8 +640,12 @@ class _PigletBulkRegistrationScreenState
   Future<void> _applyQuickWeightDistribution(AppLocalizations l10n) async {
     final aliveWeightRaw = _quickWeightAliveController.text.trim();
     final deadWeightRaw = _quickWeightDeadController.text.trim();
-    final aliveWeight = aliveWeightRaw.isEmpty ? null : double.tryParse(aliveWeightRaw);
-    final deadWeight = deadWeightRaw.isEmpty ? null : double.tryParse(deadWeightRaw);
+    final aliveWeight = aliveWeightRaw.isEmpty
+        ? null
+        : double.tryParse(aliveWeightRaw);
+    final deadWeight = deadWeightRaw.isEmpty
+        ? null
+        : double.tryParse(deadWeightRaw);
     if ((aliveWeight != null && aliveWeight <= 0) ||
         (deadWeight != null && deadWeight <= 0)) {
       await AlertDialogs.showError(
@@ -640,10 +709,10 @@ class _PigletBulkRegistrationScreenState
       }
     }
 
-    final deadPreview =
-        _pigletRows.where((r) => r.isDeadAtBirth).length;
+    final deadPreview = _pigletRows.where((r) => r.isDeadAtBirth).length;
     final alivePreview = _pigletRows.length - deadPreview;
-    if (alivePreview < 0 || (alivePreview + deadPreview) != _pigletRows.length) {
+    if (alivePreview < 0 ||
+        (alivePreview + deadPreview) != _pigletRows.length) {
       await AlertDialogs.showError(
         context: context,
         title: l10n.error,
@@ -674,6 +743,48 @@ class _PigletBulkRegistrationScreenState
         onPressed: () => Navigator.of(context).pop(),
       );
       return;
+    }
+    for (var i = 0; i < _pigletRows.length; i++) {
+      final row = _pigletRows[i];
+      if (!_isRowInactive(row)) continue;
+      final disposalTypeId = row.disposalTypeId ?? _deadDisposalTypeId;
+      if (disposalTypeId == null || _disposalTypes.isEmpty) {
+        row.individualDetailsExpanded = true;
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.pigletBulkInactiveDisposalRequired(i + 1),
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+        if (mounted) setState(() {});
+        return;
+      }
+      final reason = row.disposalReasonController.text.trim();
+      if (!row.isDeadAtBirth && reason.isEmpty) {
+        row.individualDetailsExpanded = true;
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.pigletBulkInactiveReasonRequired(i + 1),
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+        if (mounted) setState(() {});
+        return;
+      }
+      if (!row.isDeadAtBirth && row.disposalDate == null) {
+        row.individualDetailsExpanded = true;
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: l10n.pigletBulkInactiveDateRequired(i + 1),
+          buttonText: l10n.ok,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+        if (mounted) setState(() {});
+        return;
+      }
     }
 
     if (!mounted) return;
@@ -724,11 +835,12 @@ class _PigletBulkRegistrationScreenState
 
     final speciesId = _selectedSpeciesId ?? _selectedLivestockTypeId!;
     final prefix = _namePrefixController.text.trim().isEmpty
-        ? l10n.pigletDefaultNamePrefix
+        ? l10n.smallLivestockDefaultNamePrefix
         : _namePrefixController.text.trim();
     final rawWeightText = _weightController.text.trim();
-    final parsedWeight =
-        rawWeightText.isEmpty ? null : double.tryParse(rawWeightText);
+    final parsedWeight = rawWeightText.isEmpty
+        ? null
+        : double.tryParse(rawWeightText);
     if (parsedWeight != null && parsedWeight <= 0) {
       await AlertDialogs.showError(
         context: context,
@@ -766,7 +878,8 @@ class _PigletBulkRegistrationScreenState
           deadCount: deadN,
           aliveCount: totalRows - deadN,
           startDate: dobIso,
-          eventDate: (pending.eventDate != null &&
+          eventDate:
+              (pending.eventDate != null &&
                   pending.eventDate!.trim().isNotEmpty)
               ? pending.eventDate
               : dobIso,
@@ -779,19 +892,19 @@ class _PigletBulkRegistrationScreenState
       final items = <Map<String, dynamic>>[];
       for (var i = 0; i < _pigletRows.length; i++) {
         final row = _pigletRows[i];
+        row.uuid ??= _newLivestockUuid();
         final nick = row.nicknameController.text.trim();
         final name = nick.isNotEmpty ? nick : '$prefix ${i + 1}';
 
         final gender = row.isDeadAtBirth
-            ? (row.gender?.trim().isNotEmpty == true
-                  ? row.gender!
-                  : 'unknown')
+            ? (row.gender?.trim().isNotEmpty == true ? row.gender! : 'unknown')
             : row.gender!;
 
-        final status = row.isDeadAtBirth ? 'notActive' : _selectedStatus;
+        final status = _effectiveStatus(row);
         final rowWeightRaw = row.weightController.text.trim();
-        final rowWeightParsed =
-            rowWeightRaw.isEmpty ? null : double.tryParse(rowWeightRaw);
+        final rowWeightParsed = rowWeightRaw.isEmpty
+            ? null
+            : double.tryParse(rowWeightRaw);
         if (rowWeightParsed != null && rowWeightParsed <= 0) {
           if (!mounted) return;
           Navigator.of(context).pop();
@@ -807,30 +920,50 @@ class _PigletBulkRegistrationScreenState
         }
         final effectiveWeight = rowWeightParsed ?? commonWeight ?? 0.0;
         final w = row.isDeadAtBirth
-            ? (effectiveWeight < weightDeadFloor ? weightDeadFloor : effectiveWeight)
+            ? (effectiveWeight < weightDeadFloor
+                  ? weightDeadFloor
+                  : effectiveWeight)
             : effectiveWeight;
+        final dateEnteredFarm = _effectiveDateEnteredFarm(row);
+        if (dateEnteredFarm == null) {
+          if (!mounted) return;
+          Navigator.of(context).pop();
+          setState(() => _isSubmitting = false);
+          await AlertDialogs.showError(
+            context: context,
+            title: l10n.error,
+            message: l10n.pleaseSelectDateEnteredFarm,
+            buttonText: l10n.ok,
+            onPressed: () => Navigator.of(context).pop(),
+          );
+          return;
+        }
 
         items.add({
           'farmUuid': _selectedFarmUuid,
+          'uuid': row.uuid,
           'identificationNumber': row.identificationNumber,
           'dummyTagId': null,
           'barcodeTagId': null,
           'rfidTagId': null,
           'livestockTypeId': _selectedLivestockTypeId,
           'name': name,
-          'dateOfBirth': _selectedDateOfBirth!.toIso8601String().split('T').first,
-          'motherUuid': _selectedMotherUuid,
-          'fatherUuid': _selectedFatherUuid,
+          'dateOfBirth': _selectedDateOfBirth!
+              .toIso8601String()
+              .split('T')
+              .first,
+          'motherUuid': _effectiveMotherUuid(row),
+          'fatherUuid': _effectiveFatherUuid(row),
           'birthEventUuid': effectiveBirthUuid,
           'gender': gender,
           'breedId': _selectedBreedId,
           'speciesId': speciesId,
           'status': status,
-          'livestockObtainedMethodId': _selectedLivestockObtainedMethodId ?? 1,
-          'dateFirstEnteredToFarm': _selectedDateFirstEnteredToFarm,
+          'livestockObtainedMethodId': _effectiveObtainedMethodId(row) ?? 1,
+          'dateFirstEnteredToFarm': dateEnteredFarm,
           'weightAsOnRegistration': w,
-          'primaryColor': _selectedPrimaryColor,
-          'secondaryColor': _selectedSecondaryColor,
+          'primaryColor': _effectivePrimaryColor(row),
+          'secondaryColor': _effectiveSecondaryColor(row),
           'stageId': _selectedStageId,
           'isIdentified': _isIdentified,
         });
@@ -854,35 +987,43 @@ class _PigletBulkRegistrationScreenState
       }
 
       var disposalFailures = 0;
-      final deadIndices = <int>[];
+      final inactiveIndices = <int>[];
       for (var i = 0; i < _pigletRows.length; i++) {
-        if (_pigletRows[i].isDeadAtBirth) deadIndices.add(i);
+        if (_isRowInactive(_pigletRows[i])) inactiveIndices.add(i);
       }
 
       // Batch-size mismatch is handled above, so every row maps to a created
       // livestock entry and disposal tracing remains complete.
-      if (deadIndices.isNotEmpty && _deadDisposalTypeId != null) {
-        final eventDateIso = _selectedDateOfBirth!.toIso8601String();
-        final reasons = _deadDisposalReasonsController.text.trim().isEmpty
-            ? l10n.pigletDeadAtBirthDisposalReasonDefault
-            : _deadDisposalReasonsController.text.trim();
+      if (inactiveIndices.isNotEmpty) {
         final now = DateTime.now().toIso8601String();
 
-        for (final i in deadIndices) {
+        for (final i in inactiveIndices) {
+          final row = _pigletRows[i];
           try {
             final livestockUuid = created[i].uuid;
             final uuid =
                 'disposal-${DateTime.now().microsecondsSinceEpoch}-$i-${livestockUuid.hashCode}';
+            final disposalDate = row.isDeadAtBirth
+                ? _selectedDateOfBirth!
+                : (row.disposalDate ?? DateTime.now());
+            final rowReason = row.disposalReasonController.text.trim();
+            final commonReason = _deadDisposalReasonsController.text.trim();
+            final reasons = rowReason.isNotEmpty
+                ? rowReason
+                : commonReason.isNotEmpty
+                ? commonReason
+                : l10n.pigletDeadAtBirthDisposalReasonDefault;
+            final remarks = row.disposalRemarksController.text.trim();
             await eventsProvider.addDisposal(
               DisposalModel(
                 uuid: uuid,
                 farmUuid: _selectedFarmUuid!,
                 livestockUuid: livestockUuid,
-                disposalTypeId: _deadDisposalTypeId,
+                disposalTypeId: row.disposalTypeId ?? _deadDisposalTypeId,
                 reasons: reasons,
-                remarks: null,
+                remarks: remarks.isEmpty ? null : remarks,
                 status: 'completed',
-                eventDate: eventDateIso,
+                eventDate: disposalDate.toIso8601String(),
                 synced: false,
                 syncAction: 'create',
                 createdAt: now,
@@ -912,13 +1053,13 @@ class _PigletBulkRegistrationScreenState
 
         if (!mounted) return;
 
-        final deadN = deadIndices.length;
+        final inactiveN = inactiveIndices.length;
         var successMsg = pending != null
             ? '${l10n.birthEventSaved}\n\n${l10n.pigletBulkSuccess(created.length)}'
             : l10n.pigletBulkSuccess(created.length);
-        if (deadN > 0 && disposalFailures == 0) {
+        if (inactiveN > 0 && disposalFailures == 0) {
           successMsg =
-              '$successMsg\n\n${l10n.pigletBulkSuccessDisposals(deadN)}';
+              '$successMsg\n\n${l10n.pigletBulkSuccessDisposals(inactiveN)}';
         }
 
         await AlertDialogs.showSuccess(
@@ -928,7 +1069,7 @@ class _PigletBulkRegistrationScreenState
           buttonText: l10n.ok,
         );
 
-        if (mounted && disposalFailures > 0 && deadN > 0) {
+        if (mounted && disposalFailures > 0 && inactiveN > 0) {
           await AlertDialogs.showError(
             context: context,
             title: l10n.error,
@@ -1028,8 +1169,8 @@ class _PigletBulkRegistrationScreenState
     final disposalState = deadN == 0
         ? l10n.pigletBulkStatusNotApplicable
         : (_deadDisposalTypeId != null
-            ? l10n.pigletBulkStatusReady
-            : l10n.pigletBulkStatusRequired);
+              ? l10n.pigletBulkStatusReady
+              : l10n.pigletBulkStatusRequired);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1124,9 +1265,7 @@ class _PigletBulkRegistrationScreenState
               _selectedFarmUuid = v;
               if (_selectedBirthEventUuid != null) {
                 final ok = _birthEvents.any(
-                  (e) =>
-                      e.uuid == _selectedBirthEventUuid &&
-                      e.farmUuid == v,
+                  (e) => e.uuid == _selectedBirthEventUuid && e.farmUuid == v,
                 );
                 if (!ok) _selectedBirthEventUuid = null;
               }
@@ -1140,7 +1279,10 @@ class _PigletBulkRegistrationScreenState
           _infoCard(l10n, theme, l10n.pigletBulkDeferredBirthHint),
         ],
         const SizedBox(height: 24),
-        _sectionTitle(l10n.livestockClassification, l10n.selectTypeSpeciesBreed),
+        _sectionTitle(
+          l10n.livestockClassification,
+          l10n.selectTypeSpeciesBreed,
+        ),
         const SizedBox(height: 12),
         CustomDropdown<int>(
           label: l10n.livestockType,
@@ -1225,7 +1367,10 @@ class _PigletBulkRegistrationScreenState
         ),
         const SizedBox(height: 24),
         if (widget.pendingBirthEventToPersist == null) ...[
-          _sectionTitle(l10n.birthEventOptional, l10n.pigletBulkBirthEventLitterHint),
+          _sectionTitle(
+            l10n.birthEventOptional,
+            l10n.pigletBulkBirthEventLitterHint,
+          ),
           const SizedBox(height: 12),
           CustomDropdown<String>(
             label: l10n.birthEventOptional,
@@ -1265,7 +1410,10 @@ class _PigletBulkRegistrationScreenState
           ),
           const SizedBox(height: 24),
         ],
-        _sectionTitle(l10n.pigletBulkNumberOfPiglets, l10n.pigletBulkNamePrefixHint),
+        _sectionTitle(
+          l10n.pigletBulkNumberOfPiglets,
+          l10n.pigletBulkNamePrefixHint,
+        ),
         const SizedBox(height: 12),
         CustomTextField(
           controller: _pigletCountController,
@@ -1280,6 +1428,13 @@ class _PigletBulkRegistrationScreenState
             }
             return null;
           },
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.pigletBulkNumberOfPigletsHelp,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
         ),
         const SizedBox(height: 16),
         CustomTextField(
@@ -1367,7 +1522,7 @@ class _PigletBulkRegistrationScreenState
           icon: Icons.female_outlined,
           value: _selectedMotherUuid,
           enabled: widget.pendingBirthEventToPersist == null,
-          dropdownItems:           _eligibleMothers.map((livestock) {
+          dropdownItems: _eligibleMothers.map((livestock) {
             var farmName = l10n.unknownFarm;
             for (final f in _farms) {
               if (f.uuid == livestock.farmUuid) {
@@ -1392,7 +1547,7 @@ class _PigletBulkRegistrationScreenState
           hint: l10n.select,
           icon: Icons.male_outlined,
           value: _selectedFatherUuid,
-          dropdownItems:           _eligibleFathers.map((livestock) {
+          dropdownItems: _eligibleFathers.map((livestock) {
             var farmName = l10n.unknownFarm;
             for (final f in _farms) {
               if (f.uuid == livestock.farmUuid) {
@@ -1601,10 +1756,11 @@ class _PigletBulkRegistrationScreenState
                 controller: _quickWeightAliveController,
                 label: l10n.pigletBulkWeightAliveHint,
                 hintText: l10n.pigletBulkWeightPerRowHint,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
               ),
             ),
@@ -1614,10 +1770,11 @@ class _PigletBulkRegistrationScreenState
                 controller: _quickWeightDeadController,
                 label: l10n.pigletBulkWeightDeadHint,
                 hintText: l10n.pigletBulkWeightPerRowHint,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
               ),
             ),
@@ -1770,12 +1927,10 @@ class _PigletBulkRegistrationScreenState
                         theme,
                         icon: Icons.flag_outlined,
                         label: l10n.status,
-                        value: row.isDeadAtBirth
-                            ? l10n.notActive
-                            : _selectedStatus == 'active'
-                                ? l10n.active
-                                : l10n.notActive,
-                        valueColor: row.isDeadAtBirth
+                        value: _effectiveStatus(row) == 'active'
+                            ? l10n.active
+                            : l10n.notActive,
+                        valueColor: _isRowInactive(row)
                             ? theme.colorScheme.error
                             : Colors.green.shade700,
                       ),
@@ -1815,14 +1970,35 @@ class _PigletBulkRegistrationScreenState
                         label: l10n.pigletBulkWeightPerRowLabel,
                         hintText: l10n.pigletBulkWeightPerRowHint,
                         prefixIcon: Icons.monitor_weight_outlined,
-                        keyboardType:
-                            const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                             RegExp(r'^\d*\.?\d{0,2}'),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => setState(
+                            () => row.individualDetailsExpanded =
+                                !row.individualDetailsExpanded,
+                          ),
+                          icon: Icon(
+                            row.individualDetailsExpanded
+                                ? Icons.expand_less
+                                : Icons.tune_outlined,
+                          ),
+                          label: Text(l10n.pigletBulkIndividualDetails),
+                        ),
+                      ),
+                      if (row.individualDetailsExpanded) ...[
+                        const SizedBox(height: 12),
+                        _buildRowIndividualDetails(l10n, theme, row, index),
+                      ],
                     ],
                   ),
                 ),
@@ -1831,6 +2007,254 @@ class _PigletBulkRegistrationScreenState
           );
         }),
       ],
+    );
+  }
+
+  void _resetRowIndividualDetails(_PigletRowDraft row) {
+    row.statusOverride = null;
+    row.motherUuidOverride = null;
+    row.fatherUuidOverride = null;
+    row.obtainedMethodIdOverride = null;
+    row.dateEnteredFarmOverride = null;
+    row.primaryColorOverride = null;
+    row.secondaryColorOverride = null;
+    row.disposalTypeId = null;
+    row.disposalDate = null;
+    row.disposalReasonController.clear();
+    row.disposalRemarksController.clear();
+  }
+
+  Widget _buildRowIndividualDetails(
+    AppLocalizations l10n,
+    ThemeData theme,
+    _PigletRowDraft row,
+    int index,
+  ) {
+    final isInactive = _isRowInactive(row);
+    final dateEnteredOverride = row.dateEnteredFarmOverride;
+    final disposalDate =
+        row.disposalDate ?? (row.isDeadAtBirth ? _selectedDateOfBirth : null);
+
+    DropdownItem<String> parentItem(Livestock livestock) {
+      var farmName = l10n.unknownFarm;
+      for (final f in _farms) {
+        if (f.uuid == livestock.farmUuid) {
+          farmName = f.name;
+          break;
+        }
+      }
+      final label = livestock.name.isNotEmpty
+          ? livestock.name
+          : '${l10n.livestock} #${livestock.id}';
+      return DropdownItem(value: livestock.uuid, label: '$label ($farmName)');
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.tune_outlined,
+                color: Constants.primaryColor,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.pigletBulkOverrideBatchDefaults,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () =>
+                    setState(() => _resetRowIndividualDetails(row)),
+                child: Text(l10n.pigletBulkUseBatchDefaults),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.pigletBulkIndividualDetailsHelp,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
+            ),
+          ),
+          const SizedBox(height: 14),
+          CustomDropdown<String>(
+            label: l10n.status,
+            hint: row.isDeadAtBirth
+                ? l10n.notActive
+                : l10n.pigletBulkSameAsBatch,
+            icon: Icons.flag_outlined,
+            value: row.isDeadAtBirth ? 'notActive' : row.statusOverride,
+            enabled: !row.isDeadAtBirth,
+            dropdownItems: [
+              DropdownItem(value: 'active', label: l10n.active),
+              DropdownItem(value: 'notActive', label: l10n.notActive),
+            ],
+            onChanged: (v) => setState(() {
+              row.statusOverride = v;
+              if (v == 'notActive') row.individualDetailsExpanded = true;
+            }),
+            isRequired: false,
+          ),
+          const SizedBox(height: 12),
+          CustomDropdown<String>(
+            label: l10n.motherOptional,
+            hint: _hasBirthEventLink
+                ? (_labelForLivestock(_selectedMotherUuid).isEmpty
+                      ? l10n.pigletBulkSameAsBatch
+                      : _labelForLivestock(_selectedMotherUuid))
+                : l10n.pigletBulkSameAsBatch,
+            icon: Icons.female_outlined,
+            value: _hasBirthEventLink ? null : row.motherUuidOverride,
+            enabled: !_hasBirthEventLink,
+            dropdownItems: _eligibleMothers.map(parentItem).toList(),
+            onChanged: (v) => setState(() => row.motherUuidOverride = v),
+            isRequired: false,
+          ),
+          const SizedBox(height: 12),
+          CustomDropdown<String>(
+            label: l10n.fatherOptional,
+            hint: l10n.pigletBulkSameAsBatch,
+            icon: Icons.male_outlined,
+            value: row.fatherUuidOverride,
+            dropdownItems: _eligibleFathers.map(parentItem).toList(),
+            onChanged: (v) => setState(() => row.fatherUuidOverride = v),
+            isRequired: false,
+          ),
+          const SizedBox(height: 12),
+          CustomDropdown<int>(
+            label: l10n.obtainedMethod,
+            hint: l10n.pigletBulkSameAsBatch,
+            icon: Icons.source_outlined,
+            value: row.obtainedMethodIdOverride,
+            dropdownItems: _livestockObtainedMethods
+                .map((m) => DropdownItem(value: m.id, label: m.name))
+                .toList(),
+            onChanged: (v) => setState(() {
+              row.obtainedMethodIdOverride = v;
+              if (v == null) return;
+              final method = _livestockObtainedMethods.firstWhere(
+                (m) => m.id == v,
+                orElse: () => _livestockObtainedMethods.first,
+              );
+              if (method.name.toLowerCase().contains('born') &&
+                  _selectedDateOfBirth != null) {
+                row.dateEnteredFarmOverride = _selectedDateOfBirth;
+              }
+            }),
+            isRequired: false,
+          ),
+          const SizedBox(height: 12),
+          CustomDatePicker(
+            label: l10n.dateEnteredFarmRequired,
+            hint: l10n.pigletBulkSameAsBatch,
+            selectedDate: dateEnteredOverride,
+            onDateSelected: (date) =>
+                setState(() => row.dateEnteredFarmOverride = date),
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+            isRequired: false,
+          ),
+          if (dateEnteredOverride != null) ...[
+            const SizedBox(height: 4),
+            TextButton.icon(
+              onPressed: () =>
+                  setState(() => row.dateEnteredFarmOverride = null),
+              icon: const Icon(Icons.undo_outlined, size: 16),
+              label: Text(l10n.pigletBulkUseBatchDefaults),
+            ),
+          ],
+          const SizedBox(height: 12),
+          CustomDropdown<String>(
+            label: l10n.primaryColor,
+            hint: l10n.pigletBulkSameAsBatch,
+            icon: Icons.palette_outlined,
+            value: row.primaryColorOverride,
+            dropdownItems: ColorHelper.getColorDropdownItems(l10n),
+            onChanged: (v) => setState(() {
+              row.primaryColorOverride = v;
+              if (row.primaryColorOverride == row.secondaryColorOverride) {
+                row.secondaryColorOverride = null;
+              }
+            }),
+            isRequired: false,
+          ),
+          const SizedBox(height: 12),
+          CustomDropdown<String>(
+            label: l10n.secondaryColor,
+            hint: l10n.pigletBulkSameAsBatch,
+            icon: Icons.color_lens_outlined,
+            value: row.secondaryColorOverride,
+            dropdownItems: ColorHelper.getColorDropdownItems(
+              l10n,
+              excludeColor: _effectivePrimaryColor(row),
+            ),
+            onChanged: (v) => setState(() => row.secondaryColorOverride = v),
+            isRequired: false,
+          ),
+          if (isInactive) ...[
+            const SizedBox(height: 16),
+            _infoCard(l10n, theme, l10n.pigletBulkInactiveDisposalHelp),
+            const SizedBox(height: 12),
+            CustomDropdown<int>(
+              label: l10n.disposalTypeId,
+              hint: l10n.selectDisposalType,
+              icon: Icons.delete_forever_outlined,
+              value: row.disposalTypeId ?? _deadDisposalTypeId,
+              dropdownItems: _disposalTypes
+                  .map((t) => DropdownItem(value: t.id, label: t.name))
+                  .toList(),
+              onChanged: (v) => setState(() => row.disposalTypeId = v),
+            ),
+            const SizedBox(height: 12),
+            CustomDatePicker(
+              label: l10n.pigletBulkDisposalDate,
+              hint: row.isDeadAtBirth
+                  ? l10n.selectDateOfBirth
+                  : l10n.pigletBulkDisposalDateHint,
+              selectedDate: disposalDate,
+              onDateSelected: (date) => setState(() => row.disposalDate = date),
+              firstDate: DateTime(1900),
+              lastDate: DateTime.now(),
+              isRequired: !row.isDeadAtBirth,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: row.disposalReasonController,
+              label: row.isDeadAtBirth
+                  ? l10n.pigletBulkDeadDisposalReasonHint
+                  : '${l10n.disposalReasons} *',
+              hintText: row.isDeadAtBirth
+                  ? l10n.pigletDeadAtBirthDisposalReasonDefault
+                  : l10n.enterDisposalReasons,
+              prefixIcon: Icons.notes_outlined,
+              maxLines: 2,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: row.disposalRemarksController,
+              label: l10n.remarks,
+              hintText: l10n.enterRemarksOptional,
+              prefixIcon: Icons.comment_outlined,
+              maxLines: 2,
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -1875,7 +2299,7 @@ class _PigletBulkRegistrationScreenState
   /// Compact summary card displayed at the top of the preview step so users
   /// can verify ALL shared metadata before submitting the batch.
   Widget _buildSharedDataSummaryCard(AppLocalizations l10n, ThemeData theme) {
-    String _nameFor<T>({
+    String nameFor<T>({
       required List<T> items,
       required bool Function(T) match,
       required String Function(T) name,
@@ -1888,42 +2312,42 @@ class _PigletBulkRegistrationScreenState
       }
     }
 
-    final farmName = _nameFor(
+    final farmName = nameFor(
       items: _farms,
       match: (f) => f.uuid == _selectedFarmUuid,
       name: (f) => f.name,
     );
-    final typeName = _nameFor(
+    final typeName = nameFor(
       items: _livestockTypes,
       match: (t) => t.id == _selectedLivestockTypeId,
       name: (t) => t.name,
     );
-    final speciesName = _nameFor(
+    final speciesName = nameFor(
       items: _filteredSpecies,
       match: (s) => s.id == _selectedSpeciesId,
       name: (s) => s.name,
     );
-    final breedName = _nameFor(
+    final breedName = nameFor(
       items: _filteredBreeds,
       match: (b) => b.id == _selectedBreedId,
       name: (b) => b.name,
     );
-    final stageName = _nameFor(
+    final stageName = nameFor(
       items: _filteredStages,
       match: (s) => s.id == _selectedStageId,
       name: (s) => s.name,
     );
-    final motherName = _nameFor(
+    final motherName = nameFor(
       items: _eligibleMothers,
       match: (m) => m.uuid == _selectedMotherUuid,
       name: (m) => m.name.isNotEmpty ? m.name : '${l10n.livestock} #${m.id}',
     );
-    final fatherName = _nameFor(
+    final fatherName = nameFor(
       items: _eligibleFathers,
       match: (f) => f.uuid == _selectedFatherUuid,
       name: (f) => f.name.isNotEmpty ? f.name : '${l10n.livestock} #${f.id}',
     );
-    final methodName = _nameFor(
+    final methodName = nameFor(
       items: _livestockObtainedMethods,
       match: (m) => m.id == _selectedLivestockObtainedMethodId,
       name: (m) => m.name,
@@ -1944,9 +2368,7 @@ class _PigletBulkRegistrationScreenState
       }
     } else if (_selectedBirthEventUuid != null) {
       final be = _birthEventByUuid(_selectedBirthEventUuid);
-      birthEventLabel = be != null
-          ? _formatBirthEventMenuLabel(be, l10n)
-          : '—';
+      birthEventLabel = be != null ? _formatBirthEventMenuLabel(be, l10n) : '—';
     } else {
       birthEventLabel = '—';
     }
@@ -1957,8 +2379,9 @@ class _PigletBulkRegistrationScreenState
     final enteredStr = _selectedDateFirstEnteredToFarm != null
         ? DateFormat.yMMMd().format(_selectedDateFirstEnteredToFarm!)
         : '—';
-    final weight =
-        _weightController.text.trim().isEmpty ? '—' : '${_weightController.text.trim()} kg';
+    final weight = _weightController.text.trim().isEmpty
+        ? '—'
+        : '${_weightController.text.trim()} kg';
 
     final rows = <_SummaryRow>[
       _SummaryRow(Icons.agriculture_outlined, l10n.farm, farmName),
@@ -1966,25 +2389,37 @@ class _PigletBulkRegistrationScreenState
       _SummaryRow(Icons.pets_outlined, l10n.species, speciesName),
       _SummaryRow(Icons.menu_book_outlined, l10n.breed, breedName),
       if (_selectedStageId != null)
-        _SummaryRow(
-            Icons.stacked_line_chart_outlined, l10n.stage, stageName),
+        _SummaryRow(Icons.stacked_line_chart_outlined, l10n.stage, stageName),
       _SummaryRow(Icons.cake_outlined, l10n.dateOfBirth, dobStr),
-      _SummaryRow(Icons.login_outlined, l10n.dateEnteredFarmRequired, enteredStr),
+      _SummaryRow(
+        Icons.login_outlined,
+        l10n.dateEnteredFarmRequired,
+        enteredStr,
+      ),
       _SummaryRow(Icons.monitor_weight_outlined, l10n.weightKg, weight),
       _SummaryRow(Icons.source_outlined, l10n.obtainedMethod, methodName),
       if (_selectedBirthEventUuid != null || pendingDraft != null)
-        _SummaryRow(Icons.child_friendly_outlined, l10n.birthEventOptional,
-            birthEventLabel),
+        _SummaryRow(
+          Icons.child_friendly_outlined,
+          l10n.birthEventOptional,
+          birthEventLabel,
+        ),
       if (_selectedMotherUuid != null)
         _SummaryRow(Icons.female_outlined, l10n.motherOptional, motherName),
       if (_selectedFatherUuid != null)
         _SummaryRow(Icons.male_outlined, l10n.fatherOptional, fatherName),
       if (_selectedPrimaryColor != null)
-        _SummaryRow(Icons.palette_outlined, l10n.primaryColor,
-            _selectedPrimaryColor!),
+        _SummaryRow(
+          Icons.palette_outlined,
+          l10n.primaryColor,
+          _selectedPrimaryColor!,
+        ),
       if (_selectedSecondaryColor != null)
-        _SummaryRow(Icons.color_lens_outlined, l10n.secondaryColor,
-            _selectedSecondaryColor!),
+        _SummaryRow(
+          Icons.color_lens_outlined,
+          l10n.secondaryColor,
+          _selectedSecondaryColor!,
+        ),
     ];
 
     return Container(
@@ -2002,8 +2437,11 @@ class _PigletBulkRegistrationScreenState
         children: [
           Row(
             children: [
-              Icon(Icons.fact_check_outlined,
-                  color: Constants.primaryColor, size: 18),
+              Icon(
+                Icons.fact_check_outlined,
+                color: Constants.primaryColor,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 l10n.pigletBulkStepPreviewTitle,
@@ -2024,10 +2462,11 @@ class _PigletBulkRegistrationScreenState
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(r.icon,
-                      size: 14,
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.45)),
+                  Icon(
+                    r.icon,
+                    size: 14,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                  ),
                   const SizedBox(width: 6),
                   SizedBox(
                     width: 120,
@@ -2035,8 +2474,9 @@ class _PigletBulkRegistrationScreenState
                       r.label,
                       style: TextStyle(
                         fontSize: 12,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ),
@@ -2093,7 +2533,7 @@ class _PigletBulkRegistrationScreenState
         title: Text(
           widget.pendingBirthEventToPersist != null
               ? l10n.pigletBulkCompleteBirthFlowTitle
-              : l10n.pigletBulkTitle,
+              : l10n.smallLivestockBulkTitle,
           style: TextStyle(
             fontSize: Constants.largeTextSize,
             fontWeight: FontWeight.bold,

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -101,11 +102,14 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
 
     if (insemination == null) return;
 
-    if (insemination.eventDate != null && insemination.eventDate!.trim().isNotEmpty) {
+    if (insemination.eventDate != null &&
+        insemination.eventDate!.trim().isNotEmpty) {
       final parsed = DateTime.tryParse(insemination.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _selectedHeatTypeId = insemination.currentHeatTypeId;
@@ -116,7 +120,9 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     _bullBreedController.text = insemination.bullBreed ?? '';
     final productionCountry = insemination.productionCountry ?? '';
     // Check if the saved country is in our list
-    final countryList = _getProductionCountries().map((item) => item.value).toList();
+    final countryList = _getProductionCountries()
+        .map((item) => item.value)
+        .toList();
     if (countryList.contains(productionCountry)) {
       _selectedProductionCountry = productionCountry;
     } else if (productionCountry.isNotEmpty) {
@@ -232,10 +238,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     ];
 
     return countryList
-        .map((country) => DropdownItem<String>(
-              value: country,
-              label: country,
-            ))
+        .map((country) => DropdownItem<String>(value: country, label: country))
         .toList();
   }
 
@@ -245,18 +248,24 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
         context,
         listen: false,
       );
-      
+
       // Ensure data is loaded from local database
       await provider.ensureLoaded();
-      
+
       final heatTypesCount = provider.heatTypes.length;
       final inseminationServicesCount = provider.inseminationServices.length;
       final semenStrawTypesCount = provider.semenStrawTypes.length;
-      
-      log('📊 Insemination form: Reference data loaded - HeatTypes: $heatTypesCount, InseminationServices: $inseminationServicesCount, SemenStrawTypes: $semenStrawTypesCount');
 
-      if (heatTypesCount == 0 || inseminationServicesCount == 0 || semenStrawTypesCount == 0) {
-        log('⚠️ Insemination form: Some reference data is missing. Please sync to get the latest data from the server.');
+      log(
+        '📊 Insemination form: Reference data loaded - HeatTypes: $heatTypesCount, InseminationServices: $inseminationServicesCount, SemenStrawTypes: $semenStrawTypesCount',
+      );
+
+      if (heatTypesCount == 0 ||
+          inseminationServicesCount == 0 ||
+          semenStrawTypesCount == 0) {
+        log(
+          '⚠️ Insemination form: Some reference data is missing. Please sync to get the latest data from the server.',
+        );
       }
 
       if (!mounted) return;
@@ -274,10 +283,16 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
             .map((type) => DropdownItem<int>(value: type.id, label: type.name))
             .toList();
       });
-      
-      log('✅ Insemination form: Reference data items created - HeatTypes: ${_heatTypeItems.length}, InseminationServices: ${_inseminationServiceItems.length}, SemenStrawTypes: ${_semenStrawTypeItems.length}');
+
+      log(
+        '✅ Insemination form: Reference data items created - HeatTypes: ${_heatTypeItems.length}, InseminationServices: ${_inseminationServiceItems.length}, SemenStrawTypes: ${_semenStrawTypeItems.length}',
+      );
     } catch (e, stackTrace) {
-      log('❌ Insemination form: Error loading reference data: $e', error: e, stackTrace: stackTrace);
+      log(
+        '❌ Insemination form: Error loading reference data: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       if (!mounted) return;
       // Set empty lists on error to prevent crashes
       setState(() {
@@ -807,12 +822,10 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -898,7 +911,9 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -918,10 +933,8 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
     }
 
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
-    final date = await showDatePicker(
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -1059,8 +1072,8 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
               semenProductionDateIso ?? existing.semenProductionDate,
           productionCountry: _selectedProductionCountry == 'Other'
               ? (_productionCountryOtherController.text.trim().isEmpty
-                  ? null
-                  : _productionCountryOtherController.text.trim())
+                    ? null
+                    : _productionCountryOtherController.text.trim())
               : _selectedProductionCountry,
           semenBatchNumber: _semenBatchNumberController.text.trim().isEmpty
               ? null
@@ -1086,12 +1099,12 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updateInsemination(updatedModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.insemination,
@@ -1100,7 +1113,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -1137,8 +1150,8 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           semenProductionDate: semenProductionDateIso,
           productionCountry: _selectedProductionCountry == 'Other'
               ? (_productionCountryOtherController.text.trim().isEmpty
-                  ? null
-                  : _productionCountryOtherController.text.trim())
+                    ? null
+                    : _productionCountryOtherController.text.trim())
               : _selectedProductionCountry,
           semenBatchNumber: _semenBatchNumberController.text.trim().isEmpty
               ? null
@@ -1167,12 +1180,12 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addInsemination(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.insemination,
@@ -1181,7 +1194,7 @@ class _InseminationFormScreenState extends State<InseminationFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,

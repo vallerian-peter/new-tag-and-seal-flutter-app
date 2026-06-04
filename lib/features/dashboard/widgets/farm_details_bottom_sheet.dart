@@ -206,6 +206,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
+
                     PopupMenuItem(
                       value: _FarmAction.bulkActions,
                       child: Row(
@@ -216,6 +217,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ],
                       ),
                     ),
+
                     PopupMenuItem(
                       value: _FarmAction.addLivestock,
                       child: Row(
@@ -226,16 +228,18 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ],
                       ),
                     ),
+
                     PopupMenuItem(
                       value: _FarmAction.addPigletLitter,
                       child: Row(
                         children: [
                           const Icon(Icons.groups_2_outlined, size: 18),
                           const SizedBox(width: 12),
-                          Text(l10n.registerPigletLitterOption),
+                          Text(l10n.registerSmallLivestockOption),
                         ],
                       ),
                     ),
+
                     PopupMenuItem(
                       value: _FarmAction.addVaccine,
                       child: Row(
@@ -246,6 +250,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ],
                       ),
                     ),
+                    
                   ],
                 ),
               ],
@@ -512,12 +517,12 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 livestockTypeName: livestockTypeName,
               );
               return Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.contain,
-                scale: 6.0,
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.contain,
+                    scale: 6.0,
                     image: AssetImage(imagePath),
                   ),
                 ),
@@ -744,12 +749,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
   }
 }
 
-enum _FarmAction {
-  bulkActions,
-  addLivestock,
-  addPigletLitter,
-  addVaccine,
-}
+enum _FarmAction { bulkActions, addLivestock, addPigletLitter, addVaccine }
 
 class _CopyFarmUuidWidget extends StatefulWidget {
   final String farmUuid;

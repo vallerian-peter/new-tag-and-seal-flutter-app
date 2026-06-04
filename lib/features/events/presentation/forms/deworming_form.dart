@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
@@ -101,7 +102,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       final parsed = DateTime.tryParse(deworming.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
 
@@ -138,26 +141,23 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
   Future<void> _loadLogReferences() async {
     try {
-      final logProvider =
-          Provider.of<LogAdditionalDataProvider>(context, listen: false);
+      final logProvider = Provider.of<LogAdditionalDataProvider>(
+        context,
+        listen: false,
+      );
       await logProvider.loadFromLocal();
 
       if (!mounted) return;
       setState(() {
         _administrationRouteItems = logProvider.administrationRoutes
             .map(
-              (route) => DropdownItem<int>(
-                value: route.id,
-                label: route.name,
-              ),
+              (route) => DropdownItem<int>(value: route.id, label: route.name),
             )
             .toList();
         _medicineItems = logProvider.medicines
             .map(
-              (medicine) => DropdownItem<int>(
-                value: medicine.id,
-                label: medicine.name,
-              ),
+              (medicine) =>
+                  DropdownItem<int>(value: medicine.id, label: medicine.name),
             )
             .toList();
       });
@@ -191,8 +191,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
       List<Livestock> livestock = [];
       if (farmUuid != null && farmUuid.isNotEmpty) {
-        livestock =
-            await database.livestockDao.getActiveLivestockByFarmUuid(farmUuid);
+        livestock = await database.livestockDao.getActiveLivestockByFarmUuid(
+          farmUuid,
+        );
       }
 
       String? livestockUuid = _selectedLivestockUuid;
@@ -210,7 +211,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
         _farmLivestock = livestock;
         _selectedFarmUuid = farmUuid;
         if (_isBulk) {
-          final initialSelectionUuids = widget.bulkLivestockUuids ??
+          final initialSelectionUuids =
+              widget.bulkLivestockUuids ??
               _selectedBulkLivestock.map((item) => item.uuid).toList();
           _selectedBulkLivestock = livestock
               .where((item) => initialSelectionUuids.contains(item.uuid))
@@ -237,8 +239,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
     try {
       final database = Provider.of<AppDatabase>(context, listen: false);
-      final livestock =
-          await database.livestockDao.getActiveLivestockByFarmUuid(value);
+      final livestock = await database.livestockDao
+          .getActiveLivestockByFarmUuid(value);
 
       if (!mounted) return;
       setState(() {
@@ -253,8 +255,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
             _selectedLivestockUuid = livestock.first.uuid;
           } else if (_selectedLivestockUuid != null &&
               livestock.every((item) => item.uuid != _selectedLivestockUuid)) {
-            _selectedLivestockUuid =
-                livestock.isNotEmpty ? livestock.first.uuid : null;
+            _selectedLivestockUuid = livestock.isNotEmpty
+                ? livestock.first.uuid
+                : null;
           }
         }
       });
@@ -277,8 +280,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
     final farmUuid = _selectedFarmUuid;
     if (farmUuid == null || farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.farmRequired)));
       return;
     }
 
@@ -352,27 +356,27 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
                   children: [
                     Expanded(
                       child: CustomStepper(
-                    key: _stepperKey,
-                    currentStep: _currentStep,
-                    onStepContinue: _onStepContinue,
-                    onStepCancel: _onStepCancel,
-                    continueButtonText: null,
-                    backButtonText: l10n.back,
-                    finalStepButtonText: submitText,
-                    steps: [
-                      StepperStep(
-                        title: l10n.basicInformation,
-                        subtitle: l10n.recordsAndLogs,
-                        icon: Icons.info_outline,
-                        content: _buildStepOne(l10n, theme),
-                      ),
-                      StepperStep(
-                        title: l10n.dewormingDetails,
-                        subtitle: l10n.dosageDetails,
-                        icon: Icons.medical_services_outlined,
-                        content: _buildStepTwo(l10n, theme),
-                      ),
-                    ],
+                        key: _stepperKey,
+                        currentStep: _currentStep,
+                        onStepContinue: _onStepContinue,
+                        onStepCancel: _onStepCancel,
+                        continueButtonText: null,
+                        backButtonText: l10n.back,
+                        finalStepButtonText: submitText,
+                        steps: [
+                          StepperStep(
+                            title: l10n.basicInformation,
+                            subtitle: l10n.recordsAndLogs,
+                            icon: Icons.info_outline,
+                            content: _buildStepOne(l10n, theme),
+                          ),
+                          StepperStep(
+                            title: l10n.dewormingDetails,
+                            subtitle: l10n.dosageDetails,
+                            icon: Icons.medical_services_outlined,
+                            content: _buildStepTwo(l10n, theme),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -384,12 +388,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
   Widget _buildStepOne(AppLocalizations l10n, ThemeData theme) {
     final farmItems = _farms
-        .map(
-          (farm) => DropdownItem<String>(
-            value: farm.uuid,
-            label: farm.name,
-          ),
-        )
+        .map((farm) => DropdownItem<String>(value: farm.uuid, label: farm.name))
         .toList();
     final livestockItems = _farmLivestock
         .map(
@@ -660,10 +659,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       ),
       child: Text(
         message,
-        style: TextStyle(
-          color: theme.colorScheme.onSurface,
-          fontSize: 14,
-        ),
+        style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       ),
     );
   }
@@ -681,11 +677,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Constants.primaryColor,
-            size: 24,
-          ),
+          Icon(icon, color: Constants.primaryColor, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -736,12 +728,10 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   Future<void> _pickNextAdministrationDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initialDate = _selectedNextAdministrationDate ?? DateTime.now();
 
-    final selected = await showDatePicker(
+    final selected = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(initialDate.year, initialDate.month, initialDate.day),
@@ -786,12 +776,10 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -877,7 +865,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -890,7 +880,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
 
     final selectedFarmUuid = widget.farmUuid ?? _selectedFarmUuid;
-    final selectedLivestockUuid = widget.livestockUuid ?? _selectedLivestockUuid;
+    final selectedLivestockUuid =
+        widget.livestockUuid ?? _selectedLivestockUuid;
 
     if (selectedFarmUuid == null || selectedFarmUuid.isEmpty) {
       ModernAlerts.showErrorToast(context, message: l10n.logContextMissing);
@@ -903,8 +894,9 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       return;
     }
 
-    final bulkLivestockUuids =
-        _selectedBulkLivestock.map((item) => item.uuid).toList();
+    final bulkLivestockUuids = _selectedBulkLivestock
+        .map((item) => item.uuid)
+        .toList();
     if (_isBulk && bulkLivestockUuids.isEmpty) {
       ModernAlerts.showErrorToast(context, message: l10n.livestockRequired);
       return;
@@ -916,17 +908,19 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
       final licenseText = _medicalLicenseController.text.trim();
       if (_selectedProviderType == _TreatmentProviderType.vet) {
         vetId = licenseText.isEmpty ? null : licenseText;
-      } else if (_selectedProviderType == _TreatmentProviderType.extensionOfficer) {
+      } else if (_selectedProviderType ==
+          _TreatmentProviderType.extensionOfficer) {
         extensionOfficerId = licenseText.isEmpty ? null : licenseText;
       }
 
-      final nextAdministrationIso =
-          _selectedNextAdministrationDate?.toIso8601String();
+      final nextAdministrationIso = _selectedNextAdministrationDate
+          ?.toIso8601String();
 
       if (widget.isEditMode && _isBulk) {
         debugPrint('⚠️ Bulk editing is not supported for deworming logs.');
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
         return;
       }
 
@@ -943,7 +937,8 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           extensionOfficerId: extensionOfficerId,
           quantity: _quantityController.text.trim(),
           dose: _doseController.text.trim(),
-          nextAdministrationDate: nextAdministrationIso ?? existing.nextAdministrationDate,
+          nextAdministrationDate:
+              nextAdministrationIso ?? existing.nextAdministrationDate,
           updatedAt: DateTime.now().toIso8601String(),
         );
 
@@ -953,12 +948,12 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final saved = await eventsProvider.updateDeworming(updated);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.deworming,
@@ -967,7 +962,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -987,11 +982,12 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           message: l10n.bulkOperationInProgress,
           isDismissible: false,
         );
-        
+
         final created = <DewormingModel>[];
         for (final animalUuid in bulkLivestockUuids) {
           final now = DateTime.now().toIso8601String();
-          final uuid = '${DateTime.now().millisecondsSinceEpoch}-${animalUuid.hashCode}-deworming';
+          final uuid =
+              '${DateTime.now().millisecondsSinceEpoch}-${animalUuid.hashCode}-deworming';
           final eventDateIso = _selectedEventDate?.toIso8601String();
           final model = DewormingModel(
             uuid: uuid,
@@ -1012,10 +1008,10 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           );
           created.add(await eventsProvider.addDeworming(model));
         }
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.deworming,
@@ -1024,7 +1020,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
             quantity: 1,
             numberOfLivestock: bulkLivestockUuids.length,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -1067,12 +1063,12 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final saved = await eventsProvider.addDeworming(model);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.deworming,
@@ -1081,7 +1077,7 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -1109,9 +1105,4 @@ class _DewormingFormScreenState extends State<DewormingFormScreen> {
   }
 }
 
-enum _TreatmentProviderType {
-  none,
-  vet,
-  extensionOfficer,
-}
-
+enum _TreatmentProviderType { none, vet, extensionOfficer }

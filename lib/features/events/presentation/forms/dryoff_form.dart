@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -83,7 +84,9 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
       final parsed = DateTime.tryParse(dryoff.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _reasonController.text = dryoff.reason ?? '';
@@ -513,12 +516,10 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -604,7 +605,9 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
@@ -615,10 +618,8 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
         : (_endDate ?? _startDate ?? DateTime.now());
 
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
-    final date = await showDatePicker(
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
@@ -749,12 +750,12 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updateDryoff(updatedModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.dryoff,
@@ -763,7 +764,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -806,12 +807,12 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addDryoff(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.dryoff,
@@ -820,7 +821,7 @@ class _DryoffFormScreenState extends State<DryoffFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,

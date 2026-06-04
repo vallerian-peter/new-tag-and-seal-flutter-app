@@ -193,7 +193,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               // Description
               Text(
-                '${l10n.otpSentTo} ${widget.identifier}',
+                _isEmail
+                    ? '${l10n.otpSentTo} ${widget.identifier}'
+                    : l10n.otpSendToPhone(widget.identifier),
                 style: TextStyle(
                   fontSize: Constants.textSize,
                   color: theme.colorScheme.onSurface.withOpacity(0.7),

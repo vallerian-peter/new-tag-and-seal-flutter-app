@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// Custom date picker specifically for "Date Entered Farm" field
@@ -39,16 +40,16 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: _getCurrentDate() ?? DateTime.now(),
       firstDate: firstDate ?? DateTime(1900),
       lastDate: lastDate ?? DateTime.now(),
       builder: (context, child) {
-        final backgroundColor = isDark 
-            ? theme.scaffoldBackgroundColor 
+        final backgroundColor = isDark
+            ? theme.scaffoldBackgroundColor
             : Colors.white;
-            
+
         return Theme(
           data: theme.copyWith(
             colorScheme: theme.colorScheme.copyWith(
@@ -80,7 +81,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
     if (date != null && onDateSelected != null) {
       await onDateSelected!(date);
     }
-    
+
     return date;
   }
 
@@ -92,10 +93,12 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return FormField<DateTime>(
       // Use a key based on selectedDate to force rebuild when date changes
-      key: ValueKey('date_entered_farm_${selectedDate?.toIso8601String()}_$isBornOnFarm'),
+      key: ValueKey(
+        'date_entered_farm_${selectedDate?.toIso8601String()}_$isBornOnFarm',
+      ),
       initialValue: selectedDate,
       validator: dateValidator,
       builder: (FormFieldState<DateTime> field) {
@@ -148,8 +151,8 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark 
-                      ? theme.scaffoldBackgroundColor 
+                  color: theme.brightness == Brightness.dark
+                      ? theme.scaffoldBackgroundColor
                       : null,
                   border: Border.all(
                     color: hasError
@@ -169,10 +172,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
                             : theme.colorScheme.onSurface,
                       ),
                     ),
-                    Icon(
-                      Icons.calendar_today,
-                      color: Constants.primaryColor,
-                    ),
+                    Icon(Icons.calendar_today, color: Constants.primaryColor),
                   ],
                 ),
               ),
@@ -182,10 +182,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4, left: 12),
                 child: Text(
                   field.errorText ?? '',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Constants.dangerColor,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Constants.dangerColor),
                 ),
               ),
           ],
@@ -194,4 +191,3 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
     );
   }
 }
-

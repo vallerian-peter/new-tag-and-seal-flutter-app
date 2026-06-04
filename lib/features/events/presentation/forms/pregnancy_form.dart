@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/app_date_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
@@ -87,7 +88,9 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
       final parsed = DateTime.tryParse(pregnancy.eventDate!);
       if (parsed != null) {
         _selectedEventDate = parsed;
-        _eventDateController.text = DateFormat.yMMMd().add_jm().format(parsed.toLocal());
+        _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+          parsed.toLocal(),
+        );
       }
     }
     _selectedTestResultId = pregnancy.testResultId;
@@ -558,12 +561,10 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
   Future<void> _pickEventDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initial = _selectedEventDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2000),
@@ -649,19 +650,19 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
 
     setState(() {
       _selectedEventDate = combined;
-      _eventDateController.text = DateFormat.yMMMd().add_jm().format(combined.toLocal());
+      _eventDateController.text = DateFormat.yMMMd().add_jm().format(
+        combined.toLocal(),
+      );
     });
   }
 
   Future<void> _pickTestDate() async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark 
-        ? theme.scaffoldBackgroundColor 
-        : whiteColor;
+    final backgroundColor = isDark ? theme.scaffoldBackgroundColor : whiteColor;
     final initialDate = _selectedTestDate ?? DateTime.now();
 
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
@@ -782,12 +783,12 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final updated = await eventsProvider.updatePregnancy(updatedModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.pregnancy,
@@ -796,7 +797,7 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,
@@ -840,12 +841,12 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
           message: '',
           isDismissible: false,
         );
-        
+
         final created = await eventsProvider.addPregnancy(newModel);
-        
+
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           await BillCreationHelper.maybeCreateBillForLog(
             context: context,
             logType: EventLogTypes.pregnancy,
@@ -854,7 +855,7 @@ class _PregnancyFormScreenState extends State<PregnancyFormScreen> {
             quantity: 1,
             numberOfLivestock: 1,
           );
-          
+
           if (mounted) {
             await AlertDialogs.showSuccess(
               context: context,

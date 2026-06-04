@@ -403,13 +403,22 @@
 
   "enterYourEmail": "Ingiza Barua Pepe Yako",
   "enterYourPhone": "Ingiza Namba Yako ya Simu",
-  "otpWillBeSentToEmail": "Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye anwani yako ya barua pepe",
+  "otpWillBeSentToEmail": "Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye namba yako ya simu iliosajiliwa na anwani hii ya barua pepe",
   "otpWillBeSentToPhone": "Tutakutumia msimbo wa OTP wa tarakimu 6 kwenye namba yako ya simu",
   "sendOtp": "Tuma OTP",
   "otpExpiresIn10Minutes": "Msimbo wa OTP unaisha muda baada ya dakika 10",
   "verifyOtp": "Thibitisha OTP",
   "enterOtpCode": "Ingiza Msimbo wa OTP",
-  "otpSentTo": "OTP imetumwa kwa",
+  "otpSentTo": "OTP imetumwa kwenye namba ya simu iliosajiliwa na hii barua pepe *",
+  "otpSendToPhone": "OTP imetumwa kwenye {phone}",
+  "@otpSendToPhone": {
+    "description": "Ujumbe unaoonyeshwa kwenye skrini ya uthibitisho wa OTP kwa urejeshaji kwa simu",
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
   "verify": "Thibitisha",
   "resendOtp": "Tuma OTP Tena",
   "pleaseEnterCompleteOtp": "Tafadhali ingiza msimbo kamili wa OTP wa tarakimu 6",
@@ -447,9 +456,9 @@
   "livestocks": "Mifugo",
   "events": "Matukio",
   "userProfile": "Wasifu wa Mtumiaji",
-  "scanQRCode": "Skeni Msimbo wa QR",
-  "qrScanner": "Skena ya QR",
-  "qrScannerDescription": "Utendaji wa skena utatekelezwa hapa",
+  "scanQRCode": "Skani Msimbo wa QR",
+  "qrScanner": "Skana ya QR",
+  "qrScannerDescription": "Utendaji wa skana utatekelezwa hapa",
   "dashboardScreen": "Skrini ya Dashibodi",
   "allLivestocksScreen": "Skrini ya Mifugo Yote",
   "allEventsScreen": "Skrini ya Matukio Yote",
@@ -941,16 +950,52 @@
   "registerLivestockHowTitle": "Sajili mifugo",
   "registerLivestockSingleOption": "Mnyama mmoja",
   "registerLivestockSingleOptionDesc": "Fomu kamili na lebo na kitambulisho kimoja",
-  "registerPigletLitterOption": "Vizazi vya nguruwe wadogo",
-  "registerPigletLitterOptionDesc": "Maelezo sawa kwa wengi; vitambulisho kama TAREHE-01",
-  "pigletBulkTitle": "Sajili vizazi vya nguruwe wadogo",
+  "registerPigletLitterOption": "Mifugo midogo",
+  "registerSmallLivestockOption": "Mifugo midogo",
+  "registerPigletLitterOptionDesc": "Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01",
+  "registerSmallLivestockOptionDesc": "Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01",
+  "pigletBulkTitle": "Sajili mifugo midogo",
+  "smallLivestockBulkTitle": "Sajili mifugo midogo",
   "pigletBulkCompleteBirthFlowTitle": "Maliza kuzaa na watoto",
   "pigletBulkDeferredBirthHint": "Rekodi ya kuzaa itahifadhiwa pamoja na watoto wa mifugo unaposajili wote baada ya hatua ya hakiki. Hakiki na urekebishe maelezo hapa chini, kisha thibitisha.",
   "pigletBulkStepCommonTitle": "Maelezo ya pamoja",
-  "pigletBulkStepCommonSubtitle": "Shamba, aina, idadi, tarehe, wazazi",
+  "pigletBulkStepCommonSubtitle": "Shamba, aina, idadi ya kundi, tarehe, wazazi",
   "pigletBulkStepPreviewTitle": "Hakiki",
-  "pigletBulkStepPreviewSubtitle": "Vitambulisho na jinsia kwa kila nguruwe",
-  "pigletBulkNumberOfPiglets": "Idadi ya nguruwe wadogo",
+  "pigletBulkStepPreviewSubtitle": "Vitambulisho na jinsia kwa kila mnyama",
+  "pigletBulkNumberOfPiglets": "Wanyama wangapi?",
+  "pigletBulkNumberOfPigletsHelp": "Ingiza jumla ya wanyama katika kundi hili. Tumia 1 kwa mnyama mmoja.",
+  "pigletBulkSameAsBatch": "Kama kundi",
+  "pigletBulkIndividualDetails": "Maelezo ya mnyama mmoja",
+  "pigletBulkOverrideBatchDefaults": "Badilisha maelezo ya kundi",
+  "pigletBulkIndividualDetailsHelp": "Badilisha sehemu zinazotofautiana kwa mnyama huyu tu. Sehemu tupu zitatumia maelezo ya kundi.",
+  "pigletBulkUseBatchDefaults": "Tumia maelezo ya kundi",
+  "pigletBulkInactiveDisposalHelp": "Mnyama asiye hai anahitaji rekodi ya uondoaji ili historia ionyeshe kilichotokea.",
+  "pigletBulkDisposalDate": "Tarehe ya uondoaji",
+  "pigletBulkDisposalDateHint": "Chagua tarehe ya uondoaji",
+  "pigletBulkInactiveDisposalRequired": "Mnyama {index} si hai. Chagua aina ya uondoaji.",
+  "@pigletBulkInactiveDisposalRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkInactiveReasonRequired": "Mnyama {index} si hai. Ingiza sababu ya uondoaji.",
+  "@pigletBulkInactiveReasonRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkInactiveDateRequired": "Mnyama {index} si hai. Chagua tarehe ya uondoaji.",
+  "@pigletBulkInactiveDateRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "pigletBulkInvalidCount": "Ingiza nambari kamili kati ya 1 hadi {max}.",
   "@pigletBulkInvalidCount": {
     "placeholders": {
@@ -960,13 +1005,13 @@
     }
   },
   "pigletBulkNamePrefix": "Kiambishi cha jina",
-  "pigletBulkNamePrefixHint": "Mfano: Nguruwe (pamoja na nambari au jina)",
+  "pigletBulkNamePrefixHint": "Mfano: Mifugo midogo (pamoja na nambari au jina)",
   "pigletBulkPreviewInfo": "Kitambulisho kinatumia tarehe ya kuzaliwa (YYYYMMDD) na mfululizo (01, 02, …). Hatua za utoto hubaki bila kutambuliwa hadi uongeze lebo baadaye.",
   "pigletBulkNicknameOptional": "Jina la ziada (si lazima)",
   "pigletBulkRegisterAll": "Sajili wote",
-  "pigletBulkSelectSexEach": "Chagua jinsia kwa kila nguruwe.",
+  "pigletBulkSelectSexEach": "Chagua jinsia kwa kila mnyama.",
   "pigletBulkQuickSexTitle": "Mgawanyo wa haraka wa jinsia",
-  "pigletBulkQuickSexSubtitle": "Weka idadi ya nguruwe wa kike, kiume, au wasiojulikana kwa lita nzima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe {alive}.",
+  "pigletBulkQuickSexSubtitle": "Weka idadi ya wanyama wa kike, kiume, au wasiojulikana kwa kundi zima (walio hai na waliokufa). Jumla ya nambari tatu lazima iwe {alive}.",
   "@pigletBulkQuickSexSubtitle": {
     "placeholders": {
       "alive": {
@@ -976,7 +1021,7 @@
   },
   "pigletBulkQuickSexCountLabel": "Idadi",
   "pigletBulkApplySexSplit": "Tumia kwenye orodha",
-  "pigletBulkSexCountMismatch": "Kike + kiume + wasiojulikana lazima iwe {expected} (safu zote za nguruwe). Umeingiza {actual}.",
+  "pigletBulkSexCountMismatch": "Kike + kiume + wasiojulikana lazima iwe {expected} (safu zote za wanyama). Umeingiza {actual}.",
   "@pigletBulkSexCountMismatch": {
     "placeholders": {
       "expected": {
@@ -990,12 +1035,12 @@
   "pigletBulkQuickSexOrderNote": "Mpangilio: safu za mwanzo = kike, kisha kiume, kisha wasiojulikana kwa safu zote (hai na waliokufa). Unaweza kubadilisha kila safu hapa chini.",
   "pigletBulkPreviewSaveAllNote": "Kila safu—ikiwemo aliyekufa kuzaliwa—inahifadhiwa kama mnyama kwanza. Utupaji unafuatia na hutumia rekodi hizo zilizohifadhiwa.",
   "pigletBulkQuickFillSectionTitle": "Jaza haraka",
-  "pigletBulkQuickFillSectionSubtitle": "Weka kwa wingi maeneo yanayotofautiana kwa kila nguruwe. Haiyabadilishi idadi ya fahali. Unaweza kuhariri kila safu hapa chini.",
+  "pigletBulkQuickFillSectionSubtitle": "Weka kwa wingi maeneo yanayotofautiana kwa kila mnyama. Haiyabadilishi ukubwa wa kundi. Unaweza kuhariri kila safu hapa chini.",
   "pigletBulkQuickNicknameTitle": "Majina",
   "pigletBulkQuickNicknameSubtitle": "Inajaza \"Kiambishi cha jina 1\", \"2\", … kutoka hatua iliyopita (sawa na majina chaguomsingi).",
   "pigletBulkApplyNicknamePattern": "Jaza mfululizo wa majina",
   "pigletBulkQuickWeightTitle": "Uzito (kg)",
-  "pigletBulkQuickWeightSubtitle": "Weka uzito mmoja kwa nguruwe hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.",
+  "pigletBulkQuickWeightSubtitle": "Weka uzito mmoja kwa wanyama hai na mmoja kwa waliokufa kuzaliwa. Kisanduku cha kila safu kinabatilisha haya; acha tupu kutumia uzito wa hatua ya 1.",
   "pigletBulkWeightAliveHint": "Hai",
   "pigletBulkWeightDeadHint": "Aliyekufa kuzaliwa",
   "pigletBulkApplyWeights": "Weka uzito kwenye safu",
@@ -1012,7 +1057,7 @@
       }
     }
   },
-  "pigletBulkQuickFillFooterNote": "Mgawanyo wa jinsia ni kwa nguruwe hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.",
+  "pigletBulkQuickFillFooterNote": "Mgawanyo wa jinsia ni kwa wanyama hai tu, kwa mpangilio wa orodha. Majina na uzito hutumika kwa kila safu isipokuwa ukiruka kitendo.",
   "pigletBulkIdConflict": "Baadhi ya vitambulisho tayari vipo. Badilisha tarehe ya kuzaliwa au futa rekodi, kisha jaribu tena.",
   "pigletBulkConflictingIds": "Zilizochukuliwa: {ids}",
   "@pigletBulkConflictingIds": {
@@ -1022,7 +1067,7 @@
       }
     }
   },
-  "pigletBulkConfirmRegister": "Sajili nguruwe {count} sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.",
+  "pigletBulkConfirmRegister": "Sajili wanyama {count} sasa? Zitahifadhiwa kwenye kifaa hiki na zitalandanishwa mtandaoni.",
   "@pigletBulkConfirmRegister": {
     "placeholders": {
       "count": {
@@ -1030,7 +1075,7 @@
       }
     }
   },
-  "pigletBulkSuccess": "Nguruwe {count} wamesajiliwa kwa mafanikio.",
+  "pigletBulkSuccess": "Wanyama {count} wamesajiliwa kwa mafanikio.",
   "@pigletBulkSuccess": {
     "placeholders": {
       "count": {
@@ -1038,9 +1083,10 @@
       }
     }
   },
-  "pigletBulkFailed": "Imeshindwa kusajili vizazi. Jaribu tena.",
-  "pigletDefaultNamePrefix": "Nguruwe",
-  "pigletBulkSavingMessage": "Inasajili nguruwe wadogo…",
+  "pigletBulkFailed": "Imeshindwa kusajili kundi. Jaribu tena.",
+  "pigletDefaultNamePrefix": "Mifugo midogo",
+  "smallLivestockDefaultNamePrefix": "Mifugo midogo",
+  "pigletBulkSavingMessage": "Inasajili mifugo midogo…",
   "pigletBulkCountRangeHint": "1–{max}",
   "@pigletBulkCountRangeHint": {
     "placeholders": {
@@ -1049,7 +1095,7 @@
       }
     }
   },
-  "pigletBulkBirthEventLitterHint": "Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza idadi na kuashiria nguruwe waliofariki hatua inayofuata.",
+  "pigletBulkBirthEventLitterHint": "Ikiwa tukio la kuzaa lina jumla ya kuzaliwa na marehemu, kuchagua linajaza ukubwa wa kundi na kuashiria wanyama waliofariki hatua inayofuata.",
   "pigletBulkSaveCheckTitle": "Ukaguzi kabla ya kuhifadhi",
   "pigletBulkStatusReady": "Tayari",
   "pigletBulkStatusRequired": "Inahitajika",
@@ -1087,13 +1133,13 @@
   },
   "pigletBulkDeadAtBirthChip": "Aliyekufa kuzaliwa",
   "pigletBulkDisposalSectionTitle": "Utupaji kwa aliyekufa kuzaliwa",
-  "pigletBulkDisposalSectionSubtitle": "Inahitajika unaposajili nguruwe aliyekufa kuzaliwa. Rekodi ya utupaji itatengenezwa kwa kila mmoja.",
+  "pigletBulkDisposalSectionSubtitle": "Inahitajika unaposajili wanyama wasio hai. Rekodi ya utupaji itatengenezwa kwa kila mmoja.",
   "pigletBulkDisposalTypeLabel": "Aina ya utupaji",
-  "pigletBulkSelectDisposalTypeForDead": "Chagua aina ya utupaji kwa nguruwe aliyekufa kuzaliwa.",
+  "pigletBulkSelectDisposalTypeForDead": "Chagua aina ya utupaji kwa wanyama waliokufa kuzaliwa.",
   "pigletBulkDeadDisposalReasonHint": "Sababu (mf. kufia tumboni / vifo vya kuzaliwa)",
   "pigletDeadAtBirthDisposalReasonDefault": "Aliyekufa kuzaliwa (usajili wa fahali)",
   "pigletBulkGenderOptionalDead": "Jinsia (si lazima)",
-  "pigletBulkSuccessDisposals": "Pia kumbukumbu {count} za utupaji zimeandikwa kwa aliyekufa kuzaliwa.",
+  "pigletBulkSuccessDisposals": "Pia kumbukumbu {count} za utupaji zimeandikwa kwa wanyama wasio hai.",
   "@pigletBulkSuccessDisposals": {
     "placeholders": {
       "count": {

@@ -727,13 +727,22 @@
 
   "enterYourEmail": "Enter Your Email",
   "enterYourPhone": "Enter Your Phone Number",
-  "otpWillBeSentToEmail": "We'll send a 6-digit OTP code to your email address",
+  "otpWillBeSentToEmail": "We'll send a 6-digit OTP code to your phone number registered with this email address",
   "otpWillBeSentToPhone": "We'll send a 6-digit OTP code to your phone number",
   "sendOtp": "Send OTP",
   "otpExpiresIn10Minutes": "OTP code expires in 10 minutes",
   "verifyOtp": "Verify OTP",
   "enterOtpCode": "Enter OTP Code",
-  "otpSentTo": "OTP sent to",
+  "otpSentTo": "OTP sent to the phoneNumber registered with this email *",
+  "otpSendToPhone": "OTP sent to {phone}",
+  "@otpSendToPhone": {
+    "description": "Message shown on the OTP verification screen for phone recovery",
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
   "verify": "Verify",
   "resendOtp": "Resend OTP",
   "pleaseEnterCompleteOtp": "Please enter complete 6-digit OTP",
@@ -1236,18 +1245,54 @@
   "registerLivestockHowTitle": "Register livestock",
   "registerLivestockSingleOption": "Single animal",
   "registerLivestockSingleOptionDesc": "Full form with tags and one ID",
-  "registerPigletLitterOption": "Piglet litter",
-  "registerPigletLitterOptionDesc": "Same details for many piglets; IDs like YYYYMMDD-01",
-  "pigletBulkTitle": "Register piglet litter",
+  "registerPigletLitterOption": "Small livestock",
+  "registerSmallLivestockOption": "Small livestock",
+  "registerPigletLitterOptionDesc": "Same details for many animals; IDs like YYYYMMDD-01",
+  "registerSmallLivestockOptionDesc": "Same details for many animals; IDs like YYYYMMDD-01",
+  "pigletBulkTitle": "Register small livestock",
+  "smallLivestockBulkTitle": "Register small livestock",
   "pigletBulkCompleteBirthFlowTitle": "Complete birth & offspring",
   "@pigletBulkCompleteBirthFlowTitle": {"description": "App bar when finishing a birth log and litter in one flow"},
   "pigletBulkDeferredBirthHint": "The birth log will be saved together with the offspring when you tap Register all on the preview step. Review and adjust details below, then confirm.",
   "@pigletBulkDeferredBirthHint": {"description": "Info when user arrived from birth event form with litter"},
   "pigletBulkStepCommonTitle": "Shared details",
-  "pigletBulkStepCommonSubtitle": "Farm, type, litter size, dates, parents",
+  "pigletBulkStepCommonSubtitle": "Farm, type, batch size, dates, parents",
   "pigletBulkStepPreviewTitle": "Preview",
-  "pigletBulkStepPreviewSubtitle": "Generated IDs and sex per piglet",
-  "pigletBulkNumberOfPiglets": "Number of piglets",
+  "pigletBulkStepPreviewSubtitle": "Generated IDs and sex per animal",
+  "pigletBulkNumberOfPiglets": "How many animals?",
+  "pigletBulkNumberOfPigletsHelp": "Enter the total number in this batch. Use 1 for a single animal.",
+  "pigletBulkSameAsBatch": "Same as batch",
+  "pigletBulkIndividualDetails": "Individual details",
+  "pigletBulkOverrideBatchDefaults": "Override batch defaults",
+  "pigletBulkIndividualDetailsHelp": "Change only the fields that differ for this animal. Blank fields use the shared batch values.",
+  "pigletBulkUseBatchDefaults": "Use batch defaults",
+  "pigletBulkInactiveDisposalHelp": "Inactive animals need a disposal record so the history explains what happened.",
+  "pigletBulkDisposalDate": "Disposal date",
+  "pigletBulkDisposalDateHint": "Select disposal date",
+  "pigletBulkInactiveDisposalRequired": "Animal {index} is inactive. Select a disposal type.",
+  "@pigletBulkInactiveDisposalRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkInactiveReasonRequired": "Animal {index} is inactive. Enter the disposal reason.",
+  "@pigletBulkInactiveReasonRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pigletBulkInactiveDateRequired": "Animal {index} is inactive. Select the disposal date.",
+  "@pigletBulkInactiveDateRequired": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "pigletBulkInvalidCount": "Enter a whole number from 1 to {max}.",
   "@pigletBulkInvalidCount": {
     "placeholders": {
@@ -1257,13 +1302,13 @@
     }
   },
   "pigletBulkNamePrefix": "Name prefix",
-  "pigletBulkNamePrefixHint": "e.g. Piglet (combined with number or nickname)",
+  "pigletBulkNamePrefixHint": "e.g. Small livestock (combined with number or nickname)",
   "pigletBulkPreviewInfo": "Each ID uses the date of birth as YYYYMMDD plus a sequence (01, 02, …). Young stages stay not identified until you add tags later.",
   "pigletBulkNicknameOptional": "Nickname (optional)",
   "pigletBulkRegisterAll": "Register all",
-  "pigletBulkSelectSexEach": "Choose male or female for every piglet.",
+  "pigletBulkSelectSexEach": "Choose male or female for every animal.",
   "pigletBulkQuickSexTitle": "Quick sex split",
-  "pigletBulkQuickSexSubtitle": "Enter how many piglets are female, male, or unknown across the full litter (alive and dead). The three numbers must add up to {alive}.",
+  "pigletBulkQuickSexSubtitle": "Enter how many animals are female, male, or unknown across the full batch (alive and dead). The three numbers must add up to {alive}.",
   "@pigletBulkQuickSexSubtitle": {
     "placeholders": {
       "alive": {
@@ -1273,7 +1318,7 @@
   },
   "pigletBulkQuickSexCountLabel": "Count",
   "pigletBulkApplySexSplit": "Apply to list",
-  "pigletBulkSexCountMismatch": "Female + male + unknown must equal {expected} (all piglet rows). You entered {actual}.",
+  "pigletBulkSexCountMismatch": "Female + male + unknown must equal {expected} (all animal rows). You entered {actual}.",
   "@pigletBulkSexCountMismatch": {
     "placeholders": {
       "expected": {
@@ -1287,12 +1332,12 @@
   "pigletBulkQuickSexOrderNote": "Order: first N rows = female, then male, then unknown across all rows (alive and dead). You can still change any row below.",
   "pigletBulkPreviewSaveAllNote": "Every row—including dead at birth—is saved as livestock first. Disposals are created only after that, using the saved animal records.",
   "pigletBulkQuickFillSectionTitle": "Quick fill",
-  "pigletBulkQuickFillSectionSubtitle": "Bulk-set fields that differ per piglet. This does not change litter size. You can still edit any row below.",
+  "pigletBulkQuickFillSectionSubtitle": "Bulk-set fields that differ per animal. This does not change batch size. You can still edit any row below.",
   "pigletBulkQuickNicknameTitle": "Nicknames",
   "pigletBulkQuickNicknameSubtitle": "Fills \"Name prefix 1\", \"Name prefix 2\", … using the name prefix from the previous step (same as default display names).",
   "pigletBulkApplyNicknamePattern": "Fill name sequence",
   "pigletBulkQuickWeightTitle": "Weights (kg)",
-  "pigletBulkQuickWeightSubtitle": "Apply one weight for all live piglets and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.",
+  "pigletBulkQuickWeightSubtitle": "Apply one weight for all live animals and one for all dead-at-birth. Row boxes below override these; leave empty on a row to use the registration weight from step 1.",
   "pigletBulkWeightAliveHint": "Alive",
   "pigletBulkWeightDeadHint": "Dead at birth",
   "pigletBulkApplyWeights": "Apply weights to rows",
@@ -1319,7 +1364,7 @@
       }
     }
   },
-  "pigletBulkConfirmRegister": "Register {count} piglets now? They are saved on this device and will sync when online.",
+  "pigletBulkConfirmRegister": "Register {count} animals now? They are saved on this device and will sync when online.",
   "@pigletBulkConfirmRegister": {
     "placeholders": {
       "count": {
@@ -1327,7 +1372,7 @@
       }
     }
   },
-  "pigletBulkSuccess": "Successfully registered {count} piglets.",
+  "pigletBulkSuccess": "Successfully registered {count} animals.",
   "@pigletBulkSuccess": {
     "placeholders": {
       "count": {
@@ -1335,9 +1380,10 @@
       }
     }
   },
-  "pigletBulkFailed": "Could not register the litter. Please try again.",
-  "pigletDefaultNamePrefix": "Piglet",
-  "pigletBulkSavingMessage": "Registering piglets…",
+  "pigletBulkFailed": "Could not register the batch. Please try again.",
+  "pigletDefaultNamePrefix": "Small livestock",
+  "smallLivestockDefaultNamePrefix": "Small livestock",
+  "pigletBulkSavingMessage": "Registering animals…",
   "pigletBulkCountRangeHint": "1–{max}",
   "@pigletBulkCountRangeHint": {
     "placeholders": {
@@ -1346,7 +1392,7 @@
       }
     }
   },
-  "pigletBulkBirthEventLitterHint": "If the birth event includes total born and dead counts, selecting it fills the litter size and marks dead piglets on the next step.",
+  "pigletBulkBirthEventLitterHint": "If the birth event includes total born and dead counts, selecting it fills the batch size and marks dead animals on the next step.",
   "pigletBulkSaveCheckTitle": "Save check",
   "pigletBulkStatusReady": "Ready",
   "pigletBulkStatusRequired": "Required",
@@ -1384,13 +1430,13 @@
   },
   "pigletBulkDeadAtBirthChip": "Dead at birth",
   "pigletBulkDisposalSectionTitle": "Disposal for dead at birth",
-  "pigletBulkDisposalSectionSubtitle": "Required when registering stillborn piglets. A disposal log is created for each.",
+  "pigletBulkDisposalSectionSubtitle": "Required when registering inactive animals. A disposal log is created for each.",
   "pigletBulkDisposalTypeLabel": "Disposal type",
-  "pigletBulkSelectDisposalTypeForDead": "Select a disposal type for dead-at-birth piglets.",
+  "pigletBulkSelectDisposalTypeForDead": "Select a disposal type for dead-at-birth animals.",
   "pigletBulkDeadDisposalReasonHint": "Reason (e.g. stillborn / birth mortality)",
   "pigletDeadAtBirthDisposalReasonDefault": "Dead at birth (litter registration)",
   "pigletBulkGenderOptionalDead": "Sex (optional)",
-  "pigletBulkSuccessDisposals": "Also logged {count} disposal records for stillborn piglets.",
+  "pigletBulkSuccessDisposals": "Also logged {count} disposal records for inactive animals.",
   "@pigletBulkSuccessDisposals": {
     "placeholders": {
       "count": {
