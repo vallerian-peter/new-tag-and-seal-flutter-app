@@ -87,6 +87,7 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
   List<DropdownItem<int>> _medicineItems = const [];
   List<DropdownItem<int>> _stageItems = const [];
   List<DropdownItem<String>> _teethClippingMethodItems = const [];
+  List<DropdownItem<String>> _tailDockingMethodItems = const [];
 
   static const List<String> _dosageUnits = ['ml', 'l', 'mg', 'g', 'kg'];
   List<DropdownItem<String>> _markingTypeItems = const [];
@@ -189,19 +190,48 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
     );
     await dataProvider.ensureLoaded();
     final stageRows = await db.stageDao.getAllStages();
-    final teethMethodRows = await db.logReferenceDao
-        .getAllTeethClippingMethods();
+    final syncedTeethMethods = dataProvider.teethClippingMethods
+        .map((m) => m.name)
+        .toList();
+    final syncedTailMethods = dataProvider.tailDockingMethods
+        .map((m) => m.name)
+        .toList();
+    final syncedMarkingTypes = dataProvider.livestockMarkingTypes
+        .map((m) => m.name)
+        .toList();
+    final historicalTeethMethods = (await db.eventDao.getTeethClippings())
+        .map((row) => row.method?.trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList();
+    final historicalTailMethods = (await db.eventDao.getTailDockings())
+        .map((row) => row.method?.trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList();
+    final historicalMarkingTypes = (await db.eventDao.getLivestockMarkings())
+        .map((row) => row.markingType.trim())
+        .where((type) => type.isNotEmpty)
+        .toList();
+    final teethMethodItems = _buildStringDropdownItems([
+      ...syncedTeethMethods,
+      ...historicalTeethMethods,
+    ]);
+    final tailDockingMethodItems = _buildStringDropdownItems([
+      ...syncedTailMethods,
+      ...syncedTeethMethods,
+      ...historicalTailMethods,
+    ]);
+    final markingTypeItems = _buildStringDropdownItems([
+      ...syncedMarkingTypes,
+      ...historicalMarkingTypes,
+    ], formatLabel: true);
 
     if (!mounted) return;
     setState(() {
       _medicineItems = dataProvider.medicines
           .map((m) => DropdownItem<int>(value: m.id, label: m.name))
           .toList();
-      _teethClippingMethodItems = teethMethodRows
-          .map((m) => m.name.trim())
-          .where((name) => name.isNotEmpty)
-          .map((name) => DropdownItem<String>(value: name, label: name))
-          .toList();
+      _teethClippingMethodItems = teethMethodItems;
+      _tailDockingMethodItems = tailDockingMethodItems;
       _stageItems = stageRows
           .map((s) => DropdownItem<int>(value: s.id, label: s.name))
           .toList();
@@ -211,35 +241,38 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
       _selectedTeethClippingMethod ??= _teethClippingMethodItems.isNotEmpty
           ? _teethClippingMethodItems.first.value
           : null;
-      _selectedTailDockingMethod ??= _teethClippingMethodItems.isNotEmpty
-          ? _teethClippingMethodItems.first.value
+      _selectedTailDockingMethod ??= _tailDockingMethodItems.isNotEmpty
+          ? _tailDockingMethodItems.first.value
           : null;
       _selectedDosageUnit ??= _dosageUnits.first;
-    });
-
-    final markingRows = await db.eventDao.getLivestockMarkings();
-    final syncedTypes =
-        markingRows
-            .map((row) => row.markingType.trim())
-            .where((type) => type.isNotEmpty)
-            .toSet()
-            .toList()
-          ..sort();
-    final allTypes = syncedTypes;
-    if (!mounted) return;
-    setState(() {
-      _markingTypeItems = allTypes
-          .map(
-            (type) => DropdownItem<String>(
-              value: type,
-              label: type.replaceAll('_', ' '),
-            ),
-          )
-          .toList();
+      _markingTypeItems = markingTypeItems;
       _selectedMarkingType ??= _markingTypeItems.isNotEmpty
           ? _markingTypeItems.first.value
           : null;
     });
+  }
+
+  List<DropdownItem<String>> _buildStringDropdownItems(
+    List<String> values, {
+    bool formatLabel = false,
+  }) {
+    final unique = <String>{};
+    for (final value in values) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) {
+        unique.add(trimmed);
+      }
+    }
+
+    final sorted = unique.toList()..sort();
+    return sorted
+        .map(
+          (value) => DropdownItem<String>(
+            value: value,
+            label: formatLabel ? value.replaceAll('_', ' ') : value,
+          ),
+        )
+        .toList();
   }
 
   void _syncFromStageFromSelectedLivestock() {
@@ -730,7 +763,7 @@ class _HusbandryEventFormScreenState extends State<HusbandryEventFormScreen> {
               hint: l10n.selectProcedureMethod,
               icon: Icons.build_outlined,
               value: _selectedTailDockingMethod,
-              dropdownItems: _teethClippingMethodItems,
+              dropdownItems: _tailDockingMethodItems,
               onChanged: (v) => setState(() => _selectedTailDockingMethod = v),
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? l10n.doseRequired : null,

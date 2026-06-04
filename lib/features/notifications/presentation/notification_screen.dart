@@ -33,7 +33,8 @@ class _NotificationScreenBody extends StatefulWidget {
   const _NotificationScreenBody();
 
   @override
-  State<_NotificationScreenBody> createState() => _NotificationScreenBodyState();
+  State<_NotificationScreenBody> createState() =>
+      _NotificationScreenBodyState();
 }
 
 class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
@@ -86,7 +87,10 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     final theme = Theme.of(context);
 
     final notifications = [...provider.notifications]
-      ..sort((a, b) => _parseDate(a.scheduledAt).compareTo(_parseDate(b.scheduledAt)));
+      ..sort(
+        (a, b) =>
+            _parseDate(a.scheduledAt).compareTo(_parseDate(b.scheduledAt)),
+      );
     final now = DateTime.now();
     final todayNotifications = notifications.where((notification) {
       if (notification.isCompleted) return false;
@@ -102,9 +106,12 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
       ...todayNotifications.map(_notificationKey),
       ...upcoming.map(_notificationKey),
     };
-    final remainingNotifications = notifications.where(
-      (notification) => !displayedKeys.contains(_notificationKey(notification)),
-    ).toList();
+    final remainingNotifications = notifications
+        .where(
+          (notification) =>
+              !displayedKeys.contains(_notificationKey(notification)),
+        )
+        .toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -112,7 +119,7 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Bootstrap.chevron_left, size: 19,)
+          icon: Icon(Bootstrap.chevron_left, size: 19),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
         title: Text(l10n.notifications),
@@ -128,76 +135,79 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : notifications.isEmpty
-              ? Center(
-                  child: Text(
-                    l10n.noNotifications,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    if (todayNotifications.isNotEmpty) ...[
-                      NotificationSectionHeader(title: l10n.upcomingToday),
-                      const SizedBox(height: 8),
-                      ...todayNotifications.map((notification) {
-                        final scheduled = _parseDate(notification.scheduledAt);
-                        return NotificationTile(
-                          notification: notification,
-                          scheduled: scheduled,
-                          isToday: true,
-                          isUpcoming: true,
-                          onMarkCompleted: notification.isCompleted
-                              ? null
-                              : () => provider.markCompleted(notification.id!),
-                          onDelete: () => provider.deleteNotification(notification.id!),
-                        );
-                      }),
-                      const SizedBox(height: 24),
-                    ],
-                    
-                    if (upcoming.isNotEmpty) ...[
-                      NotificationSectionHeader(title: l10n.upcomingNotifications),
-                      const SizedBox(height: 8),
-                      ...upcoming.map((notification) {
-                        final scheduled = _parseDate(notification.scheduledAt);
-                        return NotificationTile(
-                          notification: notification,
-                          scheduled: scheduled,
-                          isToday: false,
-                          isUpcoming: true,
-                          onMarkCompleted: notification.isCompleted
-                              ? null
-                              : () => provider.markCompleted(notification.id!),
-                          onDelete: () => provider.deleteNotification(notification.id!),
-                        );
-                      }),
-                      const SizedBox(height: 24),
-                    ],
-                    if (remainingNotifications.isNotEmpty ||
-                        (todayNotifications.isEmpty && upcoming.isEmpty)) ...[
-                      NotificationSectionHeader(title: l10n.allNotifications),
-                      const SizedBox(height: 8),
-                      ...remainingNotifications.map((notification) {
-                        final scheduled = _parseDate(notification.scheduledAt);
-                        final isToday = _isSameDay(scheduled, now);
-                        final isUpcoming =
-                            !notification.isCompleted && scheduled.isAfter(now);
-                        return NotificationTile(
-                          notification: notification,
-                          scheduled: scheduled,
-                          isToday: isToday,
-                          isUpcoming: isUpcoming,
-                          onMarkCompleted: notification.isCompleted
-                              ? null
-                              : () => provider.markCompleted(notification.id!),
-                          onDelete: () => provider.deleteNotification(notification.id!),
-                        );
-                      }),
-                      const SizedBox(height: 32),
-                    ],
-                  ],
-                ),
+          ? Center(
+              child: Text(
+                l10n.noNotifications,
+                style: theme.textTheme.bodyMedium,
+              ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                if (todayNotifications.isNotEmpty) ...[
+                  NotificationSectionHeader(title: l10n.upcomingToday),
+                  const SizedBox(height: 8),
+                  ...todayNotifications.map((notification) {
+                    final scheduled = _parseDate(notification.scheduledAt);
+                    return NotificationTile(
+                      notification: notification,
+                      scheduled: scheduled,
+                      isToday: true,
+                      isUpcoming: true,
+                      onMarkCompleted: notification.isCompleted
+                          ? null
+                          : () => provider.markCompleted(notification.id!),
+                      onDelete: () =>
+                          provider.deleteNotification(notification.id!),
+                    );
+                  }),
+                  const SizedBox(height: 24),
+                ],
+
+                if (upcoming.isNotEmpty) ...[
+                  NotificationSectionHeader(title: l10n.upcomingNotifications),
+                  const SizedBox(height: 8),
+                  ...upcoming.map((notification) {
+                    final scheduled = _parseDate(notification.scheduledAt);
+                    return NotificationTile(
+                      notification: notification,
+                      scheduled: scheduled,
+                      isToday: false,
+                      isUpcoming: true,
+                      onMarkCompleted: notification.isCompleted
+                          ? null
+                          : () => provider.markCompleted(notification.id!),
+                      onDelete: () =>
+                          provider.deleteNotification(notification.id!),
+                    );
+                  }),
+                  const SizedBox(height: 24),
+                ],
+                if (remainingNotifications.isNotEmpty ||
+                    (todayNotifications.isEmpty && upcoming.isEmpty)) ...[
+                  NotificationSectionHeader(title: l10n.allNotifications),
+                  const SizedBox(height: 8),
+                  ...remainingNotifications.map((notification) {
+                    final scheduled = _parseDate(notification.scheduledAt);
+                    final isToday = _isSameDay(scheduled, now);
+                    final isUpcoming =
+                        !notification.isCompleted && scheduled.isAfter(now);
+                    return NotificationTile(
+                      notification: notification,
+                      scheduled: scheduled,
+                      isToday: isToday,
+                      isUpcoming: isUpcoming,
+                      onMarkCompleted: notification.isCompleted
+                          ? null
+                          : () => provider.markCompleted(notification.id!),
+                      onDelete: () =>
+                          provider.deleteNotification(notification.id!),
+                    );
+                  }),
+                  const SizedBox(height: 32),
+                ],
+              ],
+            ),
     );
   }
 
@@ -243,19 +253,25 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
             try {
               // Clear stale temp files from previous picks (prevents iOS multiple_request)
               await FilePicker.platform.clearTemporaryFiles();
-              final result = await FilePicker.platform.pickFiles(type: FileType.audio);
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.audio,
+              );
               if (result == null || result.files.isEmpty) return;
               final picked = result.files.single;
               final path = picked.path;
               if (path == null) return;
-              final relative = await AlarmAudioUtils.copySoundToAppDirectory(path);
+              final relative = await AlarmAudioUtils.copySoundToAppDirectory(
+                path,
+              );
               setModalState(() {
                 selectedSoundPath = relative;
                 selectedSoundName = picked.name;
               });
             } on PlatformException catch (e) {
               // Swallow iOS multiple_request / cancellation exceptions silently
-              debugPrint('[FilePicker] PlatformException suppressed: ${e.code} — ${e.message}');
+              debugPrint(
+                '[FilePicker] PlatformException suppressed: ${e.code} — ${e.message}',
+              );
             } on Exception catch (e) {
               debugPrint('[FilePicker] Ignored error: $e');
             } finally {
@@ -270,15 +286,17 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
               setModalState(() => previewing = false);
               return;
             }
-            final absolute = await AlarmAudioUtils.resolveAbsolutePath(selectedSoundPath);
+            final absolute = await AlarmAudioUtils.resolveAbsolutePath(
+              selectedSoundPath,
+            );
             try {
               await previewPlayer.setFilePath(absolute);
               setModalState(() => previewing = true);
               await previewPlayer.play();
             } catch (_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.previewSoundFailed)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.previewSoundFailed)));
             } finally {
               if (previewing) {
                 setModalState(() => previewing = false);
@@ -308,8 +326,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                         title: Text(
                           l10n.selectFarm,
                           style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         subtitle: Text('${l10n.recordsText}: ${_farms.length}'),
                       ),
@@ -319,7 +337,9 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                           itemCount: _farms.length,
                           separatorBuilder: (_, __) => Divider(
                             height: 1,
-                            color: theme.colorScheme.tertiary.withValues(alpha: 0.4),
+                            color: theme.colorScheme.tertiary.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                           itemBuilder: (context, index) {
                             final farm = _farms[index];
@@ -368,8 +388,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
             final available = selectedFarmUuid == null
                 ? _livestock
                 : _livestock
-                    .where((l) => l.farmUuid == selectedFarmUuid)
-                    .toList();
+                      .where((l) => l.farmUuid == selectedFarmUuid)
+                      .toList();
             await showModalBottomSheet<void>(
               context: context,
               backgroundColor: theme.scaffoldBackgroundColor,
@@ -391,10 +411,12 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                         title: Text(
                           l10n.selectLivestock,
                           style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                        subtitle: Text('${l10n.recordsText}: ${available.length}'),
+                        subtitle: Text(
+                          '${l10n.recordsText}: ${available.length}',
+                        ),
                       ),
                       Flexible(
                         child: ListView.separated(
@@ -402,7 +424,9 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                           itemCount: available.length,
                           separatorBuilder: (_, __) => Divider(
                             height: 1,
-                            color: theme.colorScheme.tertiary.withValues(alpha: 0.4),
+                            color: theme.colorScheme.tertiary.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                           itemBuilder: (context, index) {
                             final animal = available[index];
@@ -410,7 +434,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                             final animalNameForTile = trimmedName.isEmpty
                                 ? '${l10n.livestock} #${animal.id}'
                                 : trimmedName;
-                            final isSelected = selectedLivestockUuid == animal.uuid;
+                            final isSelected =
+                                selectedLivestockUuid == animal.uuid;
                             return ListTile(
                               leading: Text(
                                 '${index + 1}.',
@@ -499,7 +524,9 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                               onPressed: () => Navigator.of(context).pop(),
                               icon: const Icon(Icons.cancel_outlined),
                               style: IconButton.styleFrom(
-                                backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.4),
+                                backgroundColor: theme.cardColor.withValues(
+                                  alpha: 0.4,
+                                ),
                                 shape: const CircleBorder(),
                               ),
                               tooltip: l10n.cancel,
@@ -529,7 +556,9 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                             if (text.isEmpty) {
                               setModalState(() {
                                 selectedFarmUuid = null;
-                                if (livestockNameController.text.trim().isEmpty) {
+                                if (livestockNameController.text
+                                    .trim()
+                                    .isEmpty) {
                                   selectedLivestockUuid = null;
                                 }
                               });
@@ -543,7 +572,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                   (name) => name.isNotEmpty,
                                   orElse: () => '',
                                 );
-                            if (selectedFarmName.toLowerCase() != text.toLowerCase()) {
+                            if (selectedFarmName.toLowerCase() !=
+                                text.toLowerCase()) {
                               setModalState(() {
                                 selectedFarmUuid = null;
                                 // Farm context changed manually; reset livestock linkage too.
@@ -588,20 +618,24 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                         if (!repeatDaily)
                           CustomDatePicker(
                             controller: scheduleController,
-                            label: '${l10n.scheduleDate} • ${l10n.scheduleTime}',
+                            label:
+                                '${l10n.scheduleDate} • ${l10n.scheduleTime}',
                             hint: '${l10n.scheduleDate} • ${l10n.scheduleTime}',
                             initialDate: scheduledAt ?? DateTime.now(),
                             firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365 * 5),
+                            ),
                             autoFillValue: false,
                             onDateSelected: (date) async {
                               final initialTime = TimeOfDay.fromDateTime(
                                 scheduledAt ?? DateTime.now(),
                               );
                               final theme = Theme.of(context);
-                              final isDark = theme.brightness == Brightness.dark;
-                              final backgroundColor = isDark 
-                                  ? theme.scaffoldBackgroundColor 
+                              final isDark =
+                                  theme.brightness == Brightness.dark;
+                              final backgroundColor = isDark
+                                  ? theme.scaffoldBackgroundColor
                                   : whiteColor;
                               final time = await showTimePicker(
                                 context: context,
@@ -613,7 +647,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                         onPrimary: theme.colorScheme.onPrimary,
                                         onSurface: theme.colorScheme.onSurface,
                                         surface: backgroundColor,
-                                        surfaceContainerHighest: backgroundColor,
+                                        surfaceContainerHighest:
+                                            backgroundColor,
                                       ),
                                       dialogBackgroundColor: backgroundColor,
                                       canvasColor: backgroundColor,
@@ -623,13 +658,16 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                         backgroundColor: backgroundColor,
                                         dialBackgroundColor: backgroundColor,
                                         hourMinuteColor: backgroundColor,
-                                        hourMinuteTextColor: theme.colorScheme.onSurface,
+                                        hourMinuteTextColor:
+                                            theme.colorScheme.onSurface,
                                         dialHandColor: Constants.primaryColor,
-                                        dialTextColor: theme.colorScheme.onSurface,
+                                        dialTextColor:
+                                            theme.colorScheme.onSurface,
                                       ),
                                       textButtonTheme: TextButtonThemeData(
                                         style: TextButton.styleFrom(
-                                          foregroundColor: Constants.primaryColor,
+                                          foregroundColor:
+                                              Constants.primaryColor,
                                         ),
                                       ),
                                     ),
@@ -667,9 +705,10 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                             onTap: () async {
                               final initial = dailyTime ?? TimeOfDay.now();
                               final theme = Theme.of(context);
-                              final isDark = theme.brightness == Brightness.dark;
-                              final backgroundColor = isDark 
-                                  ? theme.scaffoldBackgroundColor 
+                              final isDark =
+                                  theme.brightness == Brightness.dark;
+                              final backgroundColor = isDark
+                                  ? theme.scaffoldBackgroundColor
                                   : whiteColor;
                               final time = await showTimePicker(
                                 context: context,
@@ -682,7 +721,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                         onPrimary: theme.colorScheme.onPrimary,
                                         onSurface: theme.colorScheme.onSurface,
                                         surface: backgroundColor,
-                                        surfaceContainerHighest: backgroundColor,
+                                        surfaceContainerHighest:
+                                            backgroundColor,
                                       ),
                                       dialogBackgroundColor: backgroundColor,
                                       canvasColor: backgroundColor,
@@ -692,13 +732,16 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                         backgroundColor: backgroundColor,
                                         dialBackgroundColor: backgroundColor,
                                         hourMinuteColor: backgroundColor,
-                                        hourMinuteTextColor: theme.colorScheme.onSurface,
+                                        hourMinuteTextColor:
+                                            theme.colorScheme.onSurface,
                                         dialHandColor: Constants.primaryColor,
-                                        dialTextColor: theme.colorScheme.onSurface,
+                                        dialTextColor:
+                                            theme.colorScheme.onSurface,
                                       ),
                                       textButtonTheme: TextButtonThemeData(
                                         style: TextButton.styleFrom(
-                                          foregroundColor: Constants.primaryColor,
+                                          foregroundColor:
+                                              Constants.primaryColor,
                                         ),
                                       ),
                                     ),
@@ -752,12 +795,16 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                   Expanded(
                                     child: OutlinedButton(
                                       // Disabled while a pick is in progress — prevents double-invoke
-                                      onPressed: _isPickingFile ? null : () => pickSound(setModalState),
+                                      onPressed: _isPickingFile
+                                          ? null
+                                          : () => pickSound(setModalState),
                                       child: _isPickingFile
                                           ? const SizedBox(
                                               width: 16,
                                               height: 16,
-                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
                                             )
                                           : Text(l10n.chooseSound),
                                     ),
@@ -765,7 +812,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () => previewSound(setModalState),
+                                      onPressed: () =>
+                                          previewSound(setModalState),
                                       child: Text(
                                         previewing
                                             ? l10n.stopPreview
@@ -781,12 +829,14 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                         const SizedBox(height: 16),
                         SwitchListTile.adaptive(
                           value: loopAudio,
-                          onChanged: (value) => setModalState(() => loopAudio = value),
+                          onChanged: (value) =>
+                              setModalState(() => loopAudio = value),
                           title: Text(l10n.loopSound),
                         ),
                         SwitchListTile.adaptive(
                           value: vibrate,
-                          onChanged: (value) => setModalState(() => vibrate = value),
+                          onChanged: (value) =>
+                              setModalState(() => vibrate = value),
                           title: Text(l10n.vibrateDevice),
                         ),
                         const SizedBox(height: 8),
@@ -796,7 +846,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                         ),
                         Slider(
                           value: volume,
-                          onChanged: (value) => setModalState(() => volume = value),
+                          onChanged: (value) =>
+                              setModalState(() => volume = value),
                           min: 0.2,
                           max: 1.0,
                           divisions: 4,
@@ -820,15 +871,25 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                 onPressed: () async {
                                   if (titleController.text.trim().isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(l10n.enterNotificationTitle)),
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.enterNotificationTitle,
+                                        ),
+                                      ),
                                     );
                                     return;
                                   }
                                   DateTime? computedDateTime;
                                   if (repeatDaily) {
                                     if (dailyTime == null) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(l10n.selectTimeRequired)),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            l10n.selectTimeRequired,
+                                          ),
+                                        ),
                                       );
                                       return;
                                     }
@@ -841,41 +902,52 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                       dailyTime!.minute,
                                     );
                                     if (!candidate.isAfter(now)) {
-                                      candidate = candidate.add(const Duration(days: 1));
+                                      candidate = candidate.add(
+                                        const Duration(days: 1),
+                                      );
                                     }
                                     computedDateTime = candidate;
                                   } else {
                                     if (scheduledAt == null) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(l10n.scheduleDate)),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(l10n.scheduleDate),
+                                        ),
                                       );
                                       return;
                                     }
                                     computedDateTime = scheduledAt;
                                   }
 
-                                  final nowIso = DateTime.now().toIso8601String();
+                                  final nowIso = DateTime.now()
+                                      .toIso8601String();
 
                                   await provider.saveNotification(
                                     NotificationModel(
                                       id: null,
                                       farmUuid: selectedFarmUuid,
-                                      farmName: farmNameController.text.trim().isEmpty
+                                      farmName:
+                                          farmNameController.text.trim().isEmpty
                                           ? null
                                           : farmNameController.text.trim(),
                                       livestockUuid: selectedLivestockUuid,
-                                      livestockName: livestockNameController.text
+                                      livestockName:
+                                          livestockNameController.text
                                               .trim()
                                               .isEmpty
                                           ? null
                                           : livestockNameController.text.trim(),
                                       title: titleController.text.trim(),
-                                      description: descriptionController.text
+                                      description:
+                                          descriptionController.text
                                               .trim()
                                               .isEmpty
                                           ? null
                                           : descriptionController.text.trim(),
-                                      scheduledAt: computedDateTime!.toIso8601String(),
+                                      scheduledAt: computedDateTime!
+                                          .toIso8601String(),
                                       createdAt: nowIso,
                                       updatedAt: nowIso,
                                       soundPath: selectedSoundPath,
@@ -915,4 +987,3 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
     }
   }
 }
-

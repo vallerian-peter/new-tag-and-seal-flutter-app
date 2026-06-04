@@ -2656,7 +2656,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPigletLitterOption => 'Small livestock';
 
   @override
-  String get registerSmallLivestockOption => 'Small livestock';
+  String get registerSmallLivestockOption => 'Small livestocks';
 
   @override
   String get registerPigletLitterOptionDesc =>
@@ -2702,6 +2702,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkSameAsBatch => 'Same as batch';
+
+  @override
+  String get pigletBulkDifferentDataQuestion =>
+      'Are some details different per animal?';
+
+  @override
+  String get pigletBulkDifferentDataHelp =>
+      'Keep this off when all animals share the same details below. Turn it on to choose exactly which fields should be filled per numbered animal.';
+
+  @override
+  String get pigletBulkChooseDifferentFields => 'Choose fields that differ';
+
+  @override
+  String get pigletBulkSelectAtLeastOneDifferentField =>
+      'Select at least one field that differs, or turn off different per animal.';
+
+  @override
+  String get pigletBulkMotherLockedByBirthEvent =>
+      'Mother is locked because this registration is linked to one birth event.';
+
+  @override
+  String get pigletBulkIndividualFieldsPreviewHelp =>
+      'Only the selected different fields are shown per animal. Blank values still use the shared batch value.';
 
   @override
   String get pigletBulkIndividualDetails => 'Individual details';

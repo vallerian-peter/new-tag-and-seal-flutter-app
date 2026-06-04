@@ -206,7 +206,6 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
-
                     PopupMenuItem(
                       value: _FarmAction.bulkActions,
                       child: Row(
@@ -250,7 +249,6 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               ],
@@ -481,7 +479,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.brightness == Brightness.dark
-            ? theme.colorScheme.surface.withValues(alpha: 0.1)
+            ? theme.cardColor.withValues(alpha: 0.1)
             : theme.colorScheme.secondary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(

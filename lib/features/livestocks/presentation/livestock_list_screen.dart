@@ -209,7 +209,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (ctx) {
         final sheetTheme = Theme.of(ctx);
 

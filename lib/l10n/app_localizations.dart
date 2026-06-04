@@ -5123,7 +5123,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerSmallLivestockOption.
   ///
   /// In en, this message translates to:
-  /// **'Small livestock'**
+  /// **'Small livestocks'**
   String get registerSmallLivestockOption;
 
   /// No description provided for @registerPigletLitterOptionDesc.
@@ -5203,6 +5203,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Same as batch'**
   String get pigletBulkSameAsBatch;
+
+  /// No description provided for @pigletBulkDifferentDataQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Are some details different per animal?'**
+  String get pigletBulkDifferentDataQuestion;
+
+  /// No description provided for @pigletBulkDifferentDataHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this off when all animals share the same details below. Turn it on to choose exactly which fields should be filled per numbered animal.'**
+  String get pigletBulkDifferentDataHelp;
+
+  /// No description provided for @pigletBulkChooseDifferentFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose fields that differ'**
+  String get pigletBulkChooseDifferentFields;
+
+  /// No description provided for @pigletBulkSelectAtLeastOneDifferentField.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one field that differs, or turn off different per animal.'**
+  String get pigletBulkSelectAtLeastOneDifferentField;
+
+  /// No description provided for @pigletBulkMotherLockedByBirthEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother is locked because this registration is linked to one birth event.'**
+  String get pigletBulkMotherLockedByBirthEvent;
+
+  /// No description provided for @pigletBulkIndividualFieldsPreviewHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the selected different fields are shown per animal. Blank values still use the shared batch value.'**
+  String get pigletBulkIndividualFieldsPreviewHelp;
 
   /// No description provided for @pigletBulkIndividualDetails.
   ///

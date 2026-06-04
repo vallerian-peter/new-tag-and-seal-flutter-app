@@ -94,8 +94,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   bool _isLoadingData = true;
   bool _hasLoadedData = false;
-  bool _hasLostDisposal = false; // Track if livestock has disposal with reason='Lost'
-  DisposalModel? _lostDisposal; // Store the Lost disposal record for displaying details
+  bool _hasLostDisposal =
+      false; // Track if livestock has disposal with reason='Lost'
+  DisposalModel?
+  _lostDisposal; // Store the Lost disposal record for displaying details
 
   static const Set<String> _earlyStageNames = {
     'piglet',
@@ -281,11 +283,13 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       if (isEditMode && widget.livestock != null) {
         try {
           // Check if livestock status is 'notActive'
-          final isNotActive = widget.livestock!.status.toLowerCase() == 'notactive';
-          
+          final isNotActive =
+              widget.livestock!.status.toLowerCase() == 'notactive';
+
           if (isNotActive) {
             // Get all disposal types to find the "Lost" type
-            final disposalTypes = await database.logReferenceDao.getAllDisposalTypes();
+            final disposalTypes = await database.logReferenceDao
+                .getAllDisposalTypes();
             DisposalType? lostDisposalType;
             try {
               lostDisposalType = disposalTypes.firstWhere(
@@ -294,29 +298,30 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             } catch (e) {
               log('⚠️ "Lost" disposal type not found in disposal types list');
             }
-            
+
             if (lostDisposalType != null) {
               // Get disposals for this livestock
               final eventsRepository = EventsRepository(database);
               final disposals = await eventsRepository.getDisposals(
                 livestockUuid: widget.livestock!.uuid,
               );
-              
+
               // Find the disposal with disposalTypeId matching "Lost" disposal type
               hasLostDisposal = disposals.any(
                 (disposal) => disposal.disposalTypeId == lostDisposalType!.id,
               );
-              
+
               if (hasLostDisposal) {
                 try {
                   _lostDisposal = disposals.firstWhere(
-                    (disposal) => disposal.disposalTypeId == lostDisposalType!.id,
+                    (disposal) =>
+                        disposal.disposalTypeId == lostDisposalType!.id,
                   );
                 } catch (e) {
                   log('⚠️ Error finding lost disposal: $e');
                 }
               }
-              
+
               log(
                 '🔍 Checked disposals for livestock ${widget.livestock!.uuid}: hasLostDisposal=$hasLostDisposal, isNotActive=$isNotActive, lostDisposalTypeId=${lostDisposalType.id}',
               );
@@ -1228,10 +1233,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           enabled: _selectedLivestockTypeId != null,
           dropdownItems: _filteredStages
               .map(
-                (stage) => DropdownItem<int>(
-                  value: stage.id,
-                  label: stage.name,
-                ),
+                (stage) =>
+                    DropdownItem<int>(value: stage.id, label: stage.name),
               )
               .toList(),
           onChanged: (value) {
@@ -1304,8 +1307,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               : _buildScanSuffixButton(
                   icon: Icons.nfc,
                   tooltip: l10n.scanOptionRfid,
-                  onPressed: () =>
-                      _handleScanForField(_rfidTagIdController, TagScanMode.rfid),
+                  onPressed: () => _handleScanForField(
+                    _rfidTagIdController,
+                    TagScanMode.rfid,
+                  ),
                 ),
           suffixIconConstraints: const BoxConstraints(
             minHeight: 48,
@@ -1509,7 +1514,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           dropdownItems: _birthEvents
               .where(
                 (event) =>
-                    _selectedFarmUuid == null || event.farmUuid == _selectedFarmUuid,
+                    _selectedFarmUuid == null ||
+                    event.farmUuid == _selectedFarmUuid,
               )
               .map(
                 (event) => DropdownItem<String>(
@@ -1528,16 +1534,20 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         Text(
           l10n.birthEventOptionalHelper,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
         ),
         const SizedBox(height: 8),
         Text(
           l10n.addLivestockAllTypesReminder,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w600,
-              ),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 24),
 
@@ -1628,7 +1638,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             hint: l10n.select,
             icon: Icons.check_circle_outline,
             value: _selectedStatus,
-            enabled: !isEditMode || (isEditMode && _hasLostDisposal), // Only enable if not in edit mode or has Lost disposal
+            enabled:
+                !isEditMode ||
+                (isEditMode &&
+                    _hasLostDisposal), // Only enable if not in edit mode or has Lost disposal
             dropdownItems: [
               DropdownItem(value: 'active', label: l10n.active),
               DropdownItem(value: 'notActive', label: l10n.notActive),
@@ -1639,7 +1652,9 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                 // Temporarily update to show the selection
                 setState(() => _selectedStatus = newStatus);
                 // Show confirmation dialog when changing to 'active' for livestock with Lost disposal
-                final confirmed = await _showLivestockFoundConfirmation(newStatus);
+                final confirmed = await _showLivestockFoundConfirmation(
+                  newStatus,
+                );
                 // If user said No, set status to 'notActive'
                 if (confirmed != true) {
                   setState(() => _selectedStatus = 'notActive');
@@ -1669,7 +1684,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         final dateStr = _lostDisposal!.eventDate ?? _lostDisposal!.createdAt;
         if (dateStr.isNotEmpty) {
           final date = DateTime.parse(dateStr);
-          formattedDate = DateFormat('MMMM dd, yyyy', Localizations.localeOf(context).toString()).format(date);
+          formattedDate = DateFormat(
+            'MMMM dd, yyyy',
+            Localizations.localeOf(context).toString(),
+          ).format(date);
         }
       } catch (e) {
         log('❌ Error formatting disposal date: $e');
@@ -1687,11 +1705,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           ),
           title: Row(
             children: [
-              Icon(
-                Icons.help_outline,
-                color: Constants.primaryColor,
-                size: 28,
-              ),
+              Icon(Icons.help_outline, color: Constants.primaryColor, size: 28),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -1720,7 +1734,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Disposal details container
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -1760,14 +1774,18 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                           children: [
                             Icon(
                               Icons.calendar_today,
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
                               size: 18,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               '${l10n.date}: $formattedDate',
                               style: TextStyle(
-                                color: isDark ? Colors.grey[300] : Colors.black87,
+                                color: isDark
+                                    ? Colors.grey[300]
+                                    : Colors.black87,
                                 fontSize: 14,
                               ),
                             ),
@@ -1778,7 +1796,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Action description
                 Text(
                   l10n.livestockFoundActionDescription,
@@ -1807,15 +1825,15 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Constants.primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(
-                l10n.yes,
-                style: const TextStyle(fontSize: 16),
-              ),
+              child: Text(l10n.yes, style: const TextStyle(fontSize: 16)),
             ),
           ],
         );
@@ -1857,13 +1875,17 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         try {
           await eventsRepository.markDisposalAsDeleted(disposal.uuid);
           deletedCount++;
-          log('🗑️ Marked disposal record as deleted (pending sync): ${disposal.uuid}');
+          log(
+            '🗑️ Marked disposal record as deleted (pending sync): ${disposal.uuid}',
+          );
         } catch (e) {
           log('❌ Error marking disposal as deleted ${disposal.uuid}: $e');
         }
       }
 
-      log('✅ Marked $deletedCount disposal record(s) as deleted for livestock ${widget.livestock!.uuid}');
+      log(
+        '✅ Marked $deletedCount disposal record(s) as deleted for livestock ${widget.livestock!.uuid}',
+      );
 
       // Update status to 'active'
       setState(() {

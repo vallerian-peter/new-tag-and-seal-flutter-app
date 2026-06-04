@@ -6,7 +6,11 @@ ThemeData lightTheme = ThemeData(
   fontFamily: Constants.fontName,
   primaryColor: Constants.primaryColor,
   scaffoldBackgroundColor: Constants.whiteColor,
-  appBarTheme: AppBarTheme(backgroundColor: Colors.white, foregroundColor: Colors.black),
+  cardColor: Constants.greyColor,
+  appBarTheme: AppBarTheme(
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.black,
+  ),
   textTheme: TextTheme(bodyLarge: TextStyle(color: Constants.blackColor)),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(),
@@ -17,9 +21,8 @@ ThemeData lightTheme = ThemeData(
     primary: Constants.primaryColor,
     secondary: Constants.whiteColor,
     tertiary: Constants.blackColor,
-    surface: Constants.greyColor,
-    background: Constants.whiteColor,
-    error: Constants.dangerColor
+    surface: Constants.whiteColor,
+    error: Constants.dangerColor,
   ),
 );
 
@@ -28,7 +31,11 @@ ThemeData darkTheme = ThemeData(
   fontFamily: Constants.fontName,
   primaryColor: Constants.primaryColor,
   scaffoldBackgroundColor: Constants.darkGreyColor,
-  appBarTheme: AppBarTheme(backgroundColor: Constants.blackColor, foregroundColor: Constants.whiteColor),
+  cardColor: Constants.greyColor,
+  appBarTheme: AppBarTheme(
+    backgroundColor: Constants.blackColor,
+    foregroundColor: Constants.whiteColor,
+  ),
   textTheme: TextTheme(bodyLarge: TextStyle(color: Constants.whiteColor)),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(),
@@ -39,8 +46,7 @@ ThemeData darkTheme = ThemeData(
     primary: Constants.primaryColor,
     secondary: Constants.blackColor,
     tertiary: Constants.whiteColor,
-    surface: Constants.greyColor,
-    background: Constants.veryDarkGreyColor,
-    error: Constants.dangerColor
+    surface: Constants.darkGreyColor,
+    error: Constants.dangerColor,
   ),
 );

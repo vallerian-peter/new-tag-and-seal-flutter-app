@@ -14,6 +14,10 @@ mixin _$LogReferenceDaoMixin on DatabaseAccessor<AppDatabase> {
   $MilkingMethodsTable get milkingMethods => attachedDatabase.milkingMethods;
   $TeethClippingMethodsTable get teethClippingMethods =>
       attachedDatabase.teethClippingMethods;
+  $TailDockingMethodsTable get tailDockingMethods =>
+      attachedDatabase.tailDockingMethods;
+  $LivestockMarkingTypesTable get livestockMarkingTypes =>
+      attachedDatabase.livestockMarkingTypes;
   $HeatTypesTable get heatTypes => attachedDatabase.heatTypes;
   $InseminationServicesTable get inseminationServices =>
       attachedDatabase.inseminationServices;

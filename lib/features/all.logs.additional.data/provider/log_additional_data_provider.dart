@@ -1,5 +1,22 @@
 import 'package:flutter/foundation.dart';
-import 'package:new_tag_and_seal_flutter_app/database/app_database.dart' hide FeedingType, Disease, DisposalType, MilkingMethod, HeatType, InseminationService, SemenStrawType, TestResult, CalvingType, CalvingProblem, BirthType, BirthProblem, ReproductiveProblem, TeethClippingMethod;
+import 'package:new_tag_and_seal_flutter_app/database/app_database.dart'
+    hide
+        FeedingType,
+        Disease,
+        DisposalType,
+        MilkingMethod,
+        HeatType,
+        InseminationService,
+        SemenStrawType,
+        TestResult,
+        CalvingType,
+        CalvingProblem,
+        BirthType,
+        BirthProblem,
+        ReproductiveProblem,
+        TeethClippingMethod,
+        TailDockingMethod,
+        LivestockMarkingType;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/administration_route.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/feeding_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/medicine.dart';
@@ -17,6 +34,8 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/reproductive_problem.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/teeth_clipping_method.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/tail_docking_method.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/livestock_marking_type.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/repo/log_additional_data_repo.dart';
 
@@ -49,6 +68,8 @@ class LogAdditionalDataProvider extends ChangeNotifier {
   List<BirthProblem> _birthProblems = const [];
   List<ReproductiveProblem> _reproductiveProblems = const [];
   List<TeethClippingMethod> _teethClippingMethods = const [];
+  List<TailDockingMethod> _tailDockingMethods = const [];
+  List<LivestockMarkingType> _livestockMarkingTypes = const [];
   List<PrepuceReferenceOption> _prepuceReferenceOptions = const [];
 
   bool get isLoading => _isLoading;
@@ -70,6 +91,9 @@ class LogAdditionalDataProvider extends ChangeNotifier {
   List<BirthProblem> get birthProblems => _birthProblems;
   List<ReproductiveProblem> get reproductiveProblems => _reproductiveProblems;
   List<TeethClippingMethod> get teethClippingMethods => _teethClippingMethods;
+  List<TailDockingMethod> get tailDockingMethods => _tailDockingMethods;
+  List<LivestockMarkingType> get livestockMarkingTypes =>
+      _livestockMarkingTypes;
   List<PrepuceReferenceOption> get prepuceReferenceOptions =>
       _prepuceReferenceOptions;
 
@@ -97,9 +121,13 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _medicineTypes = await _repository.getMedicineTypes();
       _medicines = await _repository.getMedicines();
       _diseases = await _repository.getDiseases();
-      debugPrint('🦠 LogAdditionalDataProvider: Loaded ${_diseases.length} diseases from local DB');
+      debugPrint(
+        '🦠 LogAdditionalDataProvider: Loaded ${_diseases.length} diseases from local DB',
+      );
       _disposalTypes = await _repository.getDisposalTypes();
-      debugPrint('🗑️ LogAdditionalDataProvider: Loaded ${_disposalTypes.length} disposal types from local DB');
+      debugPrint(
+        '🗑️ LogAdditionalDataProvider: Loaded ${_disposalTypes.length} disposal types from local DB',
+      );
       _milkingMethods = await _repository.getMilkingMethods();
       _heatTypes = await _repository.getHeatTypes();
       _inseminationServices = await _repository.getInseminationServices();
@@ -111,10 +139,14 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _birthProblems = await _repository.getBirthProblems();
       _reproductiveProblems = await _repository.getReproductiveProblems();
       _teethClippingMethods = await _repository.getTeethClippingMethods();
+      _tailDockingMethods = await _repository.getTailDockingMethods();
+      _livestockMarkingTypes = await _repository.getLivestockMarkingTypes();
       _prepuceReferenceOptions = await _repository.getPrepuceReferenceOptions();
 
       // Log for debugging
-      debugPrint('📊 LogAdditionalDataProvider: Loaded from local DB - HeatTypes: ${_heatTypes.length}, InseminationServices: ${_inseminationServices.length}, SemenStrawTypes: ${_semenStrawTypes.length}');
+      debugPrint(
+        '📊 LogAdditionalDataProvider: Loaded from local DB - HeatTypes: ${_heatTypes.length}, InseminationServices: ${_inseminationServices.length}, SemenStrawTypes: ${_semenStrawTypes.length}',
+      );
 
       _isLoading = false;
       _initialized = true;
@@ -124,7 +156,9 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       _isLoading = false;
       _error = e.toString();
       _initializationFuture = null;
-      debugPrint('❌ LogAdditionalDataProvider: Error loading from local DB: $e');
+      debugPrint(
+        '❌ LogAdditionalDataProvider: Error loading from local DB: $e',
+      );
       notifyListeners();
     }
   }
@@ -147,7 +181,7 @@ class LogAdditionalDataProvider extends ChangeNotifier {
       // Repository handles sync internally (calls Sync service)
       // This follows the proper flow: Provider → Repository → Sync Service
       await _repository.syncFromRemote(database);
-      
+
       // Reload from local database after sync
       await loadFromLocal();
     } catch (e) {
@@ -176,11 +210,11 @@ class LogAdditionalDataProvider extends ChangeNotifier {
     _birthProblems = const [];
     _reproductiveProblems = const [];
     _teethClippingMethods = const [];
+    _tailDockingMethods = const [];
+    _livestockMarkingTypes = const [];
     _prepuceReferenceOptions = const [];
     _initialized = false;
     _initializationFuture = null;
     notifyListeners();
   }
 }
-
-

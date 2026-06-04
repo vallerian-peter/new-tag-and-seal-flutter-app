@@ -240,7 +240,7 @@ class _ExtensionOfficerLoginFormScreenState
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
                         ? Colors.grey[800]
-                        : theme.colorScheme.surface.withValues(alpha: 0.17),
+                        : theme.cardColor.withValues(alpha: 0.17),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isDark
                         ? []

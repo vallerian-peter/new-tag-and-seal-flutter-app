@@ -2723,6 +2723,30 @@ class AppLocalizationsSw extends AppLocalizations {
   String get pigletBulkSameAsBatch => 'Kama kundi';
 
   @override
+  String get pigletBulkDifferentDataQuestion =>
+      'Je, kuna maelezo yanayotofautiana kwa kila mnyama?';
+
+  @override
+  String get pigletBulkDifferentDataHelp =>
+      'Acha imezimwa kama wanyama wote wanatumia maelezo yale yale hapa chini. Washa ili uchague sehemu zitakazojazwa kwa kila mnyama kwa namba yake.';
+
+  @override
+  String get pigletBulkChooseDifferentFields =>
+      'Chagua sehemu zinazotofautiana';
+
+  @override
+  String get pigletBulkSelectAtLeastOneDifferentField =>
+      'Chagua angalau sehemu moja inayotofautiana, au zima tofauti kwa kila mnyama.';
+
+  @override
+  String get pigletBulkMotherLockedByBirthEvent =>
+      'Mama amefungwa kwa sababu usajili huu umeunganishwa na tukio moja la kuzaliwa.';
+
+  @override
+  String get pigletBulkIndividualFieldsPreviewHelp =>
+      'Sehemu ulizochagua tu ndizo zitaonekana kwa kila mnyama. Sehemu tupu zitatumia thamani ya kundi.';
+
+  @override
   String get pigletBulkIndividualDetails => 'Maelezo ya mnyama mmoja';
 
   @override

@@ -27,10 +27,7 @@ Future<String?> showTagScannerBottomSheet(
   final config = configs.firstWhere((c) => c.mode == mode);
 
   if (!_isScanSupported(mode)) {
-    ToastAlerts.showError(
-      context,
-      message: l10n.scanUnsupportedDevice,
-    );
+    ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
     return null;
   }
 
@@ -40,15 +37,15 @@ Future<String?> showTagScannerBottomSheet(
     if (!hasPermission) {
       return null; // Permission denied or not granted
     }
-    
+
     // Ensure context is still mounted after permission check
     if (!context.mounted) {
       return null;
     }
-    
+
     // Small delay to ensure permission is fully processed
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     // Double-check context is still mounted
     if (!context.mounted) {
       return null;
@@ -66,10 +63,7 @@ Future<String?> showTagScannerBottomSheet(
     } catch (e) {
       debugPrint('Failed to create MobileScannerController: $e');
       if (context.mounted) {
-        ToastAlerts.showError(
-          context,
-          message: l10n.scanUnsupportedDevice,
-        );
+        ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
       }
       return null;
     }
@@ -81,28 +75,20 @@ Future<String?> showTagScannerBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _ScanBottomSheet(
-        config: config,
-        controller: controller,
-      ),
+      builder: (context) =>
+          _ScanBottomSheet(config: config, controller: controller),
     );
   } on MissingPluginException {
     controller?.dispose();
     if (context.mounted) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.scanUnsupportedDevice,
-      );
+      ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
     }
     return null;
   } catch (e) {
     controller?.dispose();
     debugPrint('Error showing scanner bottom sheet: $e');
     if (context.mounted) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.scanUnsupportedDevice,
-      );
+      ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
     }
     return null;
   }
@@ -155,7 +141,7 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
   // Show rationale dialog first (explains why we need permission)
   if (!context.mounted) return false;
   final shouldRequest = await _showPermissionRationaleDialog(context, l10n);
-  
+
   // User cancelled the rationale dialog
   if (shouldRequest != true) {
     return false;
@@ -163,16 +149,16 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
 
   // Small delay to ensure dialog is fully dismissed before showing system popup
   await Future.delayed(const Duration(milliseconds: 300));
-  
+
   // Check if context is still mounted after dialog dismissal
   if (!context.mounted) return false;
 
   // Request permission - this will show the system permission popup
   status = await Permission.camera.request();
-  
+
   // Re-check context after async permission request
   if (!context.mounted) return false;
-  
+
   // Check if permission was granted
   if (status.isGranted) {
     return true;
@@ -199,10 +185,7 @@ Future<bool> _ensureCameraPermission(BuildContext context) async {
 
   // Permission denied (but not permanently) - show error message
   if (context.mounted) {
-    ToastAlerts.showError(
-      context,
-      message: l10n.scanPermissionDenied,
-    );
+    ToastAlerts.showError(context, message: l10n.scanPermissionDenied);
   }
   return false;
 }
@@ -288,7 +271,8 @@ class ScannerScreen extends StatefulWidget {
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserver {
+class _ScannerScreenState extends State<ScannerScreen>
+    with WidgetsBindingObserver {
   TagScanMode _selectedMode = TagScanMode.qr;
   bool _cameraPermissionGranted = true;
 
@@ -346,8 +330,8 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
     // Check if already granted
     var status = await Permission.camera.status;
     if (status.isGranted) {
-    if (!mounted) return;
-    setState(() {
+      if (!mounted) return;
+      setState(() {
         _cameraPermissionGranted = true;
       });
       return;
@@ -369,14 +353,14 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
 
     // Directly request permission (card already shows rationale)
     status = await Permission.camera.request();
-    
+
     if (!mounted) return;
-    
+
     // Refresh permission status to ensure UI is updated
     await _refreshCameraPermission();
-    
+
     if (!mounted) return;
-    
+
     // Check the status after request
     if (status.isGranted) {
       // Permission granted - UI already updated by _refreshCameraPermission
@@ -394,10 +378,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
       // Permission denied (but not permanently)
       final l10n = AppLocalizations.of(context)!;
       if (mounted) {
-        ToastAlerts.showError(
-          context,
-          message: l10n.scanPermissionDenied,
-        );
+        ToastAlerts.showError(context, message: l10n.scanPermissionDenied);
       }
     }
   }
@@ -407,9 +388,10 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final configs = _buildScanModeConfigs(l10n);
-    final selectedConfig =
-        configs.firstWhere((element) => element.mode == _selectedMode);
-    
+    final selectedConfig = configs.firstWhere(
+      (element) => element.mode == _selectedMode,
+    );
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -432,8 +414,8 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
         ),
       ),
       body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
+        padding: const EdgeInsets.all(24),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -458,18 +440,21 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
               onModeSelected: (mode) => setState(() => _selectedMode = mode),
             ),
             const SizedBox(height: 32),
-            Expanded(
-              child: _ScanPreviewCard(config: selectedConfig),
-            ),
+            Expanded(child: _ScanPreviewCard(config: selectedConfig)),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => _startScan(selectedConfig),
-                icon: Icon(selectedConfig.startIcon, color: whiteColor, size: 18),
-                label: Text(l10n.scanStartButton, style: TextStyle(
+                icon: Icon(
+                  selectedConfig.startIcon,
                   color: whiteColor,
-                ),),
+                  size: 18,
+                ),
+                label: Text(
+                  l10n.scanStartButton,
+                  style: TextStyle(color: whiteColor),
+                ),
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   backgroundColor: Constants.primaryColor,
@@ -492,10 +477,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
 
     if (!_isScanSupported(config.mode)) {
       if (!mounted) return;
-      ToastAlerts.showError(
-        context,
-        message: l10n.scanUnsupportedDevice,
-      );
+      ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
       return;
     }
 
@@ -506,7 +488,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
         _cameraPermissionGranted = granted;
       });
       if (!granted) {
-      return;
+        return;
       }
     }
 
@@ -526,18 +508,13 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => _ScanBottomSheet(
-          config: config,
-          controller: controller,
-        ),
+        builder: (context) =>
+            _ScanBottomSheet(config: config, controller: controller),
       );
     } on MissingPluginException {
       controller?.dispose();
       if (!mounted) return;
-      ToastAlerts.showError(
-        context,
-        message: l10n.scanUnsupportedDevice,
-      );
+      ToastAlerts.showError(context, message: l10n.scanUnsupportedDevice);
       return;
     }
 
@@ -559,10 +536,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
     if (!mounted) return;
 
     if (match == null) {
-      ToastAlerts.showError(
-        context,
-        message: l10n.scanResultNotFound(value),
-      );
+      ToastAlerts.showError(context, message: l10n.scanResultNotFound(value));
       return;
     }
 
@@ -605,11 +579,11 @@ class _CameraPermissionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.white,
+        color: theme.brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.black.withOpacity(0.04),
-        ),
+        border: Border.all(color: Colors.black.withOpacity(0.04)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -627,11 +601,7 @@ class _CameraPermissionCard extends StatelessWidget {
               color: primary.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.camera_alt_outlined,
-              color: primary,
-              size: 24,
-            ),
+            child: Icon(Icons.camera_alt_outlined, color: primary, size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -667,9 +637,7 @@ class _CameraPermissionCard extends StatelessWidget {
                     ),
                     child: Text(
                       actionLabel,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -716,7 +684,9 @@ class _ScanModeSelector extends StatelessWidget {
           selected: isSelected,
           label: Text(config.title),
           onSelected: (_) => onModeSelected(config.mode),
-          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800] : theme.scaffoldBackgroundColor,
+          backgroundColor: theme.brightness == Brightness.dark
+              ? Colors.grey[800]
+              : theme.scaffoldBackgroundColor,
           selectedColor: config.accentColor,
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
             color: isSelected ? Colors.white : theme.colorScheme.onSurface,
@@ -752,9 +722,7 @@ class _ScanPreviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? Colors.grey.shade800 : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.15),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.15)),
         boxShadow: [
           if (!isDark)
             BoxShadow(
@@ -766,21 +734,17 @@ class _ScanPreviewCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
+        children: [
+          Container(
             padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
+            decoration: BoxDecoration(
               color: config.accentColor.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-              config.icon,
-              size: 72,
-              color: config.accentColor,
-                ),
-              ),
-              const SizedBox(height: 32),
-              Text(
+              shape: BoxShape.circle,
+            ),
+            child: Icon(config.icon, size: 72, color: config.accentColor),
+          ),
+          const SizedBox(height: 32),
+          Text(
             config.title,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
@@ -877,10 +841,10 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
+                const SizedBox(height: 16),
+                Text(
                   widget.config.title,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
@@ -889,11 +853,11 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                 const SizedBox(height: 8),
                 Text(
                   widget.config.description,
-                textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
-              ),
                 const SizedBox(height: 20),
                 AspectRatio(
                   aspectRatio: 0.75,
@@ -913,7 +877,9 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                             ),
                             onDetect: _onDetect,
                           )
-                        : _RfidBluetoothScanner(accentColor: widget.config.accentColor),
+                        : _RfidBluetoothScanner(
+                            accentColor: widget.config.accentColor,
+                          ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -956,10 +922,13 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                   ),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed:
-                        _manualValue.isEmpty ? null : () => _submitManual(),
+                    onPressed: _manualValue.isEmpty
+                        ? null
+                        : () => _submitManual(),
                     style: FilledButton.styleFrom(
-                      backgroundColor: widget.config.accentColor.withOpacity(0.7),
+                      backgroundColor: widget.config.accentColor.withOpacity(
+                        0.7,
+                      ),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
                       shape: RoundedRectangleBorder(
@@ -975,7 +944,7 @@ class _ScanBottomSheetState extends State<_ScanBottomSheet> {
                   child: Text(l10n.cancel),
                 ),
               ],
-              ),
+            ),
           ),
         ),
       ),
@@ -1024,16 +993,12 @@ class _RfidBluetoothScanner extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      color: theme.colorScheme.surface.withOpacity(0.9),
+      color: theme.cardColor.withOpacity(0.9),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.bluetooth,
-              color: accentColor,
-              size: 72,
-            ),
+            Icon(Icons.bluetooth, color: accentColor, size: 72),
             const SizedBox(height: 16),
             Text(
               l10n.scanBluetoothRfidScannerTitle,
@@ -1056,4 +1021,3 @@ class _RfidBluetoothScanner extends StatelessWidget {
     );
   }
 }
-

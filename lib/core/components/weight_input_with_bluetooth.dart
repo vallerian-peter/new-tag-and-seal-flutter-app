@@ -42,14 +42,14 @@ class WeightInputWithBluetooth extends StatefulWidget {
   });
 
   @override
-  State<WeightInputWithBluetooth> createState() => _WeightInputWithBluetoothState();
+  State<WeightInputWithBluetooth> createState() =>
+      _WeightInputWithBluetoothState();
 }
 
 class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
-  
   Future<void> _showBluetoothBottomSheet() async {
     final weight = await BluetoothWeightBottomSheet.show(context);
-    
+
     if (weight != null) {
       setState(() {
         widget.controller.text = weight.toStringAsFixed(2);
@@ -63,9 +63,7 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final fillColor = isDark
-        ? theme.colorScheme.surface
-        : Colors.white;
+    final fillColor = isDark ? theme.cardColor : Colors.white;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,10 +85,7 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
           ],
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             // No labelText - using only hintText as non-floating placeholder
             hintText: widget.hintText,
@@ -104,10 +99,13 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
                   color: theme.colorScheme.primary,
                   size: 22,
                 ),
-                tooltip: l10n?.bluetoothWeightScale ?? 'Connect Bluetooth Scale',
+                tooltip:
+                    l10n?.bluetoothWeightScale ?? 'Connect Bluetooth Scale',
                 onPressed: _showBluetoothBottomSheet,
                 style: IconButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -116,25 +114,45 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3)),
+              borderSide: BorderSide(
+                color: theme.colorScheme.outline.withValues(
+                  alpha: isDark ? 0.5 : 0.3,
+                ),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(isDark ? 0.5 : 0.3)),
+              borderSide: BorderSide(
+                color: theme.colorScheme.outline.withValues(
+                  alpha: isDark ? 0.5 : 0.3,
+                ),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Constants.dangerColor, width: 1.5),
+              borderSide: const BorderSide(
+                color: Constants.dangerColor,
+                width: 1.5,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Constants.dangerColor, width: 2),
+              borderSide: const BorderSide(
+                color: Constants.dangerColor,
+                width: 2,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
           validator: widget.validator,
         ),
@@ -142,4 +160,3 @@ class _WeightInputWithBluetoothState extends State<WeightInputWithBluetooth> {
     );
   }
 }
-

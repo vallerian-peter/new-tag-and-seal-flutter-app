@@ -1021,7 +1021,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         ? (isDark
               ? Colors.orange.withOpacity(0.15)
               : Colors.orange.withOpacity(0.1))
-        : (isDark ? theme.colorScheme.surface.withOpacity(0.6) : Colors.white);
+        : (isDark ? theme.cardColor.withOpacity(0.6) : Colors.white);
     final borderColor = tone == InfoBannerTone.warning
         ? Colors.orange.withOpacity(0.3)
         : theme.colorScheme.outline.withOpacity(0.12);

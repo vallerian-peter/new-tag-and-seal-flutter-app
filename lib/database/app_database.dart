@@ -51,6 +51,8 @@ import '../features/all.logs.additional.data/data/local/tables/disease_table.dar
 import '../features/all.logs.additional.data/data/local/tables/disposal_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/milking_method_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/teeth_clipping_method_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/tail_docking_method_table.dart';
+import '../features/all.logs.additional.data/data/local/tables/livestock_marking_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/prepuce_condition_type_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/prepuce_severity_table.dart';
 import '../features/all.logs.additional.data/data/local/tables/prepuce_clinical_sign_table.dart';
@@ -126,6 +128,8 @@ part 'app_database.g.dart';
     DisposalTypes,
     MilkingMethods,
     TeethClippingMethods,
+    TailDockingMethods,
+    LivestockMarkingTypes,
     PrepuceConditionTypes,
     PrepuceSeverities,
     PrepuceClinicalSigns,
@@ -193,7 +197,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 39; // v39: make finance_income source fields nullable
+  int get schemaVersion => 40; // v40: add tail docking + livestock marking reference tables
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -403,6 +407,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 39) {
         await _migrateFinanceIncomesNullableSourceFields(m);
+      }
+      if (from < 40) {
+        await _createTableIfMissing(m, tailDockingMethods);
+        await _createTableIfMissing(m, livestockMarkingTypes);
       }
     },
     beforeOpen: (details) async {

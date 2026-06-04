@@ -16,6 +16,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
   final String? Function(DateTime?)? dateValidator;
   final bool enabled;
   final bool isBornOnFarm;
+  final bool allowBornOnFarmManualOverride;
 
   const LivestockDateEnteredFarmPicker({
     super.key,
@@ -28,6 +29,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
     this.dateValidator,
     this.enabled = true,
     this.isBornOnFarm = false,
+    this.allowBornOnFarmManualOverride = true,
   });
 
   DateTime? _getCurrentDate() {
@@ -35,7 +37,9 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
   }
 
   Future<DateTime?> _showDatePicker(BuildContext context) async {
-    if (!enabled) return null;
+    final canOpenPicker =
+        enabled || (isBornOnFarm && allowBornOnFarmManualOverride);
+    if (!canOpenPicker) return null;
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -59,7 +63,7 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
               surface: backgroundColor,
               surfaceContainerHighest: backgroundColor,
             ),
-            dialogBackgroundColor: backgroundColor,
+            dialogTheme: DialogThemeData(backgroundColor: backgroundColor),
             canvasColor: backgroundColor,
             cardColor: backgroundColor,
             scaffoldBackgroundColor: backgroundColor,
@@ -133,7 +137,8 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             InkWell(
-              onTap: enabled
+              onTap:
+                  (enabled || (isBornOnFarm && allowBornOnFarmManualOverride))
                   ? () async {
                       final selected = await _showDatePicker(context);
                       if (selected != null) {
@@ -157,22 +162,30 @@ class LivestockDateEnteredFarmPicker extends StatelessWidget {
                   border: Border.all(
                     color: hasError
                         ? Constants.dangerColor
-                        : theme.colorScheme.onSurface.withOpacity(0.3),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      isEmpty ? hint : displayText,
-                      style: TextStyle(
-                        color: isEmpty
-                            ? theme.colorScheme.onSurface.withOpacity(0.6)
-                            : theme.colorScheme.onSurface,
+                    Expanded(
+                      child: Text(
+                        isEmpty ? hint : displayText,
+                        style: TextStyle(
+                          color: isEmpty
+                              ? theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                )
+                              : theme.colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                    Icon(Icons.calendar_today, color: Constants.primaryColor),
+                    const Icon(
+                      Icons.calendar_today,
+                      color: Constants.primaryColor,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),

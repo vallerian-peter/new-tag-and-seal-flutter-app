@@ -7894,6 +7894,388 @@ class TeethClippingMethodsCompanion
   }
 }
 
+class $TailDockingMethodsTable extends TailDockingMethods
+    with TableInfo<$TailDockingMethodsTable, TailDockingMethod> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TailDockingMethodsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tail_docking_methods';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TailDockingMethod> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TailDockingMethod map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TailDockingMethod(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $TailDockingMethodsTable createAlias(String alias) {
+    return $TailDockingMethodsTable(attachedDatabase, alias);
+  }
+}
+
+class TailDockingMethod extends DataClass
+    implements Insertable<TailDockingMethod> {
+  final int id;
+  final String name;
+  const TailDockingMethod({required this.id, required this.name});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  TailDockingMethodsCompanion toCompanion(bool nullToAbsent) {
+    return TailDockingMethodsCompanion(id: Value(id), name: Value(name));
+  }
+
+  factory TailDockingMethod.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TailDockingMethod(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  TailDockingMethod copyWith({int? id, String? name}) =>
+      TailDockingMethod(id: id ?? this.id, name: name ?? this.name);
+  TailDockingMethod copyWithCompanion(TailDockingMethodsCompanion data) {
+    return TailDockingMethod(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TailDockingMethod(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TailDockingMethod &&
+          other.id == this.id &&
+          other.name == this.name);
+}
+
+class TailDockingMethodsCompanion extends UpdateCompanion<TailDockingMethod> {
+  final Value<int> id;
+  final Value<String> name;
+  const TailDockingMethodsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+  });
+  TailDockingMethodsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+  }) : name = Value(name);
+  static Insertable<TailDockingMethod> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+    });
+  }
+
+  TailDockingMethodsCompanion copyWith({Value<int>? id, Value<String>? name}) {
+    return TailDockingMethodsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TailDockingMethodsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LivestockMarkingTypesTable extends LivestockMarkingTypes
+    with TableInfo<$LivestockMarkingTypesTable, LivestockMarkingType> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LivestockMarkingTypesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'livestock_marking_types';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LivestockMarkingType> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LivestockMarkingType map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LivestockMarkingType(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $LivestockMarkingTypesTable createAlias(String alias) {
+    return $LivestockMarkingTypesTable(attachedDatabase, alias);
+  }
+}
+
+class LivestockMarkingType extends DataClass
+    implements Insertable<LivestockMarkingType> {
+  final int id;
+  final String name;
+  const LivestockMarkingType({required this.id, required this.name});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  LivestockMarkingTypesCompanion toCompanion(bool nullToAbsent) {
+    return LivestockMarkingTypesCompanion(id: Value(id), name: Value(name));
+  }
+
+  factory LivestockMarkingType.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LivestockMarkingType(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  LivestockMarkingType copyWith({int? id, String? name}) =>
+      LivestockMarkingType(id: id ?? this.id, name: name ?? this.name);
+  LivestockMarkingType copyWithCompanion(LivestockMarkingTypesCompanion data) {
+    return LivestockMarkingType(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LivestockMarkingType(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LivestockMarkingType &&
+          other.id == this.id &&
+          other.name == this.name);
+}
+
+class LivestockMarkingTypesCompanion
+    extends UpdateCompanion<LivestockMarkingType> {
+  final Value<int> id;
+  final Value<String> name;
+  const LivestockMarkingTypesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+  });
+  LivestockMarkingTypesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+  }) : name = Value(name);
+  static Insertable<LivestockMarkingType> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+    });
+  }
+
+  LivestockMarkingTypesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+  }) {
+    return LivestockMarkingTypesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LivestockMarkingTypesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $PrepuceConditionTypesTable extends PrepuceConditionTypes
     with TableInfo<$PrepuceConditionTypesTable, PrepuceConditionType> {
   @override
@@ -35308,6 +35690,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MilkingMethodsTable milkingMethods = $MilkingMethodsTable(this);
   late final $TeethClippingMethodsTable teethClippingMethods =
       $TeethClippingMethodsTable(this);
+  late final $TailDockingMethodsTable tailDockingMethods =
+      $TailDockingMethodsTable(this);
+  late final $LivestockMarkingTypesTable livestockMarkingTypes =
+      $LivestockMarkingTypesTable(this);
   late final $PrepuceConditionTypesTable prepuceConditionTypes =
       $PrepuceConditionTypesTable(this);
   late final $PrepuceSeveritiesTable prepuceSeverities =
@@ -35430,6 +35816,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     disposalTypes,
     milkingMethods,
     teethClippingMethods,
+    tailDockingMethods,
+    livestockMarkingTypes,
     prepuceConditionTypes,
     prepuceSeverities,
     prepuceClinicalSigns,
@@ -42178,6 +42566,290 @@ typedef $$TeethClippingMethodsTableProcessedTableManager =
         >,
       ),
       TeethClippingMethod,
+      PrefetchHooks Function()
+    >;
+typedef $$TailDockingMethodsTableCreateCompanionBuilder =
+    TailDockingMethodsCompanion Function({Value<int> id, required String name});
+typedef $$TailDockingMethodsTableUpdateCompanionBuilder =
+    TailDockingMethodsCompanion Function({Value<int> id, Value<String> name});
+
+class $$TailDockingMethodsTableFilterComposer
+    extends Composer<_$AppDatabase, $TailDockingMethodsTable> {
+  $$TailDockingMethodsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TailDockingMethodsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TailDockingMethodsTable> {
+  $$TailDockingMethodsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TailDockingMethodsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TailDockingMethodsTable> {
+  $$TailDockingMethodsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$TailDockingMethodsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TailDockingMethodsTable,
+          TailDockingMethod,
+          $$TailDockingMethodsTableFilterComposer,
+          $$TailDockingMethodsTableOrderingComposer,
+          $$TailDockingMethodsTableAnnotationComposer,
+          $$TailDockingMethodsTableCreateCompanionBuilder,
+          $$TailDockingMethodsTableUpdateCompanionBuilder,
+          (
+            TailDockingMethod,
+            BaseReferences<
+              _$AppDatabase,
+              $TailDockingMethodsTable,
+              TailDockingMethod
+            >,
+          ),
+          TailDockingMethod,
+          PrefetchHooks Function()
+        > {
+  $$TailDockingMethodsTableTableManager(
+    _$AppDatabase db,
+    $TailDockingMethodsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TailDockingMethodsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TailDockingMethodsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TailDockingMethodsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => TailDockingMethodsCompanion(id: id, name: name),
+          createCompanionCallback:
+              ({Value<int> id = const Value.absent(), required String name}) =>
+                  TailDockingMethodsCompanion.insert(id: id, name: name),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TailDockingMethodsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TailDockingMethodsTable,
+      TailDockingMethod,
+      $$TailDockingMethodsTableFilterComposer,
+      $$TailDockingMethodsTableOrderingComposer,
+      $$TailDockingMethodsTableAnnotationComposer,
+      $$TailDockingMethodsTableCreateCompanionBuilder,
+      $$TailDockingMethodsTableUpdateCompanionBuilder,
+      (
+        TailDockingMethod,
+        BaseReferences<
+          _$AppDatabase,
+          $TailDockingMethodsTable,
+          TailDockingMethod
+        >,
+      ),
+      TailDockingMethod,
+      PrefetchHooks Function()
+    >;
+typedef $$LivestockMarkingTypesTableCreateCompanionBuilder =
+    LivestockMarkingTypesCompanion Function({
+      Value<int> id,
+      required String name,
+    });
+typedef $$LivestockMarkingTypesTableUpdateCompanionBuilder =
+    LivestockMarkingTypesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+    });
+
+class $$LivestockMarkingTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $LivestockMarkingTypesTable> {
+  $$LivestockMarkingTypesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LivestockMarkingTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LivestockMarkingTypesTable> {
+  $$LivestockMarkingTypesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LivestockMarkingTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LivestockMarkingTypesTable> {
+  $$LivestockMarkingTypesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$LivestockMarkingTypesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LivestockMarkingTypesTable,
+          LivestockMarkingType,
+          $$LivestockMarkingTypesTableFilterComposer,
+          $$LivestockMarkingTypesTableOrderingComposer,
+          $$LivestockMarkingTypesTableAnnotationComposer,
+          $$LivestockMarkingTypesTableCreateCompanionBuilder,
+          $$LivestockMarkingTypesTableUpdateCompanionBuilder,
+          (
+            LivestockMarkingType,
+            BaseReferences<
+              _$AppDatabase,
+              $LivestockMarkingTypesTable,
+              LivestockMarkingType
+            >,
+          ),
+          LivestockMarkingType,
+          PrefetchHooks Function()
+        > {
+  $$LivestockMarkingTypesTableTableManager(
+    _$AppDatabase db,
+    $LivestockMarkingTypesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LivestockMarkingTypesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$LivestockMarkingTypesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LivestockMarkingTypesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => LivestockMarkingTypesCompanion(id: id, name: name),
+          createCompanionCallback:
+              ({Value<int> id = const Value.absent(), required String name}) =>
+                  LivestockMarkingTypesCompanion.insert(id: id, name: name),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LivestockMarkingTypesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LivestockMarkingTypesTable,
+      LivestockMarkingType,
+      $$LivestockMarkingTypesTableFilterComposer,
+      $$LivestockMarkingTypesTableOrderingComposer,
+      $$LivestockMarkingTypesTableAnnotationComposer,
+      $$LivestockMarkingTypesTableCreateCompanionBuilder,
+      $$LivestockMarkingTypesTableUpdateCompanionBuilder,
+      (
+        LivestockMarkingType,
+        BaseReferences<
+          _$AppDatabase,
+          $LivestockMarkingTypesTable,
+          LivestockMarkingType
+        >,
+      ),
+      LivestockMarkingType,
       PrefetchHooks Function()
     >;
 typedef $$PrepuceConditionTypesTableCreateCompanionBuilder =
@@ -55642,6 +56314,10 @@ class $AppDatabaseManager {
       $$MilkingMethodsTableTableManager(_db, _db.milkingMethods);
   $$TeethClippingMethodsTableTableManager get teethClippingMethods =>
       $$TeethClippingMethodsTableTableManager(_db, _db.teethClippingMethods);
+  $$TailDockingMethodsTableTableManager get tailDockingMethods =>
+      $$TailDockingMethodsTableTableManager(_db, _db.tailDockingMethods);
+  $$LivestockMarkingTypesTableTableManager get livestockMarkingTypes =>
+      $$LivestockMarkingTypesTableTableManager(_db, _db.livestockMarkingTypes);
   $$PrepuceConditionTypesTableTableManager get prepuceConditionTypes =>
       $$PrepuceConditionTypesTableTableManager(_db, _db.prepuceConditionTypes);
   $$PrepuceSeveritiesTableTableManager get prepuceSeverities =>

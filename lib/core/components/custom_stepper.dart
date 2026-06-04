@@ -28,7 +28,7 @@ class CustomStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark
-        ? Theme.of(context).colorScheme.surface.withAlpha(50)
+        ? Theme.of(context).cardColor.withAlpha(50)
         : Colors.white;
     final shadow = isDark
         ? <BoxShadow>[]

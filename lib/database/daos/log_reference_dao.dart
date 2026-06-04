@@ -9,6 +9,8 @@ import '../../features/all.logs.additional.data/data/local/tables/disease_table.
 import '../../features/all.logs.additional.data/data/local/tables/disposal_type_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/milking_method_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/teeth_clipping_method_table.dart';
+import '../../features/all.logs.additional.data/data/local/tables/tail_docking_method_table.dart';
+import '../../features/all.logs.additional.data/data/local/tables/livestock_marking_type_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/heat_type_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/insemination_service_table.dart';
 import '../../features/all.logs.additional.data/data/local/tables/semen_straw_type_table.dart';
@@ -28,32 +30,36 @@ import '../../features/all.logs.additional.data/data/local/tables/prepuce_healin
 
 part 'log_reference_dao.g.dart';
 
-@DriftAccessor(tables: [
-  FeedingTypes,
-  AdministrationRoutes,
-  MedicineTypes,
-  Medicines,
-  Diseases,
-  DisposalTypes,
-  MilkingMethods,
-  TeethClippingMethods,
-  HeatTypes,
-  InseminationServices,
-  SemenStrawTypes,
-  TestResults,
-  CalvingTypes,
-  CalvingProblems,
-  BirthTypes,
-  BirthProblems,
-  ReproductiveProblems,
-  PrepuceConditionTypes,
-  PrepuceSeverities,
-  PrepuceClinicalSigns,
-  PrepuceCauseRisks,
-  PrepuceTreatmentsGiven,
-  PrepuceBreedingStatuses,
-  PrepuceHealingStatuses,
-])
+@DriftAccessor(
+  tables: [
+    FeedingTypes,
+    AdministrationRoutes,
+    MedicineTypes,
+    Medicines,
+    Diseases,
+    DisposalTypes,
+    MilkingMethods,
+    TeethClippingMethods,
+    TailDockingMethods,
+    LivestockMarkingTypes,
+    HeatTypes,
+    InseminationServices,
+    SemenStrawTypes,
+    TestResults,
+    CalvingTypes,
+    CalvingProblems,
+    BirthTypes,
+    BirthProblems,
+    ReproductiveProblems,
+    PrepuceConditionTypes,
+    PrepuceSeverities,
+    PrepuceClinicalSigns,
+    PrepuceCauseRisks,
+    PrepuceTreatmentsGiven,
+    PrepuceBreedingStatuses,
+    PrepuceHealingStatuses,
+  ],
+)
 class LogReferenceDao extends DatabaseAccessor<AppDatabase>
     with _$LogReferenceDaoMixin {
   LogReferenceDao(AppDatabase db) : super(db);
@@ -66,15 +72,15 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> upsertAdministrationRoutes(
-      List<AdministrationRoutesCompanion> entries) async {
+    List<AdministrationRoutesCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(administrationRoutes, entries);
     });
   }
 
-  Future<void> upsertMedicineTypes(
-      List<MedicineTypesCompanion> entries) async {
+  Future<void> upsertMedicineTypes(List<MedicineTypesCompanion> entries) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(medicineTypes, entries);
@@ -102,7 +108,9 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  Future<void> upsertMilkingMethods(List<MilkingMethodsCompanion> entries) async {
+  Future<void> upsertMilkingMethods(
+    List<MilkingMethodsCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(milkingMethods, entries);
@@ -115,6 +123,24 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(teethClippingMethods, entries);
+    });
+  }
+
+  Future<void> upsertTailDockingMethods(
+    List<TailDockingMethodsCompanion> entries,
+  ) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(tailDockingMethods, entries);
+    });
+  }
+
+  Future<void> upsertLivestockMarkingTypes(
+    List<LivestockMarkingTypesCompanion> entries,
+  ) async {
+    if (entries.isEmpty) return;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(livestockMarkingTypes, entries);
     });
   }
 
@@ -196,14 +222,17 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> upsertInseminationServices(
-      List<InseminationServicesCompanion> entries) async {
+    List<InseminationServicesCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(inseminationServices, entries);
     });
   }
 
-  Future<void> upsertSemenStrawTypes(List<SemenStrawTypesCompanion> entries) async {
+  Future<void> upsertSemenStrawTypes(
+    List<SemenStrawTypesCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(semenStrawTypes, entries);
@@ -224,7 +253,9 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  Future<void> upsertCalvingProblems(List<CalvingProblemsCompanion> entries) async {
+  Future<void> upsertCalvingProblems(
+    List<CalvingProblemsCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(calvingProblems, entries);
@@ -246,15 +277,15 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> upsertReproductiveProblems(
-      List<ReproductiveProblemsCompanion> entries) async {
+    List<ReproductiveProblemsCompanion> entries,
+  ) async {
     if (entries.isEmpty) return;
     await batch((batch) {
       batch.insertAllOnConflictUpdate(reproductiveProblems, entries);
     });
   }
 
-  Future<List<FeedingType>> getAllFeedingTypes() =>
-      select(feedingTypes).get();
+  Future<List<FeedingType>> getAllFeedingTypes() => select(feedingTypes).get();
 
   Future<List<AdministrationRouteData>> getAllAdministrationRoutes() =>
       select(administrationRoutes).get();
@@ -266,7 +297,8 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<Disease>> getAllDiseases() => select(diseases).get();
 
-  Future<List<DisposalType>> getAllDisposalTypes() => select(disposalTypes).get();
+  Future<List<DisposalType>> getAllDisposalTypes() =>
+      select(disposalTypes).get();
 
   Future<List<MilkingMethod>> getAllMilkingMethods() =>
       select(milkingMethods).get();
@@ -274,40 +306,40 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
   Future<List<TeethClippingMethod>> getAllTeethClippingMethods() =>
       select(teethClippingMethods).get();
 
-  Future<List<PrepuceConditionType>> getAllPrepuceConditionTypes() =>
-      (select(prepuceConditionTypes)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<TailDockingMethod>> getAllTailDockingMethods() =>
+      select(tailDockingMethods).get();
 
-  Future<List<PrepuceSeverity>> getAllPrepuceSeverities() =>
-      (select(prepuceSeverities)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<LivestockMarkingType>> getAllLivestockMarkingTypes() =>
+      select(livestockMarkingTypes).get();
 
-  Future<List<PrepuceClinicalSign>> getAllPrepuceClinicalSigns() =>
-      (select(prepuceClinicalSigns)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<PrepuceConditionType>> getAllPrepuceConditionTypes() => (select(
+    prepuceConditionTypes,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
 
-  Future<List<PrepuceCauseRisk>> getAllPrepuceCauseRisks() =>
-      (select(prepuceCauseRisks)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<PrepuceSeverity>> getAllPrepuceSeverities() => (select(
+    prepuceSeverities,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
 
-  Future<List<PrepuceTreatmentGiven>> getAllPrepuceTreatmentsGiven() =>
-      (select(prepuceTreatmentsGiven)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<PrepuceClinicalSign>> getAllPrepuceClinicalSigns() => (select(
+    prepuceClinicalSigns,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+
+  Future<List<PrepuceCauseRisk>> getAllPrepuceCauseRisks() => (select(
+    prepuceCauseRisks,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+
+  Future<List<PrepuceTreatmentGiven>> getAllPrepuceTreatmentsGiven() => (select(
+    prepuceTreatmentsGiven,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
 
   Future<List<PrepuceBreedingStatus>> getAllPrepuceBreedingStatuses() =>
-      (select(prepuceBreedingStatuses)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+      (select(
+        prepuceBreedingStatuses,
+      )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
 
-  Future<List<PrepuceHealingStatus>> getAllPrepuceHealingStatuses() =>
-      (select(prepuceHealingStatuses)
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-          .get();
+  Future<List<PrepuceHealingStatus>> getAllPrepuceHealingStatuses() => (select(
+    prepuceHealingStatuses,
+  )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
 
   Future<List<HeatType>> getAllHeatTypes() => select(heatTypes).get();
 
@@ -326,7 +358,8 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<BirthType>> getAllBirthTypes() => select(birthTypes).get();
 
-  Future<List<BirthProblem>> getAllBirthProblems() => select(birthProblems).get();
+  Future<List<BirthProblem>> getAllBirthProblems() =>
+      select(birthProblems).get();
 
   Future<List<ReproductiveProblem>> getAllReproductiveProblems() =>
       select(reproductiveProblems).get();
@@ -341,6 +374,8 @@ class LogReferenceDao extends DatabaseAccessor<AppDatabase>
       batch.deleteWhere(disposalTypes, (_) => const Constant(true));
       batch.deleteWhere(milkingMethods, (_) => const Constant(true));
       batch.deleteWhere(teethClippingMethods, (_) => const Constant(true));
+      batch.deleteWhere(tailDockingMethods, (_) => const Constant(true));
+      batch.deleteWhere(livestockMarkingTypes, (_) => const Constant(true));
       batch.deleteWhere(prepuceConditionTypes, (_) => const Constant(true));
       batch.deleteWhere(prepuceSeverities, (_) => const Constant(true));
       batch.deleteWhere(prepuceClinicalSigns, (_) => const Constant(true));

@@ -37,10 +37,15 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
     as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/teeth_clipping_method.dart'
     as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/tail_docking_method.dart'
+    as logModels;
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/livestock_marking_type.dart'
+    as logModels;
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/prepuce_reference_option.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/repo/log_additional_data_repo.dart';
 
-class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterface {
+class LogAdditionalDataRepository
+    implements LogAdditionalDataRepositoryInterface {
   final AppDatabase _database;
   late final LogReferenceDao _dao;
 
@@ -54,7 +59,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
     // This method is deprecated and returns empty data.
     // Use syncFromRemote() instead, which handles fetching and storing
     // log additional data via Sync.splashSync()
-    log('⚠️ fetchRemoteLogAdditionalData() is deprecated. Use syncFromRemote() instead.');
+    log(
+      '⚠️ fetchRemoteLogAdditionalData() is deprecated. Use syncFromRemote() instead.',
+    );
     return {};
   }
 
@@ -66,277 +73,365 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
       await Sync.splashSync(database);
     } catch (e) {
       log('❌ Error syncing log additional data from remote: $e');
-      throw Exception('Repository: Failed to sync log additional data from remote - $e');
+      throw Exception(
+        'Repository: Failed to sync log additional data from remote - $e',
+      );
     }
   }
 
   @override
   Future<void> storeLogAdditionalData(Map<String, dynamic> data) async {
     try {
-      final feedingTypes = (data['feedingTypes'] as List?)
+      final feedingTypes =
+          (data['feedingTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.FeedingType.fromJson)
-              .map((model) => FeedingTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => FeedingTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <FeedingTypesCompanion>[];
 
-      final administrationRoutes = (data['administrationRoutes'] as List?)
+      final administrationRoutes =
+          (data['administrationRoutes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.AdministrationRoute.fromJson)
-              .map((model) => AdministrationRoutesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => AdministrationRoutesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <AdministrationRoutesCompanion>[];
 
-      final medicineTypes = (data['medicineTypes'] as List?)
+      final medicineTypes =
+          (data['medicineTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.MedicineType.fromJson)
-              .map((model) => MedicineTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => MedicineTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <MedicineTypesCompanion>[];
 
-      final medicines = (data['medicines'] as List?)
+      final medicines =
+          (data['medicines'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.Medicine.fromJson)
-              .map((model) => MedicinesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                    medicineTypeId: Value(model.medicineTypeId),
-                  ))
+              .map(
+                (model) => MedicinesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                  medicineTypeId: Value(model.medicineTypeId),
+                ),
+              )
               .toList() ??
           const <MedicinesCompanion>[];
 
-      final diseases = (data['diseases'] as List?)
+      final diseases =
+          (data['diseases'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.Disease.fromJson)
-              .map((model) => DiseasesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                    status: model.status != null
-                        ? Value(model.status!)
-                        : const Value.absent(),
-                  ))
+              .map(
+                (model) => DiseasesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                  status: model.status != null
+                      ? Value(model.status!)
+                      : const Value.absent(),
+                ),
+              )
               .toList() ??
           const <DiseasesCompanion>[];
 
-      final disposalTypes = (data['disposalTypes'] as List?)
+      final disposalTypes =
+          (data['disposalTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.DisposalType.fromJson)
-              .map((model) => DisposalTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => DisposalTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <DisposalTypesCompanion>[];
 
-      final milkingMethods = (data['milkingMethods'] as List?)
+      final milkingMethods =
+          (data['milkingMethods'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.MilkingMethod.fromJson)
-              .map((model) => MilkingMethodsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => MilkingMethodsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <MilkingMethodsCompanion>[];
-      final teethClippingMethods = (data['teethClippingMethods'] as List?)
+      final teethClippingMethods =
+          (data['teethClippingMethods'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.TeethClippingMethod.fromJson)
-              .map((model) => TeethClippingMethodsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => TeethClippingMethodsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <TeethClippingMethodsCompanion>[];
+      final tailDockingMethods =
+          (data['tailDockingMethods'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(logModels.TailDockingMethod.fromJson)
+              .map(
+                (model) => TailDockingMethodsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
+              .toList() ??
+          const <TailDockingMethodsCompanion>[];
+      final livestockMarkingTypes =
+          (data['livestockMarkingTypes'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(logModels.LivestockMarkingType.fromJson)
+              .map(
+                (model) => LivestockMarkingTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
+              .toList() ??
+          const <LivestockMarkingTypesCompanion>[];
 
-      final prepuceConditionTypes = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceConditionTypes',
-        kind: PrepuceReferenceKind.conditionType,
-      ).map((opt) {
-        return PrepuceConditionTypesCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceSeverities = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceSeverities',
-        kind: PrepuceReferenceKind.severity,
-      ).map((opt) {
-        return PrepuceSeveritiesCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceClinicalSigns = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceClinicalSigns',
-        kind: PrepuceReferenceKind.clinicalSign,
-      ).map((opt) {
-        return PrepuceClinicalSignsCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceCauseRisks = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceCauseRisks',
-        kind: PrepuceReferenceKind.causeRisk,
-      ).map((opt) {
-        return PrepuceCauseRisksCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceTreatmentsGiven = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceTreatmentsGiven',
-        kind: PrepuceReferenceKind.treatmentGiven,
-      ).map((opt) {
-        return PrepuceTreatmentsGivenCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceBreedingStatuses = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceBreedingStatuses',
-        kind: PrepuceReferenceKind.breedingStatus,
-      ).map((opt) {
-        return PrepuceBreedingStatusesCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
-      final prepuceHealingStatuses = _prepuceReferenceRowsFromSync(
-        data,
-        key: 'prepuceHealingStatuses',
-        kind: PrepuceReferenceKind.healingStatus,
-      ).map((opt) {
-        return PrepuceHealingStatusesCompanion(
-          id: Value(opt.referenceId),
-          name: Value(opt.name),
-          nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
-              ? Value(opt.nameSw!.trim())
-              : const Value.absent(),
-        );
-      }).toList();
+      final prepuceConditionTypes =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceConditionTypes',
+            kind: PrepuceReferenceKind.conditionType,
+          ).map((opt) {
+            return PrepuceConditionTypesCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceSeverities =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceSeverities',
+            kind: PrepuceReferenceKind.severity,
+          ).map((opt) {
+            return PrepuceSeveritiesCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceClinicalSigns =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceClinicalSigns',
+            kind: PrepuceReferenceKind.clinicalSign,
+          ).map((opt) {
+            return PrepuceClinicalSignsCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceCauseRisks =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceCauseRisks',
+            kind: PrepuceReferenceKind.causeRisk,
+          ).map((opt) {
+            return PrepuceCauseRisksCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceTreatmentsGiven =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceTreatmentsGiven',
+            kind: PrepuceReferenceKind.treatmentGiven,
+          ).map((opt) {
+            return PrepuceTreatmentsGivenCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceBreedingStatuses =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceBreedingStatuses',
+            kind: PrepuceReferenceKind.breedingStatus,
+          ).map((opt) {
+            return PrepuceBreedingStatusesCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
+      final prepuceHealingStatuses =
+          _prepuceReferenceRowsFromSync(
+            data,
+            key: 'prepuceHealingStatuses',
+            kind: PrepuceReferenceKind.healingStatus,
+          ).map((opt) {
+            return PrepuceHealingStatusesCompanion(
+              id: Value(opt.referenceId),
+              name: Value(opt.name),
+              nameSw: opt.nameSw != null && opt.nameSw!.trim().isNotEmpty
+                  ? Value(opt.nameSw!.trim())
+                  : const Value.absent(),
+            );
+          }).toList();
 
-      final heatTypes = (data['heatTypes'] as List?)
+      final heatTypes =
+          (data['heatTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.HeatType.fromJson)
-              .map((model) => HeatTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => HeatTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <HeatTypesCompanion>[];
 
-      final inseminationServices = (data['inseminationServices'] as List?)
+      final inseminationServices =
+          (data['inseminationServices'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.InseminationService.fromJson)
-              .map((model) => InseminationServicesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => InseminationServicesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <InseminationServicesCompanion>[];
 
-      final semenStrawTypes = (data['semenStrawTypes'] as List?)
+      final semenStrawTypes =
+          (data['semenStrawTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.SemenStrawType.fromJson)
-              .map((model) => SemenStrawTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => SemenStrawTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <SemenStrawTypesCompanion>[];
 
-      final testResults = (data['testResults'] as List?)
+      final testResults =
+          (data['testResults'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.TestResult.fromJson)
-              .map((model) => TestResultsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => TestResultsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <TestResultsCompanion>[];
 
-      final calvingTypes = (data['calvingTypes'] as List?)
+      final calvingTypes =
+          (data['calvingTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.CalvingType.fromJson)
-              .map((model) => CalvingTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => CalvingTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <CalvingTypesCompanion>[];
 
-      final calvingProblems = (data['calvingProblems'] as List?)
+      final calvingProblems =
+          (data['calvingProblems'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.CalvingProblem.fromJson)
-              .map((model) => CalvingProblemsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => CalvingProblemsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <CalvingProblemsCompanion>[];
 
-      final birthTypes = (data['birthTypes'] as List?)
+      final birthTypes =
+          (data['birthTypes'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.BirthType.fromJson)
-              .map((model) => BirthTypesCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                    livestockTypeId: model.livestockTypeId != null ? Value(model.livestockTypeId!) : const Value.absent(),
-                  ))
+              .map(
+                (model) => BirthTypesCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                  livestockTypeId: model.livestockTypeId != null
+                      ? Value(model.livestockTypeId!)
+                      : const Value.absent(),
+                ),
+              )
               .toList() ??
           const <BirthTypesCompanion>[];
 
-      final birthProblems = (data['birthProblems'] as List?)
+      final birthProblems =
+          (data['birthProblems'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.BirthProblem.fromJson)
-              .map((model) => BirthProblemsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                    livestockTypeId: model.livestockTypeId != null ? Value(model.livestockTypeId!) : const Value.absent(),
-                  ))
+              .map(
+                (model) => BirthProblemsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                  livestockTypeId: model.livestockTypeId != null
+                      ? Value(model.livestockTypeId!)
+                      : const Value.absent(),
+                ),
+              )
               .toList() ??
           const <BirthProblemsCompanion>[];
 
-      final reproductiveProblems = (data['reproductiveProblems'] as List?)
+      final reproductiveProblems =
+          (data['reproductiveProblems'] as List?)
               ?.cast<Map<String, dynamic>>()
               .map(logModels.ReproductiveProblem.fromJson)
-              .map((model) => ReproductiveProblemsCompanion(
-                    id: Value(model.id),
-                    name: Value(model.name),
-                  ))
+              .map(
+                (model) => ReproductiveProblemsCompanion(
+                  id: Value(model.id),
+                  name: Value(model.name),
+                ),
+              )
               .toList() ??
           const <ReproductiveProblemsCompanion>[];
 
@@ -348,6 +443,8 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
       await _dao.upsertDisposalTypes(disposalTypes);
       await _dao.upsertMilkingMethods(milkingMethods);
       await _dao.upsertTeethClippingMethods(teethClippingMethods);
+      await _dao.upsertTailDockingMethods(tailDockingMethods);
+      await _dao.upsertLivestockMarkingTypes(livestockMarkingTypes);
       await _dao.replacePrepuceConditionTypes(prepuceConditionTypes);
       await _dao.replacePrepuceSeverities(prepuceSeverities);
       await _dao.replacePrepuceClinicalSigns(prepuceClinicalSigns);
@@ -366,7 +463,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
       await _dao.upsertReproductiveProblems(reproductiveProblems);
     } catch (e) {
       log('❌ Error storing log additional data: $e');
-      throw Exception('Repository: Failed to store log additional data locally - $e');
+      throw Exception(
+        'Repository: Failed to store log additional data locally - $e',
+      );
     }
   }
 
@@ -374,7 +473,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.FeedingType>> getFeedingTypes() async {
     final entities = await _dao.getAllFeedingTypes();
     return entities
-        .map((entity) => logModels.FeedingType(id: entity.id, name: entity.name))
+        .map(
+          (entity) => logModels.FeedingType(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -382,7 +483,10 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.AdministrationRoute>> getAdministrationRoutes() async {
     final entities = await _dao.getAllAdministrationRoutes();
     return entities
-        .map((entity) => logModels.AdministrationRoute(id: entity.id, name: entity.name))
+        .map(
+          (entity) =>
+              logModels.AdministrationRoute(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -390,7 +494,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.MedicineType>> getMedicineTypes() async {
     final entities = await _dao.getAllMedicineTypes();
     return entities
-        .map((entity) => logModels.MedicineType(id: entity.id, name: entity.name))
+        .map(
+          (entity) => logModels.MedicineType(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -398,11 +504,13 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.Medicine>> getMedicines() async {
     final entities = await _dao.getAllMedicines();
     return entities
-        .map((entity) => logModels.Medicine(
-              id: entity.id,
-              name: entity.name,
-              medicineTypeId: entity.medicineTypeId,
-            ))
+        .map(
+          (entity) => logModels.Medicine(
+            id: entity.id,
+            name: entity.name,
+            medicineTypeId: entity.medicineTypeId,
+          ),
+        )
         .toList();
   }
 
@@ -410,11 +518,13 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.Disease>> getDiseases() async {
     final entities = await _dao.getAllDiseases();
     return entities
-        .map((entity) => logModels.Disease(
-              id: entity.id,
-              name: entity.name,
-              status: entity.status,
-            ))
+        .map(
+          (entity) => logModels.Disease(
+            id: entity.id,
+            name: entity.name,
+            status: entity.status,
+          ),
+        )
         .toList();
   }
 
@@ -422,7 +532,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.DisposalType>> getDisposalTypes() async {
     final entities = await _dao.getAllDisposalTypes();
     return entities
-        .map((entity) => logModels.DisposalType(id: entity.id, name: entity.name))
+        .map(
+          (entity) => logModels.DisposalType(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -430,7 +542,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.MilkingMethod>> getMilkingMethods() async {
     final entities = await _dao.getAllMilkingMethods();
     return entities
-        .map((entity) => logModels.MilkingMethod(id: entity.id, name: entity.name))
+        .map(
+          (entity) => logModels.MilkingMethod(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -439,10 +553,31 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
     final entities = await _dao.getAllTeethClippingMethods();
     return entities
         .map(
-          (entity) => logModels.TeethClippingMethod(
-            id: entity.id,
-            name: entity.name,
-          ),
+          (entity) =>
+              logModels.TeethClippingMethod(id: entity.id, name: entity.name),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<logModels.TailDockingMethod>> getTailDockingMethods() async {
+    final entities = await _dao.getAllTailDockingMethods();
+    return entities
+        .map(
+          (entity) =>
+              logModels.TailDockingMethod(id: entity.id, name: entity.name),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<logModels.LivestockMarkingType>>
+  getLivestockMarkingTypes() async {
+    final entities = await _dao.getAllLivestockMarkingTypes();
+    return entities
+        .map(
+          (entity) =>
+              logModels.LivestockMarkingType(id: entity.id, name: entity.name),
         )
         .toList();
   }
@@ -451,54 +586,82 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<PrepuceReferenceOption>> getPrepuceReferenceOptions() async {
     final out = <PrepuceReferenceOption>[];
     final conditionTypes = await _dao.getAllPrepuceConditionTypes();
-    out.addAll(conditionTypes.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      conditionTypes.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.conditionType,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final severities = await _dao.getAllPrepuceSeverities();
-    out.addAll(severities.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      severities.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.severity,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final clinicalSigns = await _dao.getAllPrepuceClinicalSigns();
-    out.addAll(clinicalSigns.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      clinicalSigns.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.clinicalSign,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final causeRisks = await _dao.getAllPrepuceCauseRisks();
-    out.addAll(causeRisks.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      causeRisks.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.causeRisk,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final treatments = await _dao.getAllPrepuceTreatmentsGiven();
-    out.addAll(treatments.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      treatments.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.treatmentGiven,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final breeding = await _dao.getAllPrepuceBreedingStatuses();
-    out.addAll(breeding.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      breeding.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.breedingStatus,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     final healing = await _dao.getAllPrepuceHealingStatuses();
-    out.addAll(healing.map((e) => PrepuceReferenceOption(
+    out.addAll(
+      healing.map(
+        (e) => PrepuceReferenceOption(
           kind: PrepuceReferenceKind.healingStatus,
           referenceId: e.id,
           name: e.name,
           nameSw: e.nameSw,
-        )));
+        ),
+      ),
+    );
     return out;
   }
 
@@ -530,19 +693,28 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   @override
   Future<List<logModels.InseminationService>> getInseminationServices() async {
     final entities = await _dao.getAllInseminationServices();
-    log('📊 Repository: Fetched ${entities.length} insemination services from local DB');
+    log(
+      '📊 Repository: Fetched ${entities.length} insemination services from local DB',
+    );
     return entities
-        .map((entity) =>
-            logModels.InseminationService(id: entity.id, name: entity.name))
+        .map(
+          (entity) =>
+              logModels.InseminationService(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
   @override
   Future<List<logModels.SemenStrawType>> getSemenStrawTypes() async {
     final entities = await _dao.getAllSemenStrawTypes();
-    log('📊 Repository: Fetched ${entities.length} semen straw types from local DB');
+    log(
+      '📊 Repository: Fetched ${entities.length} semen straw types from local DB',
+    );
     return entities
-        .map((entity) => logModels.SemenStrawType(id: entity.id, name: entity.name))
+        .map(
+          (entity) =>
+              logModels.SemenStrawType(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -558,7 +730,9 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.CalvingType>> getCalvingTypes() async {
     final entities = await _dao.getAllCalvingTypes();
     return entities
-        .map((entity) => logModels.CalvingType(id: entity.id, name: entity.name))
+        .map(
+          (entity) => logModels.CalvingType(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -567,7 +741,8 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
     final entities = await _dao.getAllCalvingProblems();
     return entities
         .map(
-          (entity) => logModels.CalvingProblem(id: entity.id, name: entity.name),
+          (entity) =>
+              logModels.CalvingProblem(id: entity.id, name: entity.name),
         )
         .toList();
   }
@@ -604,10 +779,10 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
   Future<List<logModels.ReproductiveProblem>> getReproductiveProblems() async {
     final entities = await _dao.getAllReproductiveProblems();
     return entities
-        .map((entity) => logModels.ReproductiveProblem(
-              id: entity.id,
-              name: entity.name,
-            ))
+        .map(
+          (entity) =>
+              logModels.ReproductiveProblem(id: entity.id, name: entity.name),
+        )
         .toList();
   }
 
@@ -616,5 +791,3 @@ class LogAdditionalDataRepository implements LogAdditionalDataRepositoryInterfac
     await _dao.clearAll();
   }
 }
-
-
