@@ -30,6 +30,7 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/repository/vaccines_repository.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/milking_trend_graph.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/widgets/multi_farm_milking_trend_graph.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 
 class ViewEventsScreen extends StatefulWidget {
   final String title;
@@ -76,7 +77,8 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
         ),
       );
     }
-    if (widget.livestockName != null && widget.livestockName!.trim().isNotEmpty) {
+    if (widget.livestockName != null &&
+        widget.livestockName!.trim().isNotEmpty) {
       chips.add(
         _ContextChip(
           icon: Icons.pets_rounded,
@@ -95,24 +97,26 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
       future: _loadLogsWithReferences(context),
       builder: (context, snapshot) {
         PreferredSizeWidget buildAppBar(
-          int? total, 
+          int? total,
           List<dynamic>? logs,
           Map<String, String>? farmNamesMap,
         ) {
           final isMilking = widget.logType == EventLogTypes.milking;
-          final showSingleLivestockGraph = isMilking && 
-              widget.livestockUuid != null && 
+          final showSingleLivestockGraph =
+              isMilking &&
+              widget.livestockUuid != null &&
               widget.livestockUuid!.isNotEmpty &&
               logs != null;
-          final showMultiFarmGraph = isMilking && 
+          final showMultiFarmGraph =
+              isMilking &&
               (widget.livestockUuid == null || widget.livestockUuid!.isEmpty) &&
               logs != null &&
               logs.isNotEmpty &&
               farmNamesMap != null;
-          
+
           // Create a non-nullable reference for use in callbacks
           final nonNullFarmNamesMap = farmNamesMap;
-          
+
           return AppBar(
             backgroundColor: theme.scaffoldBackgroundColor,
             title: Text(displayTitle),
@@ -131,14 +135,14 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                         })
                         .cast<MilkingModel>()
                         .toList();
-                    
+
                     if (milkingLogs.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.noData)),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(l10n.noData)));
                       return;
                     }
-                    
+
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -147,10 +151,12 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                         initialChildSize: 0.9,
                         minChildSize: 0.5,
                         maxChildSize: 0.95,
-                        builder: (context, scrollController) => MilkingTrendGraph(
-                          milkingLogs: milkingLogs,
-                          livestockName: widget.livestockName ?? l10n.livestock,
-                        ),
+                        builder: (context, scrollController) =>
+                            MilkingTrendGraph(
+                              milkingLogs: milkingLogs,
+                              livestockName:
+                                  widget.livestockName ?? l10n.livestock,
+                            ),
                       ),
                     );
                   },
@@ -166,14 +172,14 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                         .where((log) => log is MilkingModel)
                         .cast<MilkingModel>()
                         .toList();
-                    
+
                     if (milkingLogs.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.noData)),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(l10n.noData)));
                       return;
                     }
-                    
+
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -182,10 +188,11 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                         initialChildSize: 0.9,
                         minChildSize: 0.5,
                         maxChildSize: 0.95,
-                        builder: (context, scrollController) => MultiFarmMilkingTrendGraph(
-                          milkingLogs: milkingLogs,
-                          farmNamesMap: nonNullFarmNamesMap ?? const {},
-                        ),
+                        builder: (context, scrollController) =>
+                            MultiFarmMilkingTrendGraph(
+                              milkingLogs: milkingLogs,
+                              farmNamesMap: nonNullFarmNamesMap ?? const {},
+                            ),
                       ),
                     );
                   },
@@ -242,7 +249,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
         final vaccineNamesMap = data['vaccineNames'] as Map<String, String>;
         final farmNamesMap = data['farmNames'] as Map<String, String>;
         final livestockNamesMap = data['livestockNames'] as Map<String, String>;
-        
+
         // Filter logs based on selected filter
         final filteredLogs = _filterLogs(allLogs);
         final totalLogs = filteredLogs.length;
@@ -265,17 +272,17 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
         final isMilking = widget.logType == EventLogTypes.milking;
         final milkingLogs = isMilking
             ? allLogs
-                .where((log) {
-                  if (log is! MilkingModel) return false;
-                  // If viewing a specific livestock, restrict summary to that livestock
-                  if (widget.livestockUuid == null ||
-                      widget.livestockUuid!.isEmpty) {
-                    return true;
-                  }
-                  return log.livestockUuid == widget.livestockUuid;
-                })
-                .cast<MilkingModel>()
-                .toList()
+                  .where((log) {
+                    if (log is! MilkingModel) return false;
+                    // If viewing a specific livestock, restrict summary to that livestock
+                    if (widget.livestockUuid == null ||
+                        widget.livestockUuid!.isEmpty) {
+                      return true;
+                    }
+                    return log.livestockUuid == widget.livestockUuid;
+                  })
+                  .cast<MilkingModel>()
+                  .toList()
             : <MilkingModel>[];
 
         return Scaffold(
@@ -307,7 +314,8 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                               references: logReferences,
                               vaccineNames: vaccineNamesMap,
                               farmName: farmNamesMap[log.farmUuid],
-                              livestockName: livestockNamesMap[log.livestockUuid],
+                              livestockName:
+                                  livestockNamesMap[log.livestockUuid],
                               showContextRows: !_isContextSpecific,
                             ),
                           );
@@ -334,8 +342,9 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
     final normalized = rawAmount.trim().toLowerCase();
 
     // Extract numeric value and optional unit (letters)
-    final match =
-        RegExp(r'^([0-9]*\.?[0-9]+)\s*([a-zA-Z]*)').firstMatch(normalized);
+    final match = RegExp(
+      r'^([0-9]*\.?[0-9]+)\s*([a-zA-Z]*)',
+    ).firstMatch(normalized);
     if (match == null) {
       return double.tryParse(normalized) ?? 0;
     }
@@ -356,7 +365,7 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
   DateTime? _getEffectiveDate(dynamic log) {
     final eventDateStr = log.eventDate;
     final createdAtStr = log.createdAt;
-    
+
     if (eventDateStr != null && eventDateStr.trim().isNotEmpty) {
       return DateTime.tryParse(eventDateStr);
     }
@@ -368,65 +377,79 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
 
   List<dynamic> _filterLogs(List<dynamic> logs) {
     if (_selectedFilter == 'all') return logs;
-    
+
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
     final todayEnd = todayStart.add(const Duration(days: 1));
     final weekStart = todayStart.subtract(Duration(days: now.weekday - 1));
-    
+
     return logs.where((log) {
       // Use eventDate ?? createdAt for all log types
       final effectiveDate = _getEffectiveDate(log);
       if (effectiveDate == null) return false;
-      final logDate = DateTime(effectiveDate.year, effectiveDate.month, effectiveDate.day);
-      
+      final logDate = DateTime(
+        effectiveDate.year,
+        effectiveDate.month,
+        effectiveDate.day,
+      );
+
       if (_selectedFilter == 'today') {
-        return logDate.isAtSameMomentAs(todayStart) || 
-               (logDate.isAfter(todayStart.subtract(const Duration(milliseconds: 1))) &&
+        return logDate.isAtSameMomentAs(todayStart) ||
+            (logDate.isAfter(
+                  todayStart.subtract(const Duration(milliseconds: 1)),
+                ) &&
                 logDate.isBefore(todayEnd));
       } else if (_selectedFilter == 'thisWeek') {
         return logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-               logDate.isBefore(now.add(const Duration(days: 1)));
+            logDate.isBefore(now.add(const Duration(days: 1)));
       }
       return true;
     }).toList();
   }
 
-  Widget _buildMilkingSummary(BuildContext context, List<MilkingModel> milkingLogs) {
+  Widget _buildMilkingSummary(
+    BuildContext context,
+    List<MilkingModel> milkingLogs,
+  ) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
     final weekStart = todayStart.subtract(Duration(days: now.weekday - 1));
-    
+
     double totalLitres = 0;
     double todayLitres = 0;
     double thisWeekLitres = 0;
-    
+
     for (final milking in milkingLogs) {
       // Use eventDate ?? createdAt
-      final effectiveDate = milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
+      final effectiveDate =
+          milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
           ? DateTime.tryParse(milking.eventDate!)
           : DateTime.tryParse(milking.createdAt);
       if (effectiveDate == null) continue;
-      
-      final logDate = DateTime(effectiveDate.year, effectiveDate.month, effectiveDate.day);
+
+      final logDate = DateTime(
+        effectiveDate.year,
+        effectiveDate.month,
+        effectiveDate.day,
+      );
       final amount = _parseAmountToLitres(milking.amount);
-      
+
       totalLitres += amount;
-      
+
       if (logDate.year == todayStart.year &&
           logDate.month == todayStart.month &&
           logDate.day == todayStart.day) {
         todayLitres += amount;
       }
-      
+
       if (logDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
           logDate.isBefore(now.add(const Duration(days: 1)))) {
         thisWeekLitres += amount;
       }
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
@@ -463,7 +486,9 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                   isSelected: _selectedFilter == 'today',
                   onTap: () {
                     setState(() {
-                      _selectedFilter = _selectedFilter == 'today' ? 'all' : 'today';
+                      _selectedFilter = _selectedFilter == 'today'
+                          ? 'all'
+                          : 'today';
                     });
                   },
                 ),
@@ -477,7 +502,9 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
                   isSelected: _selectedFilter == 'thisWeek',
                   onTap: () {
                     setState(() {
-                      _selectedFilter = _selectedFilter == 'thisWeek' ? 'all' : 'thisWeek';
+                      _selectedFilter = _selectedFilter == 'thisWeek'
+                          ? 'all'
+                          : 'thisWeek';
                     });
                   },
                 ),
@@ -496,10 +523,18 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
       context,
       listen: false,
     );
+    final livestockFallbackPrefix =
+        AppLocalizations.of(context)?.livestock ?? 'Livestock';
     await logReferences.ensureLoaded();
 
     // Load vaccines for name resolution
-    if (!mounted) return {'logs': <dynamic>[], 'vaccineNames': <String, String>{}, 'farmNames': <String, String>{}, 'livestockNames': <String, String>{}};
+    if (!mounted)
+      return {
+        'logs': <dynamic>[],
+        'vaccineNames': <String, String>{},
+        'farmNames': <String, String>{},
+        'livestockNames': <String, String>{},
+      };
     final database = Provider.of<AppDatabase>(context, listen: false);
     final vaccinesRepo = VaccinesRepository(database);
     final vaccines = await vaccinesRepo.getVaccines();
@@ -546,37 +581,11 @@ class _ViewEventsScreenState extends State<ViewEventsScreen> {
           log.livestockUuid,
         );
         if (livestock != null) {
-          // Use LivestockHelper if imported, otherwise just name.
-          // Since we can't easily import LivestockHelper here due to context,
-          // we'll format it manually or rely on a simple string.
-          // Better: Import LivestockHelper at top if possible.
-          // Assuming LivestockHelper is available or we duplicate logic for now.
-          // Since I can't see the imports, I will assume basic name for now,
-          // OR I can try to import LivestockHelper in the next step if missing.
-          // Note: The user requested "name-<...ids??>", so I should try to mimic that.
-
-          String displayName = livestock.name;
-          String? id = livestock.dummyTagId;
-          if (id == null ||
-              id.trim().isEmpty ||
-              id.trim().toLowerCase() == 'null') {
-            id = livestock.rfidTagId;
-          }
-          if (id == null ||
-              id.trim().isEmpty ||
-              id.trim().toLowerCase() == 'null') {
-            id = livestock.barcodeTagId;
-          }
-          if (id == null ||
-              id.trim().isEmpty ||
-              id.trim().toLowerCase() == 'null') {
-            id = livestock.identificationNumber;
-          }
-          if (id.trim().isNotEmpty &&
-              id.trim().toLowerCase() != 'null') {
-            displayName = '${livestock.name}-${id.trim()}';
-          }
-          livestockNamesMap[log.livestockUuid] = displayName;
+          livestockNamesMap[log.livestockUuid] =
+              LivestockHelper.getDisplayLabel(
+                livestock,
+                fallbackPrefix: livestockFallbackPrefix,
+              );
         }
       }
     }
@@ -671,7 +680,8 @@ class _EventLogCard extends StatelessWidget {
         );
         addRow(l10n.amount, feeding.amount);
         addRow(l10n.remarks, feeding.remarks);
-        createdDate = feeding.eventDate != null && feeding.eventDate!.trim().isNotEmpty
+        createdDate =
+            feeding.eventDate != null && feeding.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(feeding.eventDate!)
             : DateTime.tryParse(feeding.createdAt);
         break;
@@ -689,7 +699,8 @@ class _EventLogCard extends StatelessWidget {
               : change.updatedAt,
         );
         addRow(l10n.remarks, change.remarks);
-        createdDate = change.eventDate != null && change.eventDate!.trim().isNotEmpty
+        createdDate =
+            change.eventDate != null && change.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(change.eventDate!)
             : DateTime.tryParse(change.createdAt);
         break;
@@ -722,7 +733,9 @@ class _EventLogCard extends StatelessWidget {
                 : deworming.nextAdministrationDate!,
           );
         }
-        createdDate = deworming.eventDate != null && deworming.eventDate!.trim().isNotEmpty
+        createdDate =
+            deworming.eventDate != null &&
+                deworming.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(deworming.eventDate!)
             : DateTime.tryParse(deworming.createdAt);
         break;
@@ -766,7 +779,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.remarks, birthEvent.remarks);
         addRow(l10n.status, birthEvent.status);
-        createdDate = birthEvent.eventDate != null && birthEvent.eventDate!.trim().isNotEmpty
+        createdDate =
+            birthEvent.eventDate != null &&
+                birthEvent.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(birthEvent.eventDate!)
             : DateTime.tryParse(birthEvent.createdAt);
         break;
@@ -789,7 +804,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.remarks, abortedPregnancy.remarks);
         addRow(l10n.status, abortedPregnancy.status);
-        createdDate = abortedPregnancy.eventDate != null && abortedPregnancy.eventDate!.trim().isNotEmpty
+        createdDate =
+            abortedPregnancy.eventDate != null &&
+                abortedPregnancy.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(abortedPregnancy.eventDate!)
             : DateTime.tryParse(abortedPregnancy.createdAt);
         break;
@@ -824,7 +841,9 @@ class _EventLogCard extends StatelessWidget {
           );
         }
         addRow(l10n.remarks, treatment.remarks);
-        createdDate = treatment.eventDate != null && treatment.eventDate!.trim().isNotEmpty
+        createdDate =
+            treatment.eventDate != null &&
+                treatment.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(treatment.eventDate!)
             : DateTime.tryParse(treatment.createdAt);
         break;
@@ -852,7 +871,9 @@ class _EventLogCard extends StatelessWidget {
           addRow(l10n.extensionOfficerLicense, vaccination.extensionOfficerId);
         }
         addRow(l10n.status, vaccination.status);
-        createdDate = vaccination.eventDate != null && vaccination.eventDate!.trim().isNotEmpty
+        createdDate =
+            vaccination.eventDate != null &&
+                vaccination.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(vaccination.eventDate!)
             : DateTime.tryParse(vaccination.createdAt);
         break;
@@ -876,7 +897,8 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.buyerName, disposal.buyerName);
         addRow(l10n.status, disposal.status);
-        createdDate = disposal.eventDate != null && disposal.eventDate!.trim().isNotEmpty
+        createdDate =
+            disposal.eventDate != null && disposal.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(disposal.eventDate!)
             : DateTime.tryParse(disposal.createdAt);
         break;
@@ -906,7 +928,8 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.session, milking.session);
         addRow(l10n.status, milking.status);
-        createdDate = milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
+        createdDate =
+            milking.eventDate != null && milking.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(milking.eventDate!)
             : DateTime.tryParse(milking.createdAt);
         break;
@@ -926,7 +949,8 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.reason, dryoff.reason);
         addRow(l10n.remarks, dryoff.remarks);
-        createdDate = dryoff.eventDate != null && dryoff.eventDate!.trim().isNotEmpty
+        createdDate =
+            dryoff.eventDate != null && dryoff.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(dryoff.eventDate!)
             : DateTime.tryParse(dryoff.createdAt);
         break;
@@ -984,7 +1008,9 @@ class _EventLogCard extends StatelessWidget {
         addRow(l10n.aiCode, insemination.aiCode);
         addRow(l10n.manufacturerName, insemination.manufacturerName);
         addRow(l10n.semenSupplier, insemination.semenSupplier);
-        createdDate = insemination.eventDate != null && insemination.eventDate!.trim().isNotEmpty
+        createdDate =
+            insemination.eventDate != null &&
+                insemination.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(insemination.eventDate!)
             : DateTime.tryParse(insemination.createdAt);
         break;
@@ -1008,7 +1034,9 @@ class _EventLogCard extends StatelessWidget {
         }
         addRow(l10n.status, pregnancy.status);
         addRow(l10n.remarks, pregnancy.remarks);
-        createdDate = pregnancy.eventDate != null && pregnancy.eventDate!.trim().isNotEmpty
+        createdDate =
+            pregnancy.eventDate != null &&
+                pregnancy.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(pregnancy.eventDate!)
             : DateTime.tryParse(pregnancy.createdAt);
         break;
@@ -1041,7 +1069,8 @@ class _EventLogCard extends StatelessWidget {
         if (transfer.status != null && transfer.status!.trim().isNotEmpty) {
           addRow(l10n.status, transfer.status);
         }
-        createdDate = transfer.eventDate != null && transfer.eventDate!.trim().isNotEmpty
+        createdDate =
+            transfer.eventDate != null && transfer.eventDate!.trim().isNotEmpty
             ? DateTime.tryParse(transfer.eventDate!)
             : DateTime.tryParse(transfer.createdAt);
         break;
@@ -1583,10 +1612,7 @@ class _MilkingSummaryCard extends StatelessWidget {
               ? theme.colorScheme.primary.withOpacity(0.1)
               : surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: borderColor,
-            width: isSelected ? 2 : 1,
-          ),
+          border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

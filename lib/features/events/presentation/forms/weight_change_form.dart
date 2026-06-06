@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/weight_input_with_bluetooth.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/weight_change_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
@@ -125,6 +126,29 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     _remarksController.text = weightChange.remarks ?? '';
   }
 
+  Livestock? _currentSelectedLivestock() {
+    final uuid = _selectedLivestockUuid;
+    if (uuid == null || uuid.isEmpty) return null;
+    for (final item in _farmLivestock) {
+      if (item.uuid == uuid) return item;
+    }
+    return null;
+  }
+
+  void _prefillOldWeightFromSelectedLivestock({bool force = false}) {
+    if (widget.isEditMode && widget.weightChange != null) return;
+    if (!force && _oldWeightController.text.trim().isNotEmpty) return;
+
+    final livestock = _currentSelectedLivestock();
+    if (livestock == null) return;
+
+    final value = livestock.weightAsOnRegistration;
+    if (value <= 0) return;
+
+    final text = value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+    _oldWeightController.text = text;
+  }
+
   Future<void> _initializeContext() async {
     setState(() => _isLoadingContext = true);
     try {
@@ -173,6 +197,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
           _selectedBulkLivestock = const [];
         }
       });
+      _prefillOldWeightFromSelectedLivestock(force: true);
     } catch (e) {
       debugPrint('❌ Failed to load context data: $e');
     } finally {
@@ -229,6 +254,7 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
     setState(() {
       _selectedLivestockUuid = value;
     });
+    _prefillOldWeightFromSelectedLivestock(force: true);
   }
 
   Future<void> _openBulkLivestockSelector(AppLocalizations l10n) async {
@@ -362,9 +388,10 @@ class _WeightChangeFormScreenState extends State<WeightChangeFormScreen> {
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: LivestockHelper.getDisplayLabel(
+              item,
+              fallbackPrefix: l10n.livestock,
+            ),
           ),
         )
         .toList();

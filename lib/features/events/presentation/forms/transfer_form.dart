@@ -16,6 +16,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/transfer_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
@@ -390,9 +391,10 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: LivestockHelper.getDisplayLabel(
+              item,
+              fallbackPrefix: l10n.livestock,
+            ),
           ),
         )
         .toList();
@@ -904,6 +906,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     final remarks = _remarksController.text.trim().isEmpty
         ? null
         : _remarksController.text.trim();
+    final eventDateIso = _selectedEventDate?.toIso8601String();
     final transferDateIso =
         _selectedTransferDate?.toIso8601String() ??
         DateTime.now().toIso8601String();
@@ -911,7 +914,6 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     try {
       if (widget.isEditMode && !_isBulk) {
         final existing = widget.transfer!;
-        final eventDateIso = _selectedEventDate?.toIso8601String();
         final updatedModel = existing.copyWith(
           farmUuid: selectedFarmUuid,
           livestockUuid: livestockUuids.first,
@@ -944,6 +946,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
           transporterId: transporterId,
           reason: reason,
           price: price,
+          eventDate: eventDateIso,
           transferDate: transferDateIso,
           remarks: remarks,
           status: _selectedStatus,
@@ -1022,9 +1025,6 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
               ? Colors.orange.withOpacity(0.15)
               : Colors.orange.withOpacity(0.1))
         : (isDark ? theme.cardColor.withOpacity(0.6) : Colors.white);
-    final borderColor = tone == InfoBannerTone.warning
-        ? Colors.orange.withOpacity(0.3)
-        : theme.colorScheme.outline.withOpacity(0.12);
     final iconColor = tone == InfoBannerTone.warning
         ? Colors.orange
         : theme.colorScheme.primary;

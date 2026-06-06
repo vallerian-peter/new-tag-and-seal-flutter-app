@@ -9,9 +9,9 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
-import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/milking_model.dart';
@@ -22,7 +22,6 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
-import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 class MilkingFormScreen extends StatefulWidget {
   final MilkingModel? milking;
@@ -310,9 +309,10 @@ class _MilkingFormScreenState extends State<MilkingFormScreen> {
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: LivestockHelper.getDisplayLabel(
+              item,
+              fallbackPrefix: l10n.livestock,
+            ),
           ),
         )
         .toList();

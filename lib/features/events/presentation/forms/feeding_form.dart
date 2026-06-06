@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/feeding_model.dart';
@@ -321,9 +322,10 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: LivestockHelper.getDisplayLabel(
+              item,
+              fallbackPrefix: l10n.livestock,
+            ),
           ),
         )
         .toList();
@@ -529,7 +531,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
         Row(
           children: [
             Expanded(
-              flex: 2,
+              flex: 1,
               child: CustomTextField(
                 controller: _amountController,
                 label: l10n.amount,
@@ -549,6 +551,7 @@ class _FeedingFormScreenState extends State<FeedingFormScreen> {
             ),
             const SizedBox(width: 12),
             Expanded(
+              flex: 1,
               child: CustomDropdown<String>(
                 label: l10n.unit,
                 hint: l10n.unit,

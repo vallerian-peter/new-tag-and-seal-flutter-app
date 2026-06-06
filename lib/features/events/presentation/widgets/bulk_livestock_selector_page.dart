@@ -19,7 +19,8 @@ class BulkLivestockSelectorPage extends StatefulWidget {
   });
 
   @override
-  State<BulkLivestockSelectorPage> createState() => _BulkLivestockSelectorPageState();
+  State<BulkLivestockSelectorPage> createState() =>
+      _BulkLivestockSelectorPageState();
 }
 
 class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
@@ -83,9 +84,12 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
     if (_searchQuery.isNotEmpty) {
       final lowerQuery = _searchQuery.toLowerCase();
       filtered = filtered.where((livestock) {
-        final nameMatches = livestock.name.toLowerCase().contains(lowerQuery);
-        final identifierMatches =
-            _resolveIdentifier(livestock).toLowerCase().contains(lowerQuery);
+        final nameMatches = LivestockHelper.getDisplayName(
+          livestock,
+        ).toLowerCase().contains(lowerQuery);
+        final identifierMatches = _resolveIdentifier(
+          livestock,
+        ).toLowerCase().contains(lowerQuery);
         final uuidMatches = livestock.uuid.toLowerCase().contains(lowerQuery);
         return nameMatches || identifierMatches || uuidMatches;
       });
@@ -98,7 +102,11 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
     }
 
     final list = filtered.toList()
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort(
+        (a, b) => LivestockHelper.getDisplayName(a).toLowerCase().compareTo(
+          LivestockHelper.getDisplayName(b).toLowerCase(),
+        ),
+      );
     if (_sortOption == _SortOption.descending) {
       return list.reversed.toList();
     }
@@ -110,7 +118,7 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
     if (LivestockHelper.isNotActive(livestock)) {
       return;
     }
-    
+
     setState(() {
       if (_selectedLivestockUuids.contains(livestock.uuid)) {
         _selectedLivestockUuids.remove(livestock.uuid);
@@ -119,9 +127,11 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
       }
     });
   }
-  
+
   List<Livestock> get _activeLivestock {
-    return _filteredLivestock.where((l) => !LivestockHelper.isNotActive(l)).toList();
+    return _filteredLivestock
+        .where((l) => !LivestockHelper.isNotActive(l))
+        .toList();
   }
 
   String _resolveIdentifier(Livestock livestock) {
@@ -175,8 +185,10 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
     final theme = Theme.of(context);
 
     final genderLockedToFemale =
-        widget.lockGenderFilter && widget.genderFilter?.toLowerCase() == 'female';
-    final genderSelectionLocked = widget.lockGenderFilter && widget.genderFilter != null;
+        widget.lockGenderFilter &&
+        widget.genderFilter?.toLowerCase() == 'female';
+    final genderSelectionLocked =
+        widget.lockGenderFilter && widget.genderFilter != null;
 
     void setGenderFilter(String? value) {
       if (genderSelectionLocked) return;
@@ -233,16 +245,19 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: CheckboxListTile(
-                    value: _activeLivestock.isNotEmpty &&
-                        _selectedLivestockUuids.length == _activeLivestock.length,
+                    value:
+                        _activeLivestock.isNotEmpty &&
+                        _selectedLivestockUuids.length ==
+                            _activeLivestock.length,
                     onChanged: _activeLivestock.isEmpty
                         ? null
                         : (value) {
                             setState(() {
                               if (value == true) {
                                 // Only select active livestock
-                                _selectedLivestockUuids =
-                                    _activeLivestock.map((e) => e.uuid).toSet();
+                                _selectedLivestockUuids = _activeLivestock
+                                    .map((e) => e.uuid)
+                                    .toSet();
                               } else {
                                 _selectedLivestockUuids.clear();
                               }
@@ -278,7 +293,8 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                         label: l10n.male,
                         selected: _genderFilter == 'male',
                         onSelected: (_) => setGenderFilter('male'),
-                        enabled: !genderLockedToFemale && !genderSelectionLocked,
+                        enabled:
+                            !genderLockedToFemale && !genderSelectionLocked,
                       ),
                       _FilterChip(
                         label: l10n.female,
@@ -294,7 +310,8 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                       _FilterChip(
                         label: 'Z-A',
                         selected: _sortOption == _SortOption.descending,
-                        onSelected: (_) => setSortOption(_SortOption.descending),
+                        onSelected: (_) =>
+                            setSortOption(_SortOption.descending),
                       ),
                     ],
                   ),
@@ -311,15 +328,24 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                         )
                       : ListView.separated(
                           itemCount: _filteredLivestock.length,
-                          separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[200]),
+                          separatorBuilder: (_, __) =>
+                              Divider(height: 1, color: Colors.grey[200]),
                           itemBuilder: (context, index) {
                             final livestock = _filteredLivestock[index];
-                            final isNotActive = LivestockHelper.isNotActive(livestock);
-                            final isSelected =
-                                _selectedLivestockUuids.contains(livestock.uuid);
+                            final isNotActive = LivestockHelper.isNotActive(
+                              livestock,
+                            );
+                            final isSelected = _selectedLivestockUuids.contains(
+                              livestock.uuid,
+                            );
                             final identifier = _resolveIdentifier(livestock);
-                            final farmName = _farmNames[livestock.farmUuid] ?? '';
+                            final farmName =
+                                _farmNames[livestock.farmUuid] ?? '';
                             final age = _formatAge(livestock.dateOfBirth);
+                            final displayName = LivestockHelper.getDisplayLabel(
+                              livestock,
+                              fallbackPrefix: l10n.livestock,
+                            );
                             final subtitleParts = [
                               if (farmName.isNotEmpty) farmName,
                               if (age.isNotEmpty) age,
@@ -330,26 +356,29 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                             return Opacity(
                               opacity: isNotActive ? 0.6 : 1.0,
                               child: ListTile(
-                                onTap: isNotActive ? null : () => _toggleSelection(livestock),
+                                onTap: isNotActive
+                                    ? null
+                                    : () => _toggleSelection(livestock),
                                 enabled: !isNotActive,
                                 leading: Checkbox(
                                   value: isSelected,
-                                  onChanged: isNotActive ? null : (_) => _toggleSelection(livestock),
+                                  onChanged: isNotActive
+                                      ? null
+                                      : (_) => _toggleSelection(livestock),
                                 ),
                                 title: Row(
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        livestock.name.isNotEmpty
-                                            ? livestock.name
-                                            : '${l10n.livestock} #${livestock.id}',
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: isNotActive
-                                              ? Colors.grey[500]
-                                              : theme.primaryColor,
-                                        ),
+                                        displayName,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15,
+                                              color: isNotActive
+                                                  ? Colors.grey[500]
+                                                  : theme.primaryColor,
+                                            ),
                                       ),
                                     ),
                                     // Not Active Badge
@@ -362,7 +391,9 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.red.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                           border: Border.all(
                                             color: Colors.red.withOpacity(0.3),
                                             width: 1,
@@ -393,13 +424,15 @@ class _BulkLivestockSelectorPageState extends State<BulkLivestockSelectorPage> {
                                 ),
                                 subtitle: subtitleParts.isEmpty
                                     ? null
-                                    : Text(subtitleParts.join(' • '), 
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: isNotActive
-                                            ? Colors.grey[400]
-                                            : Colors.grey[600],
+                                    : Text(
+                                        subtitleParts.join(' • '),
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: isNotActive
+                                                  ? Colors.grey[400]
+                                                  : Colors.grey[600],
+                                            ),
                                       ),
-                                    ),
                                 trailing: isSelected
                                     ? Icon(
                                         Icons.check_circle,

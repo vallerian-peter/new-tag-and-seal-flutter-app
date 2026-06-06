@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
-class CustomStepper extends StatelessWidget {
+class CustomStepper extends StatefulWidget {
   final int currentStep;
   final List<StepperStep> steps;
   final VoidCallback? onStepContinue;
@@ -25,6 +27,88 @@ class CustomStepper extends StatelessWidget {
   });
 
   @override
+  State<CustomStepper> createState() => _CustomStepperState();
+}
+
+class _CustomStepperState extends State<CustomStepper> {
+  static const _controlsHeight = 104.0;
+  static const _keyboardGap = 16.0;
+  final _scrollController = ScrollController();
+  double _lastBottomInset = 0;
+  bool _scrollToFocusedFieldQueued = false;
+  Timer? _scrollToFocusedFieldTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    FocusManager.instance.addListener(_handleFocusChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    if (bottomInset == _lastBottomInset) return;
+
+    _lastBottomInset = bottomInset;
+    if (bottomInset > 0) {
+      _scheduleFocusedInputVisibility(delay: const Duration(milliseconds: 280));
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomStepper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentStep != widget.currentStep) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_scrollController.hasClients) return;
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeListener(_handleFocusChange);
+    _scrollToFocusedFieldTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handleFocusChange() {
+    if (!mounted || _lastBottomInset <= 0) return;
+    _scheduleFocusedInputVisibility(delay: const Duration(milliseconds: 120));
+  }
+
+  void _scheduleFocusedInputVisibility({required Duration delay}) {
+    _scrollToFocusedFieldTimer?.cancel();
+    _scrollToFocusedFieldTimer = Timer(delay, _ensureFocusedInputIsVisible);
+  }
+
+  void _ensureFocusedInputIsVisible() {
+    if (_scrollToFocusedFieldQueued) return;
+    _scrollToFocusedFieldQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToFocusedFieldQueued = false;
+      if (!mounted) return;
+      final focusedContext = FocusManager.instance.primaryFocus?.context;
+      if (focusedContext == null) return;
+
+      Scrollable.ensureVisible(
+        focusedContext,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        alignment: 0.28,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark
@@ -43,13 +127,16 @@ class CustomStepper extends StatelessWidget {
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    const controlsHeight = 104.0;
+    final keyboardSpacing = bottomInset > 0 ? _keyboardGap : 0.0;
 
     return Stack(
       children: [
         SingleChildScrollView(
+          controller: _scrollController,
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.only(bottom: bottomInset + controlsHeight + 24),
+          padding: EdgeInsets.only(
+            bottom: bottomInset + keyboardSpacing + _controlsHeight + 24,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,12 +164,12 @@ class CustomStepper extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
-                          children: steps.asMap().entries.map((entry) {
+                          children: widget.steps.asMap().entries.map((entry) {
                             final index = entry.key;
                             final step = entry.value;
-                            final isActive = currentStep == index;
-                            final isCompleted = currentStep > index;
-                            final isLast = index == steps.length - 1;
+                            final isActive = widget.currentStep == index;
+                            final isCompleted = widget.currentStep > index;
+                            final isLast = index == widget.steps.length - 1;
 
                             return Row(
                               children: [
@@ -124,16 +211,18 @@ class CustomStepper extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: shadow,
                   ),
-                  child: steps[currentStep].content,
+                  child: widget.steps[widget.currentStep].content,
                 ),
               ),
             ],
           ),
         ),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
           left: 0,
           right: 0,
-          bottom: bottomInset,
+          bottom: bottomInset + keyboardSpacing,
           child: _buildStepControls(
             context,
             cardColor,
@@ -229,7 +318,7 @@ class CustomStepper extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
-        color: isDark ? Color.fromARGB(255, 85, 85, 85) : cardColor,
+        color: isDark ? const Color.fromARGB(255, 85, 85, 85) : cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         border: Border(
           top: BorderSide(
@@ -251,10 +340,10 @@ class CustomStepper extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 88),
       child: Row(
         children: [
-          if (currentStep > 0)
+          if (widget.currentStep > 0)
             Expanded(
               child: OutlinedButton(
-                onPressed: onStepCancel,
+                onPressed: widget.onStepCancel,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(
@@ -267,7 +356,7 @@ class CustomStepper extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  backButtonText ?? 'Back',
+                  widget.backButtonText ?? 'Back',
                   style: TextStyle(
                     fontSize: Constants.textSize,
                     fontWeight: FontWeight.w600,
@@ -276,10 +365,10 @@ class CustomStepper extends StatelessWidget {
                 ),
               ),
             ),
-          if (currentStep > 0) const SizedBox(width: 12),
+          if (widget.currentStep > 0) const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: isLoading ? null : onStepContinue,
+              onPressed: widget.isLoading ? null : widget.onStepContinue,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: primary,
@@ -289,7 +378,7 @@ class CustomStepper extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: isLoading
+              child: widget.isLoading
                   ? SizedBox(
                       height: 20,
                       width: 20,
@@ -301,11 +390,11 @@ class CustomStepper extends StatelessWidget {
                       ),
                     )
                   : Text(
-                      currentStep == steps.length - 1
-                          ? (finalStepButtonText ??
-                                continueButtonText ??
+                      widget.currentStep == widget.steps.length - 1
+                          ? (widget.finalStepButtonText ??
+                                widget.continueButtonText ??
                                 'Register')
-                          : (continueButtonText ?? 'Continue'),
+                          : (widget.continueButtonText ?? 'Continue'),
                       style: TextStyle(
                         fontSize: Constants.textSize,
                         fontWeight: FontWeight.w600,

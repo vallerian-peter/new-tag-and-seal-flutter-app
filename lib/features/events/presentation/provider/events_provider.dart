@@ -36,8 +36,8 @@ class EventsProvider extends ChangeNotifier {
   EventsProvider({
     required EventsRepositoryInterface eventsRepository,
     NotificationProvider? notificationProvider,
-  })  : _eventsRepository = eventsRepository,
-        _notificationProvider = notificationProvider;
+  }) : _eventsRepository = eventsRepository,
+       _notificationProvider = notificationProvider;
 
   bool _isLoading = false;
   String? _error;
@@ -88,7 +88,8 @@ class EventsProvider extends ChangeNotifier {
   List<VaccinationModel> get allVaccinations => _allVaccinations;
   List<DisposalModel> get allDisposals => _allDisposals;
   List<BirthEventModel> get allBirthEvents => _allBirthEvents;
-  List<AbortedPregnancyModel> get allAbortedPregnancies => _allAbortedPregnancies;
+  List<AbortedPregnancyModel> get allAbortedPregnancies =>
+      _allAbortedPregnancies;
   List<MilkingModel> get milkings => _milkings;
   List<PregnancyModel> get pregnancies => _pregnancies;
   List<InseminationModel> get inseminations => _inseminations;
@@ -105,16 +106,15 @@ class EventsProvider extends ChangeNotifier {
   List<LivestockMarkingModel> get allLivestockMarkings => _allLivestockMarkings;
   List<StageChangeModel> get allStageChanges => _allStageChanges;
   List<PrepuceConditionModel> get allPrepuceConditions => _allPrepuceConditions;
-  
+
   Future<Map<String, int>> loadLogCounts({
     String? farmUuid,
     required String livestockUuid,
-  }) =>
-      _eventsRepository.getLogCounts(
-        farmUuid: farmUuid,
-        livestockUuid: livestockUuid,
-      );
-      
+  }) => _eventsRepository.getLogCounts(
+    farmUuid: farmUuid,
+    livestockUuid: livestockUuid,
+  );
+
   Future<EventSummary> getEventSummary() => _eventsRepository.getEventSummary();
 
   Future<void> loadEventsForLivestock({
@@ -193,7 +193,8 @@ class EventsProvider extends ChangeNotifier {
       _allVaccinations = await _eventsRepository.getAllVaccinations();
       _allDisposals = await _eventsRepository.getAllDisposals();
       _allBirthEvents = await _eventsRepository.getAllBirthEvents();
-      _allAbortedPregnancies = await _eventsRepository.getAllAbortedPregnancies();
+      _allAbortedPregnancies = await _eventsRepository
+          .getAllAbortedPregnancies();
       _allMilkings = await _eventsRepository.getAllMilkings();
       _allPregnancies = await _eventsRepository.getAllPregnancies();
       _allInseminations = await _eventsRepository.getAllInseminations();
@@ -240,10 +241,10 @@ class EventsProvider extends ChangeNotifier {
       _feedings = [..._feedings, created];
       _allFeedings = [..._allFeedings, created];
       notifyListeners();
-      
+
       // Create notification for next feeding time if it's in the future
       await _createFeedingNotification(created);
-      
+
       return created;
     } catch (e) {
       log('❌ Failed to create feeding log locally: $e');
@@ -252,7 +253,6 @@ class EventsProvider extends ChangeNotifier {
       rethrow;
     }
   }
-
 
   Future<FeedingModel> updateFeeding(FeedingModel model) async {
     try {
@@ -264,10 +264,10 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
-      
+
       // Update notification for next feeding time if it changed
       await _createFeedingNotification(updated);
-      
+
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -314,10 +314,10 @@ class EventsProvider extends ChangeNotifier {
       _dewormings = [..._dewormings, created];
       _allDewormings = [..._allDewormings, created];
       notifyListeners();
-      
+
       // Create notification for next deworming date if it's in the future
       await _createDewormingNotification(created);
-      
+
       return created;
     } catch (e) {
       _error = e.toString();
@@ -336,10 +336,10 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
-      
+
       // Update notification for next administration date if it changed
       await _createDewormingNotification(updated);
-      
+
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -354,10 +354,10 @@ class EventsProvider extends ChangeNotifier {
       _treatments = [..._treatments, created];
       _allTreatments = [..._allTreatments, created];
       notifyListeners();
-      
+
       // Create notification for next treatment date if it's in the future
       await _createTreatmentNotification(created);
-      
+
       return created;
     } catch (e) {
       _error = e.toString();
@@ -376,10 +376,10 @@ class EventsProvider extends ChangeNotifier {
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
       notifyListeners();
-      
+
       // Update notification for next treatment date if it changed
       await _createTreatmentNotification(updated);
-      
+
       return updated;
     } catch (e) {
       _error = e.toString();
@@ -523,7 +523,9 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<IronInjectionModel> updateIronInjection(IronInjectionModel model) async {
+  Future<IronInjectionModel> updateIronInjection(
+    IronInjectionModel model,
+  ) async {
     try {
       final updated = await _eventsRepository.updateIronInjectionLocally(model);
       _allIronInjections = _allIronInjections
@@ -619,8 +621,9 @@ class EventsProvider extends ChangeNotifier {
     PrepuceConditionModel model,
   ) async {
     try {
-      final updated =
-          await _eventsRepository.updatePrepuceConditionLocally(model);
+      final updated = await _eventsRepository.updatePrepuceConditionLocally(
+        model,
+      );
       _allPrepuceConditions = _allPrepuceConditions
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
@@ -639,6 +642,7 @@ class EventsProvider extends ChangeNotifier {
     required String livestockUuid,
   }) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
 
     AlertDialogs.showLoading(
       context: context,
@@ -646,6 +650,7 @@ class EventsProvider extends ChangeNotifier {
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
 
     try {
       await loadEventsForLivestock(
@@ -655,7 +660,10 @@ class EventsProvider extends ChangeNotifier {
       _error = null;
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -667,7 +675,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -681,6 +692,7 @@ class EventsProvider extends ChangeNotifier {
 
   Future<void> loadAllEventsWithDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
 
     AlertDialogs.showLoading(
       context: context,
@@ -688,13 +700,17 @@ class EventsProvider extends ChangeNotifier {
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
 
     try {
       await loadAllEvents();
       _error = null;
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -706,7 +722,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -734,6 +753,7 @@ class EventsProvider extends ChangeNotifier {
     FeedingModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
 
     AlertDialogs.showLoading(
       context: context,
@@ -741,13 +761,17 @@ class EventsProvider extends ChangeNotifier {
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
 
     try {
       final created = await addFeeding(model);
       _error = null;
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -761,7 +785,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -785,6 +812,7 @@ class EventsProvider extends ChangeNotifier {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     if (livestockUuids.isEmpty) return const [];
+    var loadingDialogOpen = false;
 
     AlertDialogs.showLoading(
       context: context,
@@ -792,6 +820,7 @@ class EventsProvider extends ChangeNotifier {
       message: l10n.bulkOperationInProgress,
       isDismissible: false,
     );
+    loadingDialogOpen = true;
 
     try {
       final created = <FeedingModel>[];
@@ -816,7 +845,10 @@ class EventsProvider extends ChangeNotifier {
       }
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -830,7 +862,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -883,17 +918,22 @@ class EventsProvider extends ChangeNotifier {
     MilkingModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
     AlertDialogs.showLoading(
       context: context,
       title: l10n.save,
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
     try {
       final created = await addMilking(model);
       _error = null;
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -906,7 +946,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -1255,17 +1298,22 @@ class EventsProvider extends ChangeNotifier {
     TransferModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
     AlertDialogs.showLoading(
       context: context,
       title: l10n.save,
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
     try {
       final created = await addTransfer(model);
       _error = null;
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -1278,7 +1326,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -1296,17 +1347,22 @@ class EventsProvider extends ChangeNotifier {
     TransferModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
     AlertDialogs.showLoading(
       context: context,
       title: l10n.save,
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
     try {
       final updated = await updateTransfer(model);
       _error = null;
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -1319,7 +1375,10 @@ class EventsProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -1340,12 +1399,82 @@ class EventsProvider extends ChangeNotifier {
     int? transporterId,
     String? reason,
     String? price,
+    String? eventDate,
     String? transferDate,
     String? remarks,
     String? status,
   }) async {
-    await _showComingSoonDialog(context);
-    return const [];
+    final l10n = AppLocalizations.of(context)!;
+    if (livestockUuids.isEmpty) return const [];
+    var loadingDialogOpen = false;
+
+    AlertDialogs.showLoading(
+      context: context,
+      title: l10n.save,
+      message: l10n.bulkOperationInProgress,
+      isDismissible: false,
+    );
+    loadingDialogOpen = true;
+
+    try {
+      final created = <TransferModel>[];
+      for (final livestockUuid in livestockUuids) {
+        final now = DateTime.now();
+        final uuid =
+            'transfer-${now.microsecondsSinceEpoch}-${livestockUuid.hashCode}';
+        final model = TransferModel(
+          uuid: uuid,
+          farmUuid: farmUuid,
+          livestockUuid: livestockUuid,
+          eventDate: eventDate,
+          toFarmUuid: toFarmUuid,
+          transporterId: transporterId,
+          reason: reason,
+          price: price,
+          transferDate: transferDate ?? now.toIso8601String(),
+          remarks: remarks,
+          status: status,
+          synced: false,
+          syncAction: 'create',
+          createdAt: now.toIso8601String(),
+          updatedAt: now.toIso8601String(),
+          farmName: null,
+          toFarmName: null,
+          livestockName: null,
+        );
+        created.add(await addTransfer(model));
+      }
+
+      if (context.mounted) {
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
+        await AlertDialogs.showSuccess(
+          context: context,
+          title: l10n.success,
+          message: 'Transfer log saved successfully',
+          buttonText: l10n.ok,
+        );
+      }
+
+      return created;
+    } catch (e) {
+      _error = e.toString();
+      if (context.mounted) {
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
+        await AlertDialogs.showError(
+          context: context,
+          title: l10n.error,
+          message: 'Failed to save transfer log',
+          buttonText: l10n.ok,
+        );
+      }
+      return const [];
+    }
   }
 
   Future<InseminationModel> addInsemination(InseminationModel model) async {
@@ -1609,7 +1738,9 @@ class EventsProvider extends ChangeNotifier {
   // ABORTED PREGNANCIES
   // ============================================================================
 
-  Future<AbortedPregnancyModel> addAbortedPregnancy(AbortedPregnancyModel model) async {
+  Future<AbortedPregnancyModel> addAbortedPregnancy(
+    AbortedPregnancyModel model,
+  ) async {
     try {
       log('📝 Creating aborted pregnancy locally: ${model.uuid}');
       final created = await _eventsRepository.createAbortedPregnancy(model);
@@ -1625,9 +1756,13 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  Future<AbortedPregnancyModel> updateAbortedPregnancy(AbortedPregnancyModel model) async {
+  Future<AbortedPregnancyModel> updateAbortedPregnancy(
+    AbortedPregnancyModel model,
+  ) async {
     try {
-      final updated = await _eventsRepository.updateAbortedPregnancyLocally(model);
+      final updated = await _eventsRepository.updateAbortedPregnancyLocally(
+        model,
+      );
       _allAbortedPregnancies = _allAbortedPregnancies
           .map((item) => item.uuid == updated.uuid ? updated : item)
           .toList();
@@ -1736,6 +1871,7 @@ class EventsProvider extends ChangeNotifier {
     FeedingModel model,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    var loadingDialogOpen = false;
 
     AlertDialogs.showLoading(
       context: context,
@@ -1743,13 +1879,17 @@ class EventsProvider extends ChangeNotifier {
       message: '',
       isDismissible: false,
     );
+    loadingDialogOpen = true;
 
     try {
       final updated = await updateFeeding(model);
       _error = null;
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showSuccess(
           context: context,
           title: l10n.success,
@@ -1764,7 +1904,10 @@ class EventsProvider extends ChangeNotifier {
       _error = e.toString();
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -2287,7 +2430,10 @@ class EventsProvider extends ChangeNotifier {
       return created;
     } catch (e, stackTrace) {
       _error = e.toString();
-      log('❌ Failed to save vaccination log in provider: $e', stackTrace: stackTrace);
+      log(
+        '❌ Failed to save vaccination log in provider: $e',
+        stackTrace: stackTrace,
+      );
       if (context.mounted) {
         Navigator.of(context).pop();
         await AlertDialogs.showError(
@@ -2753,7 +2899,9 @@ class EventsProvider extends ChangeNotifier {
   // Helper method to create or update notification for feeding events
   Future<void> _createFeedingNotification(FeedingModel feeding) async {
     if (_notificationProvider == null) {
-      log('⚠️ NotificationProvider not available, skipping notification creation');
+      log(
+        '⚠️ NotificationProvider not available, skipping notification creation',
+      );
       return;
     }
 
@@ -2772,11 +2920,13 @@ class EventsProvider extends ChangeNotifier {
 
       // Check if notification already exists for this feeding event
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'feeding_reminder' &&
-              n.farmUuid == feeding.farmUuid &&
-              n.livestockUuid == feeding.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'feeding_reminder' &&
+                n.farmUuid == feeding.farmUuid &&
+                n.livestockUuid == feeding.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -2793,20 +2943,20 @@ class EventsProvider extends ChangeNotifier {
       } else {
         // Create new notification
         notification = NotificationModel(
-        farmUuid: feeding.farmUuid,
-        farmName: null, // Will be populated when displaying
-        livestockUuid: feeding.livestockUuid,
-        livestockName: null, // Will be populated when displaying
-        title: 'feeding_reminder', // Key for localization
-        description: 'time_to_feed_livestock', // Key for localization
-        scheduledAt: nextFeedingTime.toIso8601String(),
-        isCompleted: false,
-        synced: false,
-        syncAction: 'create',
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
-        repeatDaily: false,
-      );
+          farmUuid: feeding.farmUuid,
+          farmName: null, // Will be populated when displaying
+          livestockUuid: feeding.livestockUuid,
+          livestockName: null, // Will be populated when displaying
+          title: 'feeding_reminder', // Key for localization
+          description: 'time_to_feed_livestock', // Key for localization
+          scheduledAt: nextFeedingTime.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
         log('➕ Creating new feeding notification');
       }
 
@@ -2821,7 +2971,9 @@ class EventsProvider extends ChangeNotifier {
   // Helper method to create or update notification for deworming events
   Future<void> _createDewormingNotification(DewormingModel deworming) async {
     if (_notificationProvider == null) {
-      log('⚠️ NotificationProvider not available, skipping notification creation');
+      log(
+        '⚠️ NotificationProvider not available, skipping notification creation',
+      );
       return;
     }
 
@@ -2846,11 +2998,13 @@ class EventsProvider extends ChangeNotifier {
 
       // Check if notification already exists for this deworming event
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'deworming_reminder' &&
-              n.farmUuid == deworming.farmUuid &&
-              n.livestockUuid == deworming.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'deworming_reminder' &&
+                n.farmUuid == deworming.farmUuid &&
+                n.livestockUuid == deworming.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -2867,20 +3021,20 @@ class EventsProvider extends ChangeNotifier {
       } else {
         // Create new notification
         notification = NotificationModel(
-        farmUuid: deworming.farmUuid,
-        farmName: null, // Will be populated when displaying
-        livestockUuid: deworming.livestockUuid,
-        livestockName: null, // Will be populated when displaying
-        title: 'deworming_reminder', // Key for localization
-        description: 'time_to_deworm_livestock', // Key for localization
-        scheduledAt: nextDate.toIso8601String(),
-        isCompleted: false,
-        synced: false,
-        syncAction: 'create',
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
-        repeatDaily: false,
-      );
+          farmUuid: deworming.farmUuid,
+          farmName: null, // Will be populated when displaying
+          livestockUuid: deworming.livestockUuid,
+          livestockName: null, // Will be populated when displaying
+          title: 'deworming_reminder', // Key for localization
+          description: 'time_to_deworm_livestock', // Key for localization
+          scheduledAt: nextDate.toIso8601String(),
+          isCompleted: false,
+          synced: false,
+          syncAction: 'create',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          repeatDaily: false,
+        );
         log('➕ Creating new deworming notification');
       }
 
@@ -2895,7 +3049,9 @@ class EventsProvider extends ChangeNotifier {
   // Helper method to create or update notification for treatment events
   Future<void> _createTreatmentNotification(TreatmentModel treatment) async {
     if (_notificationProvider == null) {
-      log('⚠️ NotificationProvider not available, skipping notification creation');
+      log(
+        '⚠️ NotificationProvider not available, skipping notification creation',
+      );
       return;
     }
 
@@ -2920,11 +3076,13 @@ class EventsProvider extends ChangeNotifier {
 
       // Check if notification already exists for this treatment event
       final existingNotifications = _notificationProvider.notifications
-          .where((n) =>
-              n.title == 'treatment_reminder' &&
-              n.farmUuid == treatment.farmUuid &&
-              n.livestockUuid == treatment.livestockUuid &&
-              !n.isCompleted)
+          .where(
+            (n) =>
+                n.title == 'treatment_reminder' &&
+                n.farmUuid == treatment.farmUuid &&
+                n.livestockUuid == treatment.livestockUuid &&
+                !n.isCompleted,
+          )
           .toList();
 
       NotificationModel notification;
@@ -2965,5 +3123,4 @@ class EventsProvider extends ChangeNotifier {
       // Don't rethrow - notification creation failure shouldn't fail the treatment event
     }
   }
-
 }

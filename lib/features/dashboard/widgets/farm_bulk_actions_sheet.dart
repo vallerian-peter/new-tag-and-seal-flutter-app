@@ -34,7 +34,9 @@ class FarmBulkActionsSheet extends StatelessWidget {
       // Farm invited user: allow farm-manager or specific role title mapped to logType
       if (authProvider.isFarmUser) {
         final profile = authProvider.currentProfile;
-        final roleTitle = (profile?["roleTitle"] as String?)?.toLowerCase().trim();
+        final roleTitle = (profile?["roleTitle"] as String?)
+            ?.toLowerCase()
+            .trim();
         if (roleTitle == null || roleTitle.isEmpty) return false;
         if (roleTitle == 'farm-manager') return true;
         final requiredRole = _roleTitleForLogType(logType);
@@ -84,7 +86,8 @@ class FarmBulkActionsSheet extends StatelessWidget {
               final action = filteredActions[index];
               return Padding(
                 padding: EdgeInsets.only(
-                    bottom: index == filteredActions.length - 1 ? 0 : 12),
+                  bottom: index == filteredActions.length - 1 ? 0 : 12,
+                ),
                 child: _BulkActionButton(
                   config: action,
                   onTap: () => _handleActionTap(context, action, l10n),
@@ -97,41 +100,40 @@ class FarmBulkActionsSheet extends StatelessWidget {
     );
   }
 
-
-// Map event log types to their required farm user roleTitle
-String? _roleTitleForLogType(String logType) {
-  switch (logType.toLowerCase()) {
-    case 'feeding':
-      return 'feeding-user';
-    case 'weightchange':
-      return 'weight-change-user';
-    case 'deworming':
-      return 'deworming-user';
-    case 'medication':
-      return 'medication-user';
-    case 'vaccination':
-      return 'vaccination-user';
-    case 'disposal':
-      return 'disposal-user';
-    case 'calving':
-    case 'farrowing':
-      return 'birth-event-user';
-    case 'abortedpregnancy':
-      return 'aborted-pregnancy-user';
-    case 'dryoff':
-      return 'dryoff-user';
-    case 'insemination':
-      return 'insemination-user';
-    case 'pregnancy':
-      return 'pregnancy-user';
-    case 'milking':
-      return 'milking-user';
-    case 'transfer':
-      return 'transfer-user';
-    default:
-      return null;
+  // Map event log types to their required farm user roleTitle
+  String? _roleTitleForLogType(String logType) {
+    switch (logType.toLowerCase()) {
+      case 'feeding':
+        return 'feeding-user';
+      case 'weightchange':
+        return 'weight-change-user';
+      case 'deworming':
+        return 'deworming-user';
+      case 'medication':
+        return 'medication-user';
+      case 'vaccination':
+        return 'vaccination-user';
+      case 'disposal':
+        return 'disposal-user';
+      case 'calving':
+      case 'farrowing':
+        return 'birth-event-user';
+      case 'abortedpregnancy':
+        return 'aborted-pregnancy-user';
+      case 'dryoff':
+        return 'dryoff-user';
+      case 'insemination':
+        return 'insemination-user';
+      case 'pregnancy':
+        return 'pregnancy-user';
+      case 'milking':
+        return 'milking-user';
+      case 'transfer':
+        return 'transfer-user';
+      default:
+        return null;
+    }
   }
-}
 
   void _handleActionTap(
     BuildContext context,
@@ -139,8 +141,9 @@ String? _roleTitleForLogType(String logType) {
     AppLocalizations l10n,
   ) {
     if (config.logType == null || !config.supportsBulk) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
       return;
     }
 
@@ -157,10 +160,13 @@ String? _roleTitleForLogType(String logType) {
 
     final farmUuid = (farm['uuid'] ?? farm['farmUuid'] ?? '').toString();
     if (farmUuid.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
       return;
     }
+
+    final rootNavigator = Navigator.of(context, rootNavigator: true);
 
     EventFormControl.open(
       context: context,
@@ -170,7 +176,11 @@ String? _roleTitleForLogType(String logType) {
       livestockUuid: null,
       isBulk: true,
       allowEmptyContext: true,
-      onCompleted: () => Navigator.of(context).maybePop(),
+      onCompleted: () {
+        if (rootNavigator.canPop()) {
+          rootNavigator.pop();
+        }
+      },
     );
   }
 
@@ -215,7 +225,6 @@ String? _roleTitleForLogType(String logType) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
                 Text(
                   farmName,
                   style: TextStyle(
@@ -228,7 +237,7 @@ String? _roleTitleForLogType(String logType) {
                 ),
 
                 const SizedBox(height: 4),
-                
+
                 Text(
                   farmLocation,
                   style: TextStyle(
@@ -336,20 +345,15 @@ class _BulkActionButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: config.color.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                config.icon,
-                color: config.color,
-                size: 22,
-              ),
+              child: Icon(config.icon, color: config.color, size: 22),
             ),
-            
+
             const SizedBox(width: 16),
 
             Expanded(
@@ -362,14 +366,10 @@ class _BulkActionButton extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: config.color,
-            ),
+            Icon(Icons.chevron_right, color: config.color),
           ],
         ),
       ),
     );
   }
 }
-

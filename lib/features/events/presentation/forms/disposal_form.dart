@@ -10,6 +10,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
@@ -66,6 +67,8 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
   List<Farm> _farms = const [];
   List<Livestock> _farmLivestock = const [];
   List<DropdownItem<int>> _disposalTypeItems = const [];
+  LogAdditionalDataProvider? _referenceProvider;
+  bool _referenceListenerAttached = false;
 
   String? _selectedFarmUuid;
   String? _selectedLivestockUuid;
@@ -85,6 +88,18 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         _initialize();
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_referenceListenerAttached) return;
+    _referenceProvider = Provider.of<LogAdditionalDataProvider>(
+      context,
+      listen: false,
+    );
+    _referenceProvider?.addListener(_onReferenceDataChanged);
+    _referenceListenerAttached = true;
   }
 
   void _prefillIfEditing() {
@@ -114,6 +129,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     if (disposal.status.isNotEmpty) {
       _selectedStatus = disposal.status;
     }
+    _applySaleFieldVisibility();
   }
 
   Future<void> _initialize() async {
@@ -194,33 +210,47 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
   Future<void> _loadDisposalTypes() async {
     try {
-      final referenceProvider = Provider.of<LogAdditionalDataProvider>(
-        context,
-        listen: false,
-      );
+      final referenceProvider =
+          _referenceProvider ??
+          Provider.of<LogAdditionalDataProvider>(context, listen: false);
 
       if (!referenceProvider.isLoading &&
           referenceProvider.disposalTypes.isEmpty) {
         await referenceProvider.loadFromLocal();
       }
-
-      final items = referenceProvider.disposalTypes
-          .map((type) => DropdownItem<int>(value: type.id, label: type.name))
-          .toList();
-
-      log('🗑️ Disposal form: Loaded ${items.length} disposal types');
-
-      if (!mounted) return;
-      setState(() {
-        _disposalTypeItems = items;
-      });
-
-      if (_selectedDisposalTypeId == null && items.isNotEmpty) {
-        setState(() => _selectedDisposalTypeId = items.first.value);
-      }
+      await _syncDisposalTypesFromProvider(referenceProvider);
     } catch (e, stackTrace) {
       log('❌ Failed to load disposal types: $e', stackTrace: stackTrace);
     }
+  }
+
+  Future<void> _syncDisposalTypesFromProvider(
+    LogAdditionalDataProvider referenceProvider,
+  ) async {
+    final items = referenceProvider.disposalTypes
+        .map((type) => DropdownItem<int>(value: type.id, label: type.name))
+        .toList();
+
+    log('🗑️ Disposal form: Loaded ${items.length} disposal types');
+
+    if (!mounted) return;
+    setState(() {
+      _disposalTypeItems = items;
+      if (_selectedDisposalTypeId == null && items.isNotEmpty) {
+        _selectedDisposalTypeId = items.first.value;
+      } else if (_selectedDisposalTypeId != null &&
+          items.every((item) => item.value != _selectedDisposalTypeId)) {
+        _selectedDisposalTypeId = items.isNotEmpty ? items.first.value : null;
+      }
+    });
+  }
+
+  Future<void> _onReferenceDataChanged() async {
+    final referenceProvider = _referenceProvider;
+    if (!mounted || referenceProvider == null || referenceProvider.isLoading) {
+      return;
+    }
+    await _syncDisposalTypesFromProvider(referenceProvider);
   }
 
   Future<void> _onFarmSelected(String value) async {
@@ -310,6 +340,7 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
 
   @override
   void dispose() {
+    _referenceProvider?.removeListener(_onReferenceDataChanged);
     _eventDateController.dispose();
     _reasonsController.dispose();
     _remarksController.dispose();
@@ -408,9 +439,10 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
         .map(
           (item) => DropdownItem<String>(
             value: item.uuid,
-            label: item.name.isNotEmpty
-                ? item.name
-                : '${l10n.livestock} #${item.id}',
+            label: LivestockHelper.getDisplayLabel(
+              item,
+              fallbackPrefix: l10n.livestock,
+            ),
           ),
         )
         .toList();
@@ -558,7 +590,10 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           dropdownItems: _statusItems(l10n),
           onChanged: (value) {
             if (value == null) return;
-            setState(() => _selectedStatus = value);
+            setState(() {
+              _selectedStatus = value;
+              _applySaleFieldVisibility();
+            });
           },
         ),
         const SizedBox(height: 16),
@@ -569,39 +604,41 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
           prefixIcon: Icons.notes_outlined,
           maxLines: 4,
         ),
-        const SizedBox(height: 16),
-        CustomTextField(
-          controller: _saleWeightController,
-          label: l10n.saleWeight,
-          hintText: l10n.optionalFieldHint,
-          prefixIcon: Icons.scale_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        ),
-        const SizedBox(height: 16),
-        CustomTextField(
-          controller: _salePriceController,
-          label: '${l10n.salePrice}${_isSaleDisposalTypeSelected ? ' *' : ''}',
-          hintText: l10n.optionalFieldHint,
-          prefixIcon: Icons.attach_money_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          validator: (value) {
-            final raw = value?.trim() ?? '';
-            if (_isSaleDisposalTypeSelected && raw.isEmpty) {
-              return l10n.salePrice;
-            }
-            if (raw.isNotEmpty && double.tryParse(raw) == null) {
-              return l10n.salePrice;
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        CustomTextField(
-          controller: _buyerNameController,
-          label: l10n.buyerName,
-          hintText: l10n.optionalFieldHint,
-          prefixIcon: Icons.person_outline,
-        ),
+        if (_showSaleFields) ...[
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: _saleWeightController,
+            label: l10n.saleWeight,
+            hintText: l10n.optionalFieldHint,
+            prefixIcon: Icons.scale_outlined,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: _salePriceController,
+            label: '${l10n.salePrice}${_showSaleFields ? ' *' : ''}',
+            hintText: l10n.optionalFieldHint,
+            prefixIcon: Icons.attach_money_outlined,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            validator: (value) {
+              final raw = value?.trim() ?? '';
+              if (_showSaleFields && raw.isEmpty) {
+                return l10n.salePrice;
+              }
+              if (raw.isNotEmpty && double.tryParse(raw) == null) {
+                return l10n.salePrice;
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: _buyerNameController,
+            label: l10n.buyerName,
+            hintText: l10n.optionalFieldHint,
+            prefixIcon: Icons.person_outline,
+          ),
+        ],
         const SizedBox(height: 24),
         _buildInfoBanner(
           message: l10n.disposalNotesInfo,
@@ -701,13 +738,19 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
       return;
     }
 
-    final saleWeight = _parseOptionalDouble(_saleWeightController.text);
-    final salePrice = _parseOptionalDouble(_salePriceController.text);
-    final buyerName = _buyerNameController.text.trim().isEmpty
-        ? null
-        : _buyerNameController.text.trim();
+    final showSaleFields = _showSaleFields;
+    final saleWeight = showSaleFields
+        ? _parseOptionalDouble(_saleWeightController.text)
+        : null;
+    final salePrice = showSaleFields
+        ? _parseOptionalDouble(_salePriceController.text)
+        : null;
+    final buyerName =
+        showSaleFields && _buyerNameController.text.trim().isNotEmpty
+        ? _buyerNameController.text.trim()
+        : null;
 
-    if (_isSaleDisposalTypeSelected && salePrice == null) {
+    if (showSaleFields && salePrice == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.salePrice)));
@@ -1018,18 +1061,38 @@ class _DisposalFormScreenState extends State<DisposalFormScreen> {
     });
   }
 
+  bool _isSaleLikeStatus(String value) {
+    final lower = value.trim().toLowerCase();
+    return lower.contains('sale') ||
+        lower.contains('sold') ||
+        lower.contains('sell') ||
+        lower.contains('bought') ||
+        lower.contains('buy') ||
+        lower.contains('kuuzwa') ||
+        lower.contains('uuzaji');
+  }
+
   bool get _isSaleDisposalTypeSelected {
     final selectedId = _selectedDisposalTypeId;
     if (selectedId == null) return false;
+
     for (final item in _disposalTypeItems) {
       if (item.value == selectedId) {
-        final label = item.label.toLowerCase();
-        return label.contains('sale') ||
-            label.contains('sold') ||
-            label.contains('uuzaji');
+        return _isSaleLikeStatus(item.label);
       }
     }
+
     return false;
+  }
+
+  bool get _showSaleFields =>
+      _isSaleLikeStatus(_selectedStatus) || _isSaleDisposalTypeSelected;
+
+  void _applySaleFieldVisibility() {
+    if (_showSaleFields) return;
+    _saleWeightController.clear();
+    _salePriceController.clear();
+    _buyerNameController.clear();
   }
 
   double? _parseOptionalDouble(String raw) {

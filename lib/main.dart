@@ -98,6 +98,7 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<AppDatabase>.value(value: database),
+
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: additionalDataProvider),
         ChangeNotifierProvider.value(value: authProvider),
@@ -146,6 +147,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _loadSavedLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final languageCode = prefs.getString('app_language') ?? 'en';
+    
     setState(() {
       _locale = Locale(languageCode);
     });

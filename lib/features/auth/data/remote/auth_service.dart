@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/endpoints.dart';
 
 /// Auth Service
-/// 
+///
 /// Handles all HTTP requests for authentication operations.
 /// This is a stateless service that only communicates with the API.
 /// No business logic or state management happens here.
@@ -15,7 +15,7 @@ class AuthService {
 
   /// Secure storage instance for storing sensitive data
   static const _secureStorage = FlutterSecureStorage();
-  
+
   /// Secure storage key for authentication token
   static const String _tokenKey = 'auth_token';
 
@@ -69,7 +69,9 @@ class AuthService {
           throw Exception(message);
         }
       } else if (response.statusCode == 401) {
-        final message = responseData['message'] ?? 'Invalid credentials or invite not found';
+        final message =
+            responseData['message'] ??
+            'Invalid credentials or invite not found';
         throw Exception(message);
       } else if (response.statusCode == 422) {
         final errors = responseData['errors'];
@@ -102,20 +104,50 @@ class AuthService {
     };
   }
 
+  /// Extract a meaningful error message from an API error response.
+  static String _extractErrorMessage(
+    Map<String, dynamic> responseData,
+    String fallbackMessage,
+  ) {
+    final message = responseData['message'];
+    if (message is String && message.trim().isNotEmpty) {
+      return message.trim();
+    }
+
+    final errors = responseData['errors'];
+    if (errors is Map) {
+      final errorMessages = <String>[];
+
+      errors.forEach((key, value) {
+        if (value is List) {
+          errorMessages.addAll(value.map((item) => item.toString()));
+        } else if (value != null) {
+          errorMessages.add(value.toString());
+        }
+      });
+
+      if (errorMessages.isNotEmpty) {
+        return errorMessages.join(', ');
+      }
+    }
+
+    return fallbackMessage;
+  }
+
   // ==========================================================================
   // API Methods
   // ==========================================================================
 
   /// Register a new farmer
-  /// 
+  ///
   /// Sends farmer registration data to the backend.
   /// Returns the complete API response including farmer data and token.
-  /// 
+  ///
   /// Throws an exception if:
   /// - Network request fails
   /// - Response status is not 200/201
   /// - Response format is invalid
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final farmerData = {
@@ -130,7 +162,7 @@ class AuthService {
   ///   'gender': 'male',
   ///   // ... other fields
   /// };
-  /// 
+  ///
   /// final response = await AuthService.registerFarmer(farmerData);
   /// print(response['data']['farmer']); // Farmer data
   /// print(response['data']['token']);  // Auth token
@@ -153,6 +185,10 @@ class AuthService {
 
       // Parse response
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+      final errorMessage = _extractErrorMessage(
+        responseData,
+        'Registration failed',
+      );
 
       // Check response status code
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -160,44 +196,16 @@ class AuthService {
         if (responseData['status'] == true) {
           return responseData;
         } else {
-          // API returned error
-          final message = responseData['message'] ?? 'Registration failed';
-          final errors = responseData['errors'];
-          
-          if (errors != null && errors is Map) {
-            // Format validation errors
-            final errorMessages = <String>[];
-            errors.forEach((key, value) {
-              if (value is List) {
-                errorMessages.addAll(value.cast<String>());
-              } else {
-                errorMessages.add(value.toString());
-              }
-            });
-            throw Exception('Validation failed: ${errorMessages.join(', ')}');
-          }
-          
-          throw Exception(message);
+          throw Exception(errorMessage);
         }
       } else if (response.statusCode == 422) {
-        // Validation errors
-        final errors = responseData['errors'];
-        if (errors != null && errors is Map) {
-          final errorMessages = <String>[];
-          errors.forEach((key, value) {
-            if (value is List) {
-              errorMessages.addAll(value.cast<String>());
-            }
-          });
-          throw Exception('Validation failed: ${errorMessages.join(', ')}');
-        }
-        throw Exception('Validation failed');
+        throw Exception('Validation failed: $errorMessage');
       } else if (response.statusCode == 401) {
         throw Exception('Unauthorized request');
       } else if (response.statusCode >= 500) {
-        throw Exception('Server error. Please try again later');
+        throw Exception(errorMessage);
       } else {
-        throw Exception('Registration failed: ${response.statusCode}');
+        throw Exception('$errorMessage (status ${response.statusCode})');
       }
     } catch (e) {
       if (e is Exception) {
@@ -208,22 +216,22 @@ class AuthService {
   }
 
   /// Login user with username and password
-  /// 
+  ///
   /// Sends login credentials to the backend.
   /// Returns the complete API response including user data and token.
-  /// 
+  ///
   /// Throws an exception if:
   /// - Network request fails
   /// - Credentials are invalid
   /// - Response format is invalid
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final response = await AuthService.login(
   ///   username: 'john_doe',
   ///   password: 'securepass123',
   /// );
-  /// 
+  ///
   /// print(response['data']['user']);  // User data
   /// print(response['data']['token']); // Auth token
   /// ```
@@ -236,10 +244,7 @@ class AuthService {
       final headers = await _buildHeaders();
 
       // Prepare login data
-      final loginData = {
-        'username': username,
-        'password': password,
-      };
+      final loginData = {'username': username, 'password': password};
 
       // Make POST request
       final response = await http.post(
@@ -280,10 +285,10 @@ class AuthService {
   }
 
   /// Logout current user
-  /// 
+  ///
   /// Sends logout request to the backend to invalidate the token.
   /// Returns true if logout was successful.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await AuthService.logout();
@@ -316,15 +321,15 @@ class AuthService {
   }
 
   /// Update user profile
-  /// 
+  ///
   /// Sends profile update data to the backend.
   /// Returns the updated profile data if successful.
-  /// 
+  ///
   /// Throws an exception if:
   /// - Network request fails
   /// - Validation fails
   /// - Response status is not 200
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final profileData = {
@@ -333,10 +338,12 @@ class AuthService {
   ///   'phone1': '+255712345678',
   ///   // ... other fields
   /// };
-  /// 
+  ///
   /// final response = await AuthService.updateProfile(profileData);
   /// print(response['data']['profile']); // Updated profile data
   /// ```
+  /// 
+  
   static Future<Map<String, dynamic>> updateProfile(
     Map<String, dynamic> profileData,
   ) async {
@@ -375,7 +382,9 @@ class AuthService {
         final errors = responseData['errors'] as Map<String, dynamic>?;
         if (errors != null && errors.isNotEmpty) {
           final firstError = errors.values.first;
-          final errorMessage = firstError is List ? firstError.first : firstError.toString();
+          final errorMessage = firstError is List
+              ? firstError.first
+              : firstError.toString();
           throw Exception(errorMessage);
         }
         final message = responseData['message'] ?? 'Validation failed';
@@ -394,16 +403,16 @@ class AuthService {
   }
 
   /// Change user password
-  /// 
+  ///
   /// Sends old and new password to the backend to update user password.
   /// Returns true if password change was successful.
-  /// 
+  ///
   /// Throws an exception if:
   /// - Network request fails
   /// - Old password is incorrect
   /// - New password doesn't meet requirements
   /// - Response status is not 200
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final success = await AuthService.changePassword(
@@ -464,7 +473,8 @@ class AuthService {
           });
           throw Exception('Validation failed: ${errorMessages.join(', ')}');
         }
-        final message = responseData['message'] ?? 'Current password is incorrect';
+        final message =
+            responseData['message'] ?? 'Current password is incorrect';
         throw Exception(message);
       } else if (response.statusCode == 401) {
         throw Exception('Unauthorized. Please login again');
@@ -550,10 +560,7 @@ class AuthService {
         'Accept': 'application/json',
       };
 
-      final body = <String, dynamic>{
-        'otp': otp,
-        'newPassword': newPassword,
-      };
+      final body = <String, dynamic>{'otp': otp, 'newPassword': newPassword};
       if (email != null) body['email'] = email;
       if (phone != null) body['phone'] = phone;
 
@@ -601,4 +608,3 @@ class AuthService {
     }
   }
 }
-

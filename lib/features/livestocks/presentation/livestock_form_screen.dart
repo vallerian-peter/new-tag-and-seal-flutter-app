@@ -12,6 +12,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.
 import 'package:new_tag_and_seal_flutter_app/core/components/livestock_date_entered_farm_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/color_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -476,6 +477,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         base = base.where((l) => l.livestockTypeId == typeId);
       }
 
+      base = base.where(LivestockHelper.isActive);
+
       _eligibleMothers = base
           .where((l) => l.gender.toLowerCase() == 'female')
           .where((l) => currentUuid == null ? true : l.uuid != currentUuid)
@@ -485,6 +488,15 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
           .where((l) => l.gender.toLowerCase() == 'male')
           .where((l) => currentUuid == null ? true : l.uuid != currentUuid)
           .toList();
+
+      if (_selectedMotherUuid != null &&
+          !_eligibleMothers.any((l) => l.uuid == _selectedMotherUuid)) {
+        _selectedMotherUuid = null;
+      }
+      if (_selectedFatherUuid != null &&
+          !_eligibleFathers.any((l) => l.uuid == _selectedFatherUuid)) {
+        _selectedFatherUuid = null;
+      }
     });
 
     log(
@@ -747,6 +759,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   Future<void> _submitLivestockRegistration() async {
     final l10n = AppLocalizations.of(context)!;
     final livestockProvider = context.read<LivestockProvider>();
+    var loadingDialogOpen = false;
 
     try {
       // Show loading dialog
@@ -756,6 +769,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         message: '',
         isDismissible: false,
       );
+      loadingDialogOpen = true;
 
       // Generate UUID if creating new livestock
       final uuid =
@@ -806,7 +820,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         );
 
         // Close loading dialog
-        if (mounted) Navigator.of(context).pop();
+        if (mounted && loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
 
         if (updatedLivestock) {
           log('✅ Livestock updated successfully');
@@ -844,7 +861,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         );
 
         // Close loading dialog
-        if (mounted) Navigator.of(context).pop();
+        if (mounted && loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
 
         if (createdLivestock != null) {
           log('✅ Livestock registered successfully');
@@ -879,35 +899,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
     } catch (e) {
       log('❌ Error saving livestock: $e');
 
-      // Close loading dialog if open
-      if (mounted) {
-        // Check if loading dialog is top-most route (simplified check)
-        // In a real app we might track dialog state better, but here we assume it might be open
-        // We can't easily check if dialog is open, but we can try to pop if we know we opened it.
-        // However, since we popped it in success paths, we might need to be careful.
-        // A safer way is to rely on the fact that we opened it at the start.
-        // If we are here, we might have failed before popping.
-        // But if we failed after popping (unlikely given the flow), we shouldn't pop again.
-        // Let's assume we need to pop if we haven't reached the success pop.
-        // Actually, let's just show error dialog.
-        // If loading dialog is still up, showing another dialog might stack them.
-        // Best practice: ensure loading dialog is closed before showing error.
-        // But since we don't have a variable tracking it, let's just try to pop once.
-        // Navigator.of(context).pop(); // This might pop the screen if dialog is already closed.
-        // So let's rely on the fact that we pop on success. On error, we should also pop loading.
-        // I'll add a flag or just pop.
-        // Let's just pop once, assuming loading is the top.
-        // But if exception happened before loading (unlikely), we pop the screen.
-        // Let's be safe:
+      if (mounted && loadingDialogOpen) {
+        Navigator.of(context).pop();
+        loadingDialogOpen = false;
       }
-
-      // We need to ensure loading dialog is closed.
-      // Since I can't easily know, I will just show error.
-      // If loading is there, it will be covered.
-      // But better to close it.
-      // I'll assume I need to pop it.
-      // But wait, if I pop and it wasn't there, I close the screen.
-      // I'll leave it for now and just show error.
 
       if (!mounted) return;
       await AlertDialogs.showError(
@@ -1439,73 +1434,10 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
 
   // STEP 3: Additional Info
   Widget _buildAdditionalInfoStep(AppLocalizations l10n) {
+    final showParentage = _isBornOnFarmSelected();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section Title: Parentage
-        _buildSectionTitle(
-          icon: Icons.diversity_3,
-          title: l10n.parentageInformation,
-          subtitle: l10n.optionalSelectParents,
-        ),
-        const SizedBox(height: 12),
-
-        // Mother (All Female Livestock from All Farms)
-        CustomDropdown<String>(
-          label: l10n.motherOptional,
-          hint: l10n.select,
-          icon: Icons.female_outlined,
-          value: _selectedMotherUuid,
-          dropdownItems: _eligibleMothers.map((livestock) {
-            // Find farm name for this livestock
-            final farm = _farms.firstWhere(
-              (f) => f.uuid == livestock.farmUuid,
-              orElse: () => _farms.first, // fallback
-            );
-            final livestockName = livestock.name.isNotEmpty
-                ? livestock.name
-                : '${l10n.livestock} #${livestock.id}';
-
-            return DropdownItem<String>(
-              value: livestock.uuid,
-              label: '$livestockName (${farm.name})', // Show farm name
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() => _selectedMotherUuid = value);
-          },
-          isRequired: false,
-        ),
-        const SizedBox(height: 16),
-
-        // Father (All Male Livestock from All Farms)
-        CustomDropdown<String>(
-          label: l10n.fatherOptional,
-          hint: l10n.select,
-          icon: Icons.male_outlined,
-          value: _selectedFatherUuid,
-          dropdownItems: _eligibleFathers.map((livestock) {
-            // Find farm name for this livestock
-            final farm = _farms.firstWhere(
-              (f) => f.uuid == livestock.farmUuid,
-              orElse: () => _farms.first, // fallback
-            );
-            final livestockName = livestock.name.isNotEmpty
-                ? livestock.name
-                : '${l10n.livestock} #${livestock.id}';
-
-            return DropdownItem<String>(
-              value: livestock.uuid,
-              label: '$livestockName (${farm.name})', // Show farm name
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() => _selectedFatherUuid = value);
-          },
-          isRequired: false,
-        ),
-        const SizedBox(height: 24),
-
         CustomDropdown<String>(
           label: l10n.birthEventOptional,
           hint: l10n.select,
@@ -1580,7 +1512,13 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
                 if (selectedMethod.name.toLowerCase().contains('born') &&
                     _selectedDateOfBirth != null) {
                   _selectedDateFirstEnteredToFarm = _selectedDateOfBirth;
+                } else {
+                  _selectedMotherUuid = null;
+                  _selectedFatherUuid = null;
                 }
+              } else {
+                _selectedMotherUuid = null;
+                _selectedFatherUuid = null;
               }
             });
             // Trigger form validation after state update to clear any errors
@@ -1616,6 +1554,79 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
             return null;
           },
         ),
+
+        if (showParentage) ...[
+          const SizedBox(height: 24),
+          _buildSectionTitle(
+            icon: Icons.diversity_3,
+            title: l10n.parentageInformation,
+            subtitle: l10n.optionalSelectParents,
+          ),
+          const SizedBox(height: 12),
+          CustomDropdown<String>(
+            label: l10n.motherOptional,
+            hint: l10n.select,
+            icon: Icons.female_outlined,
+            value: _selectedMotherUuid,
+            dropdownItems: _eligibleMothers.map((livestock) {
+              final farmName = _farms.isNotEmpty
+                  ? _farms
+                        .firstWhere(
+                          (f) => f.uuid == livestock.farmUuid,
+                          orElse: () => _farms.first,
+                        )
+                        .name
+                  : l10n.unknownFarm;
+              final livestockName =
+                  LivestockHelper.getDisplayName(livestock).isNotEmpty
+                  ? LivestockHelper.getDisplayName(livestock)
+                  : '${l10n.livestock} #${livestock.id}';
+              final ageLabel = LivestockHelper.getAgeLabelFromDateOfBirth(
+                livestock.dateOfBirth,
+              );
+              return DropdownItem<String>(
+                value: livestock.uuid,
+                label: '$livestockName • ${l10n.age}: $ageLabel • $farmName',
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() => _selectedMotherUuid = value);
+            },
+            isRequired: false,
+          ),
+          const SizedBox(height: 16),
+          CustomDropdown<String>(
+            label: l10n.fatherOptional,
+            hint: l10n.select,
+            icon: Icons.male_outlined,
+            value: _selectedFatherUuid,
+            dropdownItems: _eligibleFathers.map((livestock) {
+              final farmName = _farms.isNotEmpty
+                  ? _farms
+                        .firstWhere(
+                          (f) => f.uuid == livestock.farmUuid,
+                          orElse: () => _farms.first,
+                        )
+                        .name
+                  : l10n.unknownFarm;
+              final livestockName =
+                  LivestockHelper.getDisplayName(livestock).isNotEmpty
+                  ? LivestockHelper.getDisplayName(livestock)
+                  : '${l10n.livestock} #${livestock.id}';
+              final ageLabel = LivestockHelper.getAgeLabelFromDateOfBirth(
+                livestock.dateOfBirth,
+              );
+              return DropdownItem<String>(
+                value: livestock.uuid,
+                label: '$livestockName • ${l10n.age}: $ageLabel • $farmName',
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() => _selectedFatherUuid = value);
+            },
+            isRequired: false,
+          ),
+        ],
 
         const SizedBox(height: 24),
 

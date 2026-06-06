@@ -9,6 +9,7 @@ import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.additional.data/provider/all.additional.data_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/login/login_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/action_card.dart';
@@ -875,6 +876,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
       try {
         await Sync.fullSyncPostData(database);
+        if (context.mounted) {
+          await context.read<LogAdditionalDataProvider>().loadFromLocal();
+        }
       } catch (error) {
         if (context.mounted) {
           await Navigator.of(context, rootNavigator: true).maybePop();

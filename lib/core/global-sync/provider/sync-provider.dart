@@ -6,6 +6,7 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
+import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -17,7 +18,7 @@ class SyncProvider extends ChangeNotifier {
   String _syncStatus = '';
   int _syncProgress = 0;
   int _totalSteps = 4;
-  
+
   // Scheduler properties
   Timer? _syncSchedulerTimer;
   BuildContext? _currentContext;
@@ -34,13 +35,14 @@ class SyncProvider extends ChangeNotifier {
   String get syncStatus => _syncStatus;
   int get syncProgress => _syncProgress;
   int get totalSteps => _totalSteps;
-  double get syncProgressPercentage => _totalSteps > 0 ? _syncProgress / _totalSteps : 0.0;
+  double get syncProgressPercentage =>
+      _totalSteps > 0 ? _syncProgress / _totalSteps : 0.0;
 
   /// Initialize sync scheduler with context
   /// Call this from dashboard screen initState
   void initializeScheduler(BuildContext context) {
     _currentContext = context;
-    
+
     // Start periodic check (every hour to check if 24 hours have passed)
     _syncSchedulerTimer?.cancel();
     _syncSchedulerTimer = Timer.periodic(
@@ -55,9 +57,9 @@ class SyncProvider extends ChangeNotifier {
   /// Check if 24 hours have passed and sync if needed
   Future<void> _checkAndSyncIfNeeded() async {
     if (_isChecking || _database == null) return;
-    
+
     _isChecking = true;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final lastSyncTimestamp = prefs.getInt(_lastSyncTimestampKey) ?? 0;
@@ -69,7 +71,7 @@ class SyncProvider extends ChangeNotifier {
       // Check if 24 hours have passed
       if (hoursSinceLastSync >= _syncIntervalHours) {
         log('⏰ 24 hours passed - checking for unsynced data...');
-        
+
         // Get unsynced data summary
         final summary = await Sync.getUnsyncedSummary(_database);
         final unsyncedCount = summary.totalPending;
@@ -78,14 +80,18 @@ class SyncProvider extends ChangeNotifier {
 
         if (unsyncedCount > 0) {
           // Check if we need to show forced sync dialog
-          if (unsyncedCount >= _forcedSyncThreshold && _currentContext != null && _currentContext!.mounted) {
-            log('⚠️ Unsynced count ($unsyncedCount) >= threshold ($_forcedSyncThreshold) - showing forced sync dialog');
+          if (unsyncedCount >= _forcedSyncThreshold &&
+              _currentContext != null &&
+              _currentContext!.mounted) {
+            log(
+              '⚠️ Unsynced count ($unsyncedCount) >= threshold ($_forcedSyncThreshold) - showing forced sync dialog',
+            );
             await _showForcedSyncDialog();
           } else {
             // Trigger automatic sync in background
             log('🔄 Triggering automatic background sync...');
             await splashSync();
-            
+
             // Update last sync timestamp
             await prefs.setInt(_lastSyncTimestampKey, now);
             log('✅ Automatic sync completed');
@@ -109,12 +115,12 @@ class SyncProvider extends ChangeNotifier {
   /// Check if unsynced count requires forced sync dialog
   Future<void> _checkForcedSync() async {
     if (_database == null || _currentContext == null) return;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final lastCheckTimestamp = prefs.getInt(_lastUnsyncedCheckKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
-      
+
       // Check every 6 hours to avoid too frequent checks
       if (now - lastCheckTimestamp < 6 * 60 * 60 * 1000) {
         return;
@@ -124,7 +130,9 @@ class SyncProvider extends ChangeNotifier {
       final unsyncedCount = summary.totalPending;
 
       if (unsyncedCount >= _forcedSyncThreshold && _currentContext!.mounted) {
-        log('⚠️ Unsynced count ($unsyncedCount) >= threshold - showing forced sync dialog');
+        log(
+          '⚠️ Unsynced count ($unsyncedCount) >= threshold - showing forced sync dialog',
+        );
         await _showForcedSyncDialog();
       }
 
@@ -138,7 +146,7 @@ class SyncProvider extends ChangeNotifier {
   /// Show forced sync dialog (no cancel option)
   Future<void> _showForcedSyncDialog() async {
     if (_currentContext == null || !_currentContext!.mounted) return;
-    
+
     final context = _currentContext!;
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return;
@@ -155,10 +163,13 @@ class SyncProvider extends ChangeNotifier {
           onSync: () async {
             Navigator.of(context).pop();
             await splashSyncWithDialog(context);
-            
+
             // Update last sync timestamp after successful sync
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setInt(_lastSyncTimestampKey, DateTime.now().millisecondsSinceEpoch);
+            await prefs.setInt(
+              _lastSyncTimestampKey,
+              DateTime.now().millisecondsSinceEpoch,
+            );
           },
         ),
       );
@@ -177,19 +188,19 @@ class SyncProvider extends ChangeNotifier {
     if (_isSyncing) return; // Prevent multiple syncs
 
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Check network connectivity first
     _updateProgress(l10n.checkingNetworkConnection, 1);
-    
+
     final networkCheck = NetworkCheck.instance;
     final isConnected = await networkCheck.isConnected;
-    
+
     if (!isConnected) {
       // Show network error dialog
       await _showNetworkErrorDialog(context);
       return;
     }
-    
+
     _isSyncing = true;
     _syncProgress = 0;
     _syncStatus = l10n.syncStarting;
@@ -205,7 +216,7 @@ class SyncProvider extends ChangeNotifier {
 
     try {
       await _performSync(context);
-      
+
       // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -218,11 +229,13 @@ class SyncProvider extends ChangeNotifier {
 
       // Update last sync timestamp after successful sync
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_lastSyncTimestampKey, DateTime.now().millisecondsSinceEpoch);
-
+      await prefs.setInt(
+        _lastSyncTimestampKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     } catch (e) {
       log('❌ Sync error: $e');
-      
+
       // Close loading dialog
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -241,43 +254,52 @@ class SyncProvider extends ChangeNotifier {
   }
 
   /// Perform the actual sync operation
-  /// 
+  ///
   /// This sync includes:
   /// - Farms, livestock, events, vaccines, and farm users
   /// - Farm users: When synced, invitation emails are automatically sent by the backend
   Future<void> _performSync(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     try {
       // Step 1: Starting sync
       _updateProgress(l10n.syncStarting, 2);
-      
+
       // Step 2: Get NotificationProvider from context if available
       NotificationProvider? notificationProvider;
       try {
-        notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        notificationProvider = Provider.of<NotificationProvider>(
+          context,
+          listen: false,
+        );
       } catch (_) {
         // NotificationProvider not available in context, continue without it
-        log('⚠️ NotificationProvider not available in context - notifications will not be created during sync');
+        log(
+          '⚠️ NotificationProvider not available in context - notifications will not be created during sync',
+        );
       }
-      
+
       // Step 3: Call the existing Sync.splashSync method
       // Note: This sync will send unsynced farm users to backend, which triggers email sending
       // Also creates notifications for logs with nextDates if NotificationProvider is available
       _updateProgress('Syncing data...', 3);
-      await Sync.splashSync(_database, notificationProvider: notificationProvider);
-      
+      await Sync.splashSync(
+        _database,
+        notificationProvider: notificationProvider,
+      );
+      await _refreshReferenceDataIfAvailable(context);
+
       // Step 4: Sync completed
       _updateProgress(l10n.syncCompleted, 4);
-      
-      log('✅ Sync completed - farm user invitation emails have been sent if any were synced');
-      
+
+      log(
+        '✅ Sync completed - farm user invitation emails have been sent if any were synced',
+      );
     } catch (e) {
       log('❌ Sync failed: $e');
       rethrow;
     }
   }
-
 
   /// Update sync progress
   void _updateProgress(String status, int progress) {
@@ -287,11 +309,10 @@ class SyncProvider extends ChangeNotifier {
     log('🔄 Sync Progress: $status ($progress/$totalSteps)');
   }
 
-
   /// Show success dialog
   Future<void> _showSuccessDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return AlertDialogs.showSuccess(
       context: context,
       title: l10n.syncSuccessful,
@@ -307,7 +328,7 @@ class SyncProvider extends ChangeNotifier {
   /// Show network error dialog
   Future<void> _showNetworkErrorDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return AlertDialogs.showError(
       context: context,
       title: l10n.noInternetConnection,
@@ -320,10 +341,10 @@ class SyncProvider extends ChangeNotifier {
   /// Show error dialog
   Future<void> _showErrorDialog(BuildContext context, String error) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Parse and format error message for better user experience
     String userFriendlyMessage = _formatErrorMessage(error, l10n);
-    
+
     return AlertDialogs.showError(
       context: context,
       title: l10n.syncFailed,
@@ -337,47 +358,51 @@ class SyncProvider extends ChangeNotifier {
   /// Handles socket errors, network errors, and other common exceptions
   String _formatErrorMessage(String error, AppLocalizations l10n) {
     final lowerError = error.toLowerCase();
-    
+
     // Handle socket exceptions
-    if (lowerError.contains('socket') || lowerError.contains('failed host lookup')) {
+    if (lowerError.contains('socket') ||
+        lowerError.contains('failed host lookup')) {
       return l10n.connectionErrorMessage;
     }
-    
+
     // Handle timeout errors
     if (lowerError.contains('timeout') || lowerError.contains('timed out')) {
       return l10n.connectionTimeoutMessage;
     }
-    
+
     // Handle network errors
     if (lowerError.contains('network') || lowerError.contains('connection')) {
       return l10n.networkErrorMessage;
     }
-    
+
     // Handle unauthorized errors
     if (lowerError.contains('unauthorized') || lowerError.contains('401')) {
       return l10n.authenticationFailedMessage;
     }
-    
+
     // Handle server errors
-    if (lowerError.contains('500') || lowerError.contains('internal server error')) {
+    if (lowerError.contains('500') ||
+        lowerError.contains('internal server error')) {
       return l10n.serverErrorMessage;
     }
-    
+
     // Handle service unavailable
-    if (lowerError.contains('503') || lowerError.contains('service unavailable')) {
+    if (lowerError.contains('503') ||
+        lowerError.contains('service unavailable')) {
       return l10n.serviceUnavailableMessage;
     }
-    
+
     // Handle invalid response
-    if (lowerError.contains('invalid response') || lowerError.contains('format exception')) {
+    if (lowerError.contains('invalid response') ||
+        lowerError.contains('format exception')) {
       return l10n.invalidServerResponseMessage;
     }
-    
+
     // Handle generic errors - show only first 100 characters to avoid huge messages
     if (error.length > 100) {
       return '${l10n.error}: ${error.substring(0, 100)}...';
     }
-    
+
     return '${l10n.error}: $error';
   }
 
@@ -391,31 +416,38 @@ class SyncProvider extends ChangeNotifier {
   /// Simple sync without UI (for background operations)
   Future<void> splashSync() async {
     if (_isSyncing) return;
-    
+
     // Check network connectivity first
     final networkCheck = NetworkCheck.instance;
     final isConnected = await networkCheck.isConnected;
-    
+
     if (!isConnected) {
       log('❌ No internet connection - skipping background sync');
       return;
     }
-    
+
     // Try to get NotificationProvider from context if available
     NotificationProvider? notificationProvider;
     if (_currentContext != null && _currentContext!.mounted) {
       try {
-        notificationProvider = Provider.of<NotificationProvider>(_currentContext!, listen: false);
+        notificationProvider = Provider.of<NotificationProvider>(
+          _currentContext!,
+          listen: false,
+        );
       } catch (_) {
         // NotificationProvider not available, continue without it
       }
     }
-    
+
     _isSyncing = true;
     notifyListeners();
-    
+
     try {
-      await Sync.splashSync(_database, notificationProvider: notificationProvider);
+      await Sync.splashSync(
+        _database,
+        notificationProvider: notificationProvider,
+      );
+      await _refreshReferenceDataIfAvailable(_currentContext);
       log('✅ Background sync completed');
     } catch (e) {
       log('❌ Background sync failed: $e');
@@ -431,20 +463,31 @@ class SyncProvider extends ChangeNotifier {
     _syncSchedulerTimer?.cancel();
     super.dispose();
   }
+
+  Future<void> _refreshReferenceDataIfAvailable(BuildContext? context) async {
+    if (context == null || !context.mounted) return;
+
+    try {
+      final referenceProvider = Provider.of<LogAdditionalDataProvider>(
+        context,
+        listen: false,
+      );
+      await referenceProvider.loadFromLocal();
+    } catch (e) {
+      log('⚠️ Failed to refresh reference data after sync: $e');
+    }
+  }
 }
 
 /// Forced Sync Dialog Widget
-/// 
+///
 /// Shows a dialog that requires user to sync when unsynced count >= 15
 /// No cancel option - user must sync to proceed
 class _ForcedSyncDialog extends StatelessWidget {
   final int unsyncedCount;
   final VoidCallback onSync;
 
-  const _ForcedSyncDialog({
-    required this.unsyncedCount,
-    required this.onSync,
-  });
+  const _ForcedSyncDialog({required this.unsyncedCount, required this.onSync});
 
   @override
   Widget build(BuildContext context) {
@@ -452,14 +495,14 @@ class _ForcedSyncDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
-      backgroundColor: theme.brightness == Brightness.dark 
-          ? theme.scaffoldBackgroundColor 
+      backgroundColor: theme.brightness == Brightness.dark
+          ? theme.scaffoldBackgroundColor
           : Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: theme.brightness == Brightness.dark 
-              ? theme.scaffoldBackgroundColor 
+          color: theme.brightness == Brightness.dark
+              ? theme.scaffoldBackgroundColor
               : Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
@@ -512,8 +555,8 @@ class _ForcedSyncDialog extends StatelessWidget {
                 onPressed: onSync,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.primaryColor,
-                  foregroundColor: theme.brightness == Brightness.dark 
-                      ? Colors.white 
+                  foregroundColor: theme.brightness == Brightness.dark
+                      ? Colors.white
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(

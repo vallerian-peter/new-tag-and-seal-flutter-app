@@ -105,18 +105,21 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      Text(
-                        farm['location'] ?? l10n.location,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.6,
-                          ),
-                        ),
-                      ),
+
+                      // Text(
+                      //   '${farm['size']} ${farm['sizeUnit']}',
+                      //   style: TextStyle(
+                      //     fontSize: 14,
+                      //     color: theme.colorScheme.onSurface.withValues(
+                      //       alpha: 0.6,
+                      //     ),
+                      //   ),
+                      // ),
+                      
                     ],
                   ),
                 ),
+
                 PopupMenuButton<_FarmAction>(
                   icon: Icon(
                     Icons.more_vert,
@@ -464,6 +467,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     final displayName = LivestockHelper.getDisplayName(animal);
     final animalName = displayName.isEmpty ? '---' : displayName;
     final animalGender = animal.gender.isEmpty ? '---' : animal.gender;
+    final isNotActive = LivestockHelper.isNotActive(animal);
 
     // Calculate age from dateOfBirth
     final birthDate = DateTime.parse(animal.dateOfBirth);
@@ -478,12 +482,19 @@ class FarmDetailsBottomSheet extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark
-            ? theme.cardColor.withValues(alpha: 0.1)
-            : theme.colorScheme.secondary,
+        color: isNotActive
+            ? (theme.brightness == Brightness.dark
+                  ? Colors.grey[900]
+                  : Colors.grey[100])
+            : (theme.brightness == Brightness.dark
+                  ? theme.cardColor.withValues(alpha: 0.1)
+                  : theme.colorScheme.secondary),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          color: isNotActive
+              ? Colors.red.withValues(alpha: 0.5)
+              : theme.colorScheme.outline.withValues(alpha: 0.2),
+          width: isNotActive ? 2 : 1,
         ),
         boxShadow: theme.brightness == Brightness.dark
             ? [
@@ -503,126 +514,173 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                 ),
               ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          // Animal image
-          FutureBuilder<String>(
-            future: _getLivestockTypeName(context, animal.livestockTypeId),
-            builder: (context, snapshot) {
-              final livestockTypeName = snapshot.data;
-              final imagePath = LivestockImageHelper.getPlaceholderForLivestock(
-                animal,
-                livestockTypeName: livestockTypeName,
-              );
-              return Container(
-                width: 50,
-                height: 50,
+          Row(
+            children: [
+              // Animal image
+              FutureBuilder<String>(
+                future: _getLivestockTypeName(context, animal.livestockTypeId),
+                builder: (context, snapshot) {
+                  final livestockTypeName = snapshot.data;
+                  final imagePath =
+                      LivestockImageHelper.getPlaceholderForLivestock(
+                        animal,
+                        livestockTypeName: livestockTypeName,
+                      );
+                  return Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        fit: BoxFit.contain,
+                        scale: 6.0,
+                        image: AssetImage(imagePath),
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(width: 16),
+
+              // Animal details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name
+                    Text(
+                      animalName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isNotActive
+                            ? theme.colorScheme.onSurface.withValues(
+                                alpha: 0.55,
+                              )
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Details in a more organized grid layout
+                    Row(
+                      children: [
+                        // Gender
+                        Expanded(
+                          child: _buildInfoItem(
+                            context: context,
+                            icon: animalGender.toLowerCase() == 'male'
+                                ? Icons.male
+                                : Icons.female,
+                            iconColor: animalGender.toLowerCase() == 'male'
+                                ? Colors.blue
+                                : Colors.pink,
+                            label: l10n.gender,
+                            value: animalGender.toLowerCase() == 'male'
+                                ? l10n.male
+                                : l10n.female,
+                            muted: isNotActive,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Age
+                        Expanded(
+                          child: _buildInfoItem(
+                            context: context,
+                            icon: Icons.cake_outlined,
+                            iconColor: theme.colorScheme.primary,
+                            label: 'Age',
+                            value: '$age yr${age != 1 ? 's' : ''}',
+                            muted: isNotActive,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Second row: Species and Breed
+                    Row(
+                      children: [
+                        // Species - Using FutureBuilder to fetch species name
+                        Expanded(
+                          child: FutureBuilder<String>(
+                            future: _getSpeciesName(context, animal.speciesId),
+                            builder: (context, snapshot) {
+                              final species = snapshot.data ?? '---';
+                              return _buildInfoItem(
+                                context: context,
+                                icon: Iconsax.pet_outline,
+                                iconColor: theme.colorScheme.primary,
+                                label: l10n.species,
+                                value: species,
+                                muted: isNotActive,
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Breed - Using FutureBuilder to fetch breed name
+                        Expanded(
+                          child: FutureBuilder<String>(
+                            future: _getBreedName(context, animal.breedId),
+                            builder: (context, snapshot) {
+                              final breed = snapshot.data ?? '---';
+                              return _buildInfoItem(
+                                context: context,
+                                icon: Icons.category_outlined,
+                                iconColor: theme.colorScheme.primary,
+                                label: l10n.breed,
+                                value: breed,
+                                muted: isNotActive,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (isNotActive)
+            Positioned(
+              left: 0,
+              bottom: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.contain,
-                    scale: 6.0,
-                    image: AssetImage(imagePath),
+                  color: Colors.red.withValues(alpha: 0.15),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(8),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                  border: Border.all(
+                    color: Colors.red.withValues(alpha: 0.5),
+                    width: 1,
                   ),
                 ),
-              );
-            },
-          ),
-
-          const SizedBox(width: 16),
-
-          // Animal details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name
-                Text(
-                  animalName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Details in a more organized grid layout
-                Row(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Gender
-                    Expanded(
-                      child: _buildInfoItem(
-                        context: context,
-                        icon: animalGender.toLowerCase() == 'male'
-                            ? Icons.male
-                            : Icons.female,
-                        iconColor: animalGender.toLowerCase() == 'male'
-                            ? Colors.blue
-                            : Colors.pink,
-                        label: l10n.gender,
-                        value: animalGender.toLowerCase() == 'male'
-                            ? l10n.male
-                            : l10n.female,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Age
-                    Expanded(
-                      child: _buildInfoItem(
-                        context: context,
-                        icon: Icons.cake_outlined,
-                        iconColor: theme.colorScheme.primary,
-                        label: 'Age',
-                        value: '$age yr${age != 1 ? 's' : ''}',
+                    Icon(Icons.block, size: 12, color: Colors.red.shade700),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.notActive,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade700,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-
-                // Second row: Species and Breed
-                Row(
-                  children: [
-                    // Species - Using FutureBuilder to fetch species name
-                    Expanded(
-                      child: FutureBuilder<String>(
-                        future: _getSpeciesName(context, animal.speciesId),
-                        builder: (context, snapshot) {
-                          final species = snapshot.data ?? '---';
-                          return _buildInfoItem(
-                            context: context,
-                            icon: Iconsax.pet_outline,
-                            iconColor: theme.colorScheme.primary,
-                            label: l10n.species,
-                            value: species,
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Breed - Using FutureBuilder to fetch breed name
-                    Expanded(
-                      child: FutureBuilder<String>(
-                        future: _getBreedName(context, animal.breedId),
-                        builder: (context, snapshot) {
-                          final breed = snapshot.data ?? '---';
-                          return _buildInfoItem(
-                            context: context,
-                            icon: Icons.category_outlined,
-                            iconColor: theme.colorScheme.primary,
-                            label: l10n.breed,
-                            value: breed,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -635,6 +693,7 @@ class FarmDetailsBottomSheet extends StatelessWidget {
     required Color iconColor,
     required String label,
     required String value,
+    bool muted = false,
   }) {
     final theme = Theme.of(context);
     return Column(
@@ -648,7 +707,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                color: theme.colorScheme.onSurface.withValues(
+                  alpha: muted ? 0.32 : 0.5,
+                ),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -661,7 +722,9 @@ class FarmDetailsBottomSheet extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 13,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+              color: muted
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.55)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.8),
               fontWeight: FontWeight.w600,
             ),
             overflow: TextOverflow.ellipsis,

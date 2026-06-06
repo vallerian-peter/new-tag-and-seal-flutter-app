@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
@@ -802,7 +803,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
   String _parentNameByUuid(String uuid, LivestockProvider livestockProvider) {
     for (final l in livestockProvider.allLivestock) {
       if (l.uuid == uuid) {
-        return l.name.isNotEmpty ? l.name : '#${l.id}';
+        return LivestockHelper.getDisplayLabel(l, fallbackPrefix: 'Livestock');
       }
     }
     return '—';
@@ -819,8 +820,14 @@ class _LivestockListScreenState extends State<LivestockListScreen>
         .where((l) => l.gender.toLowerCase() == targetGender)
         .toList();
     parents.sort((a, b) {
-      final an = a.name.isNotEmpty ? a.name : '#${a.id}';
-      final bn = b.name.isNotEmpty ? b.name : '#${b.id}';
+      final an = LivestockHelper.getDisplayLabel(
+        a,
+        fallbackPrefix: 'Livestock',
+      );
+      final bn = LivestockHelper.getDisplayLabel(
+        b,
+        fallbackPrefix: 'Livestock',
+      );
       return an.toLowerCase().compareTo(bn.toLowerCase());
     });
 
@@ -841,7 +848,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
           builder: (ctx, setLocal) {
             final filtered = parents.where((p) {
               if (query.trim().isEmpty) return true;
-              final n = p.name.isNotEmpty ? p.name : '#${p.id}';
+              final n = LivestockHelper.getDisplayLabel(
+                p,
+                fallbackPrefix: 'Livestock',
+              );
               final idNo = p.identificationNumber;
               final q = query.toLowerCase();
               return n.toLowerCase().contains(q) ||
@@ -916,9 +926,10 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                           ),
                           itemBuilder: (_, i) {
                             final parent = filtered[i];
-                            final parentLabel = parent.name.isNotEmpty
-                                ? parent.name
-                                : '${l10n.livestock} #${parent.id}';
+                            final parentLabel = LivestockHelper.getDisplayLabel(
+                              parent,
+                              fallbackPrefix: l10n.livestock,
+                            );
                             final childrenCount = childrenCountFor(parent.uuid);
                             final isSelected = selectedUuid == parent.uuid;
                             return ListTile(

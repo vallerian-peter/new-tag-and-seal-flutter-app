@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/custom_date_picker.
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_text_field.dart';
 import 'package:new_tag_and_seal_flutter_app/core/constants/colors.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -430,10 +431,11 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                           ),
                           itemBuilder: (context, index) {
                             final animal = available[index];
-                            final trimmedName = animal.name.trim();
-                            final animalNameForTile = trimmedName.isEmpty
-                                ? '${l10n.livestock} #${animal.id}'
-                                : trimmedName;
+                            final animalNameForTile =
+                                LivestockHelper.getDisplayLabel(
+                                  animal,
+                                  fallbackPrefix: l10n.livestock,
+                                );
                             final isSelected =
                                 selectedLivestockUuid == animal.uuid;
                             return ListTile(
@@ -448,7 +450,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                                 onChanged: (_) {
                                   setState(() {
                                     selectedLivestockUuid = animal.uuid;
-                                    livestockNameController.text = trimmedName;
+                                    livestockNameController.text =
+                                        animalNameForTile;
                                     if (selectedFarmUuid == null) {
                                       selectedFarmUuid = animal.farmUuid;
                                       String farmName = '';
@@ -467,7 +470,8 @@ class _NotificationScreenBodyState extends State<_NotificationScreenBody> {
                               onTap: () {
                                 setState(() {
                                   selectedLivestockUuid = animal.uuid;
-                                  livestockNameController.text = trimmedName;
+                                  livestockNameController.text =
+                                      animalNameForTile;
                                   if (selectedFarmUuid == null) {
                                     selectedFarmUuid = animal.farmUuid;
                                     String farmName = '';

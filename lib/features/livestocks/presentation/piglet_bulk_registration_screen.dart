@@ -15,6 +15,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.d
 import 'package:new_tag_and_seal_flutter_app/core/components/weight_input_with_bluetooth.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/color_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/bills/presentation/bill_creation_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/model/birth_event_model.dart';
@@ -419,6 +420,7 @@ class _PigletBulkRegistrationScreenState
     if (typeId != null) {
       base = base.where((l) => l.livestockTypeId == typeId);
     }
+    base = base.where(LivestockHelper.isActive);
     setState(() {
       _eligibleMothers = base
           .where((l) => l.gender.toLowerCase() == 'female')
@@ -426,6 +428,15 @@ class _PigletBulkRegistrationScreenState
       _eligibleFathers = base
           .where((l) => l.gender.toLowerCase() == 'male')
           .toList();
+
+      if (_selectedMotherUuid != null &&
+          !_eligibleMothers.any((l) => l.uuid == _selectedMotherUuid)) {
+        _selectedMotherUuid = null;
+      }
+      if (_selectedFatherUuid != null &&
+          !_eligibleFathers.any((l) => l.uuid == _selectedFatherUuid)) {
+        _selectedFatherUuid = null;
+      }
     });
   }
 
@@ -629,9 +640,10 @@ class _PigletBulkRegistrationScreenState
     if (uuid == null || uuid.isEmpty) return '';
     for (final livestock in _allLivestock) {
       if (livestock.uuid == uuid) {
-        return livestock.name.isNotEmpty
-            ? livestock.name
-            : 'Livestock #${livestock.id}';
+        return LivestockHelper.getDisplayLabel(
+          livestock,
+          fallbackPrefix: 'Livestock',
+        );
       }
     }
     return '';
@@ -1006,6 +1018,7 @@ class _PigletBulkRegistrationScreenState
     final livestockProvider = context.read<LivestockProvider>();
     final eventsProvider = context.read<EventsProvider>();
     setState(() => _isSubmitting = true);
+    var loadingDialogOpen = false;
 
     try {
       AlertDialogs.showLoading(
@@ -1014,6 +1027,7 @@ class _PigletBulkRegistrationScreenState
         message: l10n.pigletBulkSavingMessage,
         isDismissible: false,
       );
+      loadingDialogOpen = true;
 
       var effectiveBirthUuid = _selectedBirthEventUuid;
       final pending = widget.pendingBirthEventToPersist;
@@ -1121,7 +1135,10 @@ class _PigletBulkRegistrationScreenState
       if (!mounted) return;
       final createdCount = created?.length ?? 0;
       if (created == null || createdCount != items.length) {
-        Navigator.of(context).pop();
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         setState(() => _isSubmitting = false);
         await AlertDialogs.showError(
           context: context,
@@ -1185,7 +1202,10 @@ class _PigletBulkRegistrationScreenState
       }
 
       if (!mounted) return;
-      Navigator.of(context).pop();
+      if (loadingDialogOpen) {
+        Navigator.of(context).pop();
+        loadingDialogOpen = false;
+      }
 
       setState(() => _isSubmitting = false);
 
@@ -1201,33 +1221,39 @@ class _PigletBulkRegistrationScreenState
         if (!mounted) return;
 
         final inactiveN = inactiveIndices.length;
-        var successMsg = pending != null
-            ? '${l10n.birthEventSaved}\n\n${l10n.pigletBulkSuccess(created.length)}'
-            : l10n.pigletBulkSuccess(created.length);
-        if (inactiveN > 0 && disposalFailures == 0) {
-          successMsg =
-              '$successMsg\n\n${l10n.pigletBulkSuccessDisposals(inactiveN)}';
-        }
-
-        await AlertDialogs.showSuccess(
-          context: context,
-          title: l10n.success,
-          message: successMsg,
-          buttonText: l10n.ok,
-        );
-
-        if (mounted && disposalFailures > 0 && inactiveN > 0) {
+        final hasPartialFailure = disposalFailures > 0 && inactiveN > 0;
+        if (hasPartialFailure) {
           await AlertDialogs.showError(
             context: context,
             title: l10n.error,
-            message: l10n.pigletBulkDisposalPartialFailure,
+            message:
+                '${l10n.pigletBulkSuccess(created.length)}\n\n${l10n.pigletBulkDisposalPartialFailure}',
             buttonText: l10n.ok,
             onPressed: () => Navigator.of(context).pop(),
+          );
+        } else {
+          var successMsg = pending != null
+              ? '${l10n.birthEventSaved}\n\n${l10n.pigletBulkSuccess(created.length)}'
+              : l10n.pigletBulkSuccess(created.length);
+          if (inactiveN > 0) {
+            successMsg =
+                '$successMsg\n\n${l10n.pigletBulkSuccessDisposals(inactiveN)}';
+          }
+
+          await AlertDialogs.showSuccess(
+            context: context,
+            title: l10n.success,
+            message: successMsg,
+            buttonText: l10n.ok,
           );
         }
 
         if (mounted) Navigator.of(context).pop(true);
       } else if (mounted) {
+        if (loadingDialogOpen) {
+          Navigator.of(context).pop();
+          loadingDialogOpen = false;
+        }
         await AlertDialogs.showError(
           context: context,
           title: l10n.error,
@@ -1240,7 +1266,10 @@ class _PigletBulkRegistrationScreenState
       log('Piglet bulk submit error: $e\n$st');
       if (mounted) {
         try {
-          Navigator.of(context).pop();
+          if (loadingDialogOpen) {
+            Navigator.of(context).pop();
+            loadingDialogOpen = false;
+          }
         } catch (_) {}
         setState(() => _isSubmitting = false);
         await AlertDialogs.showError(
@@ -1683,6 +1712,21 @@ class _PigletBulkRegistrationScreenState
                       ),
                     ),
                   ),
+                  if (_diffSex) ...[
+                    const SizedBox(height: 12),
+                    CustomDropdown<String>(
+                      label: l10n.gender,
+                      hint: l10n.selectGender,
+                      icon: Icons.wc_outlined,
+                      value: row.gender,
+                      dropdownItems: [
+                        DropdownItem(value: 'male', label: l10n.male),
+                        DropdownItem(value: 'female', label: l10n.female),
+                      ],
+                      onChanged: (v) => setState(() => row.gender = v),
+                      isRequired: true,
+                    ),
+                  ],
                   if (_diffWeight) ...[
                     const SizedBox(height: 12),
                     CustomTextField(
@@ -1722,7 +1766,8 @@ class _PigletBulkRegistrationScreenState
     final showSharedDateEnteredFarm = !_diffDateEnteredFarm;
     final showSharedColors = !_diffColors;
     final showSharedStatus = !_diffStatus;
-    final showSharedParentage = showSharedMother || showSharedFather;
+    final showSharedParentage =
+        _isBornOnFarmSelected() && (showSharedMother || showSharedFather);
     final showSharedAcquisition =
         showSharedObtainedMethod || showSharedDateEnteredFarm;
 
@@ -2010,65 +2055,6 @@ class _PigletBulkRegistrationScreenState
             isRequired: false,
           ),
         ],
-        if (showSharedParentage) ...[
-          const SizedBox(height: 24),
-          _sectionTitle(l10n.parentageInformation, l10n.optionalSelectParents),
-          if (showSharedMother) ...[
-            const SizedBox(height: 12),
-            CustomDropdown<String>(
-              label: l10n.motherOptional,
-              hint: l10n.select,
-              icon: Icons.female_outlined,
-              value: _selectedMotherUuid,
-              enabled: widget.pendingBirthEventToPersist == null,
-              dropdownItems: _eligibleMothers.map((livestock) {
-                var farmName = l10n.unknownFarm;
-                for (final f in _farms) {
-                  if (f.uuid == livestock.farmUuid) {
-                    farmName = f.name;
-                    break;
-                  }
-                }
-                final label = livestock.name.isNotEmpty
-                    ? livestock.name
-                    : '${l10n.livestock} #${livestock.id}';
-                return DropdownItem(
-                  value: livestock.uuid,
-                  label: '$label ($farmName)',
-                );
-              }).toList(),
-              onChanged: (v) => setState(() => _selectedMotherUuid = v),
-              isRequired: false,
-            ),
-          ],
-          if (showSharedFather) ...[
-            const SizedBox(height: 16),
-            CustomDropdown<String>(
-              label: l10n.fatherOptional,
-              hint: l10n.select,
-              icon: Icons.male_outlined,
-              value: _selectedFatherUuid,
-              dropdownItems: _eligibleFathers.map((livestock) {
-                var farmName = l10n.unknownFarm;
-                for (final f in _farms) {
-                  if (f.uuid == livestock.farmUuid) {
-                    farmName = f.name;
-                    break;
-                  }
-                }
-                final label = livestock.name.isNotEmpty
-                    ? livestock.name
-                    : '${l10n.livestock} #${livestock.id}';
-                return DropdownItem(
-                  value: livestock.uuid,
-                  label: '$label ($farmName)',
-                );
-              }).toList(),
-              onChanged: (v) => setState(() => _selectedFatherUuid = v),
-              isRequired: false,
-            ),
-          ],
-        ],
         if (showSharedAcquisition) ...[
           const SizedBox(height: 24),
           _sectionTitle(l10n.acquisitionDetails, l10n.howAndWhenObtained),
@@ -2088,11 +2074,18 @@ class _PigletBulkRegistrationScreenState
                   if (v != null) {
                     final m = _livestockObtainedMethods.firstWhere(
                       (e) => e.id == v,
+                      orElse: () => _livestockObtainedMethods.first,
                     );
                     if (m.name.toLowerCase().contains('born') &&
                         _selectedDateOfBirth != null) {
                       _selectedDateFirstEnteredToFarm = _selectedDateOfBirth;
+                    } else {
+                      _selectedMotherUuid = null;
+                      _selectedFatherUuid = null;
                     }
+                  } else {
+                    _selectedMotherUuid = null;
+                    _selectedFatherUuid = null;
                   }
                 });
               },
@@ -2114,6 +2107,75 @@ class _PigletBulkRegistrationScreenState
               lastDate: DateTime.now(),
               dateValidator: (d) =>
                   d == null ? l10n.pleaseSelectDateEnteredFarm : null,
+            ),
+          ],
+        ],
+        if (showSharedParentage) ...[
+          const SizedBox(height: 24),
+          _sectionTitle(l10n.parentageInformation, l10n.optionalSelectParents),
+          if (showSharedMother) ...[
+            const SizedBox(height: 12),
+            CustomDropdown<String>(
+              label: l10n.motherOptional,
+              hint: l10n.select,
+              icon: Icons.female_outlined,
+              value: _selectedMotherUuid,
+              enabled: widget.pendingBirthEventToPersist == null,
+              dropdownItems: _eligibleMothers.map((livestock) {
+                final farmName = _farms.isNotEmpty
+                    ? _farms
+                          .firstWhere(
+                            (f) => f.uuid == livestock.farmUuid,
+                            orElse: () => _farms.first,
+                          )
+                          .name
+                    : l10n.unknownFarm;
+                final label =
+                    LivestockHelper.getDisplayName(livestock).isNotEmpty
+                    ? LivestockHelper.getDisplayName(livestock)
+                    : '${l10n.livestock} #${livestock.id}';
+                final ageLabel = LivestockHelper.getAgeLabelFromDateOfBirth(
+                  livestock.dateOfBirth,
+                );
+                return DropdownItem(
+                  value: livestock.uuid,
+                  label: '$label • ${l10n.age}: $ageLabel • $farmName',
+                );
+              }).toList(),
+              onChanged: (v) => setState(() => _selectedMotherUuid = v),
+              isRequired: false,
+            ),
+          ],
+          if (showSharedFather) ...[
+            const SizedBox(height: 16),
+            CustomDropdown<String>(
+              label: l10n.fatherOptional,
+              hint: l10n.select,
+              icon: Icons.male_outlined,
+              value: _selectedFatherUuid,
+              dropdownItems: _eligibleFathers.map((livestock) {
+                final farmName = _farms.isNotEmpty
+                    ? _farms
+                          .firstWhere(
+                            (f) => f.uuid == livestock.farmUuid,
+                            orElse: () => _farms.first,
+                          )
+                          .name
+                    : l10n.unknownFarm;
+                final label =
+                    LivestockHelper.getDisplayName(livestock).isNotEmpty
+                    ? LivestockHelper.getDisplayName(livestock)
+                    : '${l10n.livestock} #${livestock.id}';
+                final ageLabel = LivestockHelper.getAgeLabelFromDateOfBirth(
+                  livestock.dateOfBirth,
+                );
+                return DropdownItem(
+                  value: livestock.uuid,
+                  label: '$label • ${l10n.age}: $ageLabel • $farmName',
+                );
+              }).toList(),
+              onChanged: (v) => setState(() => _selectedFatherUuid = v),
+              isRequired: false,
             ),
           ],
         ],
@@ -2550,9 +2612,10 @@ class _PigletBulkRegistrationScreenState
           break;
         }
       }
-      final label = livestock.name.isNotEmpty
-          ? livestock.name
-          : '${l10n.livestock} #${livestock.id}';
+      final label = LivestockHelper.getDisplayLabel(
+        livestock,
+        fallbackPrefix: l10n.livestock,
+      );
       return DropdownItem(value: livestock.uuid, label: '$label ($farmName)');
     }
 
