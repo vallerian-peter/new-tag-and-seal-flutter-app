@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -50,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final email = await _secureStorage.read(key: 'email') ?? '';
     final phone = await _secureStorage.read(key: 'phone1') ?? '';
     final role = await _secureStorage.read(key: 'role') ?? 'Farmer';
-    
+
     if (mounted) {
       setState(() {
         _userName = '$firstname $surname'.trim();
@@ -67,21 +68,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadAnalytics() async {
     try {
-      final farmProvider =
-          Provider.of<FarmProvider>(context, listen: false);
-      final eventsProvider =
-          Provider.of<EventsProvider>(context, listen: false);
+      final farmProvider = Provider.of<FarmProvider>(context, listen: false);
+      final eventsProvider = Provider.of<EventsProvider>(
+        context,
+        listen: false,
+      );
 
       final farmsData = await farmProvider.getAllFarmsWithLivestock();
       final eventSummary = await eventsProvider.getEventSummary();
 
       if (!mounted) return;
 
-      final transformed = (farmsData ?? [])
-          .map<Map<String, dynamic>>((farmData) {
+      final transformed = (farmsData ?? []).map<Map<String, dynamic>>((
+        farmData,
+      ) {
         final farm = farmData['farm'];
         final livestock = farmData['livestock'] as List? ?? const [];
-        final livestockCount = farmData['livestockCount'] as int? ?? livestock.length;
+        final livestockCount =
+            farmData['livestockCount'] as int? ?? livestock.length;
 
         return {
           'name': farm.name,
@@ -106,9 +110,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   int get _totalLivestockCount => _farmsWithLivestock.fold<int>(
-        0,
-        (sum, farm) => sum + (farm['livestockCount'] as int? ?? 0),
-      );
+    0,
+    (sum, farm) => sum + (farm['livestockCount'] as int? ?? 0),
+  );
 
   int get _totalFarmCount => _farmsWithLivestock.length;
 
@@ -122,9 +126,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
-      )
+      ),
     );
-    
+
     return Scaffold(
       body: _isLoading
           ? const Center(child: LoadingIndicator())
@@ -133,7 +137,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.only(bottom: 32),
               child: Column(
                 children: [
-
                   // Gradient Header
                   Container(
                     width: double.infinity,
@@ -149,16 +152,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.only(right: 20, left: 20, bottom: 30),
+                        padding: const EdgeInsets.only(
+                          right: 20,
+                          left: 20,
+                          bottom: 30,
+                        ),
                         child: Column(
                           children: [
-
                             Row(
                               children: [
                                 const Spacer(),
                                 IconButton(
-                                  icon: const Icon(Iconsax.setting_2_outline,
-                                      color: Colors.white, size: 22),
+                                  icon: const Icon(
+                                    Iconsax.setting_2_outline,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
                                   onPressed: _openSettings,
                                 ),
                               ],
@@ -191,9 +200,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: Constants.primaryColor,
                               ),
                             ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             Text(
                               _userName,
                               style: const TextStyle(
@@ -204,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
 
                             const SizedBox(height: 4),
-                            
+
                             Text(
                               _userEmail,
                               style: TextStyle(
@@ -217,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Profile Details Card
                   Transform.translate(
                     offset: const Offset(0, 5),
@@ -225,21 +234,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        gradient: isDark ? null : LinearGradient(
-                          colors: [
-                            Constants.primaryColor.withValues(alpha: 0.05),
-                            Colors.grey.withValues(alpha: 0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        gradient: isDark
+                            ? null
+                            : LinearGradient(
+                                colors: [
+                                  Constants.primaryColor.withValues(
+                                    alpha: 0.05,
+                                  ),
+                                  Colors.grey.withValues(alpha: 0.05),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: isDark ? Colors.transparent : Colors.grey.withValues(alpha: 0.2),
+                          color: isDark
+                              ? Colors.transparent
+                              : Colors.grey.withValues(alpha: 0.2),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: isDark 
+                            color: isDark
                                 ? Colors.black.withValues(alpha: 0.3)
                                 : Colors.grey.withValues(alpha: 0.1),
                             blurRadius: isDark ? 0 : 10,
@@ -254,12 +269,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: isDark 
+                              color: isDark
                                   ? Colors.grey.withValues(alpha: 0.3)
                                   : Colors.white.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isDark 
+                                color: isDark
                                     ? Colors.grey.withValues(alpha: 0.6)
                                     : Colors.grey.withValues(alpha: 0.3),
                               ),
@@ -286,76 +301,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                                 const SizedBox(height: 20),
-                                
+
                                 _buildDetailItem(
                                   context: context,
                                   icon: Iconsax.user_outline,
                                   label: l10n.firstName,
                                   value: _userName,
                                 ),
-                                
+
                                 const SizedBox(height: 16),
-                                
+
                                 _buildDetailItem(
                                   context: context,
                                   icon: Iconsax.sms_outline,
                                   label: l10n.email,
                                   value: _userEmail,
                                 ),
-                                
+
                                 const SizedBox(height: 16),
-                                
+
                                 _buildDetailItem(
                                   context: context,
                                   icon: Iconsax.call_outline,
                                   label: l10n.phone1,
-                                  value: _userPhone.isNotEmpty ? _userPhone : '${l10n.notProvided}',
+                                  value: _userPhone.isNotEmpty
+                                      ? _userPhone
+                                      : '${l10n.notProvided}',
                                 ),
-                                
+
                                 const SizedBox(height: 16),
-                                
+
                                 _buildDetailItem(
                                   context: context,
                                   icon: Iconsax.shield_tick_outline,
                                   label: l10n.role,
-                                  value: _userRole,
+                                  value: _userRole.toUpperCase(),
                                 ),
 
                                 const SizedBox(height: 16),
 
-                                  // Edit Profile Button (only show for farmers)
-                                  if (_userRole.toLowerCase() == 'farmer')
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Constants.primaryColor,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          elevation: 0,
+                                // Edit Profile Button (only show for farmers)
+                                if (_userRole.toLowerCase() == 'farmer')
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Constants.primaryColor,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
                                         ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const EditProfileScreen(),
-                                            ),
-                                          );
-                                        },
-                                        icon: const Icon(Iconsax.edit_outline, size: 18),
-                                        label: Text(
-                                          l10n.editProfile,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const EditProfileScreen(),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Iconsax.edit_outline,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        l10n.editProfile,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
-                                
+                                  ),
                               ],
                             ),
                           ),
@@ -363,55 +387,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // Profile Stats
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: _isStatsLoading
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 24),
-                            child: Center(
-                              child: LoadingIndicator(size: 28),
-                            ),
+                            child: Center(child: LoadingIndicator(size: 28)),
                           )
                         : Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            context: context,
-                            title: l10n.livestock,
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  context: context,
+                                  title: l10n.livestock,
                                   value: '$_totalLivestockCount',
-                            icon: Iconsax.pet_outline,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            context: context,
-                            title: l10n.events,
+                                  icon: Iconsax.pet_outline,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildStatCard(
+                                  context: context,
+                                  title: l10n.events,
                                   value: '$_totalEventCount',
-                            icon: Iconsax.calendar_outline,
-                            color: Colors.green,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            context: context,
-                            title: l10n.farms,
+                                  icon: Iconsax.calendar_outline,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildStatCard(
+                                  context: context,
+                                  title: l10n.farms,
                                   value: '$_totalFarmCount',
-                            icon: FontAwesome.seedling_solid,
-                            color: Colors.orange,
+                                  icon: FontAwesome.seedling_solid,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
-                  
-                
+
                   const SizedBox(height: 20),
 
                   // Logout Button
@@ -430,9 +451,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   const SizedBox(height: 40),
-          ],
-        ),
-      ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -443,7 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String value,
   }) {
     final theme = Theme.of(context);
-    
+
     return Row(
       children: [
         Container(
@@ -452,11 +473,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: Constants.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            color: Constants.primaryColor,
-            size: 16,
-          ),
+          child: Icon(icon, color: Constants.primaryColor, size: 16),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -497,7 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Determine navigation target based on title
     int? targetTabIndex;
     if (title == l10n.livestock) {
@@ -507,7 +524,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else if (title == l10n.farms) {
       targetTabIndex = 0; // Dashboard tab - navigates to DashboardScreen
     }
-    
+
     return InkWell(
       onTap: () {
         if (targetTabIndex != null) {
@@ -523,18 +540,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: isDark ? null : LinearGradient(
-            colors: [
-              color.withValues(alpha: 0.05),
-              color.withValues(alpha: 0.02),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: isDark
+              ? null
+              : LinearGradient(
+                  colors: [
+                    color.withValues(alpha: 0.05),
+                    color.withValues(alpha: 0.02),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
           color: isDark ? Colors.grey[800] : null,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark 
+            color: isDark
                 ? theme.colorScheme.outline.withValues(alpha: 0.2)
                 : color.withValues(alpha: 0.2),
           ),
@@ -547,11 +566,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+              child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(height: 12),
             Text(
@@ -588,57 +603,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     if (!mounted) return;
-
     final l10n = AppLocalizations.of(context)!;
 
-    await showDialog<void>(
+    await ModernAlerts.showConfirmation<void>(
       context: context,
-      builder: (context) {
-        final theme = Theme.of(context);
-        final isDark = theme.brightness == Brightness.dark;
-        return AlertDialog(
-          backgroundColor: isDark ? Colors.grey.shade700 : Colors.white,
-          surfaceTintColor: Colors.transparent,
-          title: Text(l10n.logout),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(summary.hasPending
-                  ? l10n.unsyncedDataWarning
-                  : l10n.noUnsyncedDataMessage),
-              if (summary.hasPending) ...[
-                const SizedBox(height: 12),
-                ..._buildUnsyncedSummaryItems(l10n, summary),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.cancel),
-            ),
-            if (summary.hasPending)
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _logoutFlow(syncBefore: true);
-                },
-                child: Text(l10n.syncAndLogout),
-              ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _logoutFlow(syncBefore: false);
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.redAccent,
-              ),
-              child: Text(l10n.logout),
-            ),
-          ],
-        );
-      },
+      title: l10n.logout,
+      messageWidget: _buildLogoutDialogMessage(l10n, summary),
+      confirmText: summary.hasPending ? l10n.syncAndLogout : l10n.logout,
+      cancelText: l10n.cancel,
+      onConfirm: () => _logoutFlow(syncBefore: summary.hasPending),
+      secondaryActionText: summary.hasPending ? l10n.logout : null,
+      onSecondaryAction: summary.hasPending
+          ? () => _logoutFlow(syncBefore: false)
+          : null,
+      secondaryActionColor: Colors.redAccent,
+      confirmButtonColor: Colors.redAccent,
     );
   }
 
@@ -646,8 +625,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final l10n = AppLocalizations.of(context)!;
     final database = Provider.of<AppDatabase>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final additionalDataProvider =
-        Provider.of<AdditionalDataProvider>(context, listen: false);
+    final additionalDataProvider = Provider.of<AdditionalDataProvider>(
+      context,
+      listen: false,
+    );
     final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
 
     if (syncBefore) {
@@ -699,9 +680,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _openSettings() async {
     if (!mounted) return;
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   List<Widget> _buildUnsyncedSummaryItems(
@@ -722,10 +703,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -752,6 +732,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     addItem(l10n.invitedUsersText, summary.farmUsers);
 
     return items;
+  }
+
+  Widget _buildLogoutDialogMessage(
+    AppLocalizations l10n,
+    SyncUnsyncedSummary summary,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          summary.hasPending
+              ? l10n.unsyncedDataWarning
+              : l10n.noUnsyncedDataMessage,
+        ),
+        if (summary.hasPending) ...[
+          const SizedBox(height: 12),
+          ..._buildUnsyncedSummaryItems(l10n, summary),
+        ],
+      ],
+    );
   }
 
   String _logLabel(AppLocalizations l10n, String key) {
@@ -793,4 +794,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 }
-

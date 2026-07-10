@@ -7,7 +7,7 @@ class Transfers extends Table {
   TextColumn get farmUuid => text()();
   TextColumn get livestockUuid => text()();
   TextColumn get toFarmUuid => text().nullable()();
-  IntColumn get transporterId => integer().nullable()();
+  TextColumn get transporterId => text().nullable()();
   TextColumn get reason => text().nullable()();
   TextColumn get price => text().nullable()();
   TextColumn get transferDate => text()();
@@ -22,4 +22,3 @@ class Transfers extends Table {
   @override
   Set<Column> get primaryKey => {uuid};
 }
-

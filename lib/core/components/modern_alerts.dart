@@ -86,6 +86,11 @@ class ModernAlerts {
     required String cancelText,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
+    String? secondaryActionText,
+    VoidCallback? onSecondaryAction,
+    Color? secondaryActionColor,
+    Color? confirmButtonColor,
+    bool showCancelButton = true,
     bool isDismissible = true,
   }) {
     return AlertDialogs.showConfirmation(
@@ -97,6 +102,11 @@ class ModernAlerts {
       cancelText: cancelText,
       onConfirm: onConfirm,
       onCancel: onCancel,
+      secondaryActionText: secondaryActionText,
+      onSecondaryAction: onSecondaryAction,
+      secondaryActionColor: secondaryActionColor,
+      confirmButtonColor: confirmButtonColor,
+      showCancelButton: showCancelButton,
       isDismissible: isDismissible,
     );
   }
@@ -109,7 +119,10 @@ class ModernAlerts {
     ToastAlerts.showWarning(context, message: message);
   }
 
-  static void showSuccessToast(BuildContext context, {required String message}) {
+  static void showSuccessToast(
+    BuildContext context, {
+    required String message,
+  }) {
     ToastAlerts.showSuccess(context, message: message);
   }
 }

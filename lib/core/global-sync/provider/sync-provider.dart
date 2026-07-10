@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/sync.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/core/check-network/network_check.dart';
-import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/features/notifications/presentation/provider/notification_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/provider/log_additional_data_provider.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +56,7 @@ class SyncProvider extends ChangeNotifier {
 
   /// Check if 24 hours have passed and sync if needed
   Future<void> _checkAndSyncIfNeeded() async {
-    if (_isChecking || _database == null) return;
+    if (_isChecking) return;
 
     _isChecking = true;
 
@@ -114,7 +114,7 @@ class SyncProvider extends ChangeNotifier {
 
   /// Check if unsynced count requires forced sync dialog
   Future<void> _checkForcedSync() async {
-    if (_database == null || _currentContext == null) return;
+    if (_currentContext == null) return;
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -155,23 +155,23 @@ class SyncProvider extends ChangeNotifier {
       final summary = await Sync.getUnsyncedSummary(_database);
       final unsyncedCount = summary.totalPending;
 
-      await showDialog(
+      await ModernAlerts.showConfirmation<void>(
         context: context,
-        barrierDismissible: false, // Cannot dismiss by tapping outside
-        builder: (context) => _ForcedSyncDialog(
-          unsyncedCount: unsyncedCount,
-          onSync: () async {
-            Navigator.of(context).pop();
-            await splashSyncWithDialog(context);
+        title: l10n.syncRequired,
+        message: l10n.syncRequiredMessage(unsyncedCount),
+        confirmText: l10n.syncNow,
+        cancelText: l10n.cancel,
+        showCancelButton: false,
+        isDismissible: false,
+        onConfirm: () async {
+          await splashSyncWithDialog(context);
 
-            // Update last sync timestamp after successful sync
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setInt(
-              _lastSyncTimestampKey,
-              DateTime.now().millisecondsSinceEpoch,
-            );
-          },
-        ),
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt(
+            _lastSyncTimestampKey,
+            DateTime.now().millisecondsSinceEpoch,
+          );
+        },
       );
     } catch (e) {
       log('❌ Error showing forced sync dialog: $e');
@@ -476,105 +476,5 @@ class SyncProvider extends ChangeNotifier {
     } catch (e) {
       log('⚠️ Failed to refresh reference data after sync: $e');
     }
-  }
-}
-
-/// Forced Sync Dialog Widget
-///
-/// Shows a dialog that requires user to sync when unsynced count >= 15
-/// No cancel option - user must sync to proceed
-class _ForcedSyncDialog extends StatelessWidget {
-  final int unsyncedCount;
-  final VoidCallback onSync;
-
-  const _ForcedSyncDialog({required this.unsyncedCount, required this.onSync});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-
-    return Dialog(
-      backgroundColor: theme.brightness == Brightness.dark
-          ? theme.scaffoldBackgroundColor
-          : Colors.white,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: theme.brightness == Brightness.dark
-              ? theme.scaffoldBackgroundColor
-              : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Warning icon
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.sync_problem,
-                size: 40,
-                color: Colors.orange,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Title
-            Text(
-              l10n.syncRequired,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-
-            // Message
-            Text(
-              l10n.syncRequiredMessage(unsyncedCount),
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-
-            // Sync button (only option - no cancel)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onSync,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Constants.primaryColor,
-                  foregroundColor: theme.brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  l10n.syncNow,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

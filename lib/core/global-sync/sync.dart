@@ -582,6 +582,7 @@ class Sync {
       'financeExpenses': unsyncedFinanceExpenses,
       'financeIncomes': unsyncedFinanceIncomes,
       'farmUsers': unsyncedFarmUsers,
+      
       // TODO: Add other collections here
       // 'vaccines': unsyncedVaccines,
       // 'feeds': unsyncedFeeds,

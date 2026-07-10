@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:intl/intl.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -16,6 +16,7 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,9 @@ class IncomeExpenditureReportScreen extends StatefulWidget {
 
 class _IncomeExpenditureReportScreenState
     extends State<IncomeExpenditureReportScreen> {
+  static const MethodChannel _downloadsChannel = MethodChannel(
+    'reports/downloads',
+  );
   _LedgerFilter _ledgerFilter = _LedgerFilter.all;
 
   String _formatAmount(double amount) => NumberFormatter.formatCurrency(amount);
@@ -594,6 +598,11 @@ class _IncomeExpenditureReportScreenState
         return;
       }
 
+      if (Platform.isAndroid) {
+        await _downloadReportToAndroidDownloads(bytes, fileName, l10n);
+        return;
+      }
+
       Directory? baseDir = await getDownloadsDirectory();
       baseDir ??= await getApplicationDocumentsDirectory();
       baseDir.createSync(recursive: true);
@@ -618,6 +627,41 @@ class _IncomeExpenditureReportScreenState
     }
   }
 
+  Future<void> _downloadReportToAndroidDownloads(
+    Uint8List bytes,
+    String fileName,
+    AppLocalizations l10n,
+  ) async {
+    final requiresPermission = await _downloadsChannel.invokeMethod<bool>(
+      'requiresLegacyStoragePermission',
+    );
+
+    if (requiresPermission == true) {
+      final status = await Permission.storage.request();
+      if (!status.isGranted) {
+        if (!mounted) return;
+        ModernAlerts.showErrorToast(
+          context,
+          message: '${l10n.error}: Storage permission denied.',
+        );
+        return;
+      }
+    }
+
+    final savedPath = await _downloadsChannel.invokeMethod<String>(
+      'savePdfToDownloads',
+      {'fileName': fileName, 'bytes': bytes},
+    );
+
+    if (!mounted) return;
+    ModernAlerts.showSuccessToast(
+      context,
+      message: savedPath == null || savedPath.isEmpty
+          ? l10n.reportDownloaded
+          : '${l10n.reportDownloaded}: $savedPath',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -636,10 +680,7 @@ class _IncomeExpenditureReportScreenState
       allExpenditureEntries,
       _ledgerFilter,
     );
-    final incomeEntries = _filterLedgerEntries(
-      allIncomeEntries,
-      _ledgerFilter,
-    );
+    final incomeEntries = _filterLedgerEntries(allIncomeEntries, _ledgerFilter);
     final totalIncome = _sumLedgerAmount(allIncomeEntries);
     final totalExpenditure = _sumLedgerAmount(allExpenditureEntries);
     final netBalance = totalIncome - totalExpenditure;
@@ -1010,9 +1051,8 @@ class _IncomeExpenditureReportScreenState
                       _filterPill(
                         label: l10n.incomeReportFilterAll,
                         selected: _ledgerFilter == _LedgerFilter.all,
-                        onTap: () => setState(
-                          () => _ledgerFilter = _LedgerFilter.all,
-                        ),
+                        onTap: () =>
+                            setState(() => _ledgerFilter = _LedgerFilter.all),
                       ),
                       _filterPill(
                         label: l10n.incomeReportFilterIncome,
@@ -1048,19 +1088,19 @@ class _IncomeExpenditureReportScreenState
                     )
                   else ...[
                     if (incomeEntries.isNotEmpty) ...[
-                    Text(
-                      l10n.incomeReportIncomeEntriesSectionTitle(
-                        incomeEntries.length,
+                      Text(
+                        l10n.incomeReportIncomeEntriesSectionTitle(
+                          incomeEntries.length,
+                        ),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      const SizedBox(height: 10),
+                      ...incomeEntries.map(
+                        (entry) =>
+                            _ledgerEntryCard(context: context, entry: entry),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...incomeEntries.map(
-                      (entry) =>
-                          _ledgerEntryCard(context: context, entry: entry),
-                    ),
                     ],
                     if (expenditureEntries.isNotEmpty) ...[
                       if (incomeEntries.isNotEmpty) const SizedBox(height: 8),

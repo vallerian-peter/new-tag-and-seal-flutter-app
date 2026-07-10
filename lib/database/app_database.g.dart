@@ -23232,11 +23232,11 @@ class $TransfersTable extends Transfers
     'transporterId',
   );
   @override
-  late final GeneratedColumn<int> transporterId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> transporterId = GeneratedColumn<String>(
     'transporter_id',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
@@ -23517,7 +23517,7 @@ class $TransfersTable extends Transfers
         data['${effectivePrefix}to_farm_uuid'],
       ),
       transporterId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}transporter_id'],
       ),
       reason: attachedDatabase.typeMapping.read(
@@ -23572,7 +23572,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   final String farmUuid;
   final String livestockUuid;
   final String? toFarmUuid;
-  final int? transporterId;
+  final String? transporterId;
   final String? reason;
   final String? price;
   final String transferDate;
@@ -23616,7 +23616,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       map['to_farm_uuid'] = Variable<String>(toFarmUuid);
     }
     if (!nullToAbsent || transporterId != null) {
-      map['transporter_id'] = Variable<int>(transporterId);
+      map['transporter_id'] = Variable<String>(transporterId);
     }
     if (!nullToAbsent || reason != null) {
       map['reason'] = Variable<String>(reason);
@@ -23685,7 +23685,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       farmUuid: serializer.fromJson<String>(json['farmUuid']),
       livestockUuid: serializer.fromJson<String>(json['livestockUuid']),
       toFarmUuid: serializer.fromJson<String?>(json['toFarmUuid']),
-      transporterId: serializer.fromJson<int?>(json['transporterId']),
+      transporterId: serializer.fromJson<String?>(json['transporterId']),
       reason: serializer.fromJson<String?>(json['reason']),
       price: serializer.fromJson<String?>(json['price']),
       transferDate: serializer.fromJson<String>(json['transferDate']),
@@ -23707,7 +23707,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       'farmUuid': serializer.toJson<String>(farmUuid),
       'livestockUuid': serializer.toJson<String>(livestockUuid),
       'toFarmUuid': serializer.toJson<String?>(toFarmUuid),
-      'transporterId': serializer.toJson<int?>(transporterId),
+      'transporterId': serializer.toJson<String?>(transporterId),
       'reason': serializer.toJson<String?>(reason),
       'price': serializer.toJson<String?>(price),
       'transferDate': serializer.toJson<String>(transferDate),
@@ -23727,7 +23727,7 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     String? farmUuid,
     String? livestockUuid,
     Value<String?> toFarmUuid = const Value.absent(),
-    Value<int?> transporterId = const Value.absent(),
+    Value<String?> transporterId = const Value.absent(),
     Value<String?> reason = const Value.absent(),
     Value<String?> price = const Value.absent(),
     String? transferDate,
@@ -23859,7 +23859,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   final Value<String> farmUuid;
   final Value<String> livestockUuid;
   final Value<String?> toFarmUuid;
-  final Value<int?> transporterId;
+  final Value<String?> transporterId;
   final Value<String?> reason;
   final Value<String?> price;
   final Value<String> transferDate;
@@ -23920,7 +23920,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     Expression<String>? farmUuid,
     Expression<String>? livestockUuid,
     Expression<String>? toFarmUuid,
-    Expression<int>? transporterId,
+    Expression<String>? transporterId,
     Expression<String>? reason,
     Expression<String>? price,
     Expression<String>? transferDate,
@@ -23960,7 +23960,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     Value<String>? farmUuid,
     Value<String>? livestockUuid,
     Value<String?>? toFarmUuid,
-    Value<int?>? transporterId,
+    Value<String?>? transporterId,
     Value<String?>? reason,
     Value<String?>? price,
     Value<String>? transferDate,
@@ -24015,7 +24015,7 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
       map['to_farm_uuid'] = Variable<String>(toFarmUuid.value);
     }
     if (transporterId.present) {
-      map['transporter_id'] = Variable<int>(transporterId.value);
+      map['transporter_id'] = Variable<String>(transporterId.value);
     }
     if (reason.present) {
       map['reason'] = Variable<String>(reason.value);
@@ -50458,7 +50458,7 @@ typedef $$TransfersTableCreateCompanionBuilder =
       required String farmUuid,
       required String livestockUuid,
       Value<String?> toFarmUuid,
-      Value<int?> transporterId,
+      Value<String?> transporterId,
       Value<String?> reason,
       Value<String?> price,
       required String transferDate,
@@ -50478,7 +50478,7 @@ typedef $$TransfersTableUpdateCompanionBuilder =
       Value<String> farmUuid,
       Value<String> livestockUuid,
       Value<String?> toFarmUuid,
-      Value<int?> transporterId,
+      Value<String?> transporterId,
       Value<String?> reason,
       Value<String?> price,
       Value<String> transferDate,
@@ -50530,7 +50530,7 @@ class $$TransfersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get transporterId => $composableBuilder(
+  ColumnFilters<String> get transporterId => $composableBuilder(
     column: $table.transporterId,
     builder: (column) => ColumnFilters(column),
   );
@@ -50620,7 +50620,7 @@ class $$TransfersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get transporterId => $composableBuilder(
+  ColumnOrderings<String> get transporterId => $composableBuilder(
     column: $table.transporterId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -50702,7 +50702,7 @@ class $$TransfersTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get transporterId => $composableBuilder(
+  GeneratedColumn<String> get transporterId => $composableBuilder(
     column: $table.transporterId,
     builder: (column) => column,
   );
@@ -50773,7 +50773,7 @@ class $$TransfersTableTableManager
                 Value<String> farmUuid = const Value.absent(),
                 Value<String> livestockUuid = const Value.absent(),
                 Value<String?> toFarmUuid = const Value.absent(),
-                Value<int?> transporterId = const Value.absent(),
+                Value<String?> transporterId = const Value.absent(),
                 Value<String?> reason = const Value.absent(),
                 Value<String?> price = const Value.absent(),
                 Value<String> transferDate = const Value.absent(),
@@ -50811,7 +50811,7 @@ class $$TransfersTableTableManager
                 required String farmUuid,
                 required String livestockUuid,
                 Value<String?> toFarmUuid = const Value.absent(),
-                Value<int?> transporterId = const Value.absent(),
+                Value<String?> transporterId = const Value.absent(),
                 Value<String?> reason = const Value.absent(),
                 Value<String?> price = const Value.absent(),
                 required String transferDate,

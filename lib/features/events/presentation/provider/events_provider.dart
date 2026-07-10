@@ -1396,7 +1396,7 @@ class EventsProvider extends ChangeNotifier {
     required String farmUuid,
     required List<String> livestockUuids,
     String? toFarmUuid,
-    int? transporterId,
+    String? transporterId,
     String? reason,
     String? price,
     String? eventDate,

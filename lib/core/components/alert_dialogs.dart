@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 
 /// Modern Alert Dialogs
-/// 
+///
 /// A comprehensive set of alert dialogs for different states:
 /// - Loading (with progress indicator)
 /// - Success (with checkmark icon)
 /// - Error (with error icon)
 /// - Warning (with warning icon)
 /// - Network Issues (with network icon)
-/// 
+///
 /// Features:
 /// - Component-based design
 /// - Full localization support
@@ -26,12 +26,12 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show loading dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized)
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showLoading<T>({
     required BuildContext context,
@@ -42,10 +42,7 @@ class AlertDialogs {
     return showDialog<T>(
       context: context,
       barrierDismissible: isDismissible,
-      builder: (context) => _LoadingDialog(
-        title: title,
-        message: message,
-      ),
+      builder: (context) => _LoadingDialog(title: title, message: message),
     );
   }
 
@@ -54,14 +51,14 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show success dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized)
   /// [buttonText] - Button text (localized)
   /// [onPressed] - Button callback
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showSuccess<T>({
     required BuildContext context,
@@ -88,14 +85,14 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show error dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized)
   /// [buttonText] - Button text (localized)
   /// [onPressed] - Button callback
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showError<T>({
     required BuildContext context,
@@ -122,14 +119,14 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show warning dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized)
   /// [buttonText] - Button text (localized)
   /// [onPressed] - Button callback
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showWarning<T>({
     required BuildContext context,
@@ -156,7 +153,7 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show network issues dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized)
@@ -165,7 +162,7 @@ class AlertDialogs {
   /// [onRetry] - Retry button callback
   /// [onCancel] - Cancel button callback
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showNetworkIssues<T>({
     required BuildContext context,
@@ -196,7 +193,7 @@ class AlertDialogs {
   // ============================================================================
 
   /// Show confirmation dialog
-  /// 
+  ///
   /// [context] - BuildContext
   /// [title] - Dialog title (localized)
   /// [message] - Dialog message (localized) - used if [messageWidget] is null
@@ -206,7 +203,7 @@ class AlertDialogs {
   /// [onConfirm] - Confirm button callback
   /// [onCancel] - Cancel button callback
   /// [isDismissible] - Whether dialog can be dismissed by tapping outside
-  /// 
+  ///
   /// Returns the dialog result
   static Future<T?> showConfirmation<T>({
     required BuildContext context,
@@ -217,6 +214,11 @@ class AlertDialogs {
     required String cancelText,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
+    String? secondaryActionText,
+    VoidCallback? onSecondaryAction,
+    Color? secondaryActionColor,
+    Color? confirmButtonColor,
+    bool showCancelButton = true,
     bool isDismissible = true,
   }) {
     return showDialog<T>(
@@ -230,6 +232,11 @@ class AlertDialogs {
         cancelText: cancelText,
         onConfirm: onConfirm,
         onCancel: onCancel,
+        secondaryActionText: secondaryActionText,
+        onSecondaryAction: onSecondaryAction,
+        secondaryActionColor: secondaryActionColor,
+        confirmButtonColor: confirmButtonColor,
+        showCancelButton: showCancelButton,
       ),
     );
   }
@@ -243,21 +250,16 @@ class _LoadingDialog extends StatelessWidget {
   final String title;
   final String message;
 
-  const _LoadingDialog({
-    required this.title,
-    required this.message,
-  });
+  const _LoadingDialog({required this.title, required this.message});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -274,7 +276,7 @@ class _LoadingDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Loading indicator 
+            // Loading indicator
             Container(
               width: 60,
               height: 60,
@@ -285,7 +287,9 @@ class _LoadingDialog extends StatelessWidget {
               child: const Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Constants.primaryColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Constants.primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -341,12 +345,10 @@ class _SuccessDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -458,12 +460,10 @@ class _ErrorDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -575,12 +575,10 @@ class _WarningDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -597,7 +595,6 @@ class _WarningDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            
             // Warning icon
             Container(
               width: 80,
@@ -692,12 +689,10 @@ class _NetworkIssuesDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -821,6 +816,11 @@ class _ConfirmationDialog extends StatelessWidget {
   final String cancelText;
   final VoidCallback? onConfirm;
   final VoidCallback? onCancel;
+  final String? secondaryActionText;
+  final VoidCallback? onSecondaryAction;
+  final Color? secondaryActionColor;
+  final Color? confirmButtonColor;
+  final bool showCancelButton;
 
   const _ConfirmationDialog({
     required this.title,
@@ -830,6 +830,11 @@ class _ConfirmationDialog extends StatelessWidget {
     required this.cancelText,
     this.onConfirm,
     this.onCancel,
+    this.secondaryActionText,
+    this.onSecondaryAction,
+    this.secondaryActionColor,
+    this.confirmButtonColor,
+    this.showCancelButton = true,
   });
 
   @override
@@ -837,12 +842,10 @@ class _ConfirmationDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      backgroundColor: isDark 
-          ? theme.scaffoldBackgroundColor 
-          : Colors.white,
+    return _buildDialogShell(
+      context: context,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: isDark ? theme.scaffoldBackgroundColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -906,65 +909,125 @@ class _ConfirmationDialog extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
+            if (secondaryActionText != null && onSecondaryAction != null) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onSecondaryAction?.call();
+                  },
+                  child: Text(
+                    secondaryActionText!,
+                    style: TextStyle(
+                      fontSize: Constants.textSize,
+                      fontWeight: FontWeight.w600,
+                      color: secondaryActionColor ?? Colors.redAccent,
+                    ),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Buttons
-            Row(
-              children: [
-                // Cancel button
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: onCancel ?? () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+            if (showCancelButton)
+              Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onCancel ?? () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: const BorderSide(color: Colors.grey),
                       ),
-                      side: const BorderSide(color: Colors.grey),
-                    ),
-                    child: Text(
-                      cancelText,
-                      style: const TextStyle(
-                        fontSize: Constants.textSize,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                      child: Text(
+                        cancelText,
+                        style: const TextStyle(
+                          fontSize: Constants.textSize,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                // Confirm button
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Dismiss dialog first
-                      Navigator.of(context).pop();
-                      // Then call the callback if provided
-                      onConfirm?.call();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  // Confirm button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onConfirm?.call();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            confirmButtonColor ?? Constants.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      confirmText,
-                      style: const TextStyle(
-                        fontSize: Constants.textSize,
-                        fontWeight: FontWeight.w600,
+                      child: Text(
+                        confirmText,
+                        style: const TextStyle(
+                          fontSize: Constants.textSize,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
+                ],
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onConfirm?.call();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        confirmButtonColor ?? Constants.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    confirmText,
+                    style: const TextStyle(
+                      fontSize: Constants.textSize,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              ),
           ],
         ),
       ),
     );
   }
+}
+
+Widget _buildDialogShell({
+  required BuildContext context,
+  required Widget child,
+}) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+
+  return Dialog(
+    insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+    backgroundColor: isDark ? theme.scaffoldBackgroundColor : Colors.white,
+    child: SizedBox(width: double.maxFinite, child: child),
+  );
 }

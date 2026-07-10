@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/modern_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/global-sync/provider/sync-provider.dart';
@@ -803,57 +804,19 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     final l10n = AppLocalizations.of(context)!;
 
-    await showDialog<void>(
+    await ModernAlerts.showConfirmation<void>(
       context: context,
-      builder: (dialogContext) {
-        final theme = Theme.of(dialogContext);
-        final isDark = theme.brightness == Brightness.dark;
-
-        return AlertDialog(
-          backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: Text(l10n.logout),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                summary.hasPending
-                    ? l10n.unsyncedDataWarning
-                    : l10n.noUnsyncedDataMessage,
-              ),
-              if (summary.hasPending) ...[
-                const SizedBox(height: 12),
-                ..._buildUnsyncedSummaryItems(dialogContext, l10n, summary),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.cancel),
-            ),
-            if (summary.hasPending)
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  _logoutFlow(syncBefore: true);
-                },
-                child: Text(l10n.syncAndLogout),
-              ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _logoutFlow(syncBefore: false);
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-              child: Text(l10n.logout),
-            ),
-          ],
-        );
-      },
+      title: l10n.logout,
+      messageWidget: _buildLogoutDialogMessage(l10n, summary),
+      confirmText: summary.hasPending ? l10n.syncAndLogout : l10n.logout,
+      cancelText: l10n.cancel,
+      onConfirm: () => _logoutFlow(syncBefore: summary.hasPending),
+      secondaryActionText: summary.hasPending ? l10n.logout : null,
+      onSecondaryAction: summary.hasPending
+          ? () => _logoutFlow(syncBefore: false)
+          : null,
+      secondaryActionColor: Colors.redAccent,
+      confirmButtonColor: Colors.redAccent,
     );
 
     _isLogoutDialogOpen = false;
@@ -980,6 +943,27 @@ class _DashboardScreenState extends State<DashboardScreen>
     addItem(l10n.invitedUsersText, summary.farmUsers);
 
     return items;
+  }
+
+  Widget _buildLogoutDialogMessage(
+    AppLocalizations l10n,
+    SyncUnsyncedSummary summary,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          summary.hasPending
+              ? l10n.unsyncedDataWarning
+              : l10n.noUnsyncedDataMessage,
+        ),
+        if (summary.hasPending) ...[
+          const SizedBox(height: 12),
+          ..._buildUnsyncedSummaryItems(context, l10n, summary),
+        ],
+      ],
+    );
   }
 
   String _logLabel(AppLocalizations l10n, String key) {

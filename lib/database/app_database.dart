@@ -197,7 +197,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 40; // v40: add tail docking + livestock marking reference tables
+  int get schemaVersion => 41; // v41: align transfer transporterId with backend string field
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -411,6 +411,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 40) {
         await _createTableIfMissing(m, tailDockingMethods);
         await _createTableIfMissing(m, livestockMarkingTypes);
+      }
+      if (from < 41) {
+        await _migrateTransferTransporterIdToText();
       }
     },
     beforeOpen: (details) async {
@@ -695,6 +698,95 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE $table RENAME COLUMN $oldColumn TO $newColumn',
       );
     }
+  }
+
+  Future<void> _migrateTransferTransporterIdToText() async {
+    final transfersExists = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? LIMIT 1',
+      variables: [
+        const Variable<String>('table'),
+        const Variable<String>('transfers'),
+      ],
+    ).get();
+
+    if (transfersExists.isEmpty) return;
+
+    final tableInfo = await customSelect('PRAGMA table_info(transfers)').get();
+    final transporterColumn = tableInfo.cast<QueryRow?>().firstWhere(
+      (row) => row?.data['name'] == 'transporter_id',
+      orElse: () => null,
+    );
+
+    final columnType = transporterColumn?.data['type']
+        ?.toString()
+        .toUpperCase();
+    if (columnType == 'TEXT') return;
+
+    await transaction(() async {
+      await customStatement('''
+CREATE TABLE transfers__v41 (
+  id INTEGER NULL,
+  uuid TEXT NOT NULL,
+  event_date TEXT NULL,
+  farm_uuid TEXT NOT NULL,
+  livestock_uuid TEXT NOT NULL,
+  to_farm_uuid TEXT NULL,
+  transporter_id TEXT NULL,
+  reason TEXT NULL,
+  price TEXT NULL,
+  transfer_date TEXT NOT NULL,
+  remarks TEXT NULL,
+  status TEXT NULL,
+  synced INTEGER NOT NULL DEFAULT 1 CHECK ("synced" IN (0, 1)),
+  sync_action TEXT NOT NULL DEFAULT 'server-create',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (uuid)
+)
+''');
+
+      await customStatement('''
+INSERT INTO transfers__v41 (
+  id,
+  uuid,
+  event_date,
+  farm_uuid,
+  livestock_uuid,
+  to_farm_uuid,
+  transporter_id,
+  reason,
+  price,
+  transfer_date,
+  remarks,
+  status,
+  synced,
+  sync_action,
+  created_at,
+  updated_at
+)
+SELECT
+  id,
+  uuid,
+  event_date,
+  farm_uuid,
+  livestock_uuid,
+  to_farm_uuid,
+  CAST(transporter_id AS TEXT),
+  reason,
+  price,
+  transfer_date,
+  remarks,
+  status,
+  synced,
+  sync_action,
+  created_at,
+  updated_at
+FROM transfers
+''');
+
+      await customStatement('DROP TABLE transfers');
+      await customStatement('ALTER TABLE transfers__v41 RENAME TO transfers');
+    });
   }
 
   /// Migration to version 15: Multi-livestock support

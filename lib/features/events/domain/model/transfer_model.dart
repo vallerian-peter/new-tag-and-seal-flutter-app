@@ -6,7 +6,7 @@ class TransferModel {
   final String farmUuid;
   final String livestockUuid;
   final String? toFarmUuid;
-  final int? transporterId;
+  final String? transporterId;
   final String? reason;
   final String? price;
   final String transferDate;
@@ -68,25 +68,25 @@ class TransferModel {
       uuid: uuid,
       farmUuid: farmUuid ?? this.farmUuid,
       livestockUuid: livestockUuid ?? this.livestockUuid,
-      toFarmUuid:
-          identical(toFarmUuid, _unset) ? this.toFarmUuid : toFarmUuid as String?,
+      toFarmUuid: identical(toFarmUuid, _unset)
+          ? this.toFarmUuid
+          : toFarmUuid as String?,
       transporterId: identical(transporterId, _unset)
           ? this.transporterId
-          : transporterId as int?,
-      reason:
-          identical(reason, _unset) ? this.reason : reason as String?,
+          : _asString(transporterId),
+      reason: identical(reason, _unset) ? this.reason : reason as String?,
       price: identical(price, _unset) ? this.price : price as String?,
       transferDate: transferDate ?? this.transferDate,
-      remarks:
-          identical(remarks, _unset) ? this.remarks : remarks as String?,
-      status:
-          identical(status, _unset) ? this.status : status as String?,
+      remarks: identical(remarks, _unset) ? this.remarks : remarks as String?,
+      status: identical(status, _unset) ? this.status : status as String?,
       eventDate: eventDate ?? this.eventDate,
       synced: synced ?? this.synced,
       syncAction: syncAction ?? this.syncAction,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      farmName: identical(farmName, _unset) ? this.farmName : farmName as String?,
+      farmName: identical(farmName, _unset)
+          ? this.farmName
+          : farmName as String?,
       toFarmName: identical(toFarmName, _unset)
           ? this.toFarmName
           : toFarmName as String?,
@@ -120,27 +120,41 @@ class TransferModel {
     };
   }
 
+  static int? _asInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim());
+    return null;
+  }
+
+  static String? _asString(dynamic value) {
+    if (value == null) return null;
+    final stringValue = value.toString();
+    return stringValue.trim().isEmpty ? null : stringValue;
+  }
+
   factory TransferModel.fromJson(Map<String, dynamic> json) {
     return TransferModel(
-      id: json['id'] as int?,
-      uuid: json['uuid'] as String,
-      farmUuid: json['farmUuid'] as String,
-      livestockUuid: json['livestockUuid'] as String,
-      toFarmUuid: json['toFarmUuid'] as String?,
-      transporterId: json['transporterId'] as int?,
-      reason: json['reason'] as String?,
+      id: _asInt(json['id']),
+      uuid: _asString(json['uuid'])!,
+      farmUuid: _asString(json['farmUuid'])!,
+      livestockUuid: _asString(json['livestockUuid'])!,
+      toFarmUuid: _asString(json['toFarmUuid']),
+      transporterId: _asString(json['transporterId']),
+      reason: _asString(json['reason']),
       price: json['price']?.toString(),
-      transferDate: json['transferDate'] as String,
-      remarks: json['remarks'] as String?,
-      status: json['status'] as String?,
-      eventDate: json['eventDate'] as String?,
+      transferDate: _asString(json['transferDate'])!,
+      remarks: _asString(json['remarks']),
+      status: _asString(json['status']),
+      eventDate: _asString(json['eventDate']),
       synced: (json['synced'] as bool?) ?? true,
-      syncAction: json['syncAction'] as String? ?? 'create',
-      createdAt: json['createdAt'] as String,
-      updatedAt: json['updatedAt'] as String,
-      farmName: json['farmName'] as String?,
-      toFarmName: json['toFarmName'] as String?,
-      livestockName: json['livestockName'] as String?,
+      syncAction: _asString(json['syncAction']) ?? 'create',
+      createdAt: _asString(json['createdAt'])!,
+      updatedAt: _asString(json['updatedAt'])!,
+      farmName: _asString(json['farmName']),
+      toFarmName: _asString(json['toFarmName']),
+      livestockName: _asString(json['livestockName']),
     );
   }
 
@@ -164,4 +178,3 @@ class TransferModel {
     };
   }
 }
-

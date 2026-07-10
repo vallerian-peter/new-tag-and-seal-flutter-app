@@ -886,17 +886,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     }
 
     final transporterIdText = _transporterIdController.text.trim();
-    int? transporterId;
-    if (transporterIdText.isNotEmpty) {
-      transporterId = int.tryParse(transporterIdText);
-      if (transporterId == null) {
-        ModernAlerts.showErrorToast(
-          context,
-          message: l10n.invalidTransporterId,
-        );
-        return;
-      }
-    }
+    final transporterId = transporterIdText.isEmpty ? null : transporterIdText;
 
     final reason = _reasonController.text.trim().isEmpty
         ? null
