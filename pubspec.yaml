@@ -3,7 +3,7 @@ name: new_tag_and_seal_flutter_app
 description: "LiveStock Tagging and Sealing App"
 
 publish_to: 'none' 
-version: 1.1.2+8
+version: 1.1.2+9
 
 environment:
   sdk: ^3.9.2
