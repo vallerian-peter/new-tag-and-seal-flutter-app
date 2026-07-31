@@ -23,7 +23,7 @@ import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/d
 import 'package:new_tag_and_seal_flutter_app/features/all.logs.additional.data/domain/models/birth_problem.dart'
     as models;
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/provider/events_provider.dart';
-import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/bulk_livestock_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -1205,7 +1205,7 @@ class _BirthEventFormScreenState extends State<BirthEventFormScreen> {
                   builder: (_) => Scaffold(
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                     body: SafeArea(
-                      child: PigletBulkRegistrationScreen(
+                      child: BulkLivestockRegistrationScreen(
                         pendingBirthEventToPersist: newModel,
                         preSelectedFarmUuid: selectedFarmUuid,
                         preSelectedMotherUuid: selectedLivestockUuid,

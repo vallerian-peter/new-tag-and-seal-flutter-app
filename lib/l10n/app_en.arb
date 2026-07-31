@@ -1246,17 +1246,19 @@
   "registerLivestockSingleOption": "Single animal",
   "registerLivestockSingleOptionDesc": "Full form with tags and one ID",
   "registerPigletLitterOption": "Small livestock",
-  "registerSmallLivestockOption": "Small livestocks",
+  "registerSmallLivestockOption": "Bulk Add Livestocks",
   "registerPigletLitterOptionDesc": "Same details for many animals; IDs like YYYYMMDD-01",
-  "registerSmallLivestockOptionDesc": "Same details for many animals; IDs like YYYYMMDD-01",
-  "pigletBulkTitle": "Register small livestock",
-  "smallLivestockBulkTitle": "Register small livestock",
+  "registerSmallLivestockOptionDesc": "Register many animals with shared defaults and optional individual details",
+  "pigletBulkTitle": "Bulk Add Livestocks",
+  "smallLivestockBulkTitle": "Bulk Add Livestocks",
   "pigletBulkCompleteBirthFlowTitle": "Complete birth & offspring",
   "@pigletBulkCompleteBirthFlowTitle": {"description": "App bar when finishing a birth log and litter in one flow"},
   "pigletBulkDeferredBirthHint": "The birth log will be saved together with the offspring when you tap Register all on the preview step. Review and adjust details below, then confirm.",
   "@pigletBulkDeferredBirthHint": {"description": "Info when user arrived from birth event form with litter"},
   "pigletBulkStepCommonTitle": "Shared details",
-  "pigletBulkStepCommonSubtitle": "Farm, type, batch size, dates, parents",
+  "pigletBulkStepCommonSubtitle": "Farm, type, species, breed, and stage",
+  "pigletBulkStepDifferencesTitle": "Manage differences",
+  "pigletBulkStepDifferencesSubtitle": "Batch size, shared defaults, and per-animal differences",
   "pigletBulkStepPreviewTitle": "Preview",
   "pigletBulkStepPreviewSubtitle": "Generated IDs and sex per animal",
   "pigletBulkNumberOfPiglets": "How many animals?",
@@ -1264,6 +1266,9 @@
   "pigletBulkSameAsBatch": "Same as batch",
   "pigletBulkDifferentDataQuestion": "Are some details different per animal?",
   "pigletBulkDifferentDataHelp": "Keep this off when all animals share the same details below. Turn it on to choose exactly which fields should be filled per numbered animal.",
+  "pigletBulkIdentificationSwitchTitle": "Livestock are identified",
+  "pigletBulkSystemReference": "System reference",
+  "pigletBulkDuplicateIdentificationValues": "Identification numbers must be unique within this batch.",
   "pigletBulkChooseDifferentFields": "Choose fields that differ",
   "pigletBulkSelectAtLeastOneDifferentField": "Select at least one field that differs, or turn off different per animal.",
   "pigletBulkMotherLockedByBirthEvent": "Mother is locked because this registration is linked to one birth event.",
@@ -1299,6 +1304,14 @@
       }
     }
   },
+  "pigletBulkDateEnteredBeforeBirth": "Animal {index} cannot enter the farm before its date of birth.",
+  "@pigletBulkDateEnteredBeforeBirth": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "pigletBulkInvalidCount": "Enter a whole number from 1 to {max}.",
   "@pigletBulkInvalidCount": {
     "placeholders": {
@@ -1308,7 +1321,7 @@
     }
   },
   "pigletBulkNamePrefix": "Name prefix",
-  "pigletBulkNamePrefixHint": "e.g. Small livestock (combined with number or nickname)",
+  "pigletBulkNamePrefixHint": "e.g. Livestock (combined with number or nickname)",
   "pigletBulkPreviewInfo": "Each ID uses the date of birth as YYYYMMDD plus a sequence (01, 02, …). Young stages stay not identified until you add tags later.",
   "pigletBulkNicknameOptional": "Nickname (optional)",
   "pigletBulkRegisterAll": "Register all",
@@ -1388,7 +1401,7 @@
   },
   "pigletBulkFailed": "Could not register the batch. Please try again.",
   "pigletDefaultNamePrefix": "Small livestock",
-  "smallLivestockDefaultNamePrefix": "Small livestock",
+  "smallLivestockDefaultNamePrefix": "Livestock",
   "pigletBulkSavingMessage": "Registering animals…",
   "pigletBulkCountRangeHint": "1–{max}",
   "@pigletBulkCountRangeHint": {

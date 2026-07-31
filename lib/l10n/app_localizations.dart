@@ -5123,7 +5123,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerSmallLivestockOption.
   ///
   /// In en, this message translates to:
-  /// **'Small livestocks'**
+  /// **'Bulk Add Livestocks'**
   String get registerSmallLivestockOption;
 
   /// No description provided for @registerPigletLitterOptionDesc.
@@ -5135,19 +5135,19 @@ abstract class AppLocalizations {
   /// No description provided for @registerSmallLivestockOptionDesc.
   ///
   /// In en, this message translates to:
-  /// **'Same details for many animals; IDs like YYYYMMDD-01'**
+  /// **'Register many animals with shared defaults and optional individual details'**
   String get registerSmallLivestockOptionDesc;
 
   /// No description provided for @pigletBulkTitle.
   ///
   /// In en, this message translates to:
-  /// **'Register small livestock'**
+  /// **'Bulk Add Livestocks'**
   String get pigletBulkTitle;
 
   /// No description provided for @smallLivestockBulkTitle.
   ///
   /// In en, this message translates to:
-  /// **'Register small livestock'**
+  /// **'Bulk Add Livestocks'**
   String get smallLivestockBulkTitle;
 
   /// App bar when finishing a birth log and litter in one flow
@@ -5171,8 +5171,20 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkStepCommonSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Farm, type, batch size, dates, parents'**
+  /// **'Farm, type, species, breed, and stage'**
   String get pigletBulkStepCommonSubtitle;
+
+  /// No description provided for @pigletBulkStepDifferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage differences'**
+  String get pigletBulkStepDifferencesTitle;
+
+  /// No description provided for @pigletBulkStepDifferencesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch size, shared defaults, and per-animal differences'**
+  String get pigletBulkStepDifferencesSubtitle;
 
   /// No description provided for @pigletBulkStepPreviewTitle.
   ///
@@ -5215,6 +5227,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep this off when all animals share the same details below. Turn it on to choose exactly which fields should be filled per numbered animal.'**
   String get pigletBulkDifferentDataHelp;
+
+  /// No description provided for @pigletBulkIdentificationSwitchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Livestock are identified'**
+  String get pigletBulkIdentificationSwitchTitle;
+
+  /// No description provided for @pigletBulkSystemReference.
+  ///
+  /// In en, this message translates to:
+  /// **'System reference'**
+  String get pigletBulkSystemReference;
+
+  /// No description provided for @pigletBulkDuplicateIdentificationValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Identification numbers must be unique within this batch.'**
+  String get pigletBulkDuplicateIdentificationValues;
 
   /// No description provided for @pigletBulkChooseDifferentFields.
   ///
@@ -5300,6 +5330,12 @@ abstract class AppLocalizations {
   /// **'Animal {index} is inactive. Select the disposal date.'**
   String pigletBulkInactiveDateRequired(int index);
 
+  /// No description provided for @pigletBulkDateEnteredBeforeBirth.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal {index} cannot enter the farm before its date of birth.'**
+  String pigletBulkDateEnteredBeforeBirth(int index);
+
   /// No description provided for @pigletBulkInvalidCount.
   ///
   /// In en, this message translates to:
@@ -5315,7 +5351,7 @@ abstract class AppLocalizations {
   /// No description provided for @pigletBulkNamePrefixHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Small livestock (combined with number or nickname)'**
+  /// **'e.g. Livestock (combined with number or nickname)'**
   String get pigletBulkNamePrefixHint;
 
   /// No description provided for @pigletBulkPreviewInfo.
@@ -5507,7 +5543,7 @@ abstract class AppLocalizations {
   /// No description provided for @smallLivestockDefaultNamePrefix.
   ///
   /// In en, this message translates to:
-  /// **'Small livestock'**
+  /// **'Livestock'**
   String get smallLivestockDefaultNamePrefix;
 
   /// No description provided for @pigletBulkSavingMessage.

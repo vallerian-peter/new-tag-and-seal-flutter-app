@@ -2656,7 +2656,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPigletLitterOption => 'Small livestock';
 
   @override
-  String get registerSmallLivestockOption => 'Small livestocks';
+  String get registerSmallLivestockOption => 'Bulk Add Livestocks';
 
   @override
   String get registerPigletLitterOptionDesc =>
@@ -2664,13 +2664,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerSmallLivestockOptionDesc =>
-      'Same details for many animals; IDs like YYYYMMDD-01';
+      'Register many animals with shared defaults and optional individual details';
 
   @override
-  String get pigletBulkTitle => 'Register small livestock';
+  String get pigletBulkTitle => 'Bulk Add Livestocks';
 
   @override
-  String get smallLivestockBulkTitle => 'Register small livestock';
+  String get smallLivestockBulkTitle => 'Bulk Add Livestocks';
 
   @override
   String get pigletBulkCompleteBirthFlowTitle => 'Complete birth & offspring';
@@ -2684,7 +2684,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkStepCommonSubtitle =>
-      'Farm, type, batch size, dates, parents';
+      'Farm, type, species, breed, and stage';
+
+  @override
+  String get pigletBulkStepDifferencesTitle => 'Manage differences';
+
+  @override
+  String get pigletBulkStepDifferencesSubtitle =>
+      'Batch size, shared defaults, and per-animal differences';
 
   @override
   String get pigletBulkStepPreviewTitle => 'Preview';
@@ -2710,6 +2717,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pigletBulkDifferentDataHelp =>
       'Keep this off when all animals share the same details below. Turn it on to choose exactly which fields should be filled per numbered animal.';
+
+  @override
+  String get pigletBulkIdentificationSwitchTitle => 'Livestock are identified';
+
+  @override
+  String get pigletBulkSystemReference => 'System reference';
+
+  @override
+  String get pigletBulkDuplicateIdentificationValues =>
+      'Identification numbers must be unique within this batch.';
 
   @override
   String get pigletBulkChooseDifferentFields => 'Choose fields that differ';
@@ -2765,6 +2782,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String pigletBulkDateEnteredBeforeBirth(int index) {
+    return 'Animal $index cannot enter the farm before its date of birth.';
+  }
+
+  @override
   String pigletBulkInvalidCount(int max) {
     return 'Enter a whole number from 1 to $max.';
   }
@@ -2774,7 +2796,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pigletBulkNamePrefixHint =>
-      'e.g. Small livestock (combined with number or nickname)';
+      'e.g. Livestock (combined with number or nickname)';
 
   @override
   String get pigletBulkPreviewInfo =>
@@ -2892,7 +2914,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pigletDefaultNamePrefix => 'Small livestock';
 
   @override
-  String get smallLivestockDefaultNamePrefix => 'Small livestock';
+  String get smallLivestockDefaultNamePrefix => 'Livestock';
 
   @override
   String get pigletBulkSavingMessage => 'Registering animals…';

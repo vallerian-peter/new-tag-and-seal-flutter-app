@@ -5,6 +5,7 @@ import 'package:new_tag_and_seal_flutter_app/core/utils/role_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/domain/constants/event_log_types.dart';
 import 'package:new_tag_and_seal_flutter_app/features/events/presentation/controllers/event_form_control.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/bulk_livestock_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,7 @@ class FarmBulkActionsSheet extends StatelessWidget {
     final actions = _buildActions(l10n);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final filteredActions = actions.where((a) {
+      if (a.registersLivestock) return true;
       final logType = a.logType;
       if (logType == null) return false;
       // Farmer: allowed all
@@ -82,18 +84,24 @@ class FarmBulkActionsSheet extends StatelessWidget {
             const SizedBox(height: 16),
             _buildFarmInfoCard(theme, farmName, farmLocation),
             const SizedBox(height: 20),
-            ...List.generate(filteredActions.length, (index) {
-              final action = filteredActions[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == filteredActions.length - 1 ? 0 : 12,
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(filteredActions.length, (index) {
+                    final action = filteredActions[index];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == filteredActions.length - 1 ? 0 : 12,
+                      ),
+                      child: _BulkActionButton(
+                        config: action,
+                        onTap: () => _handleActionTap(context, action, l10n),
+                      ),
+                    );
+                  }),
                 ),
-                child: _BulkActionButton(
-                  config: action,
-                  onTap: () => _handleActionTap(context, action, l10n),
-                ),
-              );
-            }),
+              ),
+            ),
           ],
         ),
       ),
@@ -140,6 +148,29 @@ class FarmBulkActionsSheet extends StatelessWidget {
     _BulkActionConfig config,
     AppLocalizations l10n,
   ) {
+    if (config.registersLivestock) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (!RoleHelper.checkCanCreateLivestock(context, l10n, authProvider)) {
+        return;
+      }
+      final farmUuid = (farm['uuid'] ?? farm['farmUuid'] ?? '').toString();
+      if (farmUuid.isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.logContextMissing)));
+        return;
+      }
+      final rootNavigator = Navigator.of(context, rootNavigator: true);
+      Navigator.of(context).pop();
+      rootNavigator.push<bool>(
+        MaterialPageRoute(
+          builder: (_) =>
+              BulkLivestockRegistrationScreen(preSelectedFarmUuid: farmUuid),
+        ),
+      );
+      return;
+    }
+
     if (config.logType == null || !config.supportsBulk) {
       ScaffoldMessenger.of(
         context,
@@ -258,6 +289,12 @@ class FarmBulkActionsSheet extends StatelessWidget {
   List<_BulkActionConfig> _buildActions(AppLocalizations l10n) {
     return [
       _BulkActionConfig(
+        title: l10n.registerSmallLivestockOption,
+        icon: Icons.groups_2_outlined,
+        color: Constants.primaryColor,
+        registersLivestock: true,
+      ),
+      _BulkActionConfig(
         title: '${l10n.bulk} ${l10n.deworming}',
         icon: Icons.bug_report_outlined,
         color: Colors.teal,
@@ -282,7 +319,7 @@ class FarmBulkActionsSheet extends StatelessWidget {
         title: '${l10n.bulk} ${l10n.medication}',
         icon: Icons.medical_services_outlined,
         color: Colors.indigo,
-        logType: EventLogTypes.medication,
+        logType: EventLogTypes.treatment,
         supportsBulk: true,
       ),
       _BulkActionConfig(
@@ -316,6 +353,7 @@ class _BulkActionConfig {
   final Color color;
   final String? logType;
   final bool supportsBulk;
+  final bool registersLivestock;
 
   const _BulkActionConfig({
     required this.title,
@@ -323,6 +361,7 @@ class _BulkActionConfig {
     required this.color,
     this.logType,
     this.supportsBulk = false,
+    this.registersLivestock = false,
   });
 }
 

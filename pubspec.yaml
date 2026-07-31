@@ -101,6 +101,7 @@ flutter:
     - assets/animations/
     - assets/animations/gifs/
     - assets/fonts/
+    - assets/data/
 
   fonts:
     - family: SFProDisplay

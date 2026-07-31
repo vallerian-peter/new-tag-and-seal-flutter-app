@@ -13,6 +13,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/livestock_date_ente
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/color_helper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_helper.dart';
+import 'package:new_tag_and_seal_flutter_app/core/utils/livestock_stage_identification_rules.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -100,15 +101,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   DisposalModel?
   _lostDisposal; // Store the Lost disposal record for displaying details
 
-  static const Set<String> _earlyStageNames = {
-    'piglet',
-    'calf',
-    'kid',
-    'lamb',
-    'chick',
-    'newborn',
-    'neonate',
-  };
+  LivestockStageIdentificationRules _stageIdentificationRules =
+      LivestockStageIdentificationRules.fallback;
 
   @override
   void initState() {
@@ -185,7 +179,17 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
   bool get _isEarlyStageSelected {
     final stage = _getSelectedStage();
     if (stage == null) return false;
-    return _earlyStageNames.contains(stage.name.trim().toLowerCase());
+    var typeName = '';
+    for (final type in _livestockTypes) {
+      if (type.id == _selectedLivestockTypeId) {
+        typeName = type.name;
+        break;
+      }
+    }
+    return _stageIdentificationRules.isYoungStage(
+      livestockType: typeName,
+      stage: stage.name,
+    );
   }
 
   bool get _disableTagFields => _isEarlyStageSelected;
@@ -275,6 +279,8 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
       final methods = await database.livestockObtainedMethodDao
           .getAllLivestockObtainedMethods();
       final stages = await database.stageDao.getAllStages();
+      final stageIdentificationRules =
+          await LivestockStageIdentificationRules.load();
       final birthEvents = await database.eventDao.getBirthEvents();
       final allLivestock = await database.livestockDao
           .getAllActiveLivestock(); // ✅ Only active livestock
@@ -340,6 +346,7 @@ class _LivestockFormScreenState extends State<LivestockFormScreen> {
         _breeds = breeds;
         _livestockObtainedMethods = methods;
         _stages = stages;
+        _stageIdentificationRules = stageIdentificationRules;
         _birthEvents = birthEvents;
         _allLivestock = allLivestock;
         _hasLostDisposal = hasLostDisposal;

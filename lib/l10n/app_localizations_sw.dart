@@ -2675,7 +2675,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get registerPigletLitterOption => 'Mifugo midogo';
 
   @override
-  String get registerSmallLivestockOption => 'Mifugo midogo';
+  String get registerSmallLivestockOption => 'Ongeza Mifugo kwa Wingi';
 
   @override
   String get registerPigletLitterOptionDesc =>
@@ -2683,13 +2683,13 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get registerSmallLivestockOptionDesc =>
-      'Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01';
+      'Sajili wanyama wengi kwa maelezo ya pamoja na maelezo binafsi ya hiari';
 
   @override
-  String get pigletBulkTitle => 'Sajili mifugo midogo';
+  String get pigletBulkTitle => 'Ongeza Mifugo kwa Wingi';
 
   @override
-  String get smallLivestockBulkTitle => 'Sajili mifugo midogo';
+  String get smallLivestockBulkTitle => 'Ongeza Mifugo kwa Wingi';
 
   @override
   String get pigletBulkCompleteBirthFlowTitle => 'Maliza kuzaa na watoto';
@@ -2703,7 +2703,14 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkStepCommonSubtitle =>
-      'Shamba, aina, idadi ya kundi, tarehe, wazazi';
+      'Shamba, aina, spishi, uzao na hatua';
+
+  @override
+  String get pigletBulkStepDifferencesTitle => 'Dhibiti tofauti';
+
+  @override
+  String get pigletBulkStepDifferencesSubtitle =>
+      'Idadi, maelezo ya pamoja na tofauti za kila mnyama';
 
   @override
   String get pigletBulkStepPreviewTitle => 'Hakiki';
@@ -2729,6 +2736,16 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get pigletBulkDifferentDataHelp =>
       'Acha imezimwa kama wanyama wote wanatumia maelezo yale yale hapa chini. Washa ili uchague sehemu zitakazojazwa kwa kila mnyama kwa namba yake.';
+
+  @override
+  String get pigletBulkIdentificationSwitchTitle => 'Mifugo imetambuliwa';
+
+  @override
+  String get pigletBulkSystemReference => 'Rejea ya mfumo';
+
+  @override
+  String get pigletBulkDuplicateIdentificationValues =>
+      'Namba za utambulisho lazima ziwe tofauti ndani ya kundi hili.';
 
   @override
   String get pigletBulkChooseDifferentFields =>
@@ -2785,6 +2802,11 @@ class AppLocalizationsSw extends AppLocalizations {
   }
 
   @override
+  String pigletBulkDateEnteredBeforeBirth(int index) {
+    return 'Mnyama $index hawezi kuingia shambani kabla ya tarehe yake ya kuzaliwa.';
+  }
+
+  @override
   String pigletBulkInvalidCount(int max) {
     return 'Ingiza nambari kamili kati ya 1 hadi $max.';
   }
@@ -2794,7 +2816,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get pigletBulkNamePrefixHint =>
-      'Mfano: Mifugo midogo (pamoja na nambari au jina)';
+      'Mfano: Mifugo (pamoja na nambari au jina)';
 
   @override
   String get pigletBulkPreviewInfo =>
@@ -2910,10 +2932,10 @@ class AppLocalizationsSw extends AppLocalizations {
   String get pigletDefaultNamePrefix => 'Mifugo midogo';
 
   @override
-  String get smallLivestockDefaultNamePrefix => 'Mifugo midogo';
+  String get smallLivestockDefaultNamePrefix => 'Mifugo';
 
   @override
-  String get pigletBulkSavingMessage => 'Inasajili mifugo midogo…';
+  String get pigletBulkSavingMessage => 'Inasajili mifugo…';
 
   @override
   String pigletBulkCountRangeHint(int max) {

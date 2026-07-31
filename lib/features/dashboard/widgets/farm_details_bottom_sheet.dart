@@ -9,7 +9,7 @@ import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
-import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/bulk_livestock_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_details_modal.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/presentation/vaccine_form.dart';
 import 'package:new_tag_and_seal_flutter_app/features/dashboard/widgets/farm_bulk_actions_sheet.dart';
@@ -179,9 +179,10 @@ class FarmDetailsBottomSheet extends StatelessWidget {
                         Navigator.push<bool>(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PigletBulkRegistrationScreen(
-                              preSelectedFarmUuid: farm['uuid'] as String,
-                            ),
+                            builder: (context) =>
+                                BulkLivestockRegistrationScreen(
+                                  preSelectedFarmUuid: farm['uuid'] as String,
+                                ),
                           ),
                         ).then((result) {
                           if (result == true && onRefresh != null) {

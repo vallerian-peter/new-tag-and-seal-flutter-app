@@ -1,0 +1,62 @@
+{
+  "genericYoungStages": [
+    "newborn",
+    "neonate",
+    "suckling",
+    "unweaned",
+    "weaner",
+    "juvenile"
+  ],
+  "livestockTypes": [
+    {
+      "aliases": ["pig", "pigs", "swine", "porcine"],
+      "youngStages": ["piglet", "weaner"],
+      "matureStages": ["grower", "finisher", "gilt", "sow", "boar", "adult"]
+    },
+    {
+      "aliases": ["cattle", "cow", "cows", "bovine"],
+      "youngStages": ["calf", "weaner", "yearling"],
+      "matureStages": ["heifer", "steer", "bull", "cow", "adult"]
+    },
+    {
+      "aliases": ["chicken", "chickens", "poultry"],
+      "youngStages": ["chick", "pullet", "cockerel"],
+      "matureStages": ["layer", "broiler", "hen", "rooster", "adult"]
+    },
+    {
+      "aliases": ["goat", "goats", "caprine"],
+      "youngStages": ["kid", "weaner", "yearling"],
+      "matureStages": ["doe", "buck", "adult"]
+    },
+    {
+      "aliases": ["sheep", "ovine"],
+      "youngStages": ["lamb", "weaner", "yearling"],
+      "matureStages": ["ewe", "ram", "adult"]
+    },
+    {
+      "aliases": ["dog", "dogs", "pet", "pets", "canine"],
+      "youngStages": ["puppy", "juvenile"],
+      "matureStages": ["adult", "senior"]
+    },
+    {
+      "aliases": ["cat", "cats", "feline"],
+      "youngStages": ["kitten", "juvenile"],
+      "matureStages": ["adult", "senior"]
+    },
+    {
+      "aliases": ["rabbit", "rabbits"],
+      "youngStages": ["kit", "bunny", "juvenile"],
+      "matureStages": ["doe", "buck", "adult"]
+    },
+    {
+      "aliases": ["horse", "horses", "equine"],
+      "youngStages": ["foal", "yearling"],
+      "matureStages": ["mare", "stallion", "gelding", "adult"]
+    },
+    {
+      "aliases": ["duck", "ducks"],
+      "youngStages": ["duckling", "juvenile"],
+      "matureStages": ["hen", "drake", "adult"]
+    }
+  ]
+}

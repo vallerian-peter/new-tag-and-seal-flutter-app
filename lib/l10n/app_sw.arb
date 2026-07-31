@@ -951,15 +951,17 @@
   "registerLivestockSingleOption": "Mnyama mmoja",
   "registerLivestockSingleOptionDesc": "Fomu kamili na lebo na kitambulisho kimoja",
   "registerPigletLitterOption": "Mifugo midogo",
-  "registerSmallLivestockOption": "Mifugo midogo",
+  "registerSmallLivestockOption": "Ongeza Mifugo kwa Wingi",
   "registerPigletLitterOptionDesc": "Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01",
-  "registerSmallLivestockOptionDesc": "Maelezo sawa kwa wanyama wengi; vitambulisho kama TAREHE-01",
-  "pigletBulkTitle": "Sajili mifugo midogo",
-  "smallLivestockBulkTitle": "Sajili mifugo midogo",
+  "registerSmallLivestockOptionDesc": "Sajili wanyama wengi kwa maelezo ya pamoja na maelezo binafsi ya hiari",
+  "pigletBulkTitle": "Ongeza Mifugo kwa Wingi",
+  "smallLivestockBulkTitle": "Ongeza Mifugo kwa Wingi",
   "pigletBulkCompleteBirthFlowTitle": "Maliza kuzaa na watoto",
   "pigletBulkDeferredBirthHint": "Rekodi ya kuzaa itahifadhiwa pamoja na watoto wa mifugo unaposajili wote baada ya hatua ya hakiki. Hakiki na urekebishe maelezo hapa chini, kisha thibitisha.",
   "pigletBulkStepCommonTitle": "Maelezo ya pamoja",
-  "pigletBulkStepCommonSubtitle": "Shamba, aina, idadi ya kundi, tarehe, wazazi",
+  "pigletBulkStepCommonSubtitle": "Shamba, aina, spishi, uzao na hatua",
+  "pigletBulkStepDifferencesTitle": "Dhibiti tofauti",
+  "pigletBulkStepDifferencesSubtitle": "Idadi, maelezo ya pamoja na tofauti za kila mnyama",
   "pigletBulkStepPreviewTitle": "Hakiki",
   "pigletBulkStepPreviewSubtitle": "Vitambulisho na jinsia kwa kila mnyama",
   "pigletBulkNumberOfPiglets": "Wanyama wangapi?",
@@ -967,6 +969,9 @@
   "pigletBulkSameAsBatch": "Kama kundi",
   "pigletBulkDifferentDataQuestion": "Je, kuna maelezo yanayotofautiana kwa kila mnyama?",
   "pigletBulkDifferentDataHelp": "Acha imezimwa kama wanyama wote wanatumia maelezo yale yale hapa chini. Washa ili uchague sehemu zitakazojazwa kwa kila mnyama kwa namba yake.",
+  "pigletBulkIdentificationSwitchTitle": "Mifugo imetambuliwa",
+  "pigletBulkSystemReference": "Rejea ya mfumo",
+  "pigletBulkDuplicateIdentificationValues": "Namba za utambulisho lazima ziwe tofauti ndani ya kundi hili.",
   "pigletBulkChooseDifferentFields": "Chagua sehemu zinazotofautiana",
   "pigletBulkSelectAtLeastOneDifferentField": "Chagua angalau sehemu moja inayotofautiana, au zima tofauti kwa kila mnyama.",
   "pigletBulkMotherLockedByBirthEvent": "Mama amefungwa kwa sababu usajili huu umeunganishwa na tukio moja la kuzaliwa.",
@@ -1002,6 +1007,14 @@
       }
     }
   },
+  "pigletBulkDateEnteredBeforeBirth": "Mnyama {index} hawezi kuingia shambani kabla ya tarehe yake ya kuzaliwa.",
+  "@pigletBulkDateEnteredBeforeBirth": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "pigletBulkInvalidCount": "Ingiza nambari kamili kati ya 1 hadi {max}.",
   "@pigletBulkInvalidCount": {
     "placeholders": {
@@ -1011,7 +1024,7 @@
     }
   },
   "pigletBulkNamePrefix": "Kiambishi cha jina",
-  "pigletBulkNamePrefixHint": "Mfano: Mifugo midogo (pamoja na nambari au jina)",
+  "pigletBulkNamePrefixHint": "Mfano: Mifugo (pamoja na nambari au jina)",
   "pigletBulkPreviewInfo": "Kitambulisho kinatumia tarehe ya kuzaliwa (YYYYMMDD) na mfululizo (01, 02, …). Hatua za utoto hubaki bila kutambuliwa hadi uongeze lebo baadaye.",
   "pigletBulkNicknameOptional": "Jina la ziada (si lazima)",
   "pigletBulkRegisterAll": "Sajili wote",
@@ -1091,8 +1104,8 @@
   },
   "pigletBulkFailed": "Imeshindwa kusajili kundi. Jaribu tena.",
   "pigletDefaultNamePrefix": "Mifugo midogo",
-  "smallLivestockDefaultNamePrefix": "Mifugo midogo",
-  "pigletBulkSavingMessage": "Inasajili mifugo midogo…",
+  "smallLivestockDefaultNamePrefix": "Mifugo",
+  "pigletBulkSavingMessage": "Inasajili mifugo…",
   "pigletBulkCountRangeHint": "1–{max}",
   "@pigletBulkCountRangeHint": {
     "placeholders": {

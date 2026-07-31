@@ -7,7 +7,7 @@ import 'package:new_tag_and_seal_flutter_app/l10n/app_localizations.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/features/auth/presentation/provider/auth_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/livestock_form_screen.dart';
-import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/piglet_bulk_registration_screen.dart';
+import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/bulk_livestock_registration_screen.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/presentation/provider/livestock_provider.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_stat_card.dart';
 import 'package:new_tag_and_seal_flutter_app/features/livestocks/widgets/livestock_card.dart';
@@ -266,7 +266,7 @@ class _LivestockListScreenState extends State<LivestockListScreen>
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const PigletBulkRegistrationScreen(),
+                            const BulkLivestockRegistrationScreen(),
                       ),
                     );
                     if (result == true && mounted) await _fetchData();
