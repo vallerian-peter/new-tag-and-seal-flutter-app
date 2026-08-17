@@ -178,7 +178,8 @@ class _BulkLivestockRegistrationScreenState
 
   bool get _hasSelectedIndividualDetailFields =>
       _hasIndividualDifferences &&
-      (_diffDateOfBirth ||
+      (_diffSex ||
+          _diffDateOfBirth ||
           _diffBirthEvent ||
           _diffMother ||
           _diffFather ||
@@ -1677,21 +1678,6 @@ class _BulkLivestockRegistrationScreenState
                       onChanged: (_) => setState(() {}),
                     ),
                   ],
-                  if (_diffSex) ...[
-                    const SizedBox(height: 12),
-                    CustomDropdown<String>(
-                      label: l10n.gender,
-                      hint: l10n.selectGender,
-                      icon: Icons.wc_outlined,
-                      value: row.gender,
-                      dropdownItems: [
-                        DropdownItem(value: 'male', label: l10n.male),
-                        DropdownItem(value: 'female', label: l10n.female),
-                      ],
-                      onChanged: (v) => setState(() => row.gender = v),
-                      isRequired: true,
-                    ),
-                  ],
                   if (_diffWeight) ...[
                     const SizedBox(height: 12),
                     CustomTextField(
@@ -1733,7 +1719,7 @@ class _BulkLivestockRegistrationScreenState
     const showSharedObtainedMethod = true;
     const showSharedDateEnteredFarm = true;
     const showSharedColors = true;
-    const showSharedStatus = true;
+    final showSharedStatus = !_diffStatus;
     final showSharedParentage = _isBornOnFarmSelected() || _hasBirthEventLink;
     const showSharedAcquisition = true;
 

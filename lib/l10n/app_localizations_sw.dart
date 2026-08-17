@@ -1568,6 +1568,28 @@ class AppLocalizationsSw extends AppLocalizations {
       'Gusa hapa kutumia GPS ya kifaa chako kujaza kuratibu kiotomatiki';
 
   @override
+  String get chooseOnMap => 'Chagua kwenye ramani';
+
+  @override
+  String get chooseFarmLocation => 'Chagua eneo la shamba';
+
+  @override
+  String get tapMapToChooseLocation =>
+      'Gusa ramani kuweka alama ya eneo la shamba';
+
+  @override
+  String get useSelectedLocation => 'Tumia eneo hili';
+
+  @override
+  String get selectedCoordinates => 'Kuratibu zilizochaguliwa';
+
+  @override
+  String get zoomIn => 'Kuza ramani';
+
+  @override
+  String get zoomOut => 'Punguza ramani';
+
+  @override
   String get locationDetails => 'Maelezo ya Mahali';
 
   @override

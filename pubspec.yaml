@@ -3,7 +3,7 @@ name: new_tag_and_seal_flutter_app
 description: "LiveStock Tagging and Sealing App"
 
 publish_to: 'none' 
-version: 1.1.2+9
+version: 1.1.2+10
 
 environment:
   sdk: ^3.9.2
@@ -55,6 +55,8 @@ dependencies:
   
   # Location Services & Permission Handler
   geolocator: ^13.0.2
+  flutter_map: ^8.3.1
+  latlong2: ^0.10.1
   permission_handler: ^11.3.1
   
   # Bluetooth
@@ -106,8 +108,8 @@ flutter:
   fonts:
     - family: SFProDisplay
       fonts:
-        - asset: assets/fonts/SFPRODISPLAYMEDIUM.OTF
-        - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        - asset: assets/fonts/SFPRODISPLAYMEDIUM.otf
+        - asset: assets/fonts/SFPRODISPLAYREGULAR.otf
 
 flutter_launcher_icons:
   android: "launcher_icon"

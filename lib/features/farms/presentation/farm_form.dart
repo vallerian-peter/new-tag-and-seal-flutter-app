@@ -7,6 +7,7 @@ import 'package:new_tag_and_seal_flutter_app/core/components/dropdown_item.dart'
 import 'package:new_tag_and_seal_flutter_app/core/components/custom_stepper.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/loading_indicator.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/gps_location_button.dart';
+import 'package:new_tag_and_seal_flutter_app/core/components/map_location_picker.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/alert_dialogs.dart';
 import 'package:new_tag_and_seal_flutter_app/core/components/toast_alerts.dart';
 import 'package:new_tag_and_seal_flutter_app/core/utils/constants.dart';
@@ -370,6 +371,24 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
     );
   }
 
+  Future<void> _chooseLocationOnMap() async {
+    final selection = await Navigator.of(context).push<MapLocationSelection>(
+      MaterialPageRoute(
+        builder: (_) => MapLocationPickerScreen(
+          initialLatitude: double.tryParse(_latitudesController.text.trim()),
+          initialLongitude: double.tryParse(_longitudesController.text.trim()),
+        ),
+      ),
+    );
+
+    if (!mounted || selection == null) return;
+
+    setState(() {
+      _latitudesController.text = selection.latitude.toStringAsFixed(6);
+      _longitudesController.text = selection.longitude.toStringAsFixed(6);
+    });
+  }
+
   // Step 2: Size & Measurements
   Widget _buildSizeMeasurementsStep(AppLocalizations l10n) {
     return Column(
@@ -430,12 +449,38 @@ class _FarmFormScreenState extends State<FarmFormScreen> {
 
         const SizedBox(height: 20),
 
-        GpsLocationButton(
-          onLocationFetched: (latitude, longitude) {
-            setState(() {
-              _latitudesController.text = latitude.toStringAsFixed(6);
-              _longitudesController.text = longitude.toStringAsFixed(6);
-            });
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final gpsButton = GpsLocationButton(
+              onLocationFetched: (latitude, longitude) {
+                setState(() {
+                  _latitudesController.text = latitude.toStringAsFixed(6);
+                  _longitudesController.text = longitude.toStringAsFixed(6);
+                });
+              },
+            );
+            final mapButton = MapLocationButton(
+              onTap: _chooseLocationOnMap,
+            );
+
+            if (constraints.maxWidth < 560) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  gpsButton,
+                  const SizedBox(height: 12),
+                  mapButton,
+                ],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(child: gpsButton),
+                const SizedBox(width: 12),
+                Expanded(child: mapButton),
+              ],
+            );
           },
         ),
 

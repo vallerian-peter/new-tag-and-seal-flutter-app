@@ -52,6 +52,7 @@ void main() async {
 
   // Initialize providers with SharedPreferences
   final themeProvider = ThemeProvider();
+
   await themeProvider.initialize();
 
   final additionalDataProvider = AdditionalDataProvider(
@@ -59,33 +60,46 @@ void main() async {
   );
 
   final authRepo = AuthRepository();
+
   final authProvider = AuthProvider(
     authRepository: authRepo,
     repository: authRepo,
   );
+  
   final syncProvider = SyncProvider(database: database);
+  
   final farmProvider = FarmProvider(farmRepository: farmRepo);
+  
   final livestockProvider = LivestockProvider(livestockRepo: livestockRepo);
+
   final logAdditionalDataProvider = LogAdditionalDataProvider(
     repository: logAdditionalDataRepo,
   );
+  
   final vaccineProvider = VaccineProvider(vaccinesRepository: vaccinesRepo);
+
   final farmUserProvider = FarmUserProvider(repository: farmUserRepo);
+  
   final alarmManager = AppAlarmManager(
     navigatorKey: appNavigatorKey,
     repository: notificationRepo,
   );
+  
   await alarmManager.initialize();
+
   final notificationProvider = NotificationProvider(
     repository: notificationRepo,
     alarmManager: alarmManager,
   );
+
   final financeExpenseProvider = FinanceExpenseProvider(
     repository: financeExpenseRepo,
   );
+
   final financeIncomeProvider = FinanceIncomeProvider(
     repository: financeIncomeRepo,
   );
+
   await notificationProvider.loadNotifications();
 
   // Initialize EventsProvider with NotificationProvider for automatic notification creation
@@ -98,6 +112,7 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<AppDatabase>.value(value: database),
+        Provider<AppAlarmManager>.value(value: alarmManager),
 
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: additionalDataProvider),
@@ -109,7 +124,6 @@ void main() async {
         ChangeNotifierProvider.value(value: eventsProvider),
         ChangeNotifierProvider.value(value: vaccineProvider),
         ChangeNotifierProvider.value(value: farmUserProvider),
-        Provider<AppAlarmManager>.value(value: alarmManager),
         ChangeNotifierProvider.value(value: notificationProvider),
         ChangeNotifierProvider.value(value: financeExpenseProvider),
         ChangeNotifierProvider.value(value: financeIncomeProvider),
@@ -128,6 +142,7 @@ class MyApp extends StatefulWidget {
   // Method to change locale from anywhere in the app
   static void setLocale(BuildContext context, Locale newLocale) async {
     _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+
     if (state != null) {
       await state.changeLocale(newLocale);
     }

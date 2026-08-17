@@ -1559,6 +1559,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap here to use your device GPS to auto-fill coordinates';
 
   @override
+  String get chooseOnMap => 'Choose on map';
+
+  @override
+  String get chooseFarmLocation => 'Choose farm location';
+
+  @override
+  String get tapMapToChooseLocation => 'Tap the map to place the farm marker';
+
+  @override
+  String get useSelectedLocation => 'Use this location';
+
+  @override
+  String get selectedCoordinates => 'Selected coordinates';
+
+  @override
+  String get zoomIn => 'Zoom in';
+
+  @override
+  String get zoomOut => 'Zoom out';
+
+  @override
   String get locationDetails => 'Location Details';
 
   @override

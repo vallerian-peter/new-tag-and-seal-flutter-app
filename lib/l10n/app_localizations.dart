@@ -3074,6 +3074,48 @@ abstract class AppLocalizations {
   /// **'Tap here to use your device GPS to auto-fill coordinates'**
   String get useGpsAutoFill;
 
+  /// No description provided for @chooseOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose on map'**
+  String get chooseOnMap;
+
+  /// No description provided for @chooseFarmLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose farm location'**
+  String get chooseFarmLocation;
+
+  /// No description provided for @tapMapToChooseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to place the farm marker'**
+  String get tapMapToChooseLocation;
+
+  /// No description provided for @useSelectedLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this location'**
+  String get useSelectedLocation;
+
+  /// No description provided for @selectedCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected coordinates'**
+  String get selectedCoordinates;
+
+  /// No description provided for @zoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in'**
+  String get zoomIn;
+
+  /// No description provided for @zoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out'**
+  String get zoomOut;
+
   /// No description provided for @locationDetails.
   ///
   /// In en, this message translates to:
