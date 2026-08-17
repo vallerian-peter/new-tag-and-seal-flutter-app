@@ -1,0 +1,9 @@
+Version 1.1.2 (11)
+
+What is new:
+- Added map-based location picker and related location UI improvements.
+- Added bulk livestock management workflows.
+- Improved livestock transfer handling and supporting forms.
+- Updated localization and livestock terminology across English and Swahili.
+- Added finance income management updates.
+- General code cleanup, dependency updates, and UI refinements.
