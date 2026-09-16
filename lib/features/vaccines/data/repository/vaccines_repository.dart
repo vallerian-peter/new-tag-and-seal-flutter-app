@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:drift/drift.dart';
 import 'package:new_tag_and_seal_flutter_app/database/app_database.dart';
 import 'package:new_tag_and_seal_flutter_app/database/daos/vaccine_dao.dart';
-import 'package:new_tag_and_seal_flutter_app/features/vaccines/data/tables/vaccine_table.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/models/vaccine_model.dart';
 import 'package:new_tag_and_seal_flutter_app/features/vaccines/domain/repo/vaccine_repo.dart';
 

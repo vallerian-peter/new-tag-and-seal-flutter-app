@@ -1,0 +1,10 @@
+Version 1.1.2 (12)
+
+What is new:
+- Enhanced Authentication: Support for logging in using either Username or Email with automatic whitespace sanitization.
+- New Password Recovery: Added secure 6-digit OTP verification screen with countdown timer and SMS delivery.
+- Farm User Access: Improved farm manager and invited farm user account synchronization and role permissions.
+- Location Services: Enhanced map-based coordinate picker for farms and livestock logs.
+- Bulk Management: Refined bulk livestock actions and transfer workflows.
+- Localization: Updated English and Swahili translations across authentication and livestock records.
+- Stability: General performance enhancements, improved offline data syncing, and bug fixes.
