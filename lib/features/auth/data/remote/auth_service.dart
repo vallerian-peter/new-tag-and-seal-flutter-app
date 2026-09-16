@@ -547,6 +547,63 @@ class AuthService {
     }
   }
 
+  /// Verify OTP code
+  static Future<Map<String, dynamic>> verifyOtp({
+    String? email,
+    String? phone,
+    required String otp,
+  }) async {
+    try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      final body = <String, dynamic>{'otp': otp};
+      if (email != null) body['email'] = email;
+      if (phone != null) body['phone'] = phone;
+
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.verifyOtp),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      log('🔐 DEBUG: Verify OTP response: ${response.body}');
+
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        if (responseData['status'] == true) {
+          return responseData;
+        } else {
+          final message = responseData['message'] ?? 'Invalid OTP';
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 400) {
+        final message = responseData['message'] ?? 'Invalid or expired OTP';
+        throw Exception(message);
+      } else if (response.statusCode == 422) {
+        final errors = responseData['errors'];
+        if (errors != null && errors is Map) {
+          final errorMessages = <String>[];
+          errors.forEach((key, value) {
+            if (value is List) errorMessages.addAll(value.cast<String>());
+          });
+          throw Exception(errorMessages.isNotEmpty ? errorMessages.first : 'Validation failed');
+        }
+        throw Exception(responseData['message'] ?? 'Validation failed');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later');
+      } else {
+        throw Exception('Failed to verify OTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Failed to verify OTP: $e');
+    }
+  }
+
   /// Reset password with OTP
   static Future<Map<String, dynamic>> resetPassword({
     String? email,

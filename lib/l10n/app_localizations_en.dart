@@ -1241,7 +1241,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendOtp => 'Send OTP';
 
   @override
-  String get otpExpiresIn10Minutes => 'OTP code expires in 10 minutes';
+  String get otpExpiresIn10Minutes => 'OTP code expires in 5 minutes';
+
+  @override
+  String get otpExpiresIn5Minutes => 'OTP code expires in 5 minutes';
+
+  @override
+  String get resendCodeIn => 'Resend code in';
+
+  @override
+  String get resetCode => 'Reset Code';
 
   @override
   String get verifyOtp => 'Verify OTP';
@@ -1275,6 +1284,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToSendOtp => 'Failed to send OTP';
+
+  @override
+  String get failedToVerifyOtp =>
+      'Invalid OTP code. Please enter the correct code or request a new one.';
+
+  @override
+  String get otpExpired => 'OTP code has expired. Please request a new one.';
+
+  @override
+  String get expiresIn => 'Expires in';
 
   @override
   String get resetPassword => 'Reset Password';

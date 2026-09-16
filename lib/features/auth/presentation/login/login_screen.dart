@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // AuthProvider will automatically store all user data, tokens, and password
         final success = await authProvider.login(
           context: context,
-          username: _emailController.text,
+          username: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
@@ -316,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               const NetworkStatusBanner(),
 
-                              // Email Field with Icon
+                              // Email or Username Field with Icon
                               CustomTextField(
                                 label: l10n.email,
                                 hintText: l10n.emailHint,
@@ -324,13 +324,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
+                                  if (value == null || value.trim().isEmpty) {
                                     return l10n.pleaseEnterEmail;
                                   }
-                                  if (!RegExp(
-                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                  ).hasMatch(value)) {
-                                    return l10n.pleaseEnterValidEmail;
+                                  final trimmed = value.trim();
+                                  if (trimmed.contains('@')) {
+                                    if (!RegExp(
+                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                    ).hasMatch(trimmed)) {
+                                      return l10n.pleaseEnterValidEmail;
+                                    }
                                   }
                                   return null;
                                 },

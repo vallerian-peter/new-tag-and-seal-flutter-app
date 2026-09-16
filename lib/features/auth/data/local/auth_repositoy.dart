@@ -845,6 +845,16 @@ class AuthRepository implements AuthRepositoryInterface {
     return await AuthService.sendOtp(email: email, phone: phone);
   }
 
+  /// Verify OTP code
+  Future<Map<String, dynamic>> verifyOtp({
+    String? email,
+    String? phone,
+    required String otp,
+  }) async {
+    await _initPrefs();
+    return await AuthService.verifyOtp(email: email, phone: phone, otp: otp);
+  }
+
   /// Reset password with OTP
   Future<Map<String, dynamic>> resetPassword({
     String? email,

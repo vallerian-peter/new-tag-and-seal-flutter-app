@@ -218,7 +218,7 @@ class _ForgotPasswordInputScreenState extends State<ForgotPasswordInputScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          l10n.otpExpiresIn10Minutes,
+                          l10n.otpExpiresIn5Minutes,
                           style: TextStyle(
                             fontSize: Constants.smallTextSize,
                             color: theme.colorScheme.onSurface.withOpacity(0.7),

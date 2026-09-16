@@ -2465,8 +2465,26 @@ abstract class AppLocalizations {
   /// No description provided for @otpExpiresIn10Minutes.
   ///
   /// In en, this message translates to:
-  /// **'OTP code expires in 10 minutes'**
+  /// **'OTP code expires in 5 minutes'**
   String get otpExpiresIn10Minutes;
+
+  /// No description provided for @otpExpiresIn5Minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP code expires in 5 minutes'**
+  String get otpExpiresIn5Minutes;
+
+  /// No description provided for @resendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in'**
+  String get resendCodeIn;
+
+  /// No description provided for @resetCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Code'**
+  String get resetCode;
 
   /// No description provided for @verifyOtp.
   ///
@@ -2527,6 +2545,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send OTP'**
   String get failedToSendOtp;
+
+  /// No description provided for @failedToVerifyOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid OTP code. Please enter the correct code or request a new one.'**
+  String get failedToVerifyOtp;
+
+  /// No description provided for @otpExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP code has expired. Please request a new one.'**
+  String get otpExpired;
+
+  /// No description provided for @expiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in'**
+  String get expiresIn;
 
   /// No description provided for @resetPassword.
   ///

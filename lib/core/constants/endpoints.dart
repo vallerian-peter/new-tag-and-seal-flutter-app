@@ -91,6 +91,9 @@ class ApiEndpoints {
   /// Send OTP for password reset (POST request, no auth required)
   static String get sendOtp => '$authBase/forgot-password/send-otp';
 
+  /// Verify OTP code (POST request, no auth required)
+  static String get verifyOtp => '$authBase/forgot-password/verify-otp';
+
   /// Reset password with OTP (POST request, no auth required)
   static String get resetPassword => '$authBase/forgot-password/reset-password';
 

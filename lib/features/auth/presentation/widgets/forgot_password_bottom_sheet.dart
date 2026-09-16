@@ -23,11 +23,12 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -156,6 +157,7 @@ class _RecoveryOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return InkWell(
       onTap: onTap,
@@ -163,7 +165,7 @@ class _RecoveryOptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Constants.veryLightGreyColor,
+          color: isDarkMode ? const Color(0xFF1F1F1F):  Constants.veryLightGreyColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Constants.primaryColor.withOpacity(0.2),
@@ -198,6 +200,7 @@ class _RecoveryOptionCard extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
               ),
             ),
+            
             const SizedBox(height: 4),
 
             // Subtitle (English)

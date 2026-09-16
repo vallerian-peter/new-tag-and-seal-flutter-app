@@ -1067,6 +1067,36 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Verify OTP code before navigating to reset password
+  Future<bool> verifyOtp({
+    String? email,
+    String? phone,
+    required String otp,
+  }) async {
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _authRepository.verifyOtp(
+        email: email,
+        phone: phone,
+        otp: otp,
+      );
+
+      if (response['status'] == true) {
+        return true;
+      } else {
+        _errorMessage = response['message'] ?? 'Invalid OTP';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Reset password with OTP
   Future<bool> resetPassword({
     String? email,

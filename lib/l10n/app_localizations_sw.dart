@@ -1249,7 +1249,17 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get otpExpiresIn10Minutes =>
-      'Msimbo wa OTP unaisha muda baada ya dakika 10';
+      'Msimbo wa OTP unaisha muda baada ya dakika 5';
+
+  @override
+  String get otpExpiresIn5Minutes =>
+      'Msimbo wa OTP unaisha muda baada ya dakika 5';
+
+  @override
+  String get resendCodeIn => 'Tuma tena msimbo baada ya';
+
+  @override
+  String get resetCode => 'Futa Msimbo';
 
   @override
   String get verifyOtp => 'Thibitisha OTP';
@@ -1284,6 +1294,17 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get failedToSendOtp => 'Imeshindwa kutuma OTP';
+
+  @override
+  String get failedToVerifyOtp =>
+      'Msimbo wa OTP si sahihi. Tafadhali ingiza msimbo sahihi au omba mpya.';
+
+  @override
+  String get otpExpired =>
+      'Msimbo wa OTP umeisha muda wake. Tafadhali omba mpya.';
+
+  @override
+  String get expiresIn => 'Muda uliosalia';
 
   @override
   String get resetPassword => 'Weka Upya Nenosiri';
